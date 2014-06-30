@@ -6,7 +6,7 @@ module Epuber
 	class DSLObject
 		extend DSLObject::DSL::AttributeSupport
 
-		# @return [Hast<Symbol, Attribute>]
+		# @return [Hash<Symbol, Attribute>]
 		#
 		attr_accessor :attributes_values
 
@@ -18,7 +18,7 @@ module Epuber
 		end
 
 		def to_s
-			"<#{self.class.name} #{@attributes_values.to_s}>"
+			"<#{self.class.name} #{@attributes_values}>"
 		end
 
 		# Defines setters and getters for properties
@@ -36,14 +36,15 @@ module Epuber
 				end
 
 				if attr.singularize?
+					original_key = key
 					key = key.to_s.singularize.to_sym
 
 					define_method(key) do
-						return @attributes_values[key]
+						return @attributes_values[original_key]
 					end
 
 					define_method(attr.writer_singular_form) do |value|
-						@attributes_values[key] = value
+						@attributes_values[original_key] = value
 					end
 				end
 			end

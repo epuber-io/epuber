@@ -7,7 +7,17 @@ module Epuber
 		def initialize
 			super
 			yield self if block_given?
+			__finish_parsing
 		end
+
+
+		private
+
+		def __finish_parsing
+			self.author = Epuber::Contributor.create(self.author, 'aut')
+		end
+
+		public
 
 
 		#---------------------------------------------------------------------------------------------------------------

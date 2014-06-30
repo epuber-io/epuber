@@ -26,6 +26,13 @@ module Epuber
 			@pretty_name = pretty_name
 			@role        = role
 		end
+
+
+		def self.create(obj, role)
+			if obj.is_a? Hash and obj.has_key?(:first_name)
+				return NormalContributor.new(obj[:first_name], obj[:last_name], role)
+			end
+		end
 	end
 
 
