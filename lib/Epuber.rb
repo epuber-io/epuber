@@ -1,5 +1,5 @@
-require 'Epuber/version'
+require 'epuber/version'
 
 module Epuber
-  # Your code goes here...
+	# Your code goes here...
 end
