@@ -1,6 +1,6 @@
 
 module Epuber
-	class Book
+	class DSLObject
 		module DSL
 
 			# @return [Array<Attribute>] The attributes of the class.

@@ -2,7 +2,7 @@
 require 'active_support/core_ext/string/inflections'
 
 module Epuber
-	class Book
+	class DSLObject
 		module DSL
 
 			# A Book attribute stores the information of an attribute. It also provides logic to implement any

@@ -1,28 +1,40 @@
-require_relative 'book/dsl'
+require_relative 'dsl/object'
+require_relative 'book/vendor/contributor'
 
 module Epuber
-	class Book
-		include Epuber::Book::DSL::AttributeSupport
+	class Book < DSLObject
 
 		def initialize
-			@attributes_values = {}
-
+			super
 			yield self if block_given?
 		end
 
-		def to_s
-			super.to_s + @attributes_values.to_s
-		end
 
-		DSL.attributes.each do |key, attr|
+		#---------------------------------------------------------------------------------------------------------------
 
-			define_method(key.to_sym) do
-				return @attributes_values[key.to_sym]
-			end
+		# @return [String] title of book
+		#
+		attribute :title,
+				  :required => true
 
-			define_method(attr.writer_name) do |value|
-				@attributes_values[key.to_sym] = value
-			end
-		end
+		# @return [String] subtitle of book
+		#
+		attribute :subtitle
+
+		# @return [Array<Contributor>] authors of book
+		#
+		attribute :authors,
+				  :types       => [Contributor],
+				  :container   => Hash,
+				  :required    => true,
+				  :singularize => true
+
+		# @return [String] publisher name
+		#
+		attribute :publisher
+
+
+		#---------------------------------------------------------------------------------------------------------------
+		define_properties_methods
 	end
 end
