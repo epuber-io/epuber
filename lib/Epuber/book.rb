@@ -9,9 +9,17 @@ module Epuber
 
 		def initialize
 			super
-			yield self if block_given?
+
+			yield self
+
+			# convert attributes to corresponding classes
 			__finish_parsing
-			__validate
+
+			# validate attributes (required, ...)
+			validate_attributes
+
+			# freeze object, so you cannot modify him
+			freeze
 		end
 
 
@@ -23,16 +31,13 @@ module Epuber
 			end
 		end
 
-		def __validate
-			unless self.author.kind_of? Contributor
-				throw StandardError, 'author|authors is not defined'
-			end
-		end
+
+
 
 		public
 
 
-		#---------------------------------------------------------------------------------------------------------------
+		#------------- DSL attributes ----------------------------------------------------------------------------------
 
 		# @return [String] title of book
 		#
@@ -55,8 +60,5 @@ module Epuber
 		#
 		attribute :publisher
 
-
-		#---------------------------------------------------------------------------------------------------------------
-		define_properties_methods
 	end
 end

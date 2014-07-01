@@ -1,53 +1,60 @@
 require_relative 'attribute'
 require_relative 'attribute_support'
+
 require 'active_support/core_ext/string/inflections'
+
 
 module Epuber
 	class DSLObject
+
+		# ------------ DSL attributes ----------------------
+		protected
+
 		extend DSLObject::DSL::AttributeSupport
 
-		# @return [Hash<Symbol, Attribute>]
+		class << self
+			# @return [Hash<Symbol, Attribute>] The attributes of the class.
+			#
+			attr_accessor :attributes
+		end
+
+		# @return [Hash<Symbol, Any>]
 		#
 		attr_accessor :attributes_values
 
+		# Validates all values of attributes
+		#
+		# @note it only check for required values for now
+		#
+		def validate_attributes
+			self.class.attributes.each do |key, attr|
+
+				value = @attributes_values[key]
+
+				if attr.required? and value.nil?
+					throw StandardError, "missing required attribute #{key}"
+				end
+			end
+		end
+
+
+
+		# ------------ Override methods ----------------------
+		public
 
 		def initialize
 			super
-
 			@attributes_values = {}
 		end
 
 		def to_s
-			"<#{self.class.name} #{@attributes_values}>"
+			"<#{self.class} #{@attributes_values}>"
 		end
 
-		# Defines setters and getters for properties
-		#
-		def self.define_properties_methods
-			@attributes.each do |key, attr|
-				key = key.to_sym
-
-				define_method(key) do
-					return @attributes_values[key]
-				end
-
-				define_method(attr.writer_name) do |value|
-					@attributes_values[key] = value
-				end
-
-				if attr.singularize?
-					original_key = key
-					key = key.to_s.singularize.to_sym
-
-					define_method(key) do
-						return @attributes_values[original_key]
-					end
-
-					define_method(attr.writer_singular_form) do |value|
-						@attributes_values[original_key] = value
-					end
-				end
-			end
+		def freeze
+			super
+			@attributes_values.freeze
 		end
+
 	end
 end
