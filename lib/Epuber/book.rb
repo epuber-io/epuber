@@ -2,19 +2,31 @@ require_relative 'dsl/object'
 require_relative 'book/vendor/contributor'
 
 module Epuber
+
+	class StandardError < ::StandardError; end
+
 	class Book < DSLObject
 
 		def initialize
 			super
 			yield self if block_given?
 			__finish_parsing
+			__validate
 		end
 
 
 		private
 
 		def __finish_parsing
-			self.author = Epuber::Contributor.create(self.author, 'aut')
+			if self.author
+				self.author = Contributor.create(self.author, 'aut')
+			end
+		end
+
+		def __validate
+			unless self.author.kind_of? Contributor
+				throw StandardError, 'author|authors is not defined'
+			end
 		end
 
 		public
