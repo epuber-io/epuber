@@ -34,10 +34,10 @@ module Epuber
 
 
 
-		public
-
 
 		#------------- DSL attributes ----------------------------------------------------------------------------------
+
+		public
 
 		# @return [String] title of book
 		#
@@ -60,5 +60,9 @@ module Epuber
 		#
 		attribute :publisher
 
+		# toc
+		# landmarks
+		# cover page
+		# other files
 	end
 end
