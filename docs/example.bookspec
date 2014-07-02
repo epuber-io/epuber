@@ -1,0 +1,27 @@
+
+Epuber::Book.new do |book|
+
+	book.title = 'Práce na dálku'
+	book.subtitle = 'Zn.: Kancelář zbytečná'
+
+	# TODO: this should be shorter, souch as [ 'Jason Fried', 'David Heinemeier Hansson' ]
+	book.authors [
+		{
+			:first_name => 'Jason',
+			:last_name  => 'Fried'
+		},
+		{
+			:first_name => 'David Heinemeier',
+			:last_name  => 'Hansson'
+		}
+	]
+
+	book.language = 'cs'
+
+	# definition of new target
+	book.target :ibooks do |target|
+		target.epub_version = 3.0
+		target.isbn = '978-80-87270-98-1'
+	end
+
+end
