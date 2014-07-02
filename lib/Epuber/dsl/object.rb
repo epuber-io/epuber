@@ -10,7 +10,7 @@ module Epuber
 		# ------------ DSL attributes ----------------------
 		protected
 
-		extend DSLObject::DSL::AttributeSupport
+		extend DSLObject::AttributeSupport
 
 		class << self
 			# @return [Hash<Symbol, Attribute>] The attributes of the class.
@@ -21,6 +21,7 @@ module Epuber
 		# @return [Hash<Symbol, Any>]
 		#
 		attr_accessor :attributes_values
+
 
 		# Validates all values of attributes
 		#
