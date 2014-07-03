@@ -32,6 +32,8 @@ module Epuber
 
 				value = @attributes_values[key]
 
+				attr.validate_type(value)
+
 				if attr.required? and value.nil?
 					if attr.singularize?
 						raise StandardError, "missing required attribute `#{key.to_s.singularize}|#{key}`"

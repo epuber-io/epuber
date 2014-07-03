@@ -4,7 +4,7 @@ Epuber::Book.new do |book|
 	book.title = 'Práce na dálku'
 	book.subtitle = 'Zn.: Kancelář zbytečná'
 
-	# TODO: this should be shorter, souch as [ 'Jason Fried', 'David Heinemeier Hansson' ]
+	# TODO: this should be shorter, such as: [ 'Jason Fried', 'David Heinemeier Hansson' ]
 	book.authors [
 		{
 			:first_name => 'Jason',
@@ -17,11 +17,45 @@ Epuber::Book.new do |book|
 	]
 
 	book.language = 'cs'
+	book.print_isbn = '978-80-87270-98-0' # isbn of print book, used for creating package for iTunesProducer
+	book.published = '2014-06-10' # publish date
+
+	book.cover_image = 'cover.jpg' # extension is not necessary if there is only one file with same basename
+
+	book.version = '1.0.1' # only for iBooks
+	book.build_version = '5' # only for result filename, maybe as an comment in epub (for future identifying)
+
 
 	# definition of new target
 	book.target :ibooks do |target|
 		target.epub_version = 3.0
-		target.isbn = '978-80-87270-98-1'
+		target.isbn = '978-80-87270-98-2'
+	end
+
+	book.target :wooky do |target|
+		target.epub_version = 2.0
+		target.isbn = '978-80-87270-98-2'
+	end
+
+
+	# definition of spine
+	book.toc do |toc|
+		toc.image_page 'cover', :landmark_cover # reference to cover text file
+		toc.image_page 'vakat'
+
+		toc.text 'copyright'
+
+		toc.text 'toc', :landmark_toc
+
+		toc.text 'ch01', :landmark_start_page
+		toc.text 'ch02'
+		toc.text 'ch03'
+		toc.text 'ch04'
+		toc.text 'ch05'
+
+		toc.text 'appendix'
+
+		toc.text 'footnotes', :linear => false
 	end
 
 end

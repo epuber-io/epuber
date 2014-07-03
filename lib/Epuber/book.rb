@@ -48,21 +48,27 @@ module Epuber
 		#
 		attribute :subtitle
 
-		# @return [Array<Contributor>] authors of book
+		# @return [Array{Contributor}] authors of book
 		#
 		attribute :authors,
-				  :types       => [Contributor],
-				  :container   => Hash,
+				  :types       => [ Contributor, NormalContributor ],
+				  :container   => Array,
 				  :required    => true,
 				  :singularize => true
 
 		# @return [String] publisher name
 		#
+		# TODO add tests
+		#
 		attribute :publisher
 
-		# toc
-		# landmarks
-		# cover page
-		# other files
+
+		# TODO language
+		# TODO print_isbn
+		# TODO toc
+		# TODO landmarks
+		# TODO cover page
+		# TODO other files
+		# TODO footnotes customization
 	end
 end

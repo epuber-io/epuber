@@ -27,7 +27,14 @@ module Epuber
 			@role        = role
 		end
 
-
+		# Creates new instance of Contributor dependent on obj content
+		#
+		# @param [Hash<Symbol, String>, Array<Hash<Symbol,String>, String, Array<String>] input object
+		# @param [String] role of contributor
+		#
+		# TODO rename to from_ruby (in future this will support json)
+		# TODO add tests
+		#
 		def self.create(obj, role)
 			if obj.is_a? Hash and obj.has_key?(:first_name)
 				return NormalContributor.new(obj[:first_name], obj[:last_name], role)
@@ -57,21 +64,30 @@ module Epuber
 
 
 		# ---- Overriden Getters -----
+
+		# Creates pretty name
+		#
+		# TODO add tests
+		#
 		def pretty_name
 			"#{@first_name} #{@last_name}"
 		end
 
+		# Creates file as string
+		#
+		# TODO add tests
+		#
 		def file_as
 			"#{@last_name.upcase}, #{@first_name}"
 		end
 
 		# ------ Overriden Setters ------
 		def pretty_name=
-			raise(Exception, 'Cannot write pretty_name property on NormalContributor')
+			raise StandardError, 'Cannot write pretty_name property on NormalContributor'
 		end
 
 		def file_as=
-			raise(Exception, 'Cannot write file_as property on NormalContributor')
+			raise StandardError, 'Cannot write file_as property on NormalContributor'
 		end
 	end
 end
