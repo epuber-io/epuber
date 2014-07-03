@@ -4,7 +4,7 @@ Epuber::Book.new do |book|
 	book.title = 'Práce na dálku'
 	book.subtitle = 'Zn.: Kancelář zbytečná'
 
-	book.authors [
+	book.authors = [
 		'Jason Fried', # 'Jason' will be first_name and 'Fried' will be last_name
 		'David Heinemeier Hansson' # 'David Heinemeier' will be first_name and 'Hansson' will be last_name
 	]
