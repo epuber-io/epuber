@@ -57,5 +57,21 @@ module Epuber
 			expect(contributor.last_name).to eq 'Fried'
 			expect(contributor.role).to eq 'aut'
 		end
+
+		it 'parse Contributor from simple name in string' do
+			contributor = Contributor.create('Jason Fried', 'aut')
+
+			expect(contributor).to be_a(NormalContributor)
+			expect(contributor.first_name).to eq 'Jason'
+			expect(contributor.last_name).to eq 'Fried'
+		end
+
+		it 'parse Contributor from simple name with middle name in string' do
+			contributor = Contributor.create('David Heinemeier Hansson', 'aut')
+
+			expect(contributor).to be_a(NormalContributor)
+			expect(contributor.first_name).to eq 'David Heinemeier'
+			expect(contributor.last_name).to eq 'Hansson'
+		end
 	end
 end

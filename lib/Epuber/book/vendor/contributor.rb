@@ -36,11 +36,15 @@ module Epuber
 		# @return [Contributor]
 		#
 		# TODO rename to from_ruby (in future this will support json)
-		# TODO add tests
 		#
 		def self.create(obj, role)
-			if obj.is_a? Hash and obj.has_key?(:first_name)
-				return NormalContributor.new(obj[:first_name], obj[:last_name], role)
+			if obj.is_a? String
+				components = obj.split(' ')
+				if components.length >= 2
+					NormalContributor.new(components.first(components.length - 1).join(' '), components.last, role)
+				end
+			elsif obj.is_a? Hash and obj.has_key?(:first_name)
+				NormalContributor.new(obj[:first_name], obj[:last_name], role)
 			end
 		end
 	end
