@@ -34,16 +34,18 @@ module Epuber
 
 		it 'author is required' do
 			expect {
-				Book.new do |b|
+				book = Book.new do |b|
 					b.title    = 'Práce na dálku'
 					b.subtitle = 'Abc'
 				end
+
+				book.validate
 			}.to raise_error
 		end
 
 		it 'title is required' do
 			expect {
-				Book.new do |b|
+				book = Book.new do |b|
 					b.subtitle = 'Abc'
 
 					b.author = {
@@ -51,13 +53,15 @@ module Epuber
 						:last_name  => 'def'
 					}
 				end
+
+				book.validate
 			}.to raise_error
 		end
 
-		it 'is freezed after creating' do
+		it 'is not freezed after creating' do
 			expect {
 				@book.title = 'a'
-			}.to raise_error
+			}.to_not raise_error
 		end
 
 		it "block is required, otherwise doesn't make sense" do

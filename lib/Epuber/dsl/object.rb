@@ -23,11 +23,15 @@ module Epuber
 		attr_accessor :attributes_values
 
 
+		public
+
 		# Validates all values of attributes
+		#
+		# @return [Void]
 		#
 		# @note it only check for required values for now
 		#
-		def validate_attributes
+		def validate
 			self.class.attributes.each do |key, attr|
 
 				value = @attributes_values[key]
@@ -46,8 +50,8 @@ module Epuber
 
 
 
+
 		# ------------ Override methods ----------------------
-		public
 
 		def initialize
 			super

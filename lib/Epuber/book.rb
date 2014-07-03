@@ -14,12 +14,6 @@ module Epuber
 
 			# convert attributes to corresponding classes
 			__finish_parsing
-
-			# validate attributes (required, ...)
-			validate_attributes
-
-			# freeze object, so you cannot modify him
-			freeze
 		end
 
 
