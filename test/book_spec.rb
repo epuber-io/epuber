@@ -44,30 +44,25 @@ module Epuber
 		end
 
 		it 'title is required' do
+
+			book = Book.new do |b|
+				b.subtitle = 'Abc'
+
+				b.author = {
+					:first_name => 'Abc',
+					:last_name  => 'def'
+				}
+			end
+
 			expect {
-				book = Book.new do |b|
-					b.subtitle = 'Abc'
-
-					b.author = {
-						:first_name => 'Abc',
-						:last_name  => 'def'
-					}
-				end
-
 				book.validate
 			}.to raise_error
 		end
 
-		it 'is not freezed after creating' do
-			expect {
-				@book.title = 'a'
-			}.to_not raise_error
-		end
-
-		it "block is required, otherwise doesn't make sense" do
+		it 'block is optional, you can build whatever you like' do
 			expect {
 				Book.new
-			}.to raise_error
+			}.to_not raise_error
 		end
 	end
 end

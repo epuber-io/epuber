@@ -10,7 +10,7 @@ module Epuber
 		def initialize
 			super
 
-			yield self
+			yield self if block_given?
 
 			# convert attributes to corresponding classes
 			__finish_parsing
