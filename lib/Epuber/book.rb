@@ -27,7 +27,7 @@ module Epuber
 
 		def __finish_parsing
 			if self.author
-				self.author = Contributor.create(self.author, 'aut')
+				self.author = Contributor.from_ruby(self.author, 'aut')
 			end
 		end
 

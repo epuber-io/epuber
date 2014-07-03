@@ -35,9 +35,7 @@ module Epuber
 		#
 		# @return [Contributor]
 		#
-		# TODO rename to from_ruby (in future this will support json)
-		#
-		def self.create(obj, role)
+		def self.from_ruby(obj, role)
 			if obj.is_a? String
 				components = obj.split(' ')
 				if components.length >= 2

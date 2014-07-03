@@ -50,7 +50,7 @@ module Epuber
 				:last_name  => 'Fried'
 			}
 
-			contributor = Contributor.create(hash, 'aut')
+			contributor = Contributor.from_ruby(hash, 'aut')
 
 			expect(contributor).to be_a(NormalContributor)
 			expect(contributor.first_name).to eq 'Jason'
@@ -59,7 +59,7 @@ module Epuber
 		end
 
 		it 'parse Contributor from simple name in string' do
-			contributor = Contributor.create('Jason Fried', 'aut')
+			contributor = Contributor.from_ruby('Jason Fried', 'aut')
 
 			expect(contributor).to be_a(NormalContributor)
 			expect(contributor.first_name).to eq 'Jason'
@@ -67,7 +67,7 @@ module Epuber
 		end
 
 		it 'parse Contributor from simple name with middle name in string' do
-			contributor = Contributor.create('David Heinemeier Hansson', 'aut')
+			contributor = Contributor.from_ruby('David Heinemeier Hansson', 'aut')
 
 			expect(contributor).to be_a(NormalContributor)
 			expect(contributor.first_name).to eq 'David Heinemeier'
