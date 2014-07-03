@@ -14,6 +14,9 @@ module Epuber
 				}
 
 				book.publisher = 'AAABBB'
+				book.language = 'cs'
+				book.isbn = '978-80-87270-98-2'
+				book.print_isbn = '978-80-87270-98-0'
 			end
 		end
 
@@ -22,13 +25,18 @@ module Epuber
 			book = @book
 
 			expect(book.title).to eq 'Práce na dálku'
-			expect(book.subtitle).to eq('Abc')
+			expect(book.subtitle).to eq 'Abc'
 
-			expect(book.author).to be_a(NormalContributor)
-			expect(book.author.first_name).to eq('Abc')
-			expect(book.author.last_name).to eq('def')
+			expect(book.author).to be_a NormalContributor
+			expect(book.author.first_name).to eq 'Abc'
+			expect(book.author.last_name).to eq 'def'
 
-			expect(book.publisher).to eq('AAABBB')
+			expect(book.publisher).to eq 'AAABBB'
+
+			expect(book.language).to eq 'cs'
+
+			expect(book.print_isbn).to eq '978-80-87270-98-0'
+			expect(book.isbn).to eq '978-80-87270-98-2'
 		end
 
 

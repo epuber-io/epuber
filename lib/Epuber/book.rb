@@ -50,15 +50,24 @@ module Epuber
 				  :required    => true,
 				  :singularize => true
 
+		
 		# @return [String] publisher name
-		#
-		# TODO add tests
 		#
 		attribute :publisher
 
+		# @return [String] language of this book
+		#
+		attribute :language
 
-		# TODO language
-		# TODO print_isbn
+		# @return [String] isbn of this book
+		#
+		attribute :isbn
+
+		# @return [String] isbn of printed book
+		#
+		attribute :print_isbn
+
+
 		# TODO toc
 		# TODO landmarks
 		# TODO cover page
