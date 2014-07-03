@@ -70,23 +70,27 @@ module Epuber
 
 		# Creates pretty name
 		#
+		# @return [String]
+		#
 		def pretty_name
 			"#{@first_name} #{@last_name}"
 		end
 
 		# Creates file as string
 		#
+		# @return [String]
+		#
 		def file_as
 			"#{@last_name.upcase}, #{@first_name}"
 		end
 
 		# ------ Overriden Setters ------
-		def pretty_name=
-			raise StandardError, 'Cannot write pretty_name property on NormalContributor'
+		def pretty_name=(*)
+			raise StandardError, "Cannot write to NormalContributor##{__method__} property, use #first_name or #last_name instead."
 		end
 
-		def file_as=
-			raise StandardError, 'Cannot write file_as property on NormalContributor'
+		def file_as=(*)
+			raise StandardError, "Cannot write to NormalContributor##{__method__} property, use #first_name or #last_name instead."
 		end
 	end
 end

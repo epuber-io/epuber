@@ -28,6 +28,18 @@ module Epuber
 		it 'formats pretty_name' do
 			expect(@contributor.pretty_name).to eq 'Jason Fried'
 		end
+
+		it 'pretty_name is readonly' do
+			expect {
+				@contributor.pretty_name = ''
+			}.to raise_error
+		end
+
+		it 'file_as is readonly' do
+			expect {
+				@contributor.file_as = ''
+			}.to raise_error
+		end
 	end
 
 	describe 'Contributor.create' do
