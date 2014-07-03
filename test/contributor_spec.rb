@@ -42,7 +42,20 @@ module Epuber
 		end
 	end
 
-	describe 'Contributor.create' do
+	describe 'Contributor.from_ruby' do
+
+		it 'parse Contributor from Hash with symbols :file_as and :pretty_name' do
+			hash = {
+				:pretty_name => 'Jason Fried',
+				:file_as     => 'FRIED, Jason'
+			}
+
+			contributor = Contributor.from_ruby(hash, 'aut')
+
+			expect(contributor).to be_a(Contributor)
+			expect(contributor.pretty_name).to eq 'Jason Fried'
+			expect(contributor.file_as).to eq 'FRIED, Jason'
+		end
 
 		it 'parse Contributor from Hash with symbols :first_name and :last_name' do
 			hash = {

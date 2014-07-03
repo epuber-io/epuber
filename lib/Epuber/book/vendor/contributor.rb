@@ -41,8 +41,12 @@ module Epuber
 				if components.length >= 2
 					NormalContributor.new(components.first(components.length - 1).join(' '), components.last, role)
 				end
-			elsif obj.is_a? Hash and obj.has_key?(:first_name)
-				NormalContributor.new(obj[:first_name], obj[:last_name], role)
+			elsif obj.is_a? Hash
+				if obj.has_key?(:first_name)
+					NormalContributor.new(obj[:first_name], obj[:last_name], role)
+				elsif obj.has_key?(:file_as)
+					Contributor.new(obj[:pretty_name], obj[:file_as], role)
+				end
 			end
 		end
 	end
