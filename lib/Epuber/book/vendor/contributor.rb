@@ -18,8 +18,9 @@ module Epuber
 		attr_accessor :role
 
 
-		# @param [String] pretty_name pretty name of contributor
-		# @param [String] file_as file as of contributor
+		# @param [String] pretty_name  pretty name of contributor
+		# @param [String] file_as      file as of contributor
+		# @param [String] role         contributor role
 		#
 		def initialize(pretty_name, file_as, role)
 			@file_as     = file_as
@@ -31,6 +32,8 @@ module Epuber
 		#
 		# @param [Hash<Symbol, String>, Array<Hash<Symbol,String>, String, Array<String>] input object
 		# @param [String] role of contributor
+		#
+		# @return [Contributor]
 		#
 		# TODO rename to from_ruby (in future this will support json)
 		# TODO add tests
@@ -67,15 +70,11 @@ module Epuber
 
 		# Creates pretty name
 		#
-		# TODO add tests
-		#
 		def pretty_name
 			"#{@first_name} #{@last_name}"
 		end
 
 		# Creates file as string
-		#
-		# TODO add tests
 		#
 		def file_as
 			"#{@last_name.upcase}, #{@first_name}"
