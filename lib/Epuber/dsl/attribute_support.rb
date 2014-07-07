@@ -19,7 +19,13 @@ module Epuber
 				key = name
 
 				define_method(key) do
-					return @attributes_values[key]
+					value = @attributes_values[key]
+
+					if not value.nil?
+						value
+					elsif value.nil? and respond_to? :parent
+						self.parent.send(key.to_s)
+					end
 				end
 
 				define_method(attr.writer_name) do |value|

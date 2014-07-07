@@ -1,6 +1,7 @@
 require_relative 'dsl/object'
 
 require_relative 'book/vendor/contributor'
+require_relative 'target'
 
 module Epuber
 
@@ -10,6 +11,8 @@ module Epuber
 
 		def initialize
 			super
+
+			@default_target = Target.new(nil)
 
 			yield self if block_given?
 
