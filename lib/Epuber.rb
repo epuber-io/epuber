@@ -1,5 +1,4 @@
-require 'epuber/version'
 
 module Epuber
-	# Your code goes here...
+	VERSION = '0.0.1'
 end
