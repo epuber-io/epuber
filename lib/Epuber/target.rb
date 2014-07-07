@@ -31,7 +31,11 @@ module Epuber
 		# @return [Target] new created sub target
 		#
 		def sub_target(name)
-			create_child_item(name)
+			child = create_child_item(name)
+
+			yield child if block_given?
+
+			child
 		end
 
 

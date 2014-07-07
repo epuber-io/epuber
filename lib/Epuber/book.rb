@@ -63,12 +63,32 @@ module Epuber
 			end
 		end
 
+		#-------------- Targets ----------------------------------
+		public
 
+		# All targets
+		#
+		# @return [Array<Target>]
+		#
+		def targets
+			if @default_target.sub_targets.length == 0
+				[ @default_target ]
+			else
+				@default_target.sub_targets
+			end
+		end
 
+		# Defines new target
+		#
+		# @return [Target] result target
+		#
+		def target(name)
+			@default_target.sub_target(name) do |target|
+				yield target if block_given?
+			end
+		end
 
 		#------------- DSL attributes ----------------------------------------------------------------------------------
-
-		public
 
 		# @return [String] title of book
 		#
@@ -105,7 +125,6 @@ module Epuber
 		attribute :print_isbn
 
 
-
 		# TODO toc
 		# TODO landmarks
 		# TODO cover page
@@ -114,5 +133,6 @@ module Epuber
 		# TODO custom metadata
 		# TODO build version
 		# TODO version
+		# TODO custom user informations (simple hash globally available)
 	end
 end

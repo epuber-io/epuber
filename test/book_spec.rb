@@ -3,8 +3,8 @@ require_relative '../lib/epuber/book'
 module Epuber
 	describe Book do
 
-		it 'should parse simple book' do
-			book = Book.new do |book|
+		before  do
+			@book = Book.new do |book|
 				book.title    = 'Práce na dálku'
 				book.subtitle = 'Abc'
 
@@ -18,6 +18,10 @@ module Epuber
 				book.isbn = '978-80-87270-98-2'
 				book.print_isbn = '978-80-87270-98-0'
 			end
+		end
+
+		it 'should parse simple book' do
+			book = @book
 
 			expect(book.title).to eq 'Práce na dálku'
 			expect(book.subtitle).to eq 'Abc'
@@ -88,6 +92,43 @@ module Epuber
 			expect {
 				book.validate
 			}.to_not raise_error
+		end
+
+
+
+		it 'there is always at least one target' do
+			expect(@book.targets.length).to eq 1
+		end
+
+		it 'can add target' do
+			@book.target :ibooks do |ibooks|
+				ibooks.isbn = 'abcd-1234'
+			end
+
+			targets = @book.targets
+			expect(targets.length).to eq 1
+
+			ibooks_target = targets[0]
+			expect(ibooks_target.isbn).to eq 'abcd-1234'
+		end
+
+		it 'can suppports nested targets' do
+			@book.isbn = 'abcd-1234'
+
+			ibooks_target_sub = nil
+			ibooks_target = @book.target :ibooks do |ibooks|
+				ibooks.epub_version = '3.0'
+
+				ibooks_target_sub = ibooks.sub_target :ibooks_sub do |ibooks_sub|
+					ibooks_sub.epub_version = '2.0'
+				end
+			end
+
+			expect(ibooks_target.sub_targets.length).to eq 1
+
+			expect(ibooks_target_sub.isbn).to eq 'abcd-1234'
+			expect(ibooks_target_sub.epub_version).to eq '2.0'
+
 		end
 	end
 end
