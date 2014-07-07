@@ -41,6 +41,27 @@ module Epuber
 			end
 		end
 
+		# Defines setter and getter for default target attribute
+		#
+		# @param [Symbol] sym  attribute name
+		#
+		# @return [Void]
+		#
+		def self.default_target_attribute(sym, readonly: false)
+
+			# getter
+			define_method(sym) do
+				@default_target.send(sym)
+			end
+
+			unless readonly
+				# setter
+				setter_method = sym.to_s + '='
+				define_method(setter_method) do |newValue|
+					@default_target.send(setter_method, newValue)
+				end
+			end
+		end
 
 
 
@@ -77,7 +98,7 @@ module Epuber
 
 		# @return [String] isbn of this book
 		#
-		attribute :isbn
+		default_target_attribute :isbn
 
 		# @return [String] isbn of printed book
 		#
@@ -91,5 +112,7 @@ module Epuber
 		# TODO other files
 		# TODO footnotes customization
 		# TODO custom metadata
+		# TODO build version
+		# TODO version
 	end
 end
