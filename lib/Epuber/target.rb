@@ -56,5 +56,7 @@ module Epuber
 		attribute :custom_fonts,
 				  :types => [ TrueClass, FalseClass ]
 
+
+		# TODO store url
 	end
 end
