@@ -1,4 +1,5 @@
 require_relative 'dsl/object'
+
 require_relative 'book/vendor/contributor'
 
 module Epuber
@@ -15,6 +16,18 @@ module Epuber
 			# convert attributes to corresponding classes
 			__finish_parsing
 		end
+
+
+		def self.from_string(string, filepath = nil)
+			if filepath
+				eval(string, nil, filepath)
+			else
+				eval(string)
+			end
+		end
+
+
+
 
 
 		private
@@ -50,7 +63,7 @@ module Epuber
 				  :required    => true,
 				  :singularize => true
 
-		
+
 		# @return [String] publisher name
 		#
 		attribute :publisher
@@ -68,10 +81,12 @@ module Epuber
 		attribute :print_isbn
 
 
+
 		# TODO toc
 		# TODO landmarks
 		# TODO cover page
 		# TODO other files
 		# TODO footnotes customization
+		# TODO custom metadata
 	end
 end

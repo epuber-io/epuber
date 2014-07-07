@@ -55,9 +55,11 @@ module Epuber
 	class NormalContributor < Contributor
 
 		# @return [String] first name of contributor
+		#
 		attr_accessor :first_name
 
 		# @return [String] lase name of contributor
+		#
 		attr_accessor :last_name
 
 

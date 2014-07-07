@@ -3,8 +3,8 @@ require_relative '../lib/epuber/book'
 module Epuber
 	describe Book do
 
-		before do
-			@book = Book.new do |book|
+		it 'should parse simple book' do
+			book = Book.new do |book|
 				book.title    = 'Práce na dálku'
 				book.subtitle = 'Abc'
 
@@ -18,11 +18,6 @@ module Epuber
 				book.isbn = '978-80-87270-98-2'
 				book.print_isbn = '978-80-87270-98-0'
 			end
-		end
-
-		it 'should parse simple book' do
-
-			book = @book
 
 			expect(book.title).to eq 'Práce na dálku'
 			expect(book.subtitle).to eq 'Abc'
@@ -41,12 +36,12 @@ module Epuber
 
 
 		it 'author is required' do
-			expect {
-				book = Book.new do |b|
-					b.title    = 'Práce na dálku'
-					b.subtitle = 'Abc'
-				end
+			book = Book.new do |b|
+				b.title    = 'Práce na dálku'
+				b.subtitle = 'Abc'
+			end
 
+			expect {
 				book.validate
 			}.to raise_error
 		end
@@ -70,6 +65,28 @@ module Epuber
 		it 'block is optional, you can build whatever you like' do
 			expect {
 				Book.new
+			}.to_not raise_error
+		end
+
+
+		it  'can parse from string' do
+			string = 	<<-END_BOOK
+							Epuber::Book.new do |book|
+
+								book.title = 'Práce na dálku'
+								book.subtitle = 'Zn.: Kancelář zbytečná'
+
+								book.author = 'Jason Fried'
+
+							end
+						END_BOOK
+
+			book = Book.from_string(string)
+
+			expect(book).to be_a Book
+
+			expect {
+				book.validate
 			}.to_not raise_error
 		end
 	end

@@ -33,14 +33,14 @@ Epuber::Book.new do |book|
 
 	# definition of spine
 	book.toc do |toc|
-		toc.image_page 'cover', :landmark_cover # reference to cover text file
-		toc.image_page 'vakat'
+		toc.text 'cover', :landmark_cover # reference to cover text file
+		toc.text 'vakat'
 
-		toc.text 'copyright'
+		toc.text 'copyright', :landmark_copyright
 
 		toc.text 'toc', :landmark_toc
 
-		toc.text 'ch01', :landmark_start_page
+		toc.text 'ch01', :landmark_start_page # TODO beware of ibooks speciality
 		toc.text 'ch02'
 		toc.text 'ch03'
 		toc.text 'ch04'
@@ -51,4 +51,13 @@ Epuber::Book.new do |book|
 		toc.text 'footnotes', :linear => false
 	end
 
+
+
+	# first parameter is name, second are attributes in Hash, third is value
+
+	# <meta name="cover" content="img.cover.jpg"/>
+	book.add_meta 'cover', { content: 'img.cover.jpg' }
+
+	# <meta property="ibooks:specified-fonts">true</meta>
+	book.add_meta 'ibooks:specified-fonts', 'true'
 end
