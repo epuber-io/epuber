@@ -42,7 +42,7 @@ module Epuber
 		end
 	end
 
-	describe 'Contributor.from_ruby' do
+	describe 'Epuber::Contributor.from_ruby' do
 
 		it 'parse Contributor from Hash with symbols :file_as and :pretty_name' do
 			hash = {

@@ -23,7 +23,7 @@ module Epuber
 
 					if not value.nil?
 						value
-					elsif value.nil? and respond_to? :parent
+					elsif attr.inherited? and value.nil? and respond_to? :parent
 						self.parent.send(key.to_s)
 					end
 				end

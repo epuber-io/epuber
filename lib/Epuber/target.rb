@@ -17,7 +17,7 @@ module Epuber
 		#
 		attr_reader :name
 
-		# @return [Array<Target>] list of sub targets
+		# @return [Array<self.class>] list of sub targets
 		#
 		def sub_targets
 			child_items
@@ -44,17 +44,20 @@ module Epuber
 		# @return [String] version of result epub
 		#
 		attribute :epub_version,
-				  :required => true
+				  :required => true,
+				  :inherited => true
 
 		# @return [String] isbn of epub
 		#
 		attribute :isbn,
-				  :required => true
+				  :required => true,
+				  :inherited => true
 
 		# @return [String] target will use custom font (for iBooks only)
 		#
 		attribute :custom_fonts,
-				  :types => [ TrueClass, FalseClass ]
+				  :types => [ TrueClass, FalseClass ],
+				  :inherited => true
 
 
 		# TODO store url

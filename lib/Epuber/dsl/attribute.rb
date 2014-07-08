@@ -46,7 +46,7 @@ module Epuber
 			# @return [String] A string representation suitable for UI.
 			#
 			def to_s
-				"Book attribute `#{name}`"
+				"Attribute `#{name}`"
 			end
 
 			# @return [String] A string representation suitable for debugging.

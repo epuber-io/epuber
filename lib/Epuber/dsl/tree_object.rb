@@ -39,7 +39,8 @@ module Epuber
 		end
 
 
-
+		# @return [self.class]
+		#
 		def create_child_item(*args)
 			child = self.class.new(*args)
 
