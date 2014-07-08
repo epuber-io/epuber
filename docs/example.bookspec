@@ -33,22 +33,28 @@ Epuber::Book.new do |book|
 
 	# definition of spine
 	book.toc do |toc|
-		toc.text 'cover', :landmark_cover # reference to cover text file
-		toc.text 'vakat'
+		toc.file 'cover', :landmark_cover # reference to cover text file
+		toc.file 'vakat'
 
-		toc.text 'copyright', :landmark_copyright
+		toc.file 'copyright', :landmark_copyright
 
-		toc.text 'toc', :landmark_toc
+		toc.file 'toc', :landmark_toc
 
-		toc.text 'ch01', :landmark_start_page # TODO beware of ibooks speciality
-		toc.text 'ch02'
-		toc.text 'ch03'
-		toc.text 'ch04'
-		toc.text 'ch05'
+		toc.file 's01' do |s01|
+			s01.file 'ch01', :landmark_start_page # TODO beware of ibooks speciality
+			s01.file 'ch02'
+		end
 
-		toc.text 'appendix'
+		toc.file 's02' do |s02|
+			s02.file 'ch03'
+			s02.file 'ch04'
+		end
 
-		toc.text 'footnotes', :linear => false
+		toc.file 'ch05'
+
+		toc.file 'appendix'
+
+		toc.file 'footnotes', :linear => false
 	end
 
 
