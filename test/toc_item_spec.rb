@@ -67,6 +67,7 @@ module Epuber
 		end
 
 
-		# TODO options
+
+		# TODO nested creating
 	end
 end

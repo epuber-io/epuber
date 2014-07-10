@@ -51,5 +51,9 @@ module Epuber
 
 			child
 		end
+
+		def create_child_items
+			yield self if block_given?
+		end
 	end
 end

@@ -130,5 +130,16 @@ module Epuber
 			expect(ibooks_target_sub.epub_version).to eq '2.0'
 
 		end
+
+
+		it 'can add toc items' do
+			expect(@book.root_toc.child_items.length).to eq 0
+
+			@book.toc do |toc|
+				toc.file 'ch01', 'Chapter 1'
+			end
+
+			expect(@book.root_toc.child_items.length).to eq 1
+		end
 	end
 end

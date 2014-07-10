@@ -2,6 +2,8 @@ require_relative 'dsl/object'
 
 require_relative 'book/vendor/contributor'
 require_relative 'target'
+require_relative 'toc_item'
+
 
 module Epuber
 
@@ -13,6 +15,7 @@ module Epuber
 			super
 
 			@default_target = Target.new(nil)
+			@root_toc = TocItem.new
 
 			yield self if block_given?
 
@@ -28,8 +31,6 @@ module Epuber
 				eval(string)
 			end
 		end
-
-
 
 
 
@@ -86,6 +87,14 @@ module Epuber
 			@default_target.sub_target(name) do |target|
 				yield target if block_given?
 			end
+		end
+
+		# @return [TocItem]
+		#
+		attr_reader :root_toc
+
+		def toc(&block)
+			@root_toc.create_child_items(&block)
 		end
 
 		#------------- DSL attributes ----------------------------------------------------------------------------------

@@ -21,17 +21,13 @@ module Epuber
 				  :default_value => []
 
 
-		def initialize
-			super
-		end
-
-
 		# -------------- creating sub items -----------------
 
 		# @param [String] file_path
 		# @param [String] title
 		#
 		# TODO title is optional
+		# TODO check opts for :landmark_*, :linear =>
 		#
 		def file(file_path, title, *opts)
 			create_child_item do |item|
@@ -54,5 +50,9 @@ module Epuber
 		def item(title, *opts)
 			file(nil, title, *opts)
 		end
+
+
+		# TODO glob
+		# TODO files
 	end
 end
