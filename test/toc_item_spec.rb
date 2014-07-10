@@ -48,7 +48,7 @@ module Epuber
 				expect(sub_item.file_path).to eq 's01' # file path should be inherited
 			end
 
-			context 'options' do
+			context 'parsing and storing options' do
 				it 'parse simple symbol' do
 					sub_item = @root.item('', :landmark, :landmark_2)
 					expect(sub_item.options).to eq [:landmark, :landmark_2]

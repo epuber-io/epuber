@@ -11,6 +11,7 @@ Epuber::Book.new do |book|
 
 	book.language = 'cs'
 	book.print_isbn = '978-80-87270-98-0' # isbn of print book, used for creating package for iTunesProducer
+	book.isbn = '978-80-87270-98-2' # this ISBN is used for every target
 	book.published = '2014-06-10' # publish date
 
 	book.cover_image = 'cover.jpg' # extension is not necessary if there is only one file with same basename
@@ -22,16 +23,15 @@ Epuber::Book.new do |book|
 	# definition of new target
 	book.target :ibooks do |target|
 		target.epub_version = 3.0
-		target.isbn = '978-80-87270-98-2'
 	end
 
 	book.target :wooky do |target|
 		target.epub_version = 2.0
-		target.isbn = '978-80-87270-98-2'
+		target.isbn = '978-80-87270-98-3' # override ISBN for this target
 	end
 
 
-	# definition of spine
+	# definition of spine, nav, ncx and landmarks
 	book.toc do |toc|
 		toc.file 'cover', :landmark_cover # reference to cover text file
 		toc.file 'vakat'
