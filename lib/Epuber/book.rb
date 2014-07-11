@@ -1,4 +1,4 @@
-require_relative 'dsl/object'
+require_relative 'dsl/dsl_object'
 
 require_relative 'book/vendor/contributor'
 require_relative 'target'

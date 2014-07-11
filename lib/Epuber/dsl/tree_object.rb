@@ -1,5 +1,5 @@
 
-require_relative 'object'
+require_relative 'dsl_object'
 
 module Epuber
 	class DSLTreeObject < DSLObject
