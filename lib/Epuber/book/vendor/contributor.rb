@@ -92,13 +92,7 @@ module Epuber
 			"#{@last_name.upcase}, #{@first_name}"
 		end
 
-		# ------ Overriden Setters ------
-		def pretty_name=(*)
-			raise StandardError, "Cannot write to NormalContributor##{__method__} property, use #first_name or #last_name instead."
-		end
-
-		def file_as=(*)
-			raise StandardError, "Cannot write to NormalContributor##{__method__} property, use #first_name or #last_name instead."
-		end
+		undef_method :pretty_name= # pretty_name is read-only in this class
+		undef_method :file_as= # file_as is read-only in this class
 	end
 end

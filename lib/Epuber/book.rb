@@ -24,9 +24,9 @@ module Epuber
 		end
 
 
-		def self.from_string(string, filepath = nil)
-			if filepath
-				eval(string, nil, filepath)
+		def self.from_string(string, file_path = nil)
+			if file_path
+				eval(string, nil, file_path)
 			else
 				eval(string)
 			end
