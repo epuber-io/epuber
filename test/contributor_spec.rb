@@ -1,4 +1,4 @@
-require_relative '../lib/epuber/book/vendor/contributor'
+require_relative '../lib/epuber/book/contributor'
 
 
 module Epuber

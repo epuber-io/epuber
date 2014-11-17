@@ -1,5 +1,5 @@
 
-require_relative 'dsl/tree_object'
+require_relative '../dsl/tree_object'
 
 
 module Epuber

@@ -1,8 +1,9 @@
 require_relative 'dsl/dsl_object'
 
-require_relative 'book/vendor/contributor'
-require_relative 'target'
-require_relative 'toc_item'
+require_relative 'book/contributor'
+require_relative 'book/toc_item'
+require_relative 'book/target'
+
 
 
 module Epuber

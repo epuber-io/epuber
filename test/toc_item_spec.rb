@@ -1,6 +1,6 @@
 require 'rspec'
 
-require_relative '../lib/epuber/toc_item'
+require_relative '../lib/epuber/book/toc_item'
 
 module Epuber
 	describe TocItem do

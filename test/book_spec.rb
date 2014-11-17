@@ -125,10 +125,10 @@ module Epuber
 			end
 
 			expect(ibooks_target.sub_targets.length).to eq 1
+			expect(ibooks_target.epub_version).to eq '3.0'
 
 			expect(ibooks_target_sub.isbn).to eq 'abcd-1234'
 			expect(ibooks_target_sub.epub_version).to eq '2.0'
-
 		end
 
 

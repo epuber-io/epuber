@@ -1,6 +1,6 @@
 require 'rspec'
 
-require_relative '../lib/Epuber/target'
+require_relative '../lib/Epuber/book/target'
 
 module Epuber
 	describe Target do
