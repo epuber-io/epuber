@@ -63,33 +63,12 @@ module Epuber
 		end
 
 
-
-		# ------------ Parsing methods -----------------------
-		protected
-
-		def before_parsing
-
-		end
-
-		def after_parsing
-
-		end
-
-
-
-
 		# ------------ Override methods ----------------------
 		public
 
 		def initialize
 			super
 			@attributes_values = {}
-
-			before_parsing
-
-			yield self if block_given?
-
-			after_parsing
 		end
 
 		def to_s

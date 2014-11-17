@@ -12,12 +12,17 @@ module Epuber
 
 	class Book < DSLObject
 
-		private
+		def initialize
+			super
 
-		def before_parsing
 			@default_target = Target.new(nil)
 			@root_toc = TocItem.new
+
+			yield self if block_given?
 		end
+
+
+		private
 
 		# Defines setter and getter for default target attribute
 		#

@@ -27,10 +27,6 @@ module Epuber
 			expect(book.title).to eq 'Práce na dálku'
 			expect(book.subtitle).to eq 'Abc'
 
-			expect(book.author).to be_a NormalContributor
-			expect(book.author.first_name).to eq 'Abc'
-			expect(book.author.last_name).to eq 'def'
-
 			expect(book.publisher).to eq 'AAABBB'
 
 			expect(book.language).to eq 'cs'
@@ -42,6 +38,13 @@ module Epuber
 		context 'attributes' do
 
 			context '#authors, #author' do
+				it 'automatically converts into NormalContributor' do
+					book = @book
+					expect(book.author).to be_a NormalContributor
+					expect(book.author.first_name).to eq 'Abc'
+					expect(book.author.last_name).to eq 'def'
+				end
+
 				it 'is required' do
 					book = Book.new do |b|
 						b.title    = 'Práce na dálku'
@@ -70,8 +73,7 @@ module Epuber
 				end
 			end
 
-
-			it 'title is required' do
+			it '#title is required' do
 				book = Book.new do |b|
 					b.subtitle = 'Abc'
 
@@ -86,10 +88,18 @@ module Epuber
 				}.to raise_error
 			end
 
-			it 'published is automatically converted to date if needed' do
-				@book.published = '2014-11-10'
+			context '#published' do
+				it 'is automatically converted to date if needed' do
+					@book.published = '2014-11-10'
 
-				expect(@book.published).to eq Date.new(2014, 11, 10)
+					expect(@book.published).to eq Date.new(2014, 11, 10)
+				end
+
+				it 'can be set with normal Date' do
+					@book.published = Date.new(2013, 11, 10)
+
+					expect(@book.published).to eq Date.new(2013, 11, 10)
+				end
 			end
 		end
 

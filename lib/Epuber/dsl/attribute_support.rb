@@ -3,11 +3,8 @@ module Epuber
 		module AttributeSupport
 
 			def attribute(name, options = {})
-				store_attribute(name, options)
-			end
+				attr = Attribute.new(name, options)
 
-			def store_attribute(name, options)
-				attr              = Attribute.new(name, options)
 				@attributes       ||= {}
 				@attributes[name] = attr
 

@@ -27,30 +27,35 @@ module Epuber
 			#
 			# @raise    If there are unrecognized options.
 			#
-			def initialize(name, options)
+			def initialize(name, inherited: false,
+			                     root_only: false,
+			                     required: false,
+			                     singularize: false,
+			                     file_patterns: false,
+			                     container: nil,
+			                     keys: nil,
+			                     default_value: nil,
+			                     auto_convert: nil,
+			                     types: nil)
+
 				@name = name
 
-				@inherited     = options.delete(:inherited) { false }
-				@root_only     = options.delete(:root_only) { false }
-				@required      = options.delete(:required) { false }
-				@singularize   = options.delete(:singularize) { false }
-				@file_patterns = options.delete(:file_patterns) { false }
-				@container     = options.delete(:container) { nil }
-				@keys          = options.delete(:keys) { nil }
-				@default_value = options.delete(:default_value) { nil }
-				@auto_convert  = options.delete(:auto_convert) { nil }
-				@types         = options.delete(:types) {
-					type = if @default_value
-									 @default_value.class
-								 else
-									 String
-								 end
-					[type]
-				}
-
-				unless options.empty?
-					raise StandardError, "Unrecognized options: #{options} for #{self}"
-				end
+				@inherited     = inherited
+				@root_only     = root_only
+				@required      = required
+				@singularize   = singularize
+				@file_patterns = file_patterns
+				@container     = container
+				@keys          = keys
+				@default_value = default_value
+				@auto_convert  = auto_convert
+				@types         = if not types.nil?
+													 types
+												 elsif @default_value
+													 [@default_value.class]
+												 else
+													 [String]
+												 end
 			end
 
 			# @return [String] A string representation suitable for UI.
@@ -207,6 +212,14 @@ module Epuber
 
 			# @!group Automatic conversion
 
+			# Converts value to compatible type of attribute
+			#
+			# Can be configured with option :auto_convert
+			#    Supports conversion from type to type, eg `{ String => Fixnum }`
+			#        also from types to type eg `{ [String, Date] => Fixnum }`
+			#    Supports custom conversion with Proc, eg `{ String => lambda { |value| value.to_s } }`
+			#        also with multiple types
+			#
 			def converted_value(value)
 				begin
 					validate_type value
@@ -219,7 +232,9 @@ module Epuber
 						if destination_class.nil?
 							array_keys = @auto_convert.select { |k, _| k.is_a? Array }
 							array_keys_with_type = array_keys.select { |k, v| k.include? value.class }
-							destination_class = array_keys_with_type.values.first
+							if array_keys_with_type.count > 0
+								destination_class = array_keys_with_type.values.first
+							end
 						end
 
 						if destination_class.is_a? Proc
