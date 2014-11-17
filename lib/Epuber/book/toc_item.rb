@@ -9,7 +9,7 @@ module Epuber
 		# @return [String]
 		#
 		attribute :file_path,
-				  :inherited => true
+							inherited: true
 
 		# @return [String]
 		#
@@ -18,7 +18,7 @@ module Epuber
 		# @return [Array<Symbol | Hash<Symbol, Object>>]
 		#
 		attribute :options,
-				  :default_value => []
+		          default_value: []
 
 
 		# -------------- creating sub items -----------------

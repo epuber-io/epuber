@@ -19,12 +19,6 @@ module Epuber
 			@root_toc = TocItem.new
 		end
 
-		def after_parsing
-			if self.author
-				self.author = Contributor.from_ruby(self.author, 'aut')
-			end
-		end
-
 		# Defines setter and getter for default target attribute
 		#
 		# @param [Symbol] sym  attribute name
@@ -46,6 +40,7 @@ module Epuber
 				end
 			end
 		end
+
 
 		#-------------- Targets ----------------------------------
 		public
@@ -85,7 +80,7 @@ module Epuber
 		# @return [String] title of book
 		#
 		attribute :title,
-				  :required => true
+							required: true
 
 		# @return [String] subtitle of book
 		#
@@ -94,10 +89,11 @@ module Epuber
 		# @return [Array{Contributor}] authors of book
 		#
 		attribute :authors,
-				  :types       => [ Contributor, NormalContributor ],
-				  :container   => Array,
-				  :required    => true,
-				  :singularize => true
+							types:        [Contributor, NormalContributor],
+							container:    Array,
+							required:     true,
+							singularize:  true,
+							auto_convert: { [String, Hash] => lambda { |value| Contributor.from_ruby(value, 'aut') } }
 
 
 		# @return [String] publisher name
@@ -115,6 +111,12 @@ module Epuber
 		# @return [String] isbn of printed book
 		#
 		attribute :print_isbn
+
+		# @return [Date] date of book was published
+		#
+		attribute :published,
+		          types: [ Date ],
+		          auto_convert: { String => Date }
 
 
 		# TODO toc

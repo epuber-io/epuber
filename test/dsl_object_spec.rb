@@ -10,7 +10,8 @@ module Epuber
 		context 'simple attributes' do
 			class TestClass < DSLObject
 				attribute :optional_string
-				attribute :optional_number
+				attribute :optional_number,
+				          types: [ Fixnum ]
 			end
 
 			before do

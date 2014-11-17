@@ -1,3 +1,5 @@
+require 'date'
+
 require 'active_support/core_ext/string/inflections'
 
 module Epuber
@@ -36,7 +38,15 @@ module Epuber
 				@container     = options.delete(:container) { nil }
 				@keys          = options.delete(:keys) { nil }
 				@default_value = options.delete(:default_value) { nil }
-				@types         = options.delete(:types) { [String] }
+				@auto_convert  = options.delete(:auto_convert) { nil }
+				@types         = options.delete(:types) {
+					type = if @default_value
+									 @default_value.class
+								 else
+									 String
+								 end
+					[type]
+				}
 
 				unless options.empty?
 					raise StandardError, "Unrecognized options: #{options} for #{self}"
@@ -156,7 +166,7 @@ module Epuber
 			def validate_type(value)
 				return if value.nil?
 				unless supported_types.any? { |klass| value.class == klass }
-					raise StandardError, "Non acceptable type `#{value.class}` for #{self}. Allowed values: `#{types.inspect}`"
+					raise StandardError, "Non acceptable type `#{value.class}` for #{self}. Allowed types: `#{types.inspect}`"
 				end
 			end
 
@@ -191,8 +201,39 @@ module Epuber
 					end
 				end
 			end
-		end
 
-		#-----------------------------------------------------------------------#
+
+			#---------------------------------------------------------------------#
+
+			# @!group Automatic conversion
+
+			def converted_value(value)
+				begin
+					validate_type value
+				rescue StandardError
+					if @auto_convert.nil?
+						raise
+					else
+						destination_class = @auto_convert[value.class]
+
+						if destination_class.nil?
+							array_keys = @auto_convert.select { |k, _| k.is_a? Array }
+							array_keys_with_type = array_keys.select { |k, v| k.include? value.class }
+							destination_class = array_keys_with_type.values.first
+						end
+
+						if destination_class.is_a? Proc
+							return destination_class.call(value)
+						elsif destination_class.respond_to? :parse
+							return destination_class.parse(value)
+						else
+							return destination_class.new(value)
+						end
+					end
+				end
+
+				value
+			end
+		end
 	end
 end

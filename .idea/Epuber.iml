@@ -10,7 +10,7 @@
     </facet>
   </component>
   <component name="ModuleRunConfigurationManager">
-    <configuration default="false" name="Test" type="RSpecRunConfigurationType" factoryName="RSpec">
+    <configuration default="false" name="Test" type="RSpecRunConfigurationType" factoryName="RSpec" singleton="true">
       <predefined_log_file id="RUBY_RSPEC" enabled="true" />
       <module name="Epuber" />
       <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
