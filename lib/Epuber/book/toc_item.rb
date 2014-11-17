@@ -36,7 +36,7 @@ module Epuber
 				if title.is_a? String
 					item.title = title
 				else
-					opts << title
+					opts.unshift(title)
 				end
 
 				item.options = opts.map do |i|
