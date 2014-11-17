@@ -48,14 +48,48 @@ module Epuber
 			end
 		end
 
+		# Creates new instance by parsing ruby code from string
+		#
+		# @param [String] string
+		#
+		# @return [Self]
+		#
+		def self.from_string(string, file_path = nil)
+			if file_path
+				eval(string, nil, file_path)
+			else
+				eval(string)
+			end
+		end
+
+
+
+		# ------------ Parsing methods -----------------------
+		protected
+
+		def before_parsing
+
+		end
+
+		def after_parsing
+
+		end
+
 
 
 
 		# ------------ Override methods ----------------------
+		public
 
 		def initialize
 			super
 			@attributes_values = {}
+
+			before_parsing
+
+			yield self if block_given?
+
+			after_parsing
 		end
 
 		def to_s

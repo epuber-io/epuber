@@ -12,32 +12,14 @@ module Epuber
 
 	class Book < DSLObject
 
-		def initialize
-			super
-
-			@default_target = Target.new(nil)
-			@root_toc = TocItem.new
-
-			yield self if block_given?
-
-			# convert attributes to corresponding classes
-			__finish_parsing
-		end
-
-
-		def self.from_string(string, file_path = nil)
-			if file_path
-				eval(string, nil, file_path)
-			else
-				eval(string)
-			end
-		end
-
-
-
 		private
 
-		def __finish_parsing
+		def before_parsing
+			@default_target = Target.new(nil)
+			@root_toc = TocItem.new
+		end
+
+		def after_parsing
 			if self.author
 				self.author = Contributor.from_ruby(self.author, 'aut')
 			end
