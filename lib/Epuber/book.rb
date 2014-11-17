@@ -80,7 +80,7 @@ module Epuber
 			@root_toc.create_child_items(&block)
 		end
 
-		#------------- DSL attributes ----------------------------------------------------------------------------------
+		#------------- DSL attributes --------------------------------------------------------------------------------------
 
 		# @return [String] title of book
 		#
@@ -91,7 +91,7 @@ module Epuber
 		#
 		attribute :subtitle
 
-		# @return [Array{Contributor}] authors of book
+		# @return [Array<Contributor>] authors of book
 		#
 		attribute :authors,
 							types:        [Contributor, NormalContributor],
@@ -124,14 +124,20 @@ module Epuber
 		          auto_convert: { String => Date }
 
 
-		# TODO toc
-		# TODO landmarks
+		# @return [String] book version
+		# @note Is used only for ibooks versions
+		#
+		attribute :version
+
+		# @return [String] build version of book
+		#
+		attribute :build_version
+
+
 		# TODO cover page
 		# TODO other files
 		# TODO footnotes customization
 		# TODO custom metadata
-		# TODO build version
-		# TODO version
 		# TODO custom user informations (just global available Hash<String, Any>)
 		# TODO url (book url) // http://melvil.cz/kniha-prace-na-dalku
 	end

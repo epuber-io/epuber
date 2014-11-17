@@ -101,6 +101,14 @@ module Epuber
 					expect(@book.published).to eq Date.new(2013, 11, 10)
 				end
 			end
+
+			it '#version is optional' do
+				@book.version = '1.0.1'
+
+				expect {
+					@book.validate
+				}.to_not raise_error
+			end
 		end
 
 		it 'block is optional, you can build whatever you like' do
@@ -176,6 +184,53 @@ module Epuber
 				end
 
 				expect(@book.root_toc.child_items.length).to eq 1
+			end
+
+			it 'can define landmarks' do
+				@book.toc do |toc|
+					toc.file 'ch01', 'Chapter 1', :landmarks_cover
+					toc.file 'ch02', 'Chapter 2', :landmarks_start_page
+				end
+
+				ch1 = @book.root_toc.child_items[0]
+				expect(ch1.options).to contain_exactly(:landmarks_cover)
+
+				ch2 = @book.root_toc.child_items[1]
+				expect(ch2.options).to contain_exactly(:landmarks_start_page)
+			end
+
+			it 'title of file is optional' do
+				@book.toc do |toc|
+					toc.file 'cover', :landmarks_cover
+					toc.file 'ch01', 'Chapter 1', :landmarks_start_page
+				end
+
+				cover = @book.root_toc.child_items[0]
+				expect(cover.options).to contain_exactly(:landmarks_cover)
+				expect(cover.title).to be_nil
+				expect(cover.file_path).to eq 'cover'
+			end
+
+			it 'support for linear = false' do
+				@book.toc do |toc|
+					toc.file 'cover', linear: false
+				end
+
+				cover = @book.root_toc.child_items[0]
+				expect(cover.options).to contain_exactly( {linear: false} )
+				expect(cover.title).to be_nil
+				expect(cover.file_path).to eq 'cover'
+			end
+
+			it 'support options and linear = false together' do
+				@book.toc do |toc|
+					toc.file 'cover', :landmarks_cover, linear: false
+				end
+
+				cover = @book.root_toc.child_items[0]
+				expect(cover.options).to contain_exactly( :landmarks_cover, {linear: false} )
+				expect(cover.title).to be_nil
+				expect(cover.file_path).to eq 'cover'
 			end
 		end
 	end

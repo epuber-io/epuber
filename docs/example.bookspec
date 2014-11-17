@@ -12,7 +12,7 @@ Epuber::Book.new do |book|
 	book.language = 'cs'
 	book.print_isbn = '978-80-87270-98-0' # isbn of print book, used for creating package for iTunesProducer
 	book.isbn = '978-80-87270-98-2' # this ISBN is used for every target
-	book.published = '2014-06-10' # publish date
+	book.published = '2014-06-10' # publish date (uses Date.parse -> supports multiple formats: YYYY-MM-DD, DD. MM. YYYY, ...)
 
 	book.cover_image = 'cover.jpg' # extension is not necessary if there is only one file with same basename
 

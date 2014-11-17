@@ -27,12 +27,18 @@ module Epuber
 		# @param [String] title
 		#
 		# TODO title is optional
-		# TODO check opts for :landmark_*, :linear =>
+		# TODO check opts for :landmark_*, linear: true
 		#
-		def file(file_path, title, *opts)
+		def file(file_path, title = nil, *opts)
 			create_child_item do |item|
 				item.file_path = file_path
-				item.title = title
+
+				if title.is_a? String
+					item.title = title
+				else
+					opts << title
+				end
+
 				item.options = opts.map do |i|
 					if i.kind_of? Hash
 						i.map do |j_key, j_value|
