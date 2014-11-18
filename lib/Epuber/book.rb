@@ -2,6 +2,7 @@ require_relative 'dsl/dsl_object'
 
 require_relative 'book/contributor'
 require_relative 'book/toc_item'
+require_relative 'book/version'
 require_relative 'book/target'
 
 
@@ -17,6 +18,9 @@ module Epuber
 
 			@default_target = Target.new(nil)
 			@root_toc = TocItem.new
+
+			# setup defaults
+			self.epub_version = 3.0
 
 			yield self if block_given?
 		end
@@ -112,6 +116,10 @@ module Epuber
 		# @return [String] isbn of this book
 		#
 		default_target_attribute :isbn
+
+		# @return [String|Fixnum] epub version
+		#
+		default_target_attribute :epub_version
 
 		# @return [String] isbn of printed book
 		#

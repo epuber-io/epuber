@@ -22,7 +22,7 @@ module Epuber
 
 					if not value.nil?
 						value
-					elsif attr.inherited? and value.nil? and respond_to? :parent
+					elsif attr.inherited? && value.nil? && respond_to?(:parent) && self.parent
 						self.parent.send(key)
 					end
 				end
@@ -53,7 +53,7 @@ module Epuber
 					define_method(singular_key) do
 						value = @attributes_values[key]
 
-						if attr.singularize? and value.is_a? Array
+						if attr.singularize? && value.is_a?(Array)
 							value.first
 						else
 							value
@@ -62,7 +62,7 @@ module Epuber
 
 					define_method(attr.writer_singular_form) do |value|
 						if attr.singularize?
-							array_value = if value.is_a? Array
+							array_value = if value.is_a?(Array)
 															value
 														else
 															[value]

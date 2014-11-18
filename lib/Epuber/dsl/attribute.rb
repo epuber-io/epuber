@@ -35,7 +35,7 @@ module Epuber
 			                     container: nil,
 			                     keys: nil,
 			                     default_value: nil,
-			                     auto_convert: nil,
+			                     auto_convert: {},
 			                     types: nil)
 
 				@name = name
@@ -227,22 +227,28 @@ module Epuber
 					if @auto_convert.nil?
 						raise
 					else
-						destination_class = @auto_convert[value.class]
+						begin
+							destination_class = @auto_convert[value.class]
 
-						if destination_class.nil?
-							array_keys = @auto_convert.select { |k, _| k.is_a? Array }
-							array_keys_with_type = array_keys.select { |k, v| k.include? value.class }
-							if array_keys_with_type.count > 0
-								destination_class = array_keys_with_type.values.first
+							if destination_class.nil?
+								array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
+								array_keys_with_type = array_keys.select { |k, _v| k.include?(value.class) }
+
+								if array_keys_with_type.count > 0
+									destination_class = array_keys_with_type.values.first
+								end
 							end
-						end
 
-						if destination_class.is_a? Proc
-							return destination_class.call(value)
-						elsif destination_class.respond_to? :parse
-							return destination_class.parse(value)
-						else
-							return destination_class.new(value)
+							if destination_class.is_a?(Proc)
+								return destination_class.call(value)
+							elsif destination_class.respond_to?(:parse)
+								return destination_class.parse(value)
+							else
+								return destination_class.new(value)
+							end
+
+						rescue
+							raise StandardError, "Unknown auto-conversion from class #{value.class} into class #{destination_class.class}"
 						end
 					end
 				end

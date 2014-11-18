@@ -1,5 +1,4 @@
 require_relative '../lib/epuber/book'
-require 'rspec/collection_matchers'
 
 module Epuber
 	describe Book do
@@ -21,7 +20,7 @@ module Epuber
 			end
 		end
 
-		it 'should parse simple book' do
+		it 'should parse simple book and store all informations' do
 			book = @book
 
 			expect(book.title).to eq 'Práce na dálku'
@@ -33,6 +32,11 @@ module Epuber
 
 			expect(book.print_isbn).to eq '978-80-87270-98-0'
 			expect(book.isbn).to eq '978-80-87270-98-2'
+		end
+
+		it 'has defaults' do
+			book = Book.new
+			expect(book.epub_version).to eq '3.0'
 		end
 
 		context 'attributes' do
