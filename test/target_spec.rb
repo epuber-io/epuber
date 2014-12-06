@@ -38,5 +38,32 @@ module Epuber
 			@child.isbn = '123'
 			expect(@child.isbn).to eq '123'
 		end
+
+		context '#is_ibooks?' do
+			it 'default is false' do
+				expect(@root.is_ibooks?).to be_falsey
+			end
+
+			it 'is true when the name is ibooks' do
+				target = Target.new('ibooks')
+				expect(target.is_ibooks?).to be_truthy
+			end
+
+			it 'is true when the attribute is set to true' do
+				@root.is_ibooks = true
+				expect(@root.is_ibooks?).to be_truthy
+			end
+
+			it 'is false when the attribute is set to false' do
+				@root.is_ibooks = false
+				expect(@root.is_ibooks?).to be_falsey
+			end
+
+			it 'is false when the attribute is set to false even when the name is ibooks' do
+				target = Target.new('ibooks')
+				target.is_ibooks = false
+				expect(target.is_ibooks?).to be_falsey
+			end
+		end
 	end
 end

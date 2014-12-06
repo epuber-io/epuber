@@ -113,6 +113,10 @@ module Epuber
 		#
 		attribute :language
 
+		# @return [Bool] book is for iBooks
+		#
+		default_target_attribute :is_ibooks
+
 		# @return [String] isbn of this book
 		#
 		default_target_attribute :isbn

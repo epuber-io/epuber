@@ -13,6 +13,7 @@ module Epuber
 			super(parent)
 
 			@name = name
+			@is_ibooks = nil
 		end
 
 		# @return [String] target name
@@ -40,6 +41,17 @@ module Epuber
 			child
 		end
 
+		#------------- other methods ---------------------------------
+
+		# @return [Bool]
+		#
+		def is_ibooks?
+			if self.is_ibooks.nil?
+				name.include?('ibooks')
+			else
+				self.is_ibooks
+			end
+		end
 
 		#----------------------- DSL items ---------------------------
 
@@ -62,6 +74,12 @@ module Epuber
 		attribute :custom_fonts,
               types: [TrueClass, FalseClass],
               inherited: true
+
+		# @return [Bool] hint for compiler to add some iBooks related stuff
+		#
+		attribute :is_ibooks,
+							types: [TrueClass, FalseClass],
+							inherited: true
 
 
 		# TODO store url

@@ -113,6 +113,14 @@ module Epuber
 					@book.validate
 				}.to_not raise_error
 			end
+
+			it '#is_ibooks is stored and optional' do
+				@book.is_ibooks = true
+
+				expect {
+					@book.validate
+				}.to_not raise_error
+			end
 		end
 
 		it 'block is optional, you can build whatever you like' do
