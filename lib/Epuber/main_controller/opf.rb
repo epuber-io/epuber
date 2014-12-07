@@ -27,14 +27,39 @@ module Epuber
         package_namespaces = EPUB2_NAMESPACES.merge(EPUB3_NAMESPACES)
         xml.package(package_namespaces, :version => book.epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
           xml.metadata {
-            xml['dc'].title book.title if book.title
+
+            if book.title
+              if book.epub_version >= 3
+                xml['dc'].title(book.title, id: 'title')
+                xml.meta('main', refines: '#title', property: 'title-type')
+              else
+                xml['dc'].title(book.title)
+              end
+            end
+
+            authors = book.authors || []
+
+            authors.each_index { |idx|
+              author = authors[idx]
+              author_id = "author_#{idx + 1}"
+              author_id_ref = "##{author_id}"
+
+              if book.epub_version >= 3
+                xml['dc'].creator(author.pretty_name, id: author_id)
+                xml.meta(author.file_as, refines: author_id_ref, property: 'file-as')
+                xml.meta('aut', refines: author_id_ref, property: 'role', scheme: 'marc:relators')
+              else
+                xml['dc'].creator(author.pretty_name)
+              end
+            }
+
           }
           xml.manifest
           xml.spine
         }
       }
 
-      builder.to_xml
+      builder.doc
     end
   end
 end

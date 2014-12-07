@@ -37,12 +37,23 @@ module Epuber
         expect(opf_xml).to have_xpath('/package/spine')
       end
 
-      it 'creates full metadata structure' do
+      it 'creates full metadata structure for default epub 3.0' do
         @sut.book = Book.new do |book|
           book.title = 'Práce na dálku'
+          book.author = {
+            first_name: 'Jared',
+            last_name: 'Diamond',
+          }
         end
 
-        expect(@sut.generate_opf).to have_xpath('/package/metadata/dc:title', 'Práce na dálku')
+        with_xpath(@sut.generate_opf, '/package/metadata') do |metadata|
+          expect(metadata).to have_xpath('/dc:title', 'Práce na dálku')
+          expect(metadata).to have_xpath("/meta[@property='title-type']", 'main')
+
+          expect(metadata).to have_xpath('/dc:creator', 'Jared Diamond')
+          expect(metadata).to have_xpath("/meta[@property='file-as']", 'DIAMOND, Jared')
+          expect(metadata).to have_xpath("/meta[@property='role']", 'aut')
+        end
       end
     end
 
