@@ -125,6 +125,10 @@ module Epuber
 		#
 		default_target_attribute :epub_version
 
+		# @return [Bool] book uses custom fonts (used only for iBooks)
+		#
+		default_target_attribute :custom_fonts
+
 		# @return [String] isbn of printed book
 		#
 		attribute :print_isbn
@@ -136,10 +140,13 @@ module Epuber
 		          auto_convert: { String => Date }
 
 
-		# @return [String] book version
+		# @return [Version] book version
 		# @note Is used only for ibooks versions
 		#
-		attribute :version
+		attribute :version,
+							inherited: true,
+							types: [Version],
+							auto_convert: { [String, Fixnum, Float] => Version }
 
 		# @return [String] build version of book
 		#

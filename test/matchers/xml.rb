@@ -9,7 +9,8 @@ def xpath_namespace_hack(xpath)
   # HACK for dealing with namespaces
   # implicit namespace
   xpath.split('/').map { |node|
-    if node.length == 0 || node.start_with?('@') || node.include?(':')
+    nodename = node.gsub(/^([A-Za-z0-9_:]+).*/) { $1 }
+    if nodename.length == 0 || nodename.start_with?('@') || nodename.include?(':')
       node
     else
       "xmlns:#{node}"
@@ -75,11 +76,19 @@ RSpec::Matchers.define :have_xpath do |xpath, text|
   end
 
   failure_message do |body|
-    @possible_error_message || "expected to find xml tag #{@original_xpath} in:\n#{body}"
+    if @possible_error_message.nil?
+      "expected to find xml tag #{@original_xpath} in:\n#{body}"
+    else
+      "#{@possible_error_message} in:\n#{body}"
+    end
   end
 
   failure_message_when_negated do |body|
-    @possible_error_message || "expected not to find xml tag #{@original_xpath} in:\n#{body}"
+    if @possible_error_message.nil?
+      "expected not to find xml tag #{@original_xpath} in:\n#{body}"
+    else
+      "#{@possible_error_message} in:\n#{body}"
+    end
   end
 
   description do

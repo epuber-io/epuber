@@ -44,6 +44,12 @@ module Epuber
             first_name: 'Jared',
             last_name: 'Diamond',
           }
+          book.published = '10. 12. 2014'
+          book.publisher = 'Jan Melvil Publishing'
+          book.language = 'cs'
+          book.version = 1.0
+          book.is_ibooks = true
+          book.custom_fonts = true
         end
 
         with_xpath(@sut.generate_opf, '/package/metadata') do |metadata|
@@ -53,6 +59,15 @@ module Epuber
           expect(metadata).to have_xpath('/dc:creator', 'Jared Diamond')
           expect(metadata).to have_xpath("/meta[@property='file-as']", 'DIAMOND, Jared')
           expect(metadata).to have_xpath("/meta[@property='role']", 'aut')
+
+          expect(metadata).to have_xpath('/dc:publisher', 'Jan Melvil Publishing')
+          expect(metadata).to have_xpath('/dc:language', 'cs')
+          expect(metadata).to have_xpath('/dc:date', '2014-12-10')
+
+          expect(metadata).to have_xpath("/meta[@property='dcterms:modified']", Time.now.utc.iso8601)
+
+          expect(metadata).to have_xpath("/meta[@property='ibooks:version']", '1.0')
+          expect(metadata).to have_xpath("/meta[@property='ibooks:specified-fonts']", 'true')
         end
       end
     end

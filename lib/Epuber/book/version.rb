@@ -5,7 +5,7 @@ module Epuber
   class Version
     include Comparable
 
-    VERSION_RE = /\A[0-9]+(\.[0-9a-zA-Z]+)*\z/
+    VERSION_RE ||= %r(\A[0-9]+(\.[0-9a-zA-Z]+)*\z)
 
     # True if the +version+ string matches RubyGems' requirements.
     #
