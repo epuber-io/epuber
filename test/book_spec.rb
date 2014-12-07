@@ -1,137 +1,138 @@
 require_relative '../lib/epuber/book'
 
 module Epuber
-	describe Book do
+  module Book
+    describe Book do
 
-		before do
-			@book = Book.new do |book|
-				book.title    = 'Práce na dálku'
-				book.subtitle = 'Abc'
+      before do
+        @book = Book.new do |book|
+          book.title    = 'Práce na dálku'
+          book.subtitle = 'Abc'
 
-				book.author = {
-					:first_name => 'Abc',
-					:last_name  => 'def'
-				}
+          book.author = {
+            :first_name => 'Abc',
+            :last_name  => 'def'
+          }
 
-				book.publisher = 'AAABBB'
-				book.language = 'cs'
-				book.isbn = '978-80-87270-98-2'
-				book.print_isbn = '978-80-87270-98-0'
-			end
-		end
+          book.publisher  = 'AAABBB'
+          book.language   = 'cs'
+          book.isbn       = '978-80-87270-98-2'
+          book.print_isbn = '978-80-87270-98-0'
+        end
+      end
 
-		it 'should parse simple book and store all informations' do
-			book = @book
+      it 'should parse simple book and store all informations' do
+        book = @book
 
-			expect(book.title).to eq 'Práce na dálku'
-			expect(book.subtitle).to eq 'Abc'
+        expect(book.title).to eq 'Práce na dálku'
+        expect(book.subtitle).to eq 'Abc'
 
-			expect(book.publisher).to eq 'AAABBB'
+        expect(book.publisher).to eq 'AAABBB'
 
-			expect(book.language).to eq 'cs'
+        expect(book.language).to eq 'cs'
 
-			expect(book.print_isbn).to eq '978-80-87270-98-0'
-			expect(book.isbn).to eq '978-80-87270-98-2'
-		end
+        expect(book.print_isbn).to eq '978-80-87270-98-0'
+        expect(book.isbn).to eq '978-80-87270-98-2'
+      end
 
-		it 'has defaults' do
-			book = Book.new
-			expect(book.epub_version).to eq '3.0'
-		end
+      it 'has defaults' do
+        book = Book.new
+        expect(book.epub_version).to eq '3.0'
+      end
 
-		context 'attributes' do
+      context 'attributes' do
 
-			context '#authors, #author' do
-				it 'automatically converts into NormalContributor' do
-					book = @book
-					expect(book.author).to be_a NormalContributor
-					expect(book.author.first_name).to eq 'Abc'
-					expect(book.author.last_name).to eq 'def'
-				end
+        context '#authors, #author' do
+          it 'automatically converts into NormalContributor' do
+            book = @book
+            expect(book.author).to be_a NormalContributor
+            expect(book.author.first_name).to eq 'Abc'
+            expect(book.author.last_name).to eq 'def'
+          end
 
-				it 'is required' do
-					book = Book.new do |b|
-						b.title    = 'Práce na dálku'
-						b.subtitle = 'Abc'
-					end
+          it 'is required' do
+            book = Book.new do |b|
+              b.title    = 'Práce na dálku'
+              b.subtitle = 'Abc'
+            end
 
-					expect {
-						book.validate
-					}.to raise_error
-				end
+            expect {
+              book.validate
+            }.to raise_error
+          end
 
-				it 'supports array' do
-					book = Book.new do |b|
-						b.title    = 'Práce na dálku'
-						b.subtitle = 'Abc'
-						b.authors = [
-							'Abc def'
-						]
-					end
+          it 'supports array' do
+            book = Book.new do |b|
+              b.title    = 'Práce na dálku'
+              b.subtitle = 'Abc'
+              b.authors  = [
+                'Abc def'
+              ]
+            end
 
-					expect {
-						book.validate
-					}.to_not raise_error
+            expect {
+              book.validate
+            }.to_not raise_error
 
-					expect(book.authors).to contain_exactly(a_kind_of NormalContributor)
-				end
-			end
+            expect(book.authors).to contain_exactly(a_kind_of NormalContributor)
+          end
+        end
 
-			it '#title is required' do
-				book = Book.new do |b|
-					b.subtitle = 'Abc'
+        it '#title is required' do
+          book = Book.new do |b|
+            b.subtitle = 'Abc'
 
-					b.author = {
-						:first_name => 'Abc',
-						:last_name  => 'def'
-					}
-				end
+            b.author = {
+              :first_name => 'Abc',
+              :last_name  => 'def'
+            }
+          end
 
-				expect {
-					book.validate
-				}.to raise_error
-			end
+          expect {
+            book.validate
+          }.to raise_error
+        end
 
-			context '#published' do
-				it 'is automatically converted to date if needed' do
-					@book.published = '2014-11-10'
+        context '#published' do
+          it 'is automatically converted to date if needed' do
+            @book.published = '2014-11-10'
 
-					expect(@book.published).to eq Date.new(2014, 11, 10)
-				end
+            expect(@book.published).to eq Date.new(2014, 11, 10)
+          end
 
-				it 'can be set with normal Date' do
-					@book.published = Date.new(2013, 11, 10)
+          it 'can be set with normal Date' do
+            @book.published = Date.new(2013, 11, 10)
 
-					expect(@book.published).to eq Date.new(2013, 11, 10)
-				end
-			end
+            expect(@book.published).to eq Date.new(2013, 11, 10)
+          end
+        end
 
-			it '#version is optional' do
-				@book.version = '1.0.1'
+        it '#version is optional' do
+          @book.version = '1.0.1'
 
-				expect {
-					@book.validate
-				}.to_not raise_error
-			end
+          expect {
+            @book.validate
+          }.to_not raise_error
+        end
 
-			it '#is_ibooks is stored and optional' do
-				@book.is_ibooks = true
+        it '#is_ibooks is stored and optional' do
+          @book.is_ibooks = true
 
-				expect {
-					@book.validate
-				}.to_not raise_error
-			end
-		end
+          expect {
+            @book.validate
+          }.to_not raise_error
+        end
+      end
 
-		it 'block is optional, you can build whatever you like' do
-			expect {
-				Book.new
-			}.to_not raise_error
-		end
+      it 'block is optional, you can build whatever you like' do
+        expect {
+          Book.new
+        }.to_not raise_error
+      end
 
-		it  'can parse from string' do
-			string = 	<<-END_BOOK
-							Epuber::Book.new do |book|
+      it 'can parse from string' do
+        string = <<-END_BOOK
+							Epuber::Book::Book.new do |book|
 
 								book.title = 'Práce na dálku'
 								book.subtitle = 'Zn.: Kancelář zbytečná'
@@ -139,111 +140,112 @@ module Epuber
 								book.author = 'Jason Fried'
 
 							end
-						END_BOOK
+        END_BOOK
 
-			book = Book.from_string(string)
+        book = Book.from_string(string)
 
-			expect(book).to be_a Book
+        expect(book).to be_a Book
 
-			expect {
-				book.validate
-			}.to_not raise_error
-		end
+        expect {
+          book.validate
+        }.to_not raise_error
+      end
 
-		context 'targets' do
-			it 'there is always at least one target' do
-				expect(@book.targets.length).to eq 1
-			end
+      context 'targets' do
+        it 'there is always at least one target' do
+          expect(@book.targets.length).to eq 1
+        end
 
-			it 'can add target' do
-				@book.target :ibooks do |ibooks|
-					ibooks.isbn = 'abcd-1234'
-				end
+        it 'can add target' do
+          @book.target :ibooks do |ibooks|
+            ibooks.isbn = 'abcd-1234'
+          end
 
-				targets = @book.targets
-				expect(targets.length).to eq 1
+          targets = @book.targets
+          expect(targets.length).to eq 1
 
-				ibooks_target = targets[0]
-				expect(ibooks_target.isbn).to eq 'abcd-1234'
-			end
+          ibooks_target = targets[0]
+          expect(ibooks_target.isbn).to eq 'abcd-1234'
+        end
 
-			it 'can suppports nested targets' do
-				@book.isbn = 'abcd-1234'
+        it 'can suppports nested targets' do
+          @book.isbn = 'abcd-1234'
 
-				ibooks_target_sub = nil
-				ibooks_target     = @book.target :ibooks do |ibooks|
-					ibooks.epub_version = '3.0'
+          ibooks_target_sub = nil
+          ibooks_target     = @book.target :ibooks do |ibooks|
+            ibooks.epub_version = '3.0'
 
-					ibooks_target_sub = ibooks.sub_target :ibooks_sub do |ibooks_sub|
-						ibooks_sub.epub_version = '2.0'
-					end
-				end
+            ibooks_target_sub = ibooks.sub_target :ibooks_sub do |ibooks_sub|
+              ibooks_sub.epub_version = '2.0'
+            end
+          end
 
-				expect(ibooks_target.sub_targets.length).to eq 1
-				expect(ibooks_target.epub_version).to eq '3.0'
+          expect(ibooks_target.sub_targets.length).to eq 1
+          expect(ibooks_target.epub_version).to eq '3.0'
 
-				expect(ibooks_target_sub.isbn).to eq 'abcd-1234'
-				expect(ibooks_target_sub.epub_version).to eq '2.0'
-			end
-		end
+          expect(ibooks_target_sub.isbn).to eq 'abcd-1234'
+          expect(ibooks_target_sub.epub_version).to eq '2.0'
+        end
+      end
 
-		context 'toc' do
-			it 'can add toc items' do
-				expect(@book.root_toc.child_items.length).to eq 0
+      context 'toc' do
+        it 'can add toc items' do
+          expect(@book.root_toc.child_items.length).to eq 0
 
-				@book.toc do |toc|
-					toc.file 'ch01', 'Chapter 1'
-				end
+          @book.toc do |toc|
+            toc.file 'ch01', 'Chapter 1'
+          end
 
-				expect(@book.root_toc.child_items.length).to eq 1
-			end
+          expect(@book.root_toc.child_items.length).to eq 1
+        end
 
-			it 'can define landmarks' do
-				@book.toc do |toc|
-					toc.file 'ch01', 'Chapter 1', :landmarks_cover
-					toc.file 'ch02', 'Chapter 2', :landmarks_start_page
-				end
+        it 'can define landmarks' do
+          @book.toc do |toc|
+            toc.file 'ch01', 'Chapter 1', :landmarks_cover
+            toc.file 'ch02', 'Chapter 2', :landmarks_start_page
+          end
 
-				ch1 = @book.root_toc.child_items[0]
-				expect(ch1.options).to contain_exactly(:landmarks_cover)
+          ch1 = @book.root_toc.child_items[0]
+          expect(ch1.options).to contain_exactly(:landmarks_cover)
 
-				ch2 = @book.root_toc.child_items[1]
-				expect(ch2.options).to contain_exactly(:landmarks_start_page)
-			end
+          ch2 = @book.root_toc.child_items[1]
+          expect(ch2.options).to contain_exactly(:landmarks_start_page)
+        end
 
-			it 'title of file is optional' do
-				@book.toc do |toc|
-					toc.file 'cover', :landmarks_cover
-					toc.file 'ch01', 'Chapter 1', :landmarks_start_page
-				end
+        it 'title of file is optional' do
+          @book.toc do |toc|
+            toc.file 'cover', :landmarks_cover
+            toc.file 'ch01', 'Chapter 1', :landmarks_start_page
+          end
 
-				cover = @book.root_toc.child_items[0]
-				expect(cover.options).to contain_exactly(:landmarks_cover)
-				expect(cover.title).to be_nil
-				expect(cover.file_path).to eq 'cover'
-			end
+          cover = @book.root_toc.child_items[0]
+          expect(cover.options).to contain_exactly(:landmarks_cover)
+          expect(cover.title).to be_nil
+          expect(cover.file_path).to eq 'cover'
+        end
 
-			it 'support for linear = false' do
-				@book.toc do |toc|
-					toc.file 'cover', linear: false
-				end
+        it 'support for linear = false' do
+          @book.toc do |toc|
+            toc.file 'cover', linear: false
+          end
 
-				cover = @book.root_toc.child_items[0]
-				expect(cover.options).to contain_exactly( {linear: false} )
-				expect(cover.title).to be_nil
-				expect(cover.file_path).to eq 'cover'
-			end
+          cover = @book.root_toc.child_items[0]
+          expect(cover.options).to contain_exactly({ linear: false })
+          expect(cover.title).to be_nil
+          expect(cover.file_path).to eq 'cover'
+        end
 
-			it 'support options and linear = false together' do
-				@book.toc do |toc|
-					toc.file 'cover', :landmarks_cover, linear: false
-				end
+        it 'support options and linear = false together' do
+          @book.toc do |toc|
+            toc.file 'cover', :landmarks_cover, linear: false
+          end
 
-				cover = @book.root_toc.child_items[0]
-				expect(cover.options).to contain_exactly( :landmarks_cover, {linear: false} )
-				expect(cover.title).to be_nil
-				expect(cover.file_path).to eq 'cover'
-			end
-		end
-	end
+          cover = @book.root_toc.child_items[0]
+          expect(cover.options).to contain_exactly(:landmarks_cover, { linear: false })
+          expect(cover.title).to be_nil
+          expect(cover.file_path).to eq 'cover'
+        end
+      end
+    end
+  end
 end

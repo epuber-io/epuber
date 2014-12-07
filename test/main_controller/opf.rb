@@ -10,7 +10,7 @@ module Epuber
       before do
         @sut = MainController.new
 
-        @sut.book = Book.new do |book|
+        @sut.book = Book::Book.new do |book|
           book.title    = 'Práce na dálku'
           book.subtitle = 'Abc'
 
@@ -27,10 +27,10 @@ module Epuber
       end
 
       it 'creates minimal xml structure for empty book' do
-        @sut.book = Book.new
+        @sut.book = Book::Book.new
 
         opf_xml = @sut.generate_opf
-        expect(opf_xml).to have_xpath('/package/@version', '3.0')
+        expect(opf_xml).to have_xpath('/package/@version', '3.0') # is default
         expect(opf_xml).to have_xpath('/package/@unique-identifier', MainController::OPF_UNIQUE_ID)
         expect(opf_xml).to have_xpath('/package/metadata')
         expect(opf_xml).to have_xpath('/package/manifest')
@@ -38,7 +38,7 @@ module Epuber
       end
 
       it 'creates full metadata structure for default epub 3.0' do
-        @sut.book = Book.new do |book|
+        @sut.book = Book::Book.new do |book|
           book.title = 'Práce na dálku'
           book.author = {
             first_name: 'Jared',
@@ -71,7 +71,5 @@ module Epuber
         end
       end
     end
-
-
   end
 end
