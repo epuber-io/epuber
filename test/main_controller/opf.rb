@@ -9,27 +9,10 @@ module Epuber
     describe 'MainController#generate_opf' do
       before do
         @sut = MainController.new
-
-        @sut.book = Book::Book.new do |book|
-          book.title    = 'Práce na dálku'
-          book.subtitle = 'Abc'
-
-          book.author = {
-            :first_name => 'Abc',
-            :last_name  => 'def'
-          }
-
-          book.publisher = 'AAABBB'
-          book.language = 'cs'
-          book.isbn = '978-80-87270-98-2'
-          book.print_isbn = '978-80-87270-98-0'
-        end
       end
 
       it 'creates minimal xml structure for empty book' do
-        @sut.book = Book::Book.new
-
-        opf_xml = @sut.generate_opf
+        opf_xml = @sut.generate_opf(Book::Book.new)
         expect(opf_xml).to have_xpath('/package/@version', '3.0') # is default
         expect(opf_xml).to have_xpath('/package/@unique-identifier', MainController::OPF_UNIQUE_ID)
         expect(opf_xml).to have_xpath('/package/metadata')
@@ -38,21 +21,20 @@ module Epuber
       end
 
       it 'creates full metadata structure for default epub 3.0' do
-        @sut.book = Book::Book.new do |book|
-          book.title = 'Práce na dálku'
-          book.author = {
-            first_name: 'Jared',
-            last_name: 'Diamond',
-          }
-          book.published = '10. 12. 2014'
-          book.publisher = 'Jan Melvil Publishing'
-          book.language = 'cs'
-          book.version = 1.0
-          book.is_ibooks = true
-          book.custom_fonts = true
+        book = Book::Book.new do |b|
+          b.title     = 'Práce na dálku'
+          b.author    = 'Jared Diamond'
+          b.published = '10. 12. 2014'
+          b.publisher = 'Jan Melvil Publishing'
+          b.language = 'cs'
+          b.version = 1.0
+          b.is_ibooks = true
+          b.custom_fonts = true
+          ### b.cover_image = 'cover.jpg'
         end
 
-        with_xpath(@sut.generate_opf, '/package/metadata') do |metadata|
+        opf_xml = @sut.generate_opf(book)
+        with_xpath(opf_xml, '/package/metadata') do |metadata|
           expect(metadata).to have_xpath('/dc:title', 'Práce na dálku')
           expect(metadata).to have_xpath("/meta[@property='title-type']", 'main')
 
@@ -68,6 +50,12 @@ module Epuber
 
           expect(metadata).to have_xpath("/meta[@property='ibooks:version']", '1.0')
           expect(metadata).to have_xpath("/meta[@property='ibooks:specified-fonts']", 'true')
+
+          ### expect(metadata).to have_xpath("/meta[@property='cover']", 'cover.jpg')
+        end
+
+        with_xpath(opf_xml, '/package/manifest') do |manifest|
+          ### expect(manifest).to have_xpath("/item[@properties='cover-image']")
         end
       end
     end

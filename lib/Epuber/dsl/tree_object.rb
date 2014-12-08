@@ -39,6 +39,12 @@ module Epuber
       end
 
 
+      def validate
+        super
+        self.child_items.each { |item| item.validate }
+      end
+
+
       # @return [self.class]
       #
       def create_child_item(*args)

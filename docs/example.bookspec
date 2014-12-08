@@ -1,5 +1,5 @@
 
-Epuber::Book.new do |book|
+Epuber::Book::Book.new do |book|
 
 	book.title = 'Práce na dálku'
 	book.subtitle = 'Zn.: Kancelář zbytečná'
@@ -54,7 +54,7 @@ Epuber::Book.new do |book|
 
 		toc.file 'appendix'
 
-		toc.file 'footnotes', :linear => false
+		toc.file 'footnotes', linear: false
 	end
 
 

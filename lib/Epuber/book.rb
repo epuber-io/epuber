@@ -24,6 +24,12 @@ module Epuber
         yield self if block_given?
       end
 
+      def validate
+        super
+
+        @default_target.validate
+      end
+
 
       private
 
@@ -86,7 +92,7 @@ module Epuber
         @root_toc.create_child_items(&block)
       end
 
-      #------------- DSL attributes --------------------------------------------------------------------------------------
+      #------------- DSL attributes ------------------------------------------------------------------------------------
 
       # @return [String] title of book
       #
@@ -131,6 +137,10 @@ module Epuber
       #
       default_target_attribute :custom_fonts
 
+      # @return [String] path or name of cover image
+      #
+      default_target_attribute :cover_image
+
       # @return [String] isbn of printed book
       #
       attribute :print_isbn
@@ -155,7 +165,7 @@ module Epuber
       attribute :build_version
 
 
-      # TODO cover page
+
       # TODO other files
       # TODO footnotes customization
       # TODO custom metadata

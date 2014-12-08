@@ -24,11 +24,14 @@ module Epuber
       OPF_UNIQUE_ID = 'bookid'
 
 
+      def create_id_from_path(path)
+        path.replace('/', '.')
+      end
+
+
       # @param target [Target]
       #
-      def generate_opf(target = nil)
-        book = self.book
-
+      def generate_opf(book, target = nil)
         target ||= if book.targets.count == 1
                      book.targets.first
                    else
@@ -60,7 +63,7 @@ module Epuber
                 if epub_version >= 3
                   xml['dc'].creator(author.pretty_name, id: author_id)
                   xml.meta(author.file_as, property: 'file-as', refines: author_id_ref)
-                  xml.meta('aut', property: 'role', refines: author_id_ref, scheme: 'marc:relators')
+                  xml.meta(author.role, property: 'role', refines: author_id_ref, scheme: 'marc:relators')
                 else
                   xml['dc'].creator(author.pretty_name)
                 end
@@ -70,10 +73,12 @@ module Epuber
               xml['dc'].language(book.language) unless book.language.nil?
               xml['dc'].date(book.published.iso8601) unless book.published.nil?
 
+              xml.meta(name: 'cover', content: create_id_from_path(target.cover_image.destination_path)) unless target.cover_image.nil?
+
               if epub_version >= 3
                 xml.meta(Time.now.utc.iso8601, property: 'dcterms:modified')
 
-                if epub_version >= 3 && target.is_ibooks
+                if target.is_ibooks
                   xml.meta(book.version, property: 'ibooks:version') unless book.version.nil?
                   xml.meta(book.custom_fonts, property: 'ibooks:specified-fonts') unless book.custom_fonts.nil?
                 end

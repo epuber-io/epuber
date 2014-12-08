@@ -1,6 +1,7 @@
 require_relative '../dsl/tree_object'
 
 require_relative '../vendor/version'
+require_relative 'file'
 
 
 module Epuber
@@ -54,6 +55,8 @@ module Epuber
 
       #----------------------- DSL items ---------------------------
 
+
+
       # @return [String] version of result epub
       #
       attribute :epub_version,
@@ -65,7 +68,6 @@ module Epuber
       # @return [String] isbn of epub
       #
       attribute :isbn,
-                required:  true,
                 inherited: true
 
       # @return [String] target will use custom font (for iBooks only)
@@ -79,6 +81,11 @@ module Epuber
       attribute :is_ibooks,
                 types:     [TrueClass, FalseClass],
                 inherited: true
+
+      attribute :cover_image,
+                types:        [Epuber::Book::File],
+                inherited:    true,
+                auto_convert: { [String] => Epuber::Book::File }
 
 
       # TODO store url
