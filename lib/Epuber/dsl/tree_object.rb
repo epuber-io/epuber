@@ -1,59 +1,60 @@
-
-require_relative 'dsl_object'
+require_relative 'object'
 
 module Epuber
-	class DSLTreeObject < DSLObject
+  module DSL
+    class TreeObject < Object
 
-		# @param [DSLTreeObject] parent
-		#
-		def initialize(parent = nil)
-			super()
+      # @param [DSLTreeObject] parent
+      #
+      def initialize(parent = nil)
+        super()
 
-			@parent = parent
-			@child_items = []
+        @parent      = parent
+        @child_items = []
 
-			unless parent.nil?
-				parent.child_items << self
-			end
-		end
+        unless parent.nil?
+          parent.child_items << self
+        end
+      end
 
-		# @return [DSLTreeObject] reference to parent
-		#
-		attr_reader :parent
+      # @return [TreeObject] reference to parent
+      #
+      attr_reader :parent
 
-		# @return [Array<DSLTreeObject>] child items
-		#
-		attr_reader :child_items
-
-
-		protected
-			attr_writer :parent
-			attr_writer :child_items
-		public
+      # @return [Array<self.class>] child items
+      #
+      attr_reader :child_items
 
 
-		# @return [Bool] reciever is root
-		#
-		def root?
-			@parent.nil?
-		end
+      protected
+      attr_writer :parent
+      attr_writer :child_items
+      public
 
 
-		# @return [self.class]
-		#
-		def create_child_item(*args)
-			child = self.class.new(*args)
+      # @return [Bool] receiver is root
+      #
+      def root?
+        @parent.nil?
+      end
 
-			yield child if block_given?
 
-			child.parent = self
-			@child_items << child
+      # @return [self.class]
+      #
+      def create_child_item(*args)
+        child = self.class.new(*args)
 
-			child
-		end
+        yield child if block_given?
 
-		def create_child_items
-			yield self if block_given?
-		end
-	end
+        child.parent = self
+        @child_items << child
+
+        child
+      end
+
+      def create_child_items
+        yield self if block_given?
+      end
+    end
+  end
 end

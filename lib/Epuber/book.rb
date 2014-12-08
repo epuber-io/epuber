@@ -1,4 +1,4 @@
-require_relative 'dsl/dsl_object'
+require_relative 'dsl/object'
 
 require_relative 'book/contributor'
 require_relative 'book/toc_item'
@@ -10,7 +10,7 @@ module Epuber
   module Book
     class StandardError < ::StandardError; end
 
-    class Book < DSLObject
+    class Book < DSL::Object
 
       def initialize
         super

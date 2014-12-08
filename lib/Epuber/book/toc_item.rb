@@ -2,7 +2,7 @@ require_relative '../dsl/tree_object'
 
 module Epuber
   module Book
-    class TocItem < DSLTreeObject
+    class TocItem < DSL::TreeObject
 
       # @return [String]
       #

@@ -5,7 +5,7 @@ require_relative '../vendor/version'
 
 module Epuber
   module Book
-    class Target < DSLTreeObject
+    class Target < DSL::TreeObject
 
       # @param [Target] parent
       # @param [String] name
@@ -23,9 +23,7 @@ module Epuber
 
       # @return [Array<self.class>] list of sub targets
       #
-      def sub_targets
-        child_items
-      end
+      alias_method :sub_targets, :child_items
 
 
       # Create new sub_target with name
