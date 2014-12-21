@@ -15,7 +15,7 @@ module Epuber
       def initialize
         super
 
-        @default_target   = Target.new(nil)
+        @default_target   = Target.new(:default)
         @root_toc         = TocItem.new
 
         # setup defaults
@@ -164,6 +164,9 @@ module Epuber
       #
       attribute :build_version
 
+      def add_file(filepath)
+        @default_target.add_file(filepath)
+      end
 
 
       # TODO other files

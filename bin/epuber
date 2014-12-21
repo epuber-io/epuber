@@ -1,0 +1,8 @@
+#!/usr/bin/eval ruby
+
+require_relative '../lib/epuber/main_controller'
+
+if ARGV[0] == 'compile'
+  mc = Epuber::MainController.new
+  mc.compile_targets
+end

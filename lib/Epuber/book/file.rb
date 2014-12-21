@@ -22,6 +22,12 @@ module Epuber
       def initialize(source_path)
         @source_path = source_path
       end
+
+      # @param other [Epuber::Book::File]
+      #
+      def ==(other)
+        @source_path == other.source_path
+      end
     end
   end
 end

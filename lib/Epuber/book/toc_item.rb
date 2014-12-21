@@ -46,6 +46,8 @@ module Epuber
               i
             end
           end.flatten
+
+          yield item if block_given?
         end
       end
 

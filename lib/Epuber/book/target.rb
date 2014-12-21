@@ -16,6 +16,7 @@ module Epuber
 
         @name      = name
         @is_ibooks = nil
+        @files     = []
       end
 
       # @return [String] target name
@@ -53,6 +54,14 @@ module Epuber
         end
       end
 
+      # Returns all files
+      # @return [Array<Epuber::Book::File>]
+      #
+      def files
+        # parent files plus our files
+        ((self.parent && self.parent.files) || []) + @files
+      end
+
       #----------------------- DSL items ---------------------------
 
 
@@ -86,6 +95,21 @@ module Epuber
                 types:        [Epuber::Book::File],
                 inherited:    true,
                 auto_convert: { [String] => Epuber::Book::File }
+
+
+      # @param file_path [String | Epuber::Book::File]
+      #
+      def add_file(file_path)
+
+        file = if file_path.is_a?(Epuber::Book::File)
+                 file_path
+               else
+                 Epuber::Book::File.new(file_path)
+               end
+
+        @files << file unless @files.include?(file)
+      end
+
 
 
       # TODO store url

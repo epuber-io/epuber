@@ -1,4 +1,7 @@
 
+require 'pathname'
+require 'fileutils'
+
 require_relative 'main_controller/opf'
 
 require_relative 'book'
@@ -8,37 +11,126 @@ module Epuber
   class MainController
     include OPF
 
+    BASE_PATH = '.epuber'
+
     # @param targets [Array<String>] targets names
     #
-    def compile_targets(targets)
+    def compile_targets(targets = nil)
 
-      Dir.glob('*.bookspec').each do |bookspec_file_path|
+      # TODO: DEBUG, remove next line
+      FileUtils.rmtree(BASE_PATH)
+
+
+      bookspecs = Pathname.glob(Pathname.pwd + '*.bookspec')
+
+      raise 'Not found .bookspec file' if bookspecs.count.zero?
+
+      bookspecs.each do |bookspec_file_pathname|
         # @type book [Book::Book]
-        book = Book::Book.from_file(bookspec_file_path)
+        # @type bookspec_file_pathname [Pathname]
 
-        book.validate
+        @book = Book::Book.from_file(bookspec_file_pathname.to_s)
+        @book.validate
+
+        puts "loaded book `#{@book.title}`"
+
+        # when the list of targets is nil use them all
+        targets ||= @book.targets.map { |target| target.name }
 
         targets.each do |target_name|
-          target = self.target_named(book, target_name)
-
-          raise "Not found target with name #{target_name}" if target.nil?
-
-          # compile files
-
-          # pack to epub file
+          process_target_named(target_name)
         end
       end
     end
 
-    # @param book [Epuber::Book::Book]
+
+    private
+
+    # @param target_name [String]
+    #
+    def process_target_named(target_name)
+      @target = target_named(target_name)
+
+      dir_name = File.join(BASE_PATH, 'build', target_name.to_s)
+      FileUtils.mkdir_p(dir_name)
+
+      @output_dir = File.absolute_path(dir_name, Dir.pwd)
+
+      puts "  handling target `#{@target.name}` in build dir `#{@output_dir}`"
+
+      process_other_files
+      process_toc_item(@book.root_toc)
+
+      # TODO: create other files (.opf, .ncx, ...)
+      
+      # TODO: pack to epub files
+
+    end
+
+    def process_other_files
+      @target.files.each { |file|
+        # @type file [Epuber::Book::File]
+        copy_file_to_destination(file_matching(file.source_path))
+      }
+    end
+
+    # @param toc_item [Epuber::Book::TocItem]
+    #
+    def process_toc_item(toc_item)
+      unless toc_item.file_path.nil?
+        puts "    processing toc item #{toc_item.file_path}"
+
+        file_pathname = file_matching(toc_item.file_path)
+        puts "      founded at #{file_pathname.to_s}"
+
+        case file_pathname.extname
+        when '.xhtml'
+          puts '    copying to destination'
+          copy_file_to_destination(file_pathname.to_s)
+        end
+      end
+
+      toc_item.child_items.each { |child|
+        process_toc_item(child)
+      }
+    end
+
+    # @param pattern [String]
+    # @return [Pathname]
+    #
+    def file_matching(pattern)
+      # @type file_path_names [Array<Pathname>]
+      file_path_names = Pathname.glob("**/#{pattern}*")
+
+      file_path_names.select! { |file_pathname|
+        !file_pathname.to_s.include?(BASE_PATH)
+      }
+
+      raise "not found file matching pattern `#{pattern}`" if file_path_names.empty?
+      raise 'found too many files' if file_path_names.count >= 2
+
+      file_path_names.first
+    end
+
+    # @param from_path [String]
+    #
+    def copy_file_to_destination(from_path)
+      dest_path = File.join(@output_dir, 'OEBPS', from_path.to_s)
+      FileUtils.mkdir_p(Pathname.new(dest_path).dirname)
+      FileUtils.cp(from_path.to_s, dest_path)
+    end
+
     # @param target_name [String]
     #
     # @return [Epuber::Book::Target]
     #
-    def target_named(book, target_name)
-      book.targets.find { |target|
+    def target_named(target_name)
+      target = @book.targets.find { |target|
         target.name == target_name
       }
+
+      raise "Not found target with name #{target_name}" if target.nil?
+      target
     end
   end
 end
