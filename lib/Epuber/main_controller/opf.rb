@@ -24,14 +24,20 @@ module Epuber
 
       OPF_UNIQUE_ID = 'bookid'
 
+      # Creates id from file path
+      #
       # @param path [String]
+      #
       # @return [String]
       #
       def create_id_from_path(path)
         path && path.gsub('/', '.')
       end
 
+      # Creates proper mime-type for file
+      #
       # @param file [Epuber::Book::File]
+      #
       # @return [String]
       #
       def mime_type_for(file)
@@ -39,20 +45,34 @@ module Epuber
         MIME::Types.of(filename).first.content_type
       end
 
+      # Creates hash of namespaces for root package element
+      #
+      # @param target [Epuber::Book::Target]
+      #
+      # @return [Hash<String, String>]
+      #
+      def package_namespaces(target)
+        namespaces = [ EPUB2_NAMESPACES ]
+        namespaces << EPUB3_NAMESPACES if target.epub_version >= 3
+        namespaces << IBOOKS_NAMESPACES if target.epub_version >= 3 && target.is_ibooks?
+        namespaces.reduce(:merge)
+      end
+
+      # Generates XML for opf document
+      #
+      # Use method #to_s to generate nice string from XML document
+      #
       # @param target [Epuber::Book::Target]
       # @param book [Epuber::Book::Book]
+      #
+      # @return [Nokogiri::XML::Document]
       #
       def generate_opf(book, target)
         epub_version = target.epub_version
 
         builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
-          package_namespaces = if epub_version >= 3
-                                 EPUB2_NAMESPACES.merge(EPUB3_NAMESPACES)
-                               else
-                                 EPUB2_NAMESPACES
-                               end
-          
-          xml.package(package_namespaces, :version => epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
+
+          xml.package(package_namespaces(target), :version => epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
             xml.metadata {
               if book.title
                 if epub_version >= 3

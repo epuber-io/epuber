@@ -49,7 +49,7 @@ module Epuber
       #
       def is_ibooks?
         if self.is_ibooks.nil?
-          name.include?('ibooks')
+          name.to_s.include?('ibooks')
         else
           self.is_ibooks
         end
