@@ -1,6 +1,6 @@
 require 'time'
 
-require 'nokogiri/xml/builder'
+require 'nokogiri'
 
 
 module Epuber
@@ -25,7 +25,7 @@ module Epuber
 
 
       def create_id_from_path(path)
-        path.replace('/', '.')
+        path && path.replace('/', '.')
       end
 
 

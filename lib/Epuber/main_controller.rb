@@ -60,17 +60,17 @@ module Epuber
 
       process_other_files
       process_toc_item(@book.root_toc)
+      generate_opf(@book, @target)
 
       # TODO: create other files (.opf, .ncx, ...)
-      
+
       # TODO: pack to epub files
 
     end
 
     def process_other_files
       @target.files.each { |file|
-        # @type file [Epuber::Book::File]
-        copy_file_to_destination(file_matching(file.source_path))
+        process_file(file)
       }
     end
 
@@ -80,14 +80,8 @@ module Epuber
       unless toc_item.file_path.nil?
         puts "    processing toc item #{toc_item.file_path}"
 
-        file_pathname = file_matching(toc_item.file_path)
-        puts "      founded at #{file_pathname.to_s}"
+        process_file(toc_item.file_path) unless toc_item.file_path.nil?
 
-        case file_pathname.extname
-        when '.xhtml'
-          puts '    copying to destination'
-          copy_file_to_destination(file_pathname.to_s)
-        end
       end
 
       toc_item.child_items.each { |child|
@@ -95,10 +89,27 @@ module Epuber
       }
     end
 
-    # @param pattern [String]
+    # @param file [String, Epuber::Book::File]
+    #
+    def process_file(file)
+      file_pathname = find_file(file)
+
+      case file_pathname.extname
+      when '.xhtml', '.css'
+        copy_file_to_destination(file_pathname.to_s)
+      end
+    end
+
+    # @param file_or_pattern [String, Epuber::Book::File]
     # @return [Pathname]
     #
-    def file_matching(pattern)
+    def find_file(file_or_pattern)
+      pattern = if file_or_pattern.is_a?(Epuber::Book::File)
+                  file_or_pattern.source_path
+                else
+                  file_or_pattern
+                end
+
       # @type file_path_names [Array<Pathname>]
       file_path_names = Pathname.glob("**/#{pattern}*")
 
@@ -118,6 +129,7 @@ module Epuber
       dest_path = File.join(@output_dir, 'OEBPS', from_path.to_s)
       FileUtils.mkdir_p(Pathname.new(dest_path).dirname)
       FileUtils.cp(from_path.to_s, dest_path)
+      # puts "copied file from #{from_path} to path #{Pathname.new(dest_path).relative_path_from(Pathname.new(Dir.pwd))}"
     end
 
     # @param target_name [String]
