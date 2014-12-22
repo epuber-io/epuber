@@ -1,6 +1,7 @@
 require 'time'
 
 require 'nokogiri'
+require 'mime-types'
 
 
 module Epuber
@@ -23,27 +24,34 @@ module Epuber
 
       OPF_UNIQUE_ID = 'bookid'
 
-
+      # @param path [String]
+      # @return [String]
+      #
       def create_id_from_path(path)
-        path && path.replace('/', '.')
+        path && path.gsub('/', '.')
       end
 
+      # @param file [Epuber::Book::File]
+      # @return [String]
+      #
+      def mime_type_for(file)
+        filename = file.destination_path
+        MIME::Types.of(filename).first.content_type
+      end
 
-      # @param target [Target]
+      # @param target [Epuber::Book::Target]
       # @param book [Epuber::Book::Book]
       #
-      def generate_opf(book, target = nil)
-        target ||= if book.targets.count == 1
-                     book.targets.first
-                   else
-                     raise 'Please specify target, can take first target only when there is only one target'
-                   end
-
+      def generate_opf(book, target)
         epub_version = target.epub_version
 
-
         builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
-          package_namespaces = EPUB2_NAMESPACES.merge(EPUB3_NAMESPACES)
+          package_namespaces = if epub_version >= 3
+                                 EPUB2_NAMESPACES.merge(EPUB3_NAMESPACES)
+                               else
+                                 EPUB2_NAMESPACES
+                               end
+          
           xml.package(package_namespaces, :version => epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
             xml.metadata {
               if book.title
@@ -86,8 +94,8 @@ module Epuber
               end
             }
             xml.manifest {
-              target.files.each {
-
+              target.all_files.each { |file|
+                xml.item(id: create_id_from_path(file.destination_path), href: file.destination_path, 'media-type' => mime_type_for(file))
               }
             }
             xml.spine
@@ -101,7 +109,7 @@ module Epuber
       # @param book [Epuber::Book::Book]
       # @return [Epuber::Book::File]
       #
-      def generate_opf_file(book, target = nil)
+      def generate_opf_file(book, target)
         opf_file = Epuber::Book::File.new(nil)
         opf_file.destination_path = 'content.opf'
         opf_file.content = generate_opf(book, target)

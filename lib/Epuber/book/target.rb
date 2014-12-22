@@ -28,10 +28,6 @@ module Epuber
       #
       alias_method :sub_targets, :child_items
 
-      # @return [Array<Epuber::Book::File>]
-      #
-      attr_reader :all_files
-
 
       # Create new sub_target with name
       #
@@ -65,6 +61,16 @@ module Epuber
       def files
         # parent files plus our files
         ((self.parent && self.parent.files) || []) + @files
+      end
+
+      # @return [Array<Epuber::Book::File>]
+      #
+      def all_files
+        ((self.parent && self.parent.all_files) || []) + @all_files
+      end
+
+      def add_to_all_files(file)
+        @all_files << file
       end
 
       #----------------------- DSL items ---------------------------

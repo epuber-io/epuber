@@ -65,6 +65,7 @@ module Epuber
 
       # generate .opf file
       opf_file = generate_opf_file(@book, @target)
+      puts opf_file.content.to_s
       process_file(opf_file)
 
       # TODO: create other files (.opf, .ncx, ...)
@@ -88,7 +89,7 @@ module Epuber
 
         file = Epuber::Book::File.new(toc_item.file_path)
 
-        @target.all_files << file
+        @target.add_to_all_files(file)
         process_file(file)
       end
 
