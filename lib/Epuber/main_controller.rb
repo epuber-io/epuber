@@ -40,6 +40,8 @@ module Epuber
         targets.each do |target_name|
           process_target_named(target_name)
         end
+
+        @book = nil
       end
     end
 
@@ -60,12 +62,16 @@ module Epuber
 
       process_other_files
       process_toc_item(@book.root_toc)
-      generate_opf(@book, @target)
+
+      # generate .opf file
+      opf_file = generate_opf_file(@book, @target)
+      process_file(opf_file)
 
       # TODO: create other files (.opf, .ncx, ...)
 
       # TODO: pack to epub files
 
+      @target = nil
     end
 
     def process_other_files
@@ -80,8 +86,10 @@ module Epuber
       unless toc_item.file_path.nil?
         puts "    processing toc item #{toc_item.file_path}"
 
-        process_file(toc_item.file_path) unless toc_item.file_path.nil?
+        file = Epuber::Book::File.new(toc_item.file_path)
 
+        @target.all_files << file
+        process_file(file)
       end
 
       toc_item.child_items.each { |child|
@@ -89,19 +97,47 @@ module Epuber
       }
     end
 
-    # @param file [String, Epuber::Book::File]
+    # @param file [Epuber::Book::File]
     #
     def process_file(file)
-      file_pathname = find_file(file)
+      dest_path = Pathname.new(destination_path_of_file(file))
+      FileUtils.mkdir_p(dest_path.dirname)
 
-      case file_pathname.extname
-      when '.xhtml', '.css'
-        copy_file_to_destination(file_pathname.to_s)
+      if !file.source_path.nil?
+        file_pathname = Pathname.new(file.real_source_path)
+
+        case file_pathname.extname
+        when '.xhtml', '.css'
+          FileUtils.cp(file_pathname.to_s, dest_path.to_s)
+        else
+          raise "unknown file extension #{file_pathname.extname} for file #{file}"
+        end
+      elsif !file.content.nil?
+        # write file
+        File.open(dest_path.to_s, 'w') { |file_handle|
+          file_handle.write(file.content)
+        }
+      end
+    end
+
+    # @param file [Epuber::Book::File]
+    # @return [String]
+    #
+    def destination_path_of_file(file)
+      if file.destination_path.nil?
+        real_path = find_file(file)
+
+        file.destination_path = real_path
+        file.real_source_path = real_path
+
+        File.join(@output_dir, 'OEBPS', real_path)
+      else
+        File.join(@output_dir, 'OEBPS', file.destination_path)
       end
     end
 
     # @param file_or_pattern [String, Epuber::Book::File]
-    # @return [Pathname]
+    # @return [String]
     #
     def find_file(file_or_pattern)
       pattern = if file_or_pattern.is_a?(Epuber::Book::File)
@@ -120,16 +156,7 @@ module Epuber
       raise "not found file matching pattern `#{pattern}`" if file_path_names.empty?
       raise 'found too many files' if file_path_names.count >= 2
 
-      file_path_names.first
-    end
-
-    # @param from_path [String]
-    #
-    def copy_file_to_destination(from_path)
-      dest_path = File.join(@output_dir, 'OEBPS', from_path.to_s)
-      FileUtils.mkdir_p(Pathname.new(dest_path).dirname)
-      FileUtils.cp(from_path.to_s, dest_path)
-      # puts "copied file from #{from_path} to path #{Pathname.new(dest_path).relative_path_from(Pathname.new(Dir.pwd))}"
+      file_path_names.first.to_s
     end
 
     # @param target_name [String]

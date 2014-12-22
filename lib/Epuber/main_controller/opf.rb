@@ -30,6 +30,7 @@ module Epuber
 
 
       # @param target [Target]
+      # @param book [Epuber::Book::Book]
       #
       def generate_opf(book, target = nil)
         target ||= if book.targets.count == 1
@@ -43,7 +44,7 @@ module Epuber
 
         builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
           package_namespaces = EPUB2_NAMESPACES.merge(EPUB3_NAMESPACES)
-          xml.package(package_namespaces, :version => book.epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
+          xml.package(package_namespaces, :version => epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
             xml.metadata {
               if book.title
                 if epub_version >= 3
@@ -84,12 +85,27 @@ module Epuber
                 end
               end
             }
-            xml.manifest
+            xml.manifest {
+              target.files.each {
+
+              }
+            }
             xml.spine
           }
         }
 
         builder.doc
+      end
+
+      # @param target [Epuber::Book::Target]
+      # @param book [Epuber::Book::Book]
+      # @return [Epuber::Book::File]
+      #
+      def generate_opf_file(book, target = nil)
+        opf_file = Epuber::Book::File.new(nil)
+        opf_file.destination_path = 'content.opf'
+        opf_file.content = generate_opf(book, target)
+        opf_file
       end
     end
   end

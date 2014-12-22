@@ -21,6 +21,14 @@ module Epuber
 
       # -------------- creating sub items -----------------
 
+      # Creating sub item from file
+      #
+      # @example
+      #      toc.file 'ch01', 'Chapter 1', :landmark_start_page
+      #      toc.file 'ch02', :landmark_copyright
+      #      toc.file 'ch03', :linear => false
+      #      toc.file 'ch04', linear: false
+      #
       # @param [String] file_path
       # @param [String] title
       #
@@ -31,7 +39,7 @@ module Epuber
         create_child_item do |item|
           item.file_path = file_path
 
-          if title.is_a? String
+          if title.is_a?(String)
             item.title = title
           else
             opts.unshift(title)

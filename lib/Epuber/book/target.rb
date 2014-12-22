@@ -17,6 +17,7 @@ module Epuber
         @name      = name
         @is_ibooks = nil
         @files     = []
+        @all_files = []
       end
 
       # @return [String] target name
@@ -26,6 +27,10 @@ module Epuber
       # @return [Array<self.class>] list of sub targets
       #
       alias_method :sub_targets, :child_items
+
+      # @return [Array<Epuber::Book::File>]
+      #
+      attr_reader :all_files
 
 
       # Create new sub_target with name
@@ -100,7 +105,6 @@ module Epuber
       # @param file_path [String | Epuber::Book::File]
       #
       def add_file(file_path)
-
         file = if file_path.is_a?(Epuber::Book::File)
                  file_path
                else
@@ -108,6 +112,7 @@ module Epuber
                end
 
         @files << file unless @files.include?(file)
+        @all_files << file unless @all_files.include?(file)
       end
 
 

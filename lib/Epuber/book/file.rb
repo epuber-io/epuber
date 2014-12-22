@@ -15,9 +15,15 @@ module Epuber
       #
       attr_accessor :mime_type
 
+
+
+      attr_accessor :content
+
+
       # @return [String]
       #
-      attr_accessor :group_name
+      attr_accessor :real_source_path
+
 
       def initialize(source_path)
         @source_path = source_path

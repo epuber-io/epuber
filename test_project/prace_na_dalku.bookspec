@@ -13,8 +13,6 @@ Epuber::Book::Book.new do |book|
   book.isbn = '978-80-87270-98-2'
   book.published = '2014-06-10'
 
-  book.cover_image = 'cover.jpg'
-
   book.version = '1.0.1'
   book.build_version = '5'
 
