@@ -9,7 +9,7 @@ module Epuber
 
       # @return [String]
       #
-      attr_accessor :source_path
+      attr_accessor :source_path_pattern
 
       # @return [String]
       #
@@ -26,13 +26,13 @@ module Epuber
 
 
       def initialize(source_path)
-        @source_path = source_path
+        @source_path_pattern = source_path
       end
 
       # @param other [Epuber::Book::File]
       #
       def ==(other)
-        @source_path == other.source_path
+        @source_path_pattern == other.source_path_pattern
       end
     end
   end

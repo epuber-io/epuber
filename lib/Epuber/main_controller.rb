@@ -93,6 +93,7 @@ module Epuber
         process_file(file)
       end
 
+      # process recursively other files
       toc_item.child_items.each { |child|
         process_toc_item(child)
       }
@@ -104,7 +105,7 @@ module Epuber
       dest_path = Pathname.new(destination_path_of_file(file))
       FileUtils.mkdir_p(dest_path.dirname)
 
-      if !file.source_path.nil?
+      if !file.source_path_pattern.nil?
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
@@ -142,7 +143,7 @@ module Epuber
     #
     def find_file(file_or_pattern)
       pattern = if file_or_pattern.is_a?(Epuber::Book::File)
-                  file_or_pattern.source_path
+                  file_or_pattern.source_path_pattern
                 else
                   file_or_pattern
                 end
