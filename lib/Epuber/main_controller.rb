@@ -3,6 +3,7 @@ require 'pathname'
 require 'fileutils'
 
 require_relative 'main_controller/opf'
+require_relative 'main_controller/nav_generator'
 
 require_relative 'book'
 
@@ -63,10 +64,17 @@ module Epuber
       process_other_files
       process_toc_item(@book.root_toc)
 
+      # generate nav file (nav.xhtml or nav.ncx)
+      nav_file = NavGenerator.new(@book, @target).generate_nav_file
+      puts nav_file.content.to_s
+      @target.add_to_all_files(nav_file)
+      process_file(nav_file)
+
       # generate .opf file
       opf_file = generate_opf_file(@book, @target)
-      puts opf_file.content.to_s
       process_file(opf_file)
+
+
 
       # TODO: create other files (.opf, .ncx, ...)
 
@@ -84,10 +92,10 @@ module Epuber
     # @param toc_item [Epuber::Book::TocItem]
     #
     def process_toc_item(toc_item)
-      unless toc_item.file_path.nil?
-        puts "    processing toc item #{toc_item.file_path}"
+      unless toc_item.file_obj.nil?
+        file = toc_item.file_obj
 
-        file = Epuber::Book::File.new(toc_item.file_path)
+        puts "    processing toc item #{file.source_path_pattern}"
 
         @target.add_to_all_files(file)
         process_file(file)

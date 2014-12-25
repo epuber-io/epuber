@@ -1,12 +1,15 @@
 require_relative '../dsl/tree_object'
+require_relative 'file'
 
 module Epuber
   module Book
     class TocItem < DSL::TreeObject
 
-      # @return [String]
+      # @return [Epuber::Book::File]
       #
-      attribute :file_path,
+      attribute :file_obj,
+                types: [Epuber::Book::File],
+                auto_convert: { String => Epuber::Book::File },
                 inherited: true
 
       # @return [String]
@@ -37,7 +40,7 @@ module Epuber
       #
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
-          item.file_path = file_path
+          item.file_obj = Epuber::Book::File.new(file_path)
 
           if title.is_a?(String)
             item.title = title

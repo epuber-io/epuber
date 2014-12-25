@@ -19,7 +19,6 @@ Epuber::Book::Book.new do |book|
   # definition of new target
   book.target :ibooks do |ibooks|
     ibooks.epub_version = 3.0
-
   end
 
   book.target :wooky do |wooky|
@@ -30,7 +29,7 @@ Epuber::Book::Book.new do |book|
   book.add_file 'prace_na_dalku.css'
 
   book.toc do |toc|
-    toc.file 'cover.xhtml', :landmark_cover
+    toc.file 'cover.xhtml', 'Obálka', :landmark_cover
     # toc.file 'vakat'
     #
     # toc.file 'copyright', :landmark_copyright
