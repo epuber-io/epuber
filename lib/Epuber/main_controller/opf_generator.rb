@@ -6,7 +6,7 @@ require 'mime-types'
 
 module Epuber
   class MainController
-    module OPF
+    class OPFGenerator
 
       EPUB2_NAMESPACES = {
         'xmlns'    => 'http://www.idpf.org/2007/opf',

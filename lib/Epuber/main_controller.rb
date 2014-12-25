@@ -2,7 +2,7 @@
 require 'pathname'
 require 'fileutils'
 
-require_relative 'main_controller/opf'
+require_relative 'main_controller/opf_generator'
 require_relative 'main_controller/nav_generator'
 
 require_relative 'book'
@@ -10,7 +10,6 @@ require_relative 'book'
 
 module Epuber
   class MainController
-    include OPF
 
     BASE_PATH = '.epuber'
 
