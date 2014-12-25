@@ -65,12 +65,12 @@ module Epuber
 
       # generate nav file (nav.xhtml or nav.ncx)
       nav_file = NavGenerator.new(@book, @target).generate_nav_file
-      puts nav_file.content.to_s
       @target.add_to_all_files(nav_file)
       process_file(nav_file)
 
       # generate .opf file
-      opf_file = generate_opf_file(@book, @target)
+      opf_file = OPFGenerator.new(@book, @target).generate_opf_file
+      puts opf_file.content
       process_file(opf_file)
 
 
