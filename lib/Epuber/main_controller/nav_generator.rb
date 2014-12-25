@@ -41,48 +41,9 @@ module Epuber
           @xml = xml
 
           if @target.epub_version >= 3
-            xml.doc.create_internal_subset('html', nil, nil)
-            xml.html(nav_namespaces) {
-              xml.head {
-                xml.title_(@book.title)
-              }
-              xml.body {
-                xml.nav('epub:type' => 'toc') {
-                  visit_nav_toc_items(@book.root_toc.child_items)
-                }
-              }
-            }
-
+            generate_xhtml_content
           else
-            xml.doc.create_internal_subset('ncx',
-                                           '-//NISO//DTD ncx 2005-1//EN',
-                                           'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd')
-
-            xml.ncx(nav_namespaces, version: '2005-1') {
-
-              # head
-              xml.head {
-                xml.meta(name: 'dtb:uid', content: @target.isbn)
-
-                # TODO: try without these
-                xml.meta(name: 'dtb:depth', content: '1')
-                xml.meta(name: 'dtb:totalPageCount', content: '1')
-                xml.meta(name: 'dtb:maxPageNumber', content: '1')
-              }
-
-              # title
-              xml.docTitle {
-                xml.text_(@book.title)
-              }
-
-              @nav_play_order = 1
-              @nav_nav_point_id = 1
-
-              # nav map
-              xml.navMap {
-                visit_nav_toc_items(@book.root_toc.child_items)
-              }
-            }
+            generate_ncx_content
           end
 
           @xml = nil
@@ -122,12 +83,58 @@ module Epuber
         end
       end
 
+      def generate_xhtml_content
+        @xml.doc.create_internal_subset('html', nil, nil)
+        @xml.html(nav_namespaces) {
+          @xml.head {
+            @xml.title_(@book.title)
+          }
+          @xml.body {
+            @xml.nav('epub:type' => 'toc') {
+              visit_toc_items(@book.root_toc.child_items)
+            }
+          }
+        }
+      end
+
+      def generate_ncx_content
+        @xml.doc.create_internal_subset('ncx',
+                                       '-//NISO//DTD ncx 2005-1//EN',
+                                       'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd')
+
+        @xml.ncx(nav_namespaces, version: '2005-1') {
+
+          # head
+          @xml.head {
+            @xml.meta(name: 'dtb:uid', content: @target.isbn)
+
+            # TODO: try without these
+            @xml.meta(name: 'dtb:depth', content: '1')
+            @xml.meta(name: 'dtb:totalPageCount', content: '1')
+            @xml.meta(name: 'dtb:maxPageNumber', content: '1')
+          }
+
+          # title
+          @xml.docTitle {
+            @xml.text_(@book.title)
+          }
+
+          @nav_play_order = 1
+          @nav_nav_point_id = 1
+
+          # nav map
+          @xml.navMap {
+            visit_toc_items(@book.root_toc.child_items)
+          }
+        }
+      end
+
       # @param toc_items [Array<Epuber::Book::TocItem>]
       #
-      def visit_nav_toc_items(toc_items)
+      def visit_toc_items(toc_items)
         iterate_lambda = lambda {
           toc_items.each { |child_item|
-            visit_nav_toc_item(child_item)
+            visit_toc_item(child_item)
           }
         }
 
@@ -142,14 +149,14 @@ module Epuber
 
       # @param toc_item [Epuber::Book::TocItem]
       #
-      def visit_nav_toc_item(toc_item)
+      def visit_toc_item(toc_item)
         if toc_item.title.nil?
-          visit_nav_toc_items(toc_item.child_items)
+          visit_toc_items(toc_item.child_items)
         elsif @target.epub_version >= 3
           @xml.li {
             @xml.a(toc_item.title, href: toc_item.file_obj.destination_path)
 
-            visit_nav_toc_items(toc_item.child_items)
+            visit_toc_items(toc_item.child_items)
           }
         else
           @xml.navPoint(id: "navPoint_#{@nav_nav_point_id}", playOrder: @nav_play_order) {
@@ -161,7 +168,7 @@ module Epuber
             @nav_nav_point_id += 1
             @nav_play_order += 1
 
-            visit_nav_toc_items(toc_item.child_items)
+            visit_toc_items(toc_item.child_items)
           }
         end
       end
