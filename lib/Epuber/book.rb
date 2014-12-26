@@ -18,9 +18,6 @@ module Epuber
         @default_target   = Target.new(:default)
         @root_toc         = TocItem.new
 
-        # setup defaults
-        self.epub_version = 3.0
-
         yield self if block_given?
       end
 

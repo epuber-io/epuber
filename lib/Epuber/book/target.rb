@@ -104,7 +104,8 @@ module Epuber
                 required:     true,
                 inherited:    true,
                 types:        [Version],
-                auto_convert: { [String, Fixnum, Float] => Version }
+                auto_convert: { [String, Fixnum, Float] => Version },
+                default_value: 3.0
 
       # @return [String] isbn of epub
       #
