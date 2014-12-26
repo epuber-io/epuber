@@ -50,10 +50,10 @@ module Epuber
       def create_child_item(*args)
         child = self.class.new(*args)
 
-        yield child if block_given?
-
         child.parent = self
         @child_items << child
+
+        yield child if block_given?
 
         child
       end
