@@ -12,6 +12,18 @@ module Epuber
           define_method_attr(name, attr)
         end
 
+        def find_root(instance)
+          if instance.respond_to?(:parent)
+            if instance.parent.nil?
+              instance
+            else
+              find_root(instance.parent)
+            end
+          else
+            nil
+          end
+        end
+
         # @param [Attribute] attr
         #
         def define_method_attr(name, attr)
@@ -21,10 +33,13 @@ module Epuber
           define_method(key) do
             value = @attributes_values[key]
 
-            if not value.nil?
+            if !value.nil?
               value
-            elsif attr.inherited? && value.nil? && respond_to?(:parent) && self.parent
+            elsif attr.inherited? && respond_to?(:parent) && self.parent
               self.parent.send(key)
+            elsif !attr.default_value.nil?
+              root_obj = self.class.find_root(self) || self
+              root_obj.send(attr.writer_name, attr.default_value)
             end
           end
 

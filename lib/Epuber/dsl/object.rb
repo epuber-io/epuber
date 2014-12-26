@@ -35,7 +35,7 @@ module Epuber
       def validate
         self.class.attributes.each do |key, attr|
 
-          value = @attributes_values[key]
+          value = @attributes_values[key] || attr.converted_value(attr.default_value)
 
           attr.validate_type(value)
 
