@@ -12,6 +12,7 @@ module Epuber
   class MainController
 
     BASE_PATH = '.epuber'
+    EPUB_CONTENT_FOLDER = 'OEBPS'
 
     # @param targets [Array<String>] targets names
     #
@@ -73,9 +74,8 @@ module Epuber
       puts opf_file.content
       process_file(opf_file)
 
-
-
-      # TODO: create other files (.opf, .ncx, ...)
+      # TODO: create META-INF
+      # TODO: create
 
       # TODO: pack to epub files
 
@@ -139,9 +139,9 @@ module Epuber
         file.destination_path = real_path
         file.real_source_path = real_path
 
-        File.join(@output_dir, 'OEBPS', real_path)
+        File.join(@output_dir, EPUB_CONTENT_FOLDER, real_path)
       else
-        File.join(@output_dir, 'OEBPS', file.destination_path)
+        File.join(@output_dir, EPUB_CONTENT_FOLDER, file.destination_path)
       end
     end
 
