@@ -12,7 +12,9 @@ describe 'Test project' do
 
       system('ruby ../bin/epuber compile')
 
-      system('epubcheck experiment-ibooks.epub')
+      Dir.glob('*.epub').each { |epub_file|
+        system(%{epubcheck #{epub_file}})
+      }
     }
   end
 end
