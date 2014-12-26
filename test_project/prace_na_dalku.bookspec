@@ -16,6 +16,8 @@ Epuber::Book::Book.new do |book|
   book.version = '1.0.1'
   book.build_version = '5'
 
+  book.cover_image = 'cover'
+
   book.target :ibooks do |ibooks|
     ibooks.epub_version = 3.0
   end
