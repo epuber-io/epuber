@@ -24,6 +24,32 @@ module Epuber
         'xmlns:ibooks' => 'http://apple.com/ibooks/html-extensions',
       }.freeze
 
+      # resource page http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm#TOC2.6
+      LANDMARKS_MAP = {
+
+        # my favorite
+        landmark_cover:      'cover',
+        landmark_start_page: 'text',
+        landmark_copyright:  'copyright-page',
+        landmark_toc:        'toc',
+
+        # others
+        landmark_title:                 'title-page',
+        landmark_index:                 'index',
+        landmark_glossary:              'glossary',
+        landmark_acknowledgements:      'acknowledgements',
+        landmark_bibliography:          'bibliography',
+        landmark_colophon:              'colophon',
+        landmark_dedication:            'dedication',
+        landmark_epigraph:              'epigraph',
+        landmark_foreword:              'foreword',
+        landmark_list_of_illustrations: 'loi',
+        landmark_list_of_tables:        'lot',
+        landmark_notes:                 'notes',
+        landmark_preface:               'preface',
+
+      }.freeze
+
       OPF_UNIQUE_ID = 'bookid'
 
       # @param target [Epuber::Book::Target]
@@ -48,6 +74,7 @@ module Epuber
             generate_metadata
             generate_manifest
             generate_spine
+            generate_guide
           }
 
           @xml = nil
@@ -173,6 +200,39 @@ module Epuber
         @xml.itemref(attrs)
 
         visit_toc_items(toc_item.child_items)
+      end
+
+      # --------- GUIDE --------------------------
+
+      def generate_guide
+        unless @target.epub_version >= 3
+          @xml.guide {
+            guide_visit_toc_item(@book.root_toc)
+          }
+        end
+      end
+
+      # @param toc_items [Array<Epuber::Book::TocItem>]
+      #
+      def guide_visit_toc_items(toc_items)
+        toc_items.each { |child_item|
+          guide_visit_toc_item(child_item)
+        }
+      end
+
+      # @param toc_item [Epuber::Book::TocItem]
+      #
+      def guide_visit_toc_item(toc_item)
+        landmarks = toc_item.landmarks
+        landmarks.each { |landmark|
+          type = LANDMARKS_MAP[landmark]
+
+          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP}" if type.nil?
+
+          @xml.reference(type: type, href: toc_item.file_obj.destination_path)
+        }
+
+        guide_visit_toc_items(toc_item.child_items)
       end
 
       # --------- other methods --------------------------
