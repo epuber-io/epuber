@@ -13,7 +13,7 @@ describe 'Test project' do
       system('ruby ../bin/epuber compile')
 
       Dir.glob('*.epub').each { |epub_file|
-        system(%{epubcheck #{epub_file}})
+        system(%{epubcheck "#{epub_file}"})
       }
     }
   end
