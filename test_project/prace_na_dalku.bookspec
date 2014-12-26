@@ -26,6 +26,7 @@ Epuber::Book::Book.new do |book|
   end
 
   book.add_file 'prace_na_dalku.css'
+  book.add_files '*.{png,jpg,jpeg}'
 
   book.toc do |toc|
     toc.file 'cover', :landmark_cover, :landmark_start_page
