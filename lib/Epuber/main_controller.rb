@@ -64,7 +64,14 @@ module Epuber
 
       process_other_files
       process_toc_item(@book.root_toc)
+      generate_other_files
 
+      archive(@output_dir, "experiment-#{target_name}.epub") # TODO: correct file name
+
+      @target = nil
+    end
+
+    def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
       nav_file = NavGenerator.new(@book, @target).generate_nav_file
       @target.add_to_all_files(nav_file)
@@ -75,9 +82,9 @@ module Epuber
       process_file(opf_file)
 
       # generate mimetype file
-      mimetype_file = Epuber::Book::File.new(nil)
+      mimetype_file                  = Epuber::Book::File.new(nil)
       mimetype_file.destination_path = '../mimetype'
-      mimetype_file.content = 'application/epub+zip'
+      mimetype_file.content          = 'application/epub+zip'
       process_file(mimetype_file)
 
       # generate META-INF files
@@ -85,10 +92,6 @@ module Epuber
       meta_inf_files.each { |meta_file|
         process_file(meta_file)
       }
-
-      archive(@output_dir, "experiment-#{target_name}.epub") # TODO: correct file name
-
-      @target = nil
     end
 
     def process_other_files
