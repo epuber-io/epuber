@@ -164,6 +164,12 @@ module Epuber
       #
       attribute :build_version
 
+      # @return [String] base name for output epub file
+      #
+      attribute :output_base_name,
+                inherited: true
+
+
       # Add file to book, see Target#add_file to more details
       #
       def add_file(*args)

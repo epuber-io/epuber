@@ -15,6 +15,7 @@ Epuber::Book::Book.new do |book|
 
   book.version = '1.0.1'
   book.build_version = '5'
+  book.output_base_name = 'prace_na_dalku'
 
   book.cover_image = 'cover'
 

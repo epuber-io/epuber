@@ -66,7 +66,8 @@ module Epuber
       process_target_files
       generate_other_files
 
-      archive(@output_dir, "experiment-#{target_name}.epub") # TODO: correct file name
+      epub_name = "#{@book.output_base_name}#{@book.build_version}-#{target_name}.epub"
+      archive(@output_dir, epub_name)
 
       @target = nil
     end
