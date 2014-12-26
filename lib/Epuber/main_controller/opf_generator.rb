@@ -168,7 +168,7 @@ module Epuber
       def visit_toc_item(toc_item)
         attrs = {}
         attrs['idref'] = create_id_from_path(toc_item.file_obj.destination_path)
-        attrs['linear'] = 'no' if toc_item.options.include?({ linear: false })
+        attrs['linear'] = 'no' unless toc_item.linear?
 
         @xml.itemref(attrs)
 

@@ -22,6 +22,30 @@ module Epuber
                 default_value: []
 
 
+
+      # -------------- creating sub items -----------------
+
+      def landmarks
+        self.options.select { |item|
+          item.is_a?(Symbol) && item.to_s.start_with?('landmark')
+        }
+      end
+
+      # @return [Bool]
+      #
+      def linear?
+        first = self.options.select { |item|
+          item.is_a?(Hash) && (item.include?(:linear) || item.include?('linear'))
+        }.first
+
+        if first.nil?
+          true
+        else
+          first.values.first
+        end
+      end
+
+
       # -------------- creating sub items -----------------
 
       # Creating sub item from file
