@@ -106,7 +106,7 @@ module Epuber
 
           # head
           @xml.head {
-            @xml.meta(name: 'dtb:uid', content: @target.isbn)
+            @xml.meta(name: 'dtb:uid', content: "urn:isbn:#{@target.isbn}")
 
             # TODO: try without these
             @xml.meta(name: 'dtb:depth', content: '1')
