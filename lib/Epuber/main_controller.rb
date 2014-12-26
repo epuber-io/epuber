@@ -61,8 +61,8 @@ module Epuber
 
       puts "  handling target `#{@target.name}` in build dir `#{@output_dir}`"
 
-      process_target_files
       process_toc_item(@book.root_toc)
+      process_target_files
       generate_other_files
 
       archive(@output_dir, "experiment-#{target_name}.epub") # TODO: correct file name
@@ -95,6 +95,13 @@ module Epuber
     end
 
     def process_target_files
+      @target.files.select { |file|
+        !file.only_one
+      }.each { |file|
+        files = find_files(file).map { |path| Epuber::Book::File.new(path) }
+        @target.replace_file_with_files(file, files)
+      }
+
       @target.files.each { |file|
         process_file(file)
       }
@@ -128,7 +135,7 @@ module Epuber
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
-        when '.xhtml', '.css'
+        when '.xhtml', '.css', '.png', '.jpg', '.jpeg'
           FileUtils.cp(file_pathname.to_s, dest_path.to_s)
         else
           raise "unknown file extension #{file_pathname.extname} for file #{file}"
@@ -180,15 +187,22 @@ module Epuber
     end
 
     # @param file_or_pattern [String, Epuber::Book::File]
-    # @param group [Symbol]
-    # @return [String]
+    # @return [String] only pattern
     #
-    def find_file(file_or_pattern, group = nil)
-      pattern = if file_or_pattern.is_a?(Epuber::Book::File)
-                  file_or_pattern.source_path_pattern
-                else
-                  file_or_pattern
-                end
+    def pattern_from(file_or_pattern)
+      if file_or_pattern.is_a?(Epuber::Book::File)
+        file_or_pattern.source_path_pattern
+      else
+        file_or_pattern
+      end
+    end
+
+    # @param file_or_pattern [String, Epuber::Book::File]
+    # @param group [Symbol]
+    # @return [Array<String>]
+    #
+    def find_files(file_or_pattern, group = nil)
+      pattern = pattern_from(file_or_pattern)
 
       group = file_or_pattern.group if group.nil? && file_or_pattern.is_a?(Epuber::Book::File)
 
@@ -197,6 +211,17 @@ module Epuber
       if file_paths.empty?
         file_paths = file_paths_with_pattern("**/#{pattern}.*", group)
       end
+
+      file_paths
+    end
+
+    # @param file_or_pattern [String, Epuber::Book::File]
+    # @param group [Symbol]
+    # @return [String]
+    #
+    def find_file(file_or_pattern, group = nil)
+      pattern = pattern_from(file_or_pattern)
+      file_paths = find_files(file_or_pattern, group)
 
       raise "not found file matching pattern `#{pattern}`" if file_paths.empty?
       raise "found too many files for pattern `#{pattern}`" if file_paths.count >= 2

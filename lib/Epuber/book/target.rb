@@ -73,6 +73,27 @@ module Epuber
         @all_files << file
       end
 
+      # @param file [Epuber::Book::File]
+      # @param files [Array<Epuber::Book::Files>]
+      #
+      def replace_file_with_files(file, files)
+        if @files.include?(file) || @all_files.include?(file)
+          index = @files.index(file)
+          unless index.nil?
+            @files.delete_at(index)
+            @files.insert(index, *files)
+          end
+
+          index = @all_files.index(file)
+          unless index.nil?
+            @all_files.delete_at(index)
+            @all_files.insert(index, *files)
+          end
+        elsif !self.parent.nil?
+          self.parent.replace_file_with_files(file, files)
+        end
+      end
+
       #----------------------- DSL items ---------------------------
 
 
@@ -109,19 +130,26 @@ module Epuber
 
 
       # @param file_path [String | Epuber::Book::File]
+      # @param group [Symbol]
       #
-      def add_file(file_path)
+      def add_file(file_path, group: nil)
         file = if file_path.is_a?(Epuber::Book::File)
                  file_path
                else
-                 Epuber::Book::File.new(file_path)
+                 Epuber::Book::File.new(file_path, group: group)
                end
 
         @files << file unless @files.include?(file)
         @all_files << file unless @all_files.include?(file)
+        file
       end
 
-
+      def add_files(*file_paths)
+        file_paths.each { |file_path|
+          file_obj = add_file(file_path)
+          file_obj.only_one = false
+        }
+      end
 
       # TODO store url
     end

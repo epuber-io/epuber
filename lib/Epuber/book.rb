@@ -164,8 +164,16 @@ module Epuber
       #
       attribute :build_version
 
-      def add_file(filepath)
-        @default_target.add_file(filepath)
+      # Add file to book, see Target#add_file to more details
+      #
+      def add_file(*args)
+        @default_target.add_file(*args)
+      end
+
+      # Add files to book, see Target#add_files to more details
+      #
+      def add_files(*file_paths)
+        @default_target.add_files(*file_paths)
       end
 
 

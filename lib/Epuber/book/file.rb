@@ -23,6 +23,14 @@ module Epuber
       #
       attr_accessor :content
 
+      # When looking for file, the resulted list should contain only one file
+      #
+      # Default: true
+      #
+      # @return [Bool]
+      #
+      attr_accessor :only_one
+
       # @return [Array<String>]
       #
       attr_accessor :properties
@@ -35,6 +43,7 @@ module Epuber
       def initialize(source_path, group: nil)
         @source_path_pattern = source_path
 
+        @only_one = true
         @group = group
         @properties = []
       end
