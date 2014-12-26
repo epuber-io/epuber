@@ -40,7 +40,10 @@ module Epuber
       #
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
-          item.file_obj = Epuber::Book::File.new(file_path)
+
+          unless file_path.nil?
+            item.file_obj = Epuber::Book::File.new(file_path)
+          end
 
           if title.is_a?(String)
             item.title = title

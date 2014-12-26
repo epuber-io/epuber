@@ -29,10 +29,14 @@ module Epuber
         @source_path_pattern = source_path
       end
 
-      # @param other [Epuber::Book::File]
+      # @param other [String, Epuber::Book::File]
       #
       def ==(other)
-        @source_path_pattern == other.source_path_pattern
+        if other.is_a?(String)
+          @source_path_pattern == other
+        else
+          @source_path_pattern == other.source_path_pattern
+        end
       end
     end
   end

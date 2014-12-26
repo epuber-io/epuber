@@ -62,7 +62,7 @@ module Epuber
 
       puts "  handling target `#{@target.name}` in build dir `#{@output_dir}`"
 
-      process_other_files
+      process_target_files
       process_toc_item(@book.root_toc)
       generate_other_files
 
@@ -94,7 +94,7 @@ module Epuber
       }
     end
 
-    def process_other_files
+    def process_target_files
       @target.files.each { |file|
         process_file(file)
       }

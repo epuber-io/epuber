@@ -221,7 +221,7 @@ module Epuber
           cover = @book.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover)
           expect(cover.title).to be_nil
-          expect(cover.file_path).to eq 'cover'
+          expect(cover.file_obj).to eq 'cover'
         end
 
         it 'support for linear = false' do
@@ -232,7 +232,7 @@ module Epuber
           cover = @book.root_toc.child_items[0]
           expect(cover.options).to contain_exactly({ linear: false })
           expect(cover.title).to be_nil
-          expect(cover.file_path).to eq 'cover'
+          expect(cover.file_obj).to eq 'cover'
         end
 
         it 'support options and linear = false together' do
@@ -243,7 +243,7 @@ module Epuber
           cover = @book.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover, { linear: false })
           expect(cover.title).to be_nil
-          expect(cover.file_path).to eq 'cover'
+          expect(cover.file_obj).to eq 'cover'
         end
       end
     end

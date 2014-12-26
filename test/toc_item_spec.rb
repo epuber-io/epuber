@@ -8,12 +8,12 @@ module Epuber
 		before do
 			@root           = TocItem.new
 			@root.title     = 'Section 1'
-			@root.file_path = 's01'
+			@root.file_obj  = 's01'
 		end
 
 		it 'store information' do
 			expect(@root.title).to eq 'Section 1'
-			expect(@root.file_path).to eq 's01'
+			expect(@root.file_obj).to eq 's01'
 		end
 
 		context 'sub items creating' do
@@ -31,13 +31,13 @@ module Epuber
 					sub_item = @root.file('ch01', 'Chapter 1')
 
 					expect(sub_item.title).to eq 'Chapter 1'
-					expect(sub_item.file_path).to eq 'ch01'
+					expect(sub_item.file_obj).to eq 'ch01'
 				end
 
-				it 'child items inherit file_path' do
+				it 'child items inherit file_obj' do
 					sub_item = @root.file(nil, 'Chapter 1')
 
-					expect(sub_item.file_path).to eq 's01'
+					expect(sub_item.file_obj).to eq 's01'
 				end
 			end
 
@@ -45,7 +45,7 @@ module Epuber
 				sub_item = @root.item('Chapter 2')
 
 				expect(sub_item.title).to eq 'Chapter 2'
-				expect(sub_item.file_path).to eq 's01' # file path should be inherited
+				expect(sub_item.file_obj).to eq 's01' # file path should be inherited
 			end
 
 			context 'parsing and storing options' do
