@@ -16,7 +16,6 @@ Epuber::Book::Book.new do |book|
   book.version = '1.0.1'
   book.build_version = '5'
 
-  # definition of new target
   book.target :ibooks do |ibooks|
     ibooks.epub_version = 3.0
   end
@@ -29,27 +28,33 @@ Epuber::Book::Book.new do |book|
   book.add_file 'prace_na_dalku.css'
 
   book.toc do |toc|
-    toc.file 'cover.xhtml', 'Obálka', :landmark_cover
-    # toc.file 'vakat'
-    #
-    # toc.file 'copyright', :landmark_copyright
-    #
-    # toc.file 'toc', :landmark_toc
-    #
-    # toc.file 's01' do |s01|
-    #   s01.file 'ch01', :landmark_start_page
-    #   s01.file 'ch02'
-    # end
-    #
-    # toc.file 's02' do |s02|
-    #   s02.file 'ch03'
-    #   s02.file 'ch04'
-    # end
-    #
-    # toc.file 'ch05'
-    #
-    # toc.file 'appendix'
-    #
-    # toc.file 'footnotes', linear: false
+    toc.file 'cover', :landmark_cover, :landmark_start_page
+    toc.file 'vakat'
+
+    toc.file 'copyright', :landmark_copyright
+
+    toc.file 'toc', :landmark_toc
+
+    toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do
+      toc.file 's01ch01'
+      toc.file 's01ch02'
+      toc.file 's01ch03'
+    end
+
+    toc.file 's02', 'JAK NA VÝMLUVY' do
+      toc.file 's02ch01'
+      toc.file 's02ch02'
+      toc.file 's02ch03'
+    end
+
+    toc.file 's03', 'JAK SPOLUPRACOVAT NA DÁLKU' do
+      toc.file 's03ch01'
+      toc.file 's03ch02'
+      toc.file 's03ch03'
+    end
+
+    toc.file 'appendix'
+
+    toc.file 'footnotes', linear: false
   end
 end
