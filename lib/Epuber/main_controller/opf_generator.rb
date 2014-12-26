@@ -68,54 +68,7 @@ module Epuber
 
       private
 
-      def generate_manifest
-        @xml.manifest {
-          @target.all_files.each { |file|
-            attrs = {}
-            attrs['id'] = create_id_from_path(file.destination_path)
-            attrs['href'] = file.destination_path
-            attrs['media-type'] = mime_type_for(file)
-            attrs['properties'] = file.properties.join(' ') if file.properties.length > 0 && @target.epub_version >= 3
-
-            @xml.item(attrs)
-          }
-        }
-      end
-
-      def generate_spine
-        args = if @target.epub_version >= 3
-                 {}
-               else
-                 nav_file = @target.all_files.find { |file| file.destination_path.end_with?('.ncx') }
-                 raise 'not found nav file' if nav_file.nil?
-
-                 { toc: create_id_from_path(nav_file.destination_path) }
-               end
-
-        @xml.spine(args) {
-          visit_toc_items(@book.root_toc.child_items)
-        }
-      end
-
-      # @param toc_items [Array<Epuber::Book::TocItem>]
-      #
-      def visit_toc_items(toc_items)
-        toc_items.each { |child_item|
-          visit_toc_item(child_item)
-        }
-      end
-
-      # @param toc_item [Epuber::Book::TocItem]
-      #
-      def visit_toc_item(toc_item)
-        attrs = {}
-        attrs['idref'] = create_id_from_path(toc_item.file_obj.destination_path)
-        attrs['linear'] = 'no' if toc_item.options.include?({ linear: false })
-
-        @xml.itemref(attrs)
-
-        visit_toc_items(toc_item.child_items)
-      end
+      # --------- METADATA --------------------------
 
       def generate_metadata
         epub_version = @target.epub_version
@@ -167,6 +120,61 @@ module Epuber
           end
         }
       end
+
+      # --------- MANIFEST --------------------------
+
+      def generate_manifest
+        @xml.manifest {
+          @target.all_files.each { |file|
+            attrs = {}
+            attrs['id'] = create_id_from_path(file.destination_path)
+            attrs['href'] = file.destination_path
+            attrs['media-type'] = mime_type_for(file)
+            attrs['properties'] = file.properties.join(' ') if file.properties.length > 0 && @target.epub_version >= 3
+
+            @xml.item(attrs)
+          }
+        }
+      end
+
+      # --------- SPINE --------------------------
+
+      def generate_spine
+        args = if @target.epub_version >= 3
+                 {}
+               else
+                 nav_file = @target.all_files.find { |file| file.destination_path.end_with?('.ncx') }
+                 raise 'not found nav file' if nav_file.nil?
+
+                 { toc: create_id_from_path(nav_file.destination_path) }
+               end
+
+        @xml.spine(args) {
+          visit_toc_items(@book.root_toc.child_items)
+        }
+      end
+
+      # @param toc_items [Array<Epuber::Book::TocItem>]
+      #
+      def visit_toc_items(toc_items)
+        toc_items.each { |child_item|
+          visit_toc_item(child_item)
+        }
+      end
+
+      # @param toc_item [Epuber::Book::TocItem]
+      #
+      def visit_toc_item(toc_item)
+        attrs = {}
+        attrs['idref'] = create_id_from_path(toc_item.file_obj.destination_path)
+        attrs['linear'] = 'no' if toc_item.options.include?({ linear: false })
+
+        @xml.itemref(attrs)
+
+        visit_toc_items(toc_item.child_items)
+      end
+
+      # --------- other methods --------------------------
 
       # Creates id from file path
       #
