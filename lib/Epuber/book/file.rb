@@ -15,6 +15,10 @@ module Epuber
       #
       attr_accessor :mime_type
 
+      # @return [Symbol]
+      #
+      attr_accessor :group
+
       # @return [String]
       #
       attr_accessor :content
@@ -28,16 +32,16 @@ module Epuber
       attr_accessor :real_source_path
 
 
-      def initialize(source_path)
+      def initialize(source_path, group: nil)
         @source_path_pattern = source_path
 
+        @group = group
         @properties = []
       end
 
       # @param property [String]
       #
       def add_property(property)
-        @properties ||= []
         @properties << property unless @properties.include?(property)
       end
 

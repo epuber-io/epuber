@@ -35,14 +35,14 @@ module Epuber
       # @param [String] file_path
       # @param [String] title
       #
-      # TODO title is optional
       # TODO check opts for :landmark_*, linear: true
       #
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
 
           unless file_path.nil?
-            item.file_obj = Epuber::Book::File.new(file_path)
+            file_obj= Epuber::Book::File.new(file_path, group: :text)
+            item.file_obj = file_obj
           end
 
           if title.is_a?(String)

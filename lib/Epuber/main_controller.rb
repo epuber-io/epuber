@@ -15,6 +15,10 @@ module Epuber
     BASE_PATH = '.epuber'
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
+    GROUP_EXTENSIONS = {
+      text: %w(.xhtml .html),
+    }
+
     # @param targets [Array<String>] targets names
     #
     def compile_targets(targets = nil)
@@ -153,27 +157,51 @@ module Epuber
       end
     end
 
+    # @param pattern [String]
+    # @param group [Symbol]
+    # @return [Array<String>]
+    #
+    def file_paths_with_pattern(pattern, group = nil)
+      file_paths = Dir.glob(pattern)
+
+      file_paths.select! { |file_path|
+        !file_path.include?(BASE_PATH)
+      }
+
+      # filter depend on group
+      unless group.nil?
+        file_paths.select! { |file_path|
+          extname = Pathname.new(file_path).extname
+          GROUP_EXTENSIONS[group].include?(extname)
+        }
+      end
+
+      file_paths
+    end
+
     # @param file_or_pattern [String, Epuber::Book::File]
+    # @param group [Symbol]
     # @return [String]
     #
-    def find_file(file_or_pattern)
+    def find_file(file_or_pattern, group = nil)
       pattern = if file_or_pattern.is_a?(Epuber::Book::File)
                   file_or_pattern.source_path_pattern
                 else
                   file_or_pattern
                 end
 
-      # @type file_path_names [Array<Pathname>]
-      file_path_names = Pathname.glob("**/#{pattern}") + Pathname.glob("**/#{pattern}.*")
+      group = file_or_pattern.group if group.nil? && file_or_pattern.is_a?(Epuber::Book::File)
 
-      file_path_names.select! { |file_pathname|
-        !file_pathname.to_s.include?(BASE_PATH)
-      }
+      file_paths = file_paths_with_pattern("**/#{pattern}", group)
 
-      raise "not found file matching pattern `#{pattern}`" if file_path_names.empty?
-      raise "found too many files for pattern `#{pattern}`" if file_path_names.count >= 2
+      if file_paths.empty?
+        file_paths = file_paths_with_pattern("**/#{pattern}.*", group)
+      end
 
-      file_path_names.first.to_s
+      raise "not found file matching pattern `#{pattern}`" if file_paths.empty?
+      raise "found too many files for pattern `#{pattern}`" if file_paths.count >= 2
+
+      file_paths.first
     end
 
     # @param target_name [String]
