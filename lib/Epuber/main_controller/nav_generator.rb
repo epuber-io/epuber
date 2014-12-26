@@ -107,11 +107,6 @@ module Epuber
           # head
           @xml.head {
             @xml.meta(name: 'dtb:uid', content: "urn:isbn:#{@target.isbn}")
-
-            # TODO: try without these
-            @xml.meta(name: 'dtb:depth', content: '1')
-            @xml.meta(name: 'dtb:totalPageCount', content: '1')
-            @xml.meta(name: 'dtb:maxPageNumber', content: '1')
           }
 
           # title
