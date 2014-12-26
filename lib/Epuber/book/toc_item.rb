@@ -25,8 +25,10 @@ module Epuber
 
       # -------------- creating sub items -----------------
 
+      # @return [Array<Symbol>]
+      #
       def landmarks
-        self.options.select { |item|
+        options.select { |item|
           item.is_a?(Symbol) && item.to_s.start_with?('landmark')
         }
       end
@@ -34,7 +36,7 @@ module Epuber
       # @return [Bool]
       #
       def linear?
-        first = self.options.select { |item|
+        first = options.select { |item|
           item.is_a?(Hash) && (item.include?(:linear) || item.include?('linear'))
         }.first
 
