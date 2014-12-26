@@ -71,7 +71,13 @@ module Epuber
       def generate_manifest
         @xml.manifest {
           @target.all_files.each { |file|
-            @xml.item(id: create_id_from_path(file.destination_path), href: file.destination_path, 'media-type' => mime_type_for(file))
+            attrs = {}
+            attrs['id'] = create_id_from_path(file.destination_path)
+            attrs['href'] = file.destination_path
+            attrs['media-type'] = mime_type_for(file)
+            attrs['properties'] = file.properties.join(' ') if file.properties.length > 0 && @target.epub_version >= 3
+
+            @xml.item(attrs)
           }
         }
       end
@@ -102,7 +108,11 @@ module Epuber
       # @param toc_item [Epuber::Book::TocItem]
       #
       def visit_toc_item(toc_item)
-        @xml.itemref(idref: toc_item.file_obj.destination_path)
+        attrs = {}
+        attrs['idref'] = create_id_from_path(toc_item.file_obj.destination_path)
+        attrs['linear'] = false if toc_item.options.include?({ linear: false })
+
+        @xml.itemref(attrs)
 
         visit_toc_items(toc_item.child_items)
       end

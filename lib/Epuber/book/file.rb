@@ -15,10 +15,13 @@ module Epuber
       #
       attr_accessor :mime_type
 
-
-
+      # @return [String]
+      #
       attr_accessor :content
 
+      # @return [Array<String>]
+      #
+      attr_accessor :properties
 
       # @return [String]
       #
@@ -27,6 +30,15 @@ module Epuber
 
       def initialize(source_path)
         @source_path_pattern = source_path
+
+        @properties = []
+      end
+
+      # @param property [String]
+      #
+      def add_property(property)
+        @properties ||= []
+        @properties << property unless @properties.include?(property)
       end
 
       # @param other [String, Epuber::Book::File]

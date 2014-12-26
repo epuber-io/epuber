@@ -18,14 +18,9 @@ module Epuber
     # @param targets [Array<String>] targets names
     #
     def compile_targets(targets = nil)
-
-      # TODO: DEBUG, remove next line
-      FileUtils.rmtree(BASE_PATH)
-
-
       bookspecs = Pathname.glob(Pathname.pwd + '*.bookspec')
 
-      raise 'Not found .bookspec file' if bookspecs.count.zero?
+      raise "Not found .bookspec file in `#{Dir.pwd}`" if bookspecs.count.zero?
 
       bookspecs.each do |bookspec_file_pathname|
         # @type book [Book::Book]
@@ -74,6 +69,7 @@ module Epuber
     def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
       nav_file = NavGenerator.new(@book, @target).generate_nav_file
+      nav_file.add_property('nav')
       @target.add_to_all_files(nav_file)
       process_file(nav_file)
 
@@ -212,7 +208,7 @@ module Epuber
         all_files = Dir.glob('**/**')
 
         run_command(%{zip -q0X "#{abs_zip_file_path}" mimetype})
-        run_command(%{zip -Xr9D "#{abs_zip_file_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
+        run_command(%{zip -qXr9D "#{abs_zip_file_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
       }
     end
   end
