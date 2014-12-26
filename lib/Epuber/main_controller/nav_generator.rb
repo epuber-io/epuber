@@ -21,6 +21,15 @@ module Epuber
         'epub:prefix' => 'ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0'
       }.freeze
 
+      # resource page http://www.idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-landmarks
+      LANDMARKS_MAP = {
+        # my favorite
+        landmark_cover:      { type: 'cover', text: 'Cover page' },
+        landmark_start_page: { type: %w(bodymatter ibooks:reader-start-page), text: 'Start Reading' },
+        landmark_copyright:  { type: 'copyright-page', text: 'Copyright page' },
+        landmark_toc:        { type: 'toc', text: 'Table of contents' },
+      }.freeze
+
 
       # @param target [Epuber::Book::Target]
       # @param book [Epuber::Book::Book]
@@ -90,8 +99,17 @@ module Epuber
             @xml.title_(@book.title)
           }
           @xml.body {
+
+            # toc
             @xml.nav('epub:type' => 'toc') {
               visit_toc_items(@book.root_toc.child_items)
+            }
+
+            # landmarks
+            @xml.nav('epub:type' => 'landmarks') {
+              @xml.ol {
+                landmarks_visit_toc_item(@book.root_toc)
+              }
             }
           }
         }
@@ -166,6 +184,46 @@ module Epuber
             visit_toc_items(toc_item.child_items)
           }
         end
+      end
+
+
+      # --------------- landmarks -----------------------------
+
+      # @param toc_items [Array<Epuber::Book::TocItem>]
+      #
+      def landmarks_visit_toc_items(toc_items)
+        toc_items.each { |child_item|
+          landmarks_visit_toc_item(child_item)
+        }
+      end
+
+      # @param toc_item [Epuber::Book::TocItem]
+      #
+      def landmarks_visit_toc_item(toc_item)
+        landmarks = toc_item.landmarks
+        landmarks.each { |landmark|
+          dict = LANDMARKS_MAP[landmark]
+
+          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP}" if dict.nil?
+
+          map_type = dict[:type]
+          types = if map_type.is_a?(Array)
+                    map_type
+                  else
+                    [map_type]
+                  end
+
+          types.select! { |type| !type.to_s.start_with?('ibooks:') } unless @target.is_ibooks?
+          
+          types.each { |type|
+
+            @xml.li {
+              @xml.a(dict[:text], 'epub:type' => type, 'href' => toc_item.file_obj.destination_path)
+            }
+          }
+        }
+
+        landmarks_visit_toc_items(toc_item.child_items)
       end
     end
   end
