@@ -164,14 +164,14 @@ module Epuber
                 end
 
       # @type file_path_names [Array<Pathname>]
-      file_path_names = Pathname.glob("**/#{pattern}*")
+      file_path_names = Pathname.glob("**/#{pattern}") + Pathname.glob("**/#{pattern}.*")
 
       file_path_names.select! { |file_pathname|
         !file_pathname.to_s.include?(BASE_PATH)
       }
 
       raise "not found file matching pattern `#{pattern}`" if file_path_names.empty?
-      raise 'found too many files' if file_path_names.count >= 2
+      raise "found too many files for pattern `#{pattern}`" if file_path_names.count >= 2
 
       file_path_names.first.to_s
     end
