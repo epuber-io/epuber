@@ -121,6 +121,11 @@ module Epuber
         epub_version = @target.epub_version
 
         @xml.metadata {
+
+          # identifier
+          @xml['dc'].identifier("urn:isbn:#{@target.isbn}", id: OPF_UNIQUE_ID)
+
+          # title
           if @book.title
             if epub_version >= 3
               @xml['dc'].title(@book.title, id: 'title')
@@ -130,6 +135,7 @@ module Epuber
             end
           end
 
+          # authors
           authors = @book.authors || []
           authors.each_index { |idx|
             author        = authors[idx]
