@@ -135,7 +135,7 @@ module Epuber
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
-        when '.xhtml', '.css', '.png', '.jpg', '.jpeg'
+        when '.xhtml', '.css', '.png', '.jpg', '.jpeg', '.otf', '.ttf'
           FileUtils.cp(file_pathname.to_s, dest_path.to_s)
         else
           raise "unknown file extension #{file_pathname.extname} for file #{file}"
