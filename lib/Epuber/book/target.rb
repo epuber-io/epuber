@@ -126,7 +126,7 @@ module Epuber
       attribute :cover_image,
                 types:        [Epuber::Book::File],
                 inherited:    true,
-                auto_convert: { [String] => Epuber::Book::File }
+                auto_convert: { [String] => lambda { |value| Epuber::Book::File.new(value, group: :image, properties: ['cover-image']) } }
 
 
       # @param file_path [String | Epuber::Book::File]

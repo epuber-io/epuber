@@ -125,12 +125,13 @@ module Epuber
 
       def generate_manifest
         @xml.manifest {
-          @target.all_files.each { |file|
+          all_files = @target.all_files
+          all_files.each { |file|
             attrs = {}
             attrs['id'] = create_id_from_path(file.destination_path)
             attrs['href'] = file.destination_path
             attrs['media-type'] = mime_type_for(file)
-            attrs['properties'] = file.properties.join(' ') if file.properties.length > 0 && @target.epub_version >= 3
+            attrs['properties'] = file.properties.to_a.join(' ') if file.properties.length > 0 && @target.epub_version >= 3
 
             @xml.item(attrs)
           }

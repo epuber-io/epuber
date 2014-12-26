@@ -17,6 +17,7 @@ module Epuber
 
     GROUP_EXTENSIONS = {
       text: %w(.xhtml .html),
+      image: %w(.png .jpg .jpeg),
     }
 
     # @param targets [Array<String>] targets names
@@ -105,6 +106,19 @@ module Epuber
       @target.files.each { |file|
         process_file(file)
       }
+
+      cover_image = @target.cover_image
+      unless cover_image.nil?
+        destination_path_of_file(cover_image) # resolve destination path
+
+        index = @target.all_files.index(cover_image)
+        if index.nil?
+          @target.add_to_all_files(cover_image)
+        else
+          file = @target.all_files[index]
+          file.merge_with(cover_image)
+        end
+      end
     end
 
     # @param toc_item [Epuber::Book::TocItem]
@@ -131,7 +145,7 @@ module Epuber
       dest_path = Pathname.new(destination_path_of_file(file))
       FileUtils.mkdir_p(dest_path.dirname)
 
-      if !file.source_path_pattern.nil?
+      if !file.real_source_path.nil?
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
@@ -179,7 +193,11 @@ module Epuber
       unless group.nil?
         file_paths.select! { |file_path|
           extname = Pathname.new(file_path).extname
-          GROUP_EXTENSIONS[group].include?(extname)
+          group_array = GROUP_EXTENSIONS[group]
+
+          raise "Uknown file group #{group.inspect}" if group_array.nil?
+
+          group_array.include?(extname)
         }
       end
 
