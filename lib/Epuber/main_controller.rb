@@ -23,15 +23,14 @@ module Epuber
     # @param targets [Array<String>] targets names
     #
     def compile_targets(targets = nil)
-      bookspecs = Pathname.glob(Pathname.pwd + '*.bookspec')
+      bookspecs = Dir.glob('*.bookspec')
 
       raise "Not found .bookspec file in `#{Dir.pwd}`" if bookspecs.count.zero?
 
-      bookspecs.each do |bookspec_file_pathname|
-        # @type book [Book::Book]
-        # @type bookspec_file_pathname [Pathname]
+      bookspecs.each do |bookspec_file_path|
+        # @type @book [Book::Book]
 
-        @book = Book::Book.from_file(bookspec_file_pathname.to_s)
+        @book = Book::Book.from_file(bookspec_file_path)
         @book.validate
 
         puts "loaded book `#{@book.title}`"

@@ -214,7 +214,7 @@ module Epuber
                   end
 
           types.select! { |type| !type.to_s.start_with?('ibooks:') } unless @target.is_ibooks?
-          
+
           types.each { |type|
 
             @xml.li {

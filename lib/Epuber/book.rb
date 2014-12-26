@@ -180,7 +180,6 @@ module Epuber
       end
 
 
-      # TODO other files
       # TODO footnotes customization
       # TODO custom metadata
       # TODO custom user informations (just global available Hash<String, Any>)

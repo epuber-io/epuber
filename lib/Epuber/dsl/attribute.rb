@@ -223,7 +223,7 @@ module Epuber
         #
         def converted_value(value)
           begin
-            validate_type value
+            validate_type(value)
           rescue StandardError
             if @auto_convert.nil?
               raise

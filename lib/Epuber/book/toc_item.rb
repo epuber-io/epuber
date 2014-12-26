@@ -67,7 +67,7 @@ module Epuber
         create_child_item do |item|
 
           unless file_path.nil?
-            file_obj= Epuber::Book::File.new(file_path, group: :text)
+            file_obj = Epuber::Book::File.new(file_path, group: :text)
             item.file_obj = file_obj
           end
 

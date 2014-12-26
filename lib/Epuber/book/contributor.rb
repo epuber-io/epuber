@@ -36,12 +36,12 @@ module Epuber
       # @return [Contributor]
       #
       def self.from_ruby(obj, role)
-        if obj.is_a? String
+        if obj.is_a?(String)
           components = obj.split(' ')
           if components.length >= 2
             NormalContributor.new(components.first(components.length - 1).join(' '), components.last, role)
           end
-        elsif obj.is_a? Hash
+        elsif obj.is_a?(Hash)
           if obj.has_key?(:first_name)
             NormalContributor.new(obj[:first_name], obj[:last_name], role)
           elsif obj.has_key?(:file_as)
