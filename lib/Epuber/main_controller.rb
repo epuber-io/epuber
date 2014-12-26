@@ -4,6 +4,7 @@ require 'fileutils'
 
 require_relative 'main_controller/opf_generator'
 require_relative 'main_controller/nav_generator'
+require_relative 'main_controller/meta_inf_generator'
 
 require_relative 'book'
 
@@ -57,7 +58,7 @@ module Epuber
       dir_name = File.join(BASE_PATH, 'build', target_name.to_s)
       FileUtils.mkdir_p(dir_name)
 
-      @output_dir = File.absolute_path(dir_name, Dir.pwd)
+      @output_dir = File.expand_path(dir_name)
 
       puts "  handling target `#{@target.name}` in build dir `#{@output_dir}`"
 
@@ -71,13 +72,21 @@ module Epuber
 
       # generate .opf file
       opf_file = OPFGenerator.new(@book, @target).generate_opf_file
-      puts opf_file.content
       process_file(opf_file)
 
-      # TODO: create META-INF
-      # TODO: create
+      # generate mimetype file
+      mimetype_file = Epuber::Book::File.new(nil)
+      mimetype_file.destination_path = '../mimetype'
+      mimetype_file.content = 'application/epub+zip'
+      process_file(mimetype_file)
 
-      # TODO: pack to epub files
+      # generate META-INF files
+      meta_inf_files = MetaInfGenerator.new(@book, @target, File.join(EPUB_CONTENT_FOLDER, opf_file.destination_path)).generate_all_files
+      meta_inf_files.each { |meta_file|
+        process_file(meta_file)
+      }
+
+      archive(@output_dir, "experiment-#{target_name}.epub") # TODO: correct file name
 
       @target = nil
     end
@@ -179,6 +188,29 @@ module Epuber
 
       raise "Not found target with name #{target_name}" if target.nil?
       target
+    end
+
+    # @param cmd [String]
+    #
+    def run_command(cmd, quite: false)
+      system(cmd)
+
+      $stdout.flush
+      $stderr.flush
+
+      code = $?
+      raise 'wrong return value' if code != 0
+    end
+
+    def archive(folder_path, zip_file_path)
+      abs_zip_file_path = File.expand_path(zip_file_path)
+
+      Dir.chdir(folder_path) {
+        all_files = Dir.glob('**/**')
+
+        run_command(%{zip -q0X "#{abs_zip_file_path}" mimetype})
+        run_command(%{zip -Xr9D "#{abs_zip_file_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
+      }
     end
   end
 end
