@@ -20,9 +20,10 @@ Gem::Specification.new do |spec|
 
 	spec.add_runtime_dependency 'activesupport', '>= 3.2.15'
 	spec.add_runtime_dependency 'nokogiri'
-  spec.add_runtime_dependency 'mime-types', '~> 2.4.3'
+  spec.add_runtime_dependency 'mime-types', '~> 2.4'
   spec.add_runtime_dependency 'stylus'
 
-	spec.add_development_dependency 'bundler', '~> 1.6'
+	spec.add_development_dependency 'bundler', '~> 1'
 	spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'epubcheck'
 end
