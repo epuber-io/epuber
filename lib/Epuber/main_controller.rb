@@ -78,7 +78,7 @@ module Epuber
 
       @output_dir = File.expand_path(dir_name)
 
-      puts "  handling target #{@target.name.inspect} in build dir `#{@output_dir}`"
+      puts "  handling target #{@target.name.inspect} in build dir `#{dir_name}`"
 
       process_toc_item(@book.root_toc)
       process_target_files
@@ -143,7 +143,6 @@ module Epuber
     def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
       nav_file = NavGenerator.new(@book, @target).generate_nav_file
-      nav_file.add_property('nav')
       @target.add_to_all_files(nav_file)
       process_file(nav_file)
 

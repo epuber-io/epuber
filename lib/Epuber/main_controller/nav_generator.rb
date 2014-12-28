@@ -64,16 +64,17 @@ module Epuber
       # @return [Epuber::Book::File]
       #
       def generate_nav_file
-        opf_file = Epuber::Book::File.new(nil)
+        nav_file = Epuber::Book::File.new(nil)
 
-        opf_file.destination_path = if @target.epub_version >= 3
+        nav_file.destination_path = if @target.epub_version >= 3
                                       'nav.xhtml'
                                     else
                                       'nav.ncx'
                                     end
 
-        opf_file.content = generate_nav
-        opf_file
+        nav_file.content = generate_nav
+        nav_file.add_property('nav')
+        nav_file
       end
 
 
