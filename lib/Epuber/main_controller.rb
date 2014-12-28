@@ -1,8 +1,12 @@
+require 'rubygems'
+require 'bundler/setup'
+Bundler.setup
 
 require 'pathname'
 require 'fileutils'
 
 require 'stylus'
+require 'bade'
 
 require_relative 'main_controller/opf_generator'
 require_relative 'main_controller/nav_generator'
@@ -28,6 +32,7 @@ module Epuber
 
     EXTENSIONS_RENAME = {
       '.styl' => '.css',
+      '.bade' => '.xhtml',
     }
 
 
@@ -223,8 +228,13 @@ module Epuber
         when '.styl'
           file.content = Stylus.compile(::File.new(file_pathname))
           return process_file(file)
+        when '.bade'
+          parsed = Bade::Parser.new(file: file_pathname.to_s).parse(::File.read(file_pathname.to_s))
+          lam = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
+          file.content = lam.call
+          return process_file(file)
         else
-          raise "unknown file extension #{file_pathname.extname} for file #{file}"
+          raise "unknown file extension #{file_pathname.extname} for file #{file.inspect}"
         end
       end
 

@@ -79,6 +79,20 @@
     </content>
     <orderEntry type="jdk" jdkName="ruby-2.0.0-p247" jdkType="RUBY_SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="bade (v0.1.0, /Users/samnung/Work/BP/Bade) [path][gem]">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../Bade/bin" />
+          <root url="file://$MODULE_DIR$/../Bade/lib" />
+          <root url="file://$MODULE_DIR$/../Bade/.idea" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../Bade/bin" />
+          <root url="file://$MODULE_DIR$/../Bade/lib" />
+          <root url="file://$MODULE_DIR$/../Bade/.idea" />
+        </SOURCES>
+      </library>
+    </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="activesupport (v4.2.0, ruby-2.0.0-p247) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bundler (v1.7.6, ruby-2.0.0-p247) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.2.5, ruby-2.0.0-p247) [gem]" level="application" />
