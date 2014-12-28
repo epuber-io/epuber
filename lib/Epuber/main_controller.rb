@@ -16,11 +16,15 @@ module Epuber
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
     GROUP_EXTENSIONS = {
-      text: %w(.xhtml .html),
+      text: %w(.xhtml .html .md .bade),
       image: %w(.png .jpg .jpeg),
+      font: %w(.otf .ttf),
+      style: %w(.css .styl),
     }
 
-    # @param targets [Array<String>] targets names
+    STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css)
+
+    # @param targets [Array<String>] targets names, when nil all targets will be used
     #
     def compile_targets(targets = nil)
       bookspecs = Dir.glob('*.bookspec')
@@ -149,7 +153,7 @@ module Epuber
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
-        when '.xhtml', '.css', '.png', '.jpg', '.jpeg', '.otf', '.ttf'
+        when *STATIC_EXTENSIONS
           FileUtils.cp(file_pathname.to_s, dest_path.to_s)
         else
           raise "unknown file extension #{file_pathname.extname} for file #{file}"
