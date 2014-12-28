@@ -24,6 +24,7 @@ module Epuber
 
     STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css)
 
+
     # @param targets [Array<String>] targets names, when nil all targets will be used
     #
     # @return [void]
@@ -59,6 +60,7 @@ module Epuber
     #
     def process_target_named(target_name)
       @target = target_named(target_name)
+      @all_files = []
 
       dir_name = File.join(BASE_PATH, 'build', target_name.to_s)
       FileUtils.mkdir_p(dir_name)
@@ -71,10 +73,60 @@ module Epuber
       process_target_files
       generate_other_files
 
+      # cleanup
+      remove_unnecessary_files
+      remove_empty_folders
+
       epub_name = "#{@book.output_base_name}#{@book.build_version}-#{target_name}.epub"
       archive(@output_dir, epub_name)
 
+      @all_files = nil
       @target = nil
+    end
+
+    def remove_empty_folders
+      Dir.chdir(@output_dir) {
+        Dir.glob('**/*')
+          .select { |d| File.directory?(d) }
+          .select { |d| (Dir.entries(d) - %w[ . .. ]).empty? }
+          .each { |d|
+          puts "removing empty folder `#{d}`"
+          Dir.rmdir(d)
+        }
+      }
+    end
+
+    def remove_unnecessary_files
+      requested_paths = @all_files.map { |file|
+        file.destination_path
+      }.map { |path|
+        # files have paths from EPUB_CONTENT_FOLDER
+        pathname = Pathname.new(File.join(@output_dir, EPUB_CONTENT_FOLDER, path))
+        pathname.relative_path_from(Pathname.new(@output_dir)).to_s
+      }
+
+      existing_paths = nil
+
+      Dir.chdir(@output_dir) {
+        existing_paths = Dir.glob('**/*')
+      }
+
+      unnecessary_paths = existing_paths - requested_paths
+
+      # absolute path
+      unnecessary_paths.map! { |path|
+        File.join(@output_dir, path)
+      }
+
+      # remove directories
+      unnecessary_paths.select! { |path|
+        !File.directory?(path)
+      }
+
+      unnecessary_paths.each { |path|
+        puts "removing unnecessary file: `#{path}`"
+        File.delete(path)
+      }
     end
 
     def generate_other_files
@@ -166,6 +218,8 @@ module Epuber
           file_handle.write(file.content)
         }
       end
+
+      @all_files << file
     end
 
     # @param file [Epuber::Book::File]
@@ -282,7 +336,7 @@ module Epuber
       abs_zip_file_path = File.expand_path(zip_file_path)
 
       Dir.chdir(folder_path) {
-        all_files = Dir.glob('**/**')
+        all_files = Dir.glob('**/*')
 
         run_command(%{zip -q0X "#{abs_zip_file_path}" mimetype})
         run_command(%{zip -qXr9D "#{abs_zip_file_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
