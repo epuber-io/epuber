@@ -2,6 +2,8 @@
 require 'pathname'
 require 'fileutils'
 
+require 'stylus'
+
 require_relative 'main_controller/opf_generator'
 require_relative 'main_controller/nav_generator'
 require_relative 'main_controller/meta_inf_generator'
@@ -23,6 +25,10 @@ module Epuber
     }
 
     STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css)
+
+    EXTENSIONS_RENAME = {
+      '.styl' => '.css',
+    }
 
 
     # @param targets [Array<String>] targets names, when nil all targets will be used
@@ -203,20 +209,23 @@ module Epuber
       dest_path = Pathname.new(destination_path_of_file(file))
       FileUtils.mkdir_p(dest_path.dirname)
 
-      if !file.real_source_path.nil?
+      if !file.content.nil?
+        # write file
+        File.open(dest_path.to_s, 'w') { |file_handle|
+          file_handle.write(file.content)
+        }
+      elsif !file.real_source_path.nil?
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
         when *STATIC_EXTENSIONS
           FileUtils.cp(file_pathname.to_s, dest_path.to_s)
+        when '.styl'
+          file.content = Stylus.compile(::File.new(file_pathname))
+          return process_file(file)
         else
           raise "unknown file extension #{file_pathname.extname} for file #{file}"
         end
-      elsif !file.content.nil?
-        # write file
-        File.open(dest_path.to_s, 'w') { |file_handle|
-          file_handle.write(file.content)
-        }
       end
 
       @all_files << file
@@ -227,12 +236,21 @@ module Epuber
     #
     def destination_path_of_file(file)
       if file.destination_path.nil?
-        real_path = find_file(file)
+        real_source_path = find_file(file)
 
-        file.destination_path = real_path
-        file.real_source_path = real_path
+        extname = Pathname.new(real_source_path).extname
+        new_extname = EXTENSIONS_RENAME[extname]
 
-        File.join(@output_dir, EPUB_CONTENT_FOLDER, real_path)
+        dest_path = if new_extname.nil?
+                      real_source_path
+                    else
+                      real_source_path.sub(/#{extname}$/, new_extname)
+                    end
+
+        file.destination_path = dest_path
+        file.real_source_path = real_source_path
+
+        File.join(@output_dir, EPUB_CONTENT_FOLDER, dest_path)
       else
         File.join(@output_dir, EPUB_CONTENT_FOLDER, file.destination_path)
       end

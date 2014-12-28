@@ -29,6 +29,8 @@ Epuber::Book::Book.new do |book|
   end
 
   book.add_file 'prace_na_dalku.css'
+  book.add_file 'prace_na_dalku-stylus.styl'
+
   book.add_files '*.{png,jpg,jpeg}'
   book.add_files '*.{otf,ttf}'
 
