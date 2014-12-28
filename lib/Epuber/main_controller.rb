@@ -39,7 +39,7 @@ module Epuber
         @book = Book::Book.from_file(bookspec_file_path)
         @book.validate
 
-        puts "loaded book `#{@book.title}`"
+        puts "loaded book `#{bookspec_file_path}`"
 
         # when the list of targets is nil use them all
         targets ||= @book.targets.map { |target| target.name }
@@ -65,7 +65,7 @@ module Epuber
 
       @output_dir = File.expand_path(dir_name)
 
-      puts "  handling target `#{@target.name}` in build dir `#{@output_dir}`"
+      puts "  handling target #{@target.name.inspect} in build dir `#{@output_dir}`"
 
       process_toc_item(@book.root_toc)
       process_target_files
