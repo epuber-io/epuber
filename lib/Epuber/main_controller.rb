@@ -73,12 +73,12 @@ module Epuber
       process_target_files
       generate_other_files
 
-      # cleanup
+      # build folder cleanup
       remove_unnecessary_files
       remove_empty_folders
 
-      epub_name = "#{@book.output_base_name}#{@book.build_version}-#{target_name}.epub"
-      archive(@output_dir, epub_name)
+      # final
+      archive
 
       @all_files = nil
       @target = nil
@@ -322,7 +322,7 @@ module Epuber
 
     # @param cmd [String]
     #
-    def run_command(cmd, quite: false)
+    def run_command(cmd)
       system(cmd)
 
       $stdout.flush
@@ -332,14 +332,14 @@ module Epuber
       raise 'wrong return value' if code != 0
     end
 
-    def archive(folder_path, zip_file_path)
-      abs_zip_file_path = File.expand_path(zip_file_path)
+    def archive
+      epub_path = File.expand_path("#{@book.output_base_name}#{@book.build_version}-#{@target.name}.epub")
 
-      Dir.chdir(folder_path) {
+      Dir.chdir(@output_dir) {
         all_files = Dir.glob('**/*')
 
-        run_command(%{zip -q0X "#{abs_zip_file_path}" mimetype})
-        run_command(%{zip -qXr9D "#{abs_zip_file_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
+        run_command(%{zip -q0X "#{epub_path}" mimetype})
+        run_command(%{zip -qXr9D "#{epub_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
       }
     end
   end
