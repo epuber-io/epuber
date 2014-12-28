@@ -30,8 +30,8 @@ module Epuber
 
       # Creates new instance of Contributor dependent on obj content
       #
-      # @param [Hash<Symbol, String>, Array<Hash<Symbol,String>, String, Array<String>] input object
-      # @param [String] role of contributor
+      # @param obj [Hash<Symbol, String>, Array<Hash<Symbol,String>, String, Array<String>] input object
+      # @param role [String] role of contributor
       #
       # @return [Contributor]
       #

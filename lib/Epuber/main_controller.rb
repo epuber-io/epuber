@@ -26,6 +26,8 @@ module Epuber
 
     # @param targets [Array<String>] targets names, when nil all targets will be used
     #
+    # @return [void]
+    #
     def compile_targets(targets = nil)
       bookspecs = Dir.glob('*.bookspec')
 

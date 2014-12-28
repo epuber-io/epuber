@@ -3,6 +3,11 @@ module Epuber
     class Object
       module AttributeSupport
 
+        # @param name [Symbol] attribute name
+        # @param options [Dict]
+        #
+        # @see Epuber::DSL::Attribute
+        #
         def attribute(name, options = {})
           attr = Attribute.new(name, options)
 
@@ -24,7 +29,8 @@ module Epuber
           end
         end
 
-        # @param [Attribute] attr
+        # @param name [Symbol]
+        # @param attr [Attribute]
         #
         def define_method_attr(name, attr)
           key = name

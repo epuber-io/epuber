@@ -6,38 +6,32 @@ module Epuber
   module DSL
     class Object
 
-      # A Book attribute stores the information of an attribute. It also provides logic to implement any
-      # required logic.
+      # Stores the information of an attribute. It also provides logic to implement any required logic.
       #
       class Attribute
 
-        # @return [Symbol] the name of the attribute.
+        # @return [Symbol] name of attribute
         #
         attr_reader :name
 
         # Returns a new attribute initialized with the given options.
         #
-        # Attributes by default are:
+        # @param name [Symbol]
         #
-        # - inherited
-        #
-        # @param    [Symbol] name @see name
-        #
-        # @param    [Hash{Symbol=>Object}] options
-        #           The options for configuring the attribute (see Options group).
+        # @see #name
         #
         # @raise    If there are unrecognized options.
         #
         def initialize(name, inherited: false,
-                       root_only: false,
-                       required: false,
-                       singularize: false,
-                       file_patterns: false,
-                       container: nil,
-                       keys: nil,
-                       default_value: nil,
-                       auto_convert: {},
-                       types: nil)
+                             root_only: false,
+                              required: false,
+                           singularize: false,
+                         file_patterns: false,
+                             container: nil,
+                                  keys: nil,
+                         default_value: nil,
+                          auto_convert: {},
+                                 types: nil)
 
           @name = name
 
@@ -76,7 +70,7 @@ module Epuber
         # @!group Options
 
         # @return [Array<Class>] the list of the classes of the values supported by the attribute writer.
-        #         If not specified defaults to #{String}.
+        #         If not specified defaults to [String].
         #
         attr_reader :types
 
@@ -87,7 +81,7 @@ module Epuber
           @supported_types ||= @types.dup.push(container).compact
         end
 
-        # @return [Class] if defined it can be #{Array} or #{Hash}. It is used as default initialization value
+        # @return [Class] if defined it can be [Array] or [Hash]. It is used as default initialization value
         #         and to automatically wrap other values to arrays.
         #
         attr_reader :container

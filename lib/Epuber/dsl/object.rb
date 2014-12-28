@@ -26,9 +26,7 @@ module Epuber
 
       public
 
-      # Validates all values of attributes
-      #
-      # @return [Void]
+      # Validates all values of attributes, if there is some error, StandardError will be raised
       #
       # @note it only check for required values for now
       #
@@ -51,7 +49,7 @@ module Epuber
 
       # Creates new instance by parsing ruby code from file
       #
-      # @param [String] string
+      # @param file_path [String]
       #
       # @return [Self]
       #
@@ -61,7 +59,7 @@ module Epuber
 
       # Creates new instance by parsing ruby code from string
       #
-      # @param [String] string
+      # @param string [String]
       #
       # @return [Self]
       #

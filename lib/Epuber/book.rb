@@ -167,7 +167,7 @@ module Epuber
                 inherited: true
 
 
-      # Add file to book, see Target#add_file to more details
+      # Add file to book, see {Target#add_file} to more details
       #
       def add_file(*args)
         @default_target.add_file(*args)
