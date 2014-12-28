@@ -11,7 +11,7 @@ module Epuber
       # ------------ DSL attributes ----------------------
       protected
 
-      extend Object::AttributeSupport
+      extend AttributeSupport
 
       class << self
         # @return [Hash<Symbol, Attribute>] The attributes of the class.
