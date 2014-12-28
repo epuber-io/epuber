@@ -22,9 +22,9 @@ module Epuber
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
     GROUP_EXTENSIONS = {
-      text: %w(.xhtml .html .md .bade),
+      text:  %w(.xhtml .html .md .bade),
       image: %w(.png .jpg .jpeg),
-      font: %w(.otf .ttf),
+      font:  %w(.otf .ttf),
       style: %w(.css .styl),
     }
 

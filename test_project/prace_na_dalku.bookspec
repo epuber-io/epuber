@@ -17,6 +17,8 @@ Epuber::Book::Book.new do |book|
   book.build_version = '5'
   book.output_base_name = 'prace_na_dalku'
 
+  book.custom_fonts = true
+
   book.cover_image = 'cover'
 
   book.target :ibooks do |ibooks|

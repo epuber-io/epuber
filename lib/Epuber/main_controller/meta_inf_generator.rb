@@ -31,14 +31,34 @@ module Epuber
         builder.doc
       end
 
+      def generate_ibooks_display_options_xml
+        builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
+          xml.display_options {
+            xml.platform(name: '*') {
+              xml.option(true.to_s, name: 'specified-fonts')
+            }
+          }
+        }
+        builder.doc
+      end
+
       # @return [Array<Epuber::Book::File>]
       #
       def generate_all_files
+        all = []
         container_xml = Epuber::Book::File.new(nil)
         container_xml.destination_path = '../META-INF/container.xml'
         container_xml.content = generate_container_xml
+        all << container_xml
 
-        [ container_xml ]
+        if @target.custom_fonts && @target.is_ibooks?
+          display_options = Epuber::Book::File.new(nil)
+          display_options.destination_path = '../META-INF/com.apple.ibooks.display-options.xml'
+          display_options.content = generate_ibooks_display_options_xml
+          all << display_options
+        end
+
+        all
       end
     end
   end
