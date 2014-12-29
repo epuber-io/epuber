@@ -42,7 +42,7 @@ module Epuber
     end
 
     def self.print_welcome
-      puts <<-END.green
+      puts <<-END.yellow
 Welcome to epuber init script. It will create basic structure for this project:
   .gitignore
   <book-id>.bookspec
@@ -53,6 +53,17 @@ Welcome to epuber init script. It will create basic structure for this project:
   text/
 
 It will ask you about some basic information, please fill them.
+END
+    end
+
+    def self.print_good_bye(book_id)
+      puts <<-END.yellow
+Success.
+Epuber now ends.
+
+Please review #{book_id}.bookspec file, remove comments, etc.
+
+Bye :)
 END
     end
 
@@ -126,7 +137,5 @@ END
 
       result
     end
-
-
   end
 end
