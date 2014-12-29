@@ -23,6 +23,10 @@ module Epuber
       #
       attr_accessor :attributes_values
 
+      # @return [String]
+      #
+      attr_reader :file_path
+
 
       public
 
@@ -64,11 +68,18 @@ module Epuber
       # @return [Self]
       #
       def self.from_string(string, file_path = nil)
-        if file_path
-          eval(string, nil, file_path)
-        else
-          eval(string)
-        end
+        obj = if file_path
+                eval(string, nil, file_path)
+              else
+                eval(string)
+              end
+
+        obj.instance_eval { @file_path = file_path }
+        obj
+      end
+
+      def from_file?
+        !file_path.nil?
       end
 
 
@@ -78,6 +89,7 @@ module Epuber
       def initialize
         super
         @attributes_values = {}
+        @file_path = nil
       end
 
       def to_s

@@ -366,7 +366,19 @@ module Epuber
     end
 
     def archive
-      epub_path = File.expand_path("#{@book.output_base_name}#{@book.build_version}-#{@target.name}.epub")
+      epub_name = if !@book.output_base_name.nil?
+                    @book.output_base_name
+                  elsif @book.from_file?
+                    Pathname.new(@book.file_path).basename
+                  else
+                    @book.title
+                  end
+
+      epub_name += @book.build_version.to_s unless @book.build_version.nil?
+      epub_name += "-#{@target.name.to_s}" if @target != @book.default_target
+      epub_name += '.epub'
+
+      epub_path = File.expand_path(epub_name)
 
       Dir.chdir(@output_dir) {
         all_files = Dir.glob('**/*')
