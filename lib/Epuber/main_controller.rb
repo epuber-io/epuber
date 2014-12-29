@@ -40,7 +40,7 @@ module Epuber
     #
     # @return [void]
     #
-    def compile_targets(targets = nil)
+    def compile_targets(targets = [])
       bookspecs = Dir.glob('*.bookspec')
 
       raise "Not found .bookspec file in `#{Dir.pwd}`" if bookspecs.count.zero?
@@ -54,7 +54,9 @@ module Epuber
         puts "loaded book `#{bookspec_file_path}`"
 
         # when the list of targets is nil use them all
-        targets ||= @book.targets.map { |target| target.name }
+        if targets.empty?
+          targets = @book.targets
+        end
 
         targets.each do |target_name|
           process_target_named(target_name)
@@ -67,7 +69,7 @@ module Epuber
 
     private
 
-    # @param target_name [String]
+    # @param target_name [String, Epuber::Book::Target]
     #
     def process_target_named(target_name)
       @target = target_named(target_name)
@@ -334,13 +336,17 @@ module Epuber
       file_paths.first
     end
 
-    # @param target_name [String]
+    # @param target_name [String, Epuber::Book::Target]
     #
     # @return [Epuber::Book::Target]
     #
     def target_named(target_name)
+      if target_name.is_a?(Epuber::Book::Target)
+        return target_name
+      end
+
       target = @book.targets.find { |target|
-        target.name == target_name
+        target.name == target_name || target.name.to_s == target_name
       }
 
       raise "Not found target with name #{target_name}" if target.nil?
