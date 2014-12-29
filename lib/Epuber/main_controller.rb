@@ -75,7 +75,7 @@ module Epuber
       @target = target_named(target_name)
       @all_files = []
 
-      dir_name = File.join(BASE_PATH, 'build', target_name.to_s)
+      dir_name = File.join(BASE_PATH, 'build', @target.name.to_s)
       FileUtils.mkdir_p(dir_name)
 
       @output_dir = File.expand_path(dir_name)
