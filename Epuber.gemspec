@@ -1,11 +1,9 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require_relative 'lib/Epuber'
+require_relative 'lib/epuber'
 
 Gem::Specification.new do |spec|
-	spec.name        = 'Epuber'
+	spec.name        = 'epuber'
 	spec.version     = Epuber::VERSION
 	spec.authors     = ['Roman Kříž']
 	spec.email       = ['samnung@gmail.com']
@@ -22,6 +20,7 @@ Gem::Specification.new do |spec|
 	spec.add_runtime_dependency 'nokogiri'
   spec.add_runtime_dependency 'mime-types', '~> 2.4'
   spec.add_runtime_dependency 'stylus'
+  spec.add_runtime_dependency 'claide'
   spec.add_runtime_dependency 'colorize'
 
 	spec.add_development_dependency 'bundler', '~> 1'

@@ -1,8 +1,9 @@
+require 'rubygems'
 
 module Epuber
-
-  autoload :VERSION, 'epuber/version'
+  require_relative 'epuber/version'
 
   autoload :MainController, 'epuber/main_controller'
-  autoload :InitStructure, 'epuber/init_structure'
+
+  require_relative 'epuber/command'
 end

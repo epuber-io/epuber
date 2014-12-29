@@ -1,12 +1,7 @@
-#!/usr/bin/eval ruby
+#!/usr/bin/ruby
+
+require 'claide'
 
 require_relative '../lib/epuber'
 
-case ARGV.shift
-when 'compile'
-  Epuber::MainController.new.compile_targets(ARGV)
-when 'init'
-  Epuber::InitStructure.create
-else
-  raise 'Unknown command'
-end
+Epuber::Command.run(ARGV)
