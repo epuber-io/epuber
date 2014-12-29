@@ -1,8 +1,10 @@
 #!/usr/bin/eval ruby
 
-require_relative '../lib/epuber/main_controller'
 
-if ARGV[0] == 'compile'
-  mc = Epuber::MainController.new
-  mc.compile_targets
+case ARGV.shift
+when 'compile'
+  require_relative '../lib/epuber'
+  Epuber::MainController.new.compile_targets(ARGV)
+else
+  raise 'Unknown command'
 end

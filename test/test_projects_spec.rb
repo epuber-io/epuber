@@ -1,7 +1,7 @@
 require 'rspec'
 require 'fileutils'
 
-require_relative '../lib/epuber/main_controller'
+require_relative '../lib/epuber'
 
 
 describe 'Test project' do

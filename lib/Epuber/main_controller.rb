@@ -26,14 +26,14 @@ module Epuber
       image: %w(.png .jpg .jpeg),
       font:  %w(.otf .ttf),
       style: %w(.css .styl),
-    }
+    }.freeze
 
-    STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css)
+    STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css).freeze
 
     EXTENSIONS_RENAME = {
       '.styl' => '.css',
       '.bade' => '.xhtml',
-    }
+    }.freeze
 
 
     # @param targets [Array<String>] targets names, when nil all targets will be used

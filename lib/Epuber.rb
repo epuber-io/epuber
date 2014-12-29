@@ -1,4 +1,7 @@
 
 module Epuber
-	VERSION = '0.0.1'
+
+  autoload :VERSION, 'epuber/version'
+
+  autoload :MainController, 'epuber/main_controller'
 end
