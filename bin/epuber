@@ -1,10 +1,12 @@
 #!/usr/bin/eval ruby
 
+require_relative '../lib/epuber'
 
 case ARGV.shift
 when 'compile'
-  require_relative '../lib/epuber'
   Epuber::MainController.new.compile_targets(ARGV)
+when 'init'
+  Epuber::InitStructure.create
 else
   raise 'Unknown command'
 end

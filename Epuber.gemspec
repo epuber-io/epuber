@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
 	spec.add_runtime_dependency 'nokogiri'
   spec.add_runtime_dependency 'mime-types', '~> 2.4'
   spec.add_runtime_dependency 'stylus'
+  spec.add_runtime_dependency 'colorize'
 
 	spec.add_development_dependency 'bundler', '~> 1'
 	spec.add_development_dependency 'rspec'

@@ -1,0 +1,127 @@
+# This is template for .bookspec
+
+Epuber::Book::Book.new do |book|
+
+  # Name of the book, REQUIRED
+  book.title = '#{book_title}'
+
+  # Subtitle of book, OPTIONAL
+  #
+  # book.subtitle = ''
+
+  # List of authors, REQUIRED
+  #
+  # Can be composed from hash or simple string
+  #
+  # Examples:
+  # book.authors = [
+  #     'Jason Fried' #=> 'Jason' is first name and 'Fried' is last name
+  #     'David Heinemeier Hansson' #=> 'David' is first name and 'Heinemeier Hansson' as last name
+  #         (if there is more names only the first is taken as first, others are last name)
+  # ]
+  # book.author = 'Jason Fried' # if there is only one author, you can write like this
+  #
+  # book.authors = []
+
+  # Language of the book, OPTIONAL
+  #
+  # book.language = 'cs'
+
+  # Book ISBN, REQUIRED
+  # Is used as identifier
+  #
+  book.isbn = 'XXX-XX-XXXXX-XX-X'
+
+  # ISBN of printed version, OPTIONAL
+  #
+  # Will be used for generating metadata for iBooks
+  #
+  # book.print_isbn = '978-80-87270-98-0'
+
+  # Published date, OPTIONAL
+  #
+  # You can also use Ruby Date class (see examples here: http://www.ruby-doc.org/stdlib-2.1.1/libdoc/date/rdoc/Date.html)
+  #
+  # book.published = '2014-06-10'
+
+  # Version of book, REQUIRED for iBooks and epub 3.O
+  #
+  # This is used only for iBooks version
+  #
+  book.version = '0.0.1'
+
+  # Build version, RECOMMENDED
+  #
+  # Is used in result epub file name, see book.output_base_name
+  #
+  book.build_version = '1'
+
+  # Result epub file name, OPTIONAL
+  #
+  # Result epub file name is composed from: \#{book.output_base_name || basename(book.file_path)}\#{book.build_version}-\#{target.name}
+  #
+  # book.output_base_name = 'book'
+
+  # Flag for iBooks, OPTIONAL
+  #
+  # This tell iBooks to use your fonts instead of system fonts only
+  #
+  # book.custom_fonts = true
+
+
+  # Path to cover image, OPTIONAL
+  #
+  # The path don't have to be full, the file will be found with string used as pattern
+  #
+  # book.cover_image = 'cover'
+
+  # If you want to create more then one epub, with specific version of epub and more custom info, OPTIONAL
+  #
+  # book.target :ibooks do |ibooks|
+  #   ibooks.epub_version = 3.0
+  # end
+
+  # List of targets is unlimited, so lets create another one
+  #
+  # book.target :wooky do |wooky|
+  #   wooky.epub_version = 2.0
+  #
+  #   # you can also change isbn for specific target
+  #   wooky.isbn = '978-80-87270-98-3'
+  # end
+
+  # Add some files, for example css styles
+  book.add_file 'styles/#{book_id}.styl'
+
+  # Add other files like images, fonts
+  book.add_files '*.{png,jpg,jpeg}'
+  book.add_files '*.{otf,ttf}'
+
+
+  # Definition of TOC, with some informations like landmarks, linearity
+  #
+  book.toc do |toc|
+    # add file with name: cover (searching is same as cover image), with landmarks cover and start page
+    #
+    # toc.file 'cover', :landmark_cover, :landmark_start_page
+    # toc.file 'vakat'
+
+    # toc.file 'copyright', :landmark_copyright
+
+    # toc.file 'toc', :landmark_toc
+
+    # you can also nest the structure and specify title
+    #
+    # toc.file 's01', 'Section 1' do |sub|
+    #   sub.file 's01ch01', 'Chapter 1'
+    #   sub.file 's01ch02', 'Chapter 2'
+    #   sub.file 's01ch03', 'Chapter 3'
+    # end
+
+    # toc.file 'appendix'
+
+    # to create file which is not linear to rest of book
+    #
+    # toc.file 'footnotes', linear: false
+  end
+end
