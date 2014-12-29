@@ -3,7 +3,7 @@
 require_relative 'lib/epuber'
 
 Gem::Specification.new do |spec|
-	spec.name        = 'Epuber'
+	spec.name        = 'epuber'
 	spec.version     = Epuber::VERSION
 	spec.authors     = ['Roman Kříž']
 	spec.email       = ['samnung@gmail.com']
