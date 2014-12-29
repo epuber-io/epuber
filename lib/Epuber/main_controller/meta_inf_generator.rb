@@ -1,12 +1,13 @@
 
-require 'nokogiri'
 require 'mime-types'
 
+require_relative 'generator'
 require_relative '../book/file'
+
 
 module Epuber
   class MainController
-    class MetaInfGenerator
+    class MetaInfGenerator < Generator
 
       # @param book [Epuber::Book::Book]
       # @param target [Epuber::Book::Target]
@@ -21,25 +22,23 @@ module Epuber
       # @return [Nokogiri::XML::Document]
       #
       def generate_container_xml
-        builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
+        generate_xml { |xml|
           xml.container(version: 1.0, xmlns: 'urn:oasis:names:tc:opendocument:xmlns:container') {
             xml.rootfiles {
               xml.rootfile('full-path' => @content_opf_path, 'media-type' => MIME::Types.of(@content_opf_path).first.content_type)
             }
           }
         }
-        builder.doc
       end
 
       def generate_ibooks_display_options_xml
-        builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
+        generate_xml { |xml|
           xml.display_options {
             xml.platform(name: '*') {
               xml.option(true.to_s, name: 'specified-fonts')
             }
           }
         }
-        builder.doc
       end
 
       # @return [Array<Epuber::Book::File>]

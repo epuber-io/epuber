@@ -1,11 +1,11 @@
-require 'nokogiri'
 
+require_relative 'generator'
 require_relative '../book/toc_item'
 
 
 module Epuber
   class MainController
-    class NavGenerator
+    class NavGenerator < Generator
 
       NCX_NAMESPACES = {
         'xmlns' => 'http://www.daisy.org/z3986/2005/ncx/'
@@ -23,7 +23,6 @@ module Epuber
 
       # resource page http://www.idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-landmarks
       LANDMARKS_MAP = {
-        # my favorite
         landmark_cover:      { type: 'cover', text: 'Cover page' },
         landmark_start_page: { type: %w(bodymatter ibooks:reader-start-page), text: 'Start Reading' },
         landmark_copyright:  { type: 'copyright-page', text: 'Copyright page' },
@@ -46,19 +45,13 @@ module Epuber
       # @return [Nokogiri::XML::Document]
       #
       def generate_nav
-        builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
-          @xml = xml
-
+        generate_xml {
           if @target.epub_version >= 3
             generate_xhtml_content
           else
             generate_ncx_content
           end
-
-          @xml = nil
         }
-
-        builder.doc
       end
 
       # @return [Epuber::Book::File]
@@ -85,8 +78,8 @@ module Epuber
       #
       def nav_namespaces
         if @target.epub_version >= 3
-          dict = XHTML_NAMESPACES
-          dict = dict.merge(XHTML_IBOOKS_NAMESPACES) if @target.is_ibooks?
+          dict = XHTML_NAMESPACES.dup
+          dict.merge!(XHTML_IBOOKS_NAMESPACES) if @target.is_ibooks?
           dict
         else
           NCX_NAMESPACES

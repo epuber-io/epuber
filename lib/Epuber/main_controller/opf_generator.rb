@@ -1,14 +1,14 @@
 require 'time'
 
-require 'nokogiri'
 require 'mime-types'
 
+require_relative 'generator'
 require_relative '../book/toc_item'
 
 
 module Epuber
   class MainController
-    class OPFGenerator
+    class OPFGenerator < Generator
 
       EPUB2_NAMESPACES = {
         'xmlns'    => 'http://www.idpf.org/2007/opf',
@@ -67,20 +67,14 @@ module Epuber
       # @return [Nokogiri::XML::Document]
       #
       def generate_opf
-        builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
-          @xml = xml
-
+        generate_xml { |xml|
           xml.package(package_namespaces, :version => @target.epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
             generate_metadata
             generate_manifest
             generate_spine
             generate_guide
           }
-
-          @xml = nil
         }
-
-        builder.doc
       end
 
       # @return [Epuber::Book::File]
