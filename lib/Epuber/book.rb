@@ -27,6 +27,8 @@ module Epuber
         @default_target.validate
       end
 
+      attr_reader :default_target
+
 
       private
 
@@ -159,7 +161,9 @@ module Epuber
 
       # @return [String] build version of book
       #
-      attribute :build_version
+      attribute :build_version,
+                types:        [Version],
+                auto_convert: { [String, Fixnum, Float] => Version }
 
       # @return [String] base name for output epub file
       #
