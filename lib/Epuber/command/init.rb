@@ -7,7 +7,7 @@ require_relative '../command'
 module Epuber
   class Command
     class Init < Command
-      self.summary = 'Init'
+      self.summary = 'Initialize current folder to use it as Epuber project'
 
       def validate!
         existing = Dir.glob('*.bookspec')
@@ -62,7 +62,7 @@ END
       # @return [void]
       #
       def write_bookspec(book_title, book_id)
-        template_path = File.expand_path(File.join('..', 'init_structure', 'template.bookspec'), File.dirname(__FILE__))
+        template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
         rendered = render_file_template(template_path, book_title: book_title, book_id: book_id)
         write("#{book_id}.bookspec", rendered)
       end
