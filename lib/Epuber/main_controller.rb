@@ -45,7 +45,7 @@ module Epuber
       raise "Not found .bookspec file in `#{Dir.pwd}`" if bookspecs.count.zero?
 
       bookspecs.each do |bookspec_file_path|
-        # @type @book [Book::Book]
+        # @type @book [Epuber::Book::Book]
 
         @book = Book::Book.from_file(bookspec_file_path)
         @book.validate
@@ -368,7 +368,7 @@ module Epuber
       epub_name = if !@book.output_base_name.nil?
                     @book.output_base_name
                   elsif @book.from_file?
-                    Pathname.new(@book.file_path).basename
+                    File.basename(@book.file_path, File.extname(@book.file_path))
                   else
                     @book.title
                   end
