@@ -23,12 +23,12 @@ module Epuber
       #
       attr_accessor :attributes_values
 
+
+      public
+
       # @return [String]
       #
       attr_reader :file_path
-
-
-      public
 
       # Validates all values of attributes, if there is some error, StandardError will be raised
       #
