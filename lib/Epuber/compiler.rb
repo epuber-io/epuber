@@ -20,7 +20,7 @@ module Epuber
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
     GROUP_EXTENSIONS = {
-      text:  %w(.xhtml .html .md .bade),
+      text:  %w(.xhtml .html .md .bade .rxhtml),
       image: %w(.png .jpg .jpeg),
       font:  %w(.otf .ttf),
       style: %w(.css .styl),
@@ -29,8 +29,9 @@ module Epuber
     STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css).freeze
 
     EXTENSIONS_RENAME = {
-      '.styl' => '.css',
-      '.bade' => '.xhtml',
+      '.styl'   => '.css',
+      '.bade'   => '.xhtml',
+      '.rxhtml' => '.xhtml',
     }.freeze
 
     # @param book [Epuber::Book::Book]
