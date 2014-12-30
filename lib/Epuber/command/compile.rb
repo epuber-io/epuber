@@ -15,6 +15,10 @@ module Epuber
         super(argv)
       end
 
+      def validate!
+        verify_bookspec_exists!
+      end
+
       def run
         require_relative '../main_controller'
         MainController.new.compile_targets(@targets)

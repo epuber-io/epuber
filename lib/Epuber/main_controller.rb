@@ -40,11 +40,7 @@ module Epuber
     # @return [void]
     #
     def compile_targets(targets = [])
-      bookspecs = Dir.glob('*.bookspec')
-
-      raise "Not found .bookspec file in `#{Dir.pwd}`" if bookspecs.count.zero?
-
-      bookspecs.each do |bookspec_file_path|
+      Dir.glob('*.bookspec') do |bookspec_file_path|
         # @type @book [Epuber::Book::Book]
 
         @book = Book::Book.from_file(bookspec_file_path)
@@ -352,7 +348,29 @@ module Epuber
       target
     end
 
+    # Creates name of epub file for current book and current target
+    #
+    # @return [String] name of result epub file
+    #
+    def epub_name
+      epub_name = if !@book.output_base_name.nil?
+                    @book.output_base_name
+                  elsif @book.from_file?
+                    File.basename(@book.file_path, File.extname(@book.file_path))
+                  else
+                    @book.title
+                  end
+
+      epub_name += @book.build_version.to_s unless @book.build_version.nil?
+      epub_name += "-#{@target.name.to_s}" if @target != @book.default_target
+      epub_name + '.epub'
+    end
+
     # @param cmd [String]
+    #
+    # @return [void]
+    #
+    # @raise if the return value is not 0
     #
     def run_command(cmd)
       system(cmd)
@@ -364,19 +382,11 @@ module Epuber
       raise 'wrong return value' if code != 0
     end
 
+    # Archives current target files to epub
+    #
+    # @return [void]
+    #
     def archive
-      epub_name = if !@book.output_base_name.nil?
-                    @book.output_base_name
-                  elsif @book.from_file?
-                    File.basename(@book.file_path, File.extname(@book.file_path))
-                  else
-                    @book.title
-                  end
-
-      epub_name += @book.build_version.to_s unless @book.build_version.nil?
-      epub_name += "-#{@target.name.to_s}" if @target != @book.default_target
-      epub_name += '.epub'
-
       epub_path = File.expand_path(epub_name)
 
       Dir.chdir(@output_dir) {
