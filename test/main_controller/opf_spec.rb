@@ -1,20 +1,20 @@
 require_relative '../matchers/xml'
 
-require_relative '../../lib/epuber/main_controller'
+require_relative '../../lib/epuber/compiler'
 require_relative '../../lib/epuber/book/target'
 require_relative '../../lib/epuber/book'
 
 module Epuber
-  describe MainController::OPFGenerator do
+  describe Compiler::OPFGenerator do
     before do
       book = Book::Book.new
-      @sut = MainController::OPFGenerator.new(book, book.targets.first)
+      @sut = Compiler::OPFGenerator.new(book, book.targets.first)
     end
 
     it 'creates minimal xml structure for empty book' do
       opf_xml = @sut.generate_opf
       expect(opf_xml).to have_xpath('/package/@version', '3.0') # is default
-      expect(opf_xml).to have_xpath('/package/@unique-identifier', MainController::OPFGenerator::OPF_UNIQUE_ID)
+      expect(opf_xml).to have_xpath('/package/@unique-identifier', Compiler::OPFGenerator::OPF_UNIQUE_ID)
       expect(opf_xml).to have_xpath('/package/metadata')
       expect(opf_xml).to have_xpath('/package/manifest')
       expect(opf_xml).to have_xpath('/package/spine')
@@ -33,7 +33,7 @@ module Epuber
         ### b.cover_image = 'cover.jpg'
       end
 
-      @sut = MainController::OPFGenerator.new(book, book.targets.first)
+      @sut = Compiler::OPFGenerator.new(book, book.targets.first)
 
       opf_xml = @sut.generate_opf
       with_xpath(opf_xml, '/package/metadata') do |metadata|

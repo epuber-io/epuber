@@ -7,17 +7,16 @@ require 'fileutils'
 require 'stylus'
 require 'bade'
 
-require_relative 'main_controller/opf_generator'
-require_relative 'main_controller/nav_generator'
-require_relative 'main_controller/meta_inf_generator'
+require_relative 'compiler/opf_generator'
+require_relative 'compiler/nav_generator'
+require_relative 'compiler/meta_inf_generator'
 
 require_relative 'book'
 
 
 module Epuber
-  class MainController
+  class Compiler
 
-    BASE_PATH = '.epuber'
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
     GROUP_EXTENSIONS = {
@@ -34,48 +33,28 @@ module Epuber
       '.bade' => '.xhtml',
     }.freeze
 
+    # @param book [Epuber::Book::Book]
+    # @param target [Epuber::Book::Target]
+    #
+    def initialize(book, target)
+      @book = book
+      @target = target
+    end
 
-    # @param targets [Array<String>] targets names, when nil all targets will be used
+    # Compile target to build folder
+    #
+    # @param build_folder [String] path to folder, where will be stored all compiled files
     #
     # @return [void]
     #
-    def compile_targets(targets = [])
-      Dir.glob('*.bookspec') do |bookspec_file_path|
-        # @type @book [Epuber::Book::Book]
-
-        @book = Book::Book.from_file(bookspec_file_path)
-        @book.validate
-
-        puts "loaded book `#{bookspec_file_path}`"
-
-        # when the list of targets is nil use them all
-        if targets.empty?
-          targets = @book.targets
-        end
-
-        targets.each do |target_name|
-          process_target_named(target_name)
-        end
-
-        @book = nil
-      end
-    end
-
-
-    private
-
-    # @param target_name [String, Epuber::Book::Target]
-    #
-    def process_target_named(target_name)
-      @target = target_named(target_name)
+    def compile(build_folder)
       @all_files = []
 
-      dir_name = File.join(BASE_PATH, 'build', @target.name.to_s)
-      FileUtils.mkdir_p(dir_name)
+      FileUtils.mkdir_p(build_folder)
 
-      @output_dir = File.expand_path(dir_name)
+      @output_dir = File.expand_path(build_folder)
 
-      puts "  handling target #{@target.name.inspect} in build dir `#{dir_name}`"
+      puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
 
       process_toc_item(@book.root_toc)
       process_target_files
@@ -84,13 +63,43 @@ module Epuber
       # build folder cleanup
       remove_unnecessary_files
       remove_empty_folders
-
-      # final
-      archive
-
-      @all_files = nil
-      @target = nil
     end
+
+    # Archives current target files to epub
+    #
+    # @return [void]
+    #
+    def archive(path = epub_name)
+      epub_path = File.expand_path(path)
+
+      Dir.chdir(@output_dir) {
+        all_files = Dir.glob('**/*')
+
+        run_command(%{zip -q0X "#{epub_path}" mimetype})
+        run_command(%{zip -qXr9D "#{epub_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
+      }
+    end
+
+    # Creates name of epub file for current book and current target
+    #
+    # @return [String] name of result epub file
+    #
+    def epub_name
+      epub_name = if !@book.output_base_name.nil?
+                    @book.output_base_name
+                  elsif @book.from_file?
+                    File.basename(@book.file_path, File.extname(@book.file_path))
+                  else
+                    @book.title
+                  end
+
+      epub_name += @book.build_version.to_s unless @book.build_version.nil?
+      epub_name += "-#{@target.name.to_s}" if @target != @book.default_target
+      epub_name + '.epub'
+    end
+
+
+    private
 
     def remove_empty_folders
       Dir.chdir(@output_dir) {
@@ -270,7 +279,7 @@ module Epuber
       file_paths = Dir.glob(pattern)
 
       file_paths.select! { |file_path|
-        !file_path.include?(BASE_PATH)
+        !file_path.include?(Command::BASE_PATH)
       }
 
       # filter depend on group
@@ -331,41 +340,6 @@ module Epuber
       file_paths.first
     end
 
-    # @param target_name [String, Epuber::Book::Target]
-    #
-    # @return [Epuber::Book::Target]
-    #
-    def target_named(target_name)
-      if target_name.is_a?(Epuber::Book::Target)
-        return target_name
-      end
-
-      target = @book.targets.find { |target|
-        target.name == target_name || target.name.to_s == target_name
-      }
-
-      raise "Not found target with name #{target_name}" if target.nil?
-      target
-    end
-
-    # Creates name of epub file for current book and current target
-    #
-    # @return [String] name of result epub file
-    #
-    def epub_name
-      epub_name = if !@book.output_base_name.nil?
-                    @book.output_base_name
-                  elsif @book.from_file?
-                    File.basename(@book.file_path, File.extname(@book.file_path))
-                  else
-                    @book.title
-                  end
-
-      epub_name += @book.build_version.to_s unless @book.build_version.nil?
-      epub_name += "-#{@target.name.to_s}" if @target != @book.default_target
-      epub_name + '.epub'
-    end
-
     # @param cmd [String]
     #
     # @return [void]
@@ -380,21 +354,6 @@ module Epuber
 
       code = $?
       raise 'wrong return value' if code != 0
-    end
-
-    # Archives current target files to epub
-    #
-    # @return [void]
-    #
-    def archive
-      epub_path = File.expand_path(epub_name)
-
-      Dir.chdir(@output_dir) {
-        all_files = Dir.glob('**/*')
-
-        run_command(%{zip -q0X "#{epub_path}" mimetype})
-        run_command(%{zip -qXr9D "#{epub_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
-      }
     end
   end
 end

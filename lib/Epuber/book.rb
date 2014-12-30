@@ -191,6 +191,28 @@ module Epuber
       end
 
 
+
+
+
+      # --------------------------------------------------------------------- #
+      # @!group Other methods
+
+      # Finds target with name or nil when not found
+      #
+      # @param target_name [Symbol, String, Epuber::Book::Target]
+      #
+      # @return [Epuber::Book::Target, nil]
+      #
+      def target_named(target_name)
+        if target_name.is_a?(Epuber::Book::Target)
+          return target_name
+        end
+
+        targets.find { |target|
+          target.name == target_name || target.name.to_s == target_name.to_s
+        }
+      end
+
       # TODO footnotes customization
       # TODO custom metadata
       # TODO custom user informations (just global available Hash<String, Any>)

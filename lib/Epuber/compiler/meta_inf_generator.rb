@@ -6,7 +6,7 @@ require_relative '../book/file'
 
 
 module Epuber
-  class MainController
+  class Compiler
     class MetaInfGenerator < Generator
 
       # @param book [Epuber::Book::Book]

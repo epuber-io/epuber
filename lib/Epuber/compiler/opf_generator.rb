@@ -7,7 +7,7 @@ require_relative '../book/toc_item'
 
 
 module Epuber
-  class MainController
+  class Compiler
     class OPFGenerator < Generator
 
       EPUB2_NAMESPACES = {

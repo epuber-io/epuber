@@ -1,7 +1,7 @@
 require 'nokogiri'
 
 module Epuber
-  class MainController
+  class Compiler
     class Generator
 
       protected
@@ -14,7 +14,7 @@ module Epuber
         builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') { |xml|
           @xml = xml
 
-          yield xml if block_given?
+          block.call(xml) unless block.nil?
 
           @xml = nil
         }

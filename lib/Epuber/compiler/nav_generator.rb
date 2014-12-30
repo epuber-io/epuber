@@ -4,7 +4,7 @@ require_relative '../book/toc_item'
 
 
 module Epuber
-  class MainController
+  class Compiler
     class NavGenerator < Generator
 
       NCX_NAMESPACES = {
