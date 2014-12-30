@@ -11,7 +11,7 @@ module Epuber
 
       def validate!
         existing = Dir.glob('*.bookspec')
-        raise "Can't reinit this folder, #{existing.first} already exists." unless existing.empty?
+        help! "Can't reinit this folder, #{existing.first} already exists." unless existing.empty?
       end
 
       def run
