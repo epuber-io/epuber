@@ -88,6 +88,9 @@ Epuber::Book::Book.new do |book|
   #
   #   # you can also change isbn for specific target
   #   wooky.isbn = '978-80-87270-98-3'
+  #
+  #   # add constant to target, will be available in text files with CONST['key'] or with TARGET.constants['key']
+  #   wooky.add_const 'key', 'value'
   # end
 
   # Add some files, for example css styles

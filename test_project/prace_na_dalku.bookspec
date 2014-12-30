@@ -15,19 +15,22 @@ Epuber::Book::Book.new do |book|
 
   book.version = '1.0.1'
   book.build_version = '5'
-  book.output_base_name = 'prace_na_dalku'
 
   book.custom_fonts = true
 
   book.cover_image = 'cover'
 
-  book.target :ibooks do |ibooks|
-    ibooks.epub_version = 3.0
+  book.target :ibooks do |t|
+    t.add_const 'restart_store_url', 'https://itunes.apple.com/cz/book/restart/id490604028?mt=11'
+  end
+  book.target :play do |t|
+    t.add_const 'restart_store_url', 'https://play.google.com/store/books/details?id=AU5RAQAAQBAJ'
   end
 
-  book.target :wooky do |wooky|
-    wooky.epub_version = 2.0
-    wooky.isbn = '978-80-87270-98-3'
+  book.target :wooky do |t|
+    t.epub_version = 2.0
+    t.isbn = '978-80-87270-98-3'
+    t.add_const 'restart_store_url', 'http://melvil.cz/kniha-restart'
   end
 
   book.add_file 'prace_na_dalku.css'

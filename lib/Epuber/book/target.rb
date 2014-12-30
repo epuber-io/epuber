@@ -18,6 +18,7 @@ module Epuber
         @is_ibooks = nil
         @files     = []
         @all_files = []
+        @constants = {}
       end
 
       # @return [String] target name
@@ -94,6 +95,10 @@ module Epuber
         end
       end
 
+      def constants
+        ((self.parent && self.parent.constants) || {}).merge(@constants)
+      end
+
       #----------------------- DSL items ---------------------------
 
 
@@ -133,6 +138,8 @@ module Epuber
       # @param file_path [String | Epuber::Book::File]
       # @param group [Symbol]
       #
+      # @return [Epuber::Book::File] created file
+      #
       def add_file(file_path, group: nil)
         file = if file_path.is_a?(Epuber::Book::File)
                  file_path
@@ -145,11 +152,24 @@ module Epuber
         file
       end
 
+      # @param file_paths [Array<String>]
+      #
+      # @return [void]
+      #
       def add_files(*file_paths)
         file_paths.each { |file_path|
           file_obj = add_file(file_path)
           file_obj.only_one = false
         }
+      end
+
+      # @param key [String]
+      # @param value [String]
+      #
+      # @return [void]
+      #
+      def add_const(key, value)
+        @constants[key] = value
       end
 
       # TODO store url

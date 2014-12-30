@@ -184,6 +184,13 @@ module Epuber
       end
 
 
+      # Add constant to target, constants can be used within text files
+      #
+      def add_const(*args)
+        @default_target.add_const(*args)
+      end
+
+
       # TODO footnotes customization
       # TODO custom metadata
       # TODO custom user informations (just global available Hash<String, Any>)
