@@ -45,6 +45,8 @@ module Epuber
       raise PlainInformative, "Multiple `.bookspec' found in current directory" if bookspec_files.count > 1
     end
 
+    # @return [Array<String>]
+    #
     def self.find_bookspec_files
       Dir.glob('*.bookspec')
     end

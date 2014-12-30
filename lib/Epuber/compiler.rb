@@ -47,8 +47,9 @@ module Epuber
     #
     # @return [void]
     #
-    def compile(build_folder)
+    def compile(build_folder, check: false)
       @all_files = []
+      @should_check = check
 
       FileUtils.mkdir_p(build_folder)
 
@@ -63,6 +64,8 @@ module Epuber
       # build folder cleanup
       remove_unnecessary_files
       remove_empty_folders
+
+      @should_check = false
     end
 
     # Archives current target files to epub
@@ -228,15 +231,12 @@ module Epuber
         file_pathname = Pathname.new(file.real_source_path)
 
         case file_pathname.extname
+        when '.bade', '.xhtml'
+          process_text_file(file)
         when *STATIC_EXTENSIONS
-          FileUtils.cp(file_pathname.to_s, dest_path.to_s)
+          process_static_file(file)
         when '.styl'
           file.content = Stylus.compile(::File.new(file_pathname))
-          return process_file(file)
-        when '.bade'
-          parsed = Bade::Parser.new(file: file_pathname.to_s).parse(::File.read(file_pathname.to_s))
-          lam = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
-          file.content = lam.call
           return process_file(file)
         else
           raise "unknown file extension #{file_pathname.extname} for file #{file.inspect}"
@@ -244,6 +244,41 @@ module Epuber
       end
 
       @all_files << file
+    end
+
+    # @param file [Epuber::Book::File]
+    #
+    def process_text_file(file)
+      source_pathname = Pathname.new(file.real_source_path)
+
+      xhtml_content   = case source_pathname.extname
+                        when '.xhtml'
+                          ::File.read(source_pathname.to_s)
+                        when '.rxhtml'
+                          RubyTemplater.render_file(source_pathname.to_s)
+                        when '.bade'
+                          parsed = Bade::Parser.new(file: source_pathname.to_s).parse(::File.read(source_pathname.to_s))
+                          lam    = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
+                          lam.call
+                        else
+                          raise "Unknown text extension #{source_pathname.extname}"
+                        end
+
+      # TODO: perform text transform
+      # TODO: perform analysis
+
+      file.content = xhtml_content
+
+      File.open(destination_path_of_file(file), 'w') { |file_handle|
+        file_handle.write(xhtml_content)
+      }
+    end
+
+    # @param file [Epuber::Book::File]
+    #
+    def process_static_file(file)
+      dest_path = destination_path_of_file(file)
+      FileUtils.cp(file.real_source_path, dest_path)
     end
 
     # @param file [Epuber::Book::File]
