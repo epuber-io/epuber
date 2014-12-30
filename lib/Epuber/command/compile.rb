@@ -39,7 +39,11 @@ module Epuber
 
           build_dir = File.join(BASE_PATH, 'build', target.name.to_s)
           compiler.compile(build_dir, check: @should_check)
-          compiler.archive
+          archive_path = compiler.archive
+
+          if @should_check
+            system(%Q{epubcheck "#{archive_path}"})
+          end
         end
       end
 

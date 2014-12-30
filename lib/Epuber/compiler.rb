@@ -65,13 +65,13 @@ module Epuber
       # build folder cleanup
       remove_unnecessary_files
       remove_empty_folders
-
-      @should_check = false
     end
 
     # Archives current target files to epub
     #
-    # @return [void]
+    # @param path [String] path to created archive
+    #
+    # @return [String] path
     #
     def archive(path = epub_name)
       epub_path = File.expand_path(path)
@@ -82,6 +82,8 @@ module Epuber
         run_command(%{zip -q0X "#{epub_path}" mimetype})
         run_command(%{zip -qXr9D "#{epub_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store})
       }
+
+      path
     end
 
     # Creates name of epub file for current book and current target
