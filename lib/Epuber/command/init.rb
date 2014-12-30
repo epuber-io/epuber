@@ -63,7 +63,7 @@ END
       #
       def write_bookspec(book_title, book_id)
         template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
-        rendered = render_file_template(template_path, book_title: book_title, book_id: book_id)
+        rendered = RubyTemplater.render_file(template_path, book_title: book_title, book_id: book_id)
         write("#{book_id}.bookspec", rendered)
       end
 
@@ -85,19 +85,6 @@ END
 // This is generated with `epuber init` script.
         END
         )
-      end
-
-      # @param file_path [String] path to template file
-      #
-      # @return [String] rendered template
-      #
-      def render_file_template(file_path, vars = {})
-        require_relative '../vendor/hash_binding'
-        hash_binding = Epuber::HashBinding.new(vars)
-        b = hash_binding.get_binding
-        string = ::File.read(file_path)
-        eval_string = %Q{%Q{#{string}}}
-        eval(eval_string, b, file_path)
       end
 
       # @param string [String] text to file
