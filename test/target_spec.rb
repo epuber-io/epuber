@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'rspec'
+require_relative 'helpers/spec_helper'
 
 require_relative '../lib/Epuber/book/target'
 

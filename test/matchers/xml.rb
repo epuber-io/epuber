@@ -1,7 +1,8 @@
 # encoding: utf-8
 
 require 'nokogiri'
-require 'rspec'
+
+require_relative '../helpers/spec_helper'
 
 # @param xpath [String]
 # @return [String]

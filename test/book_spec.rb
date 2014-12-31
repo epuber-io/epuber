@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require_relative 'helpers/spec_helper'
+
 require_relative '../lib/epuber/book'
 
 module Epuber
