@@ -14,6 +14,7 @@ module Epuber
   class Command < CLAide::Command
     require_relative 'command/compile'
     require_relative 'command/init'
+    require_relative 'command/server'
 
     BASE_PATH = '.epuber'
 

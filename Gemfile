@@ -7,4 +7,7 @@ gemspec
 
 gem 'bade', path: '../Bade'
 
-gem 'rubocop', require: false
+gem 'rubocop', group: :test, require: false
+
+gem 'sinatra'
+gem 'thin'

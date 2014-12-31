@@ -1,0 +1,38 @@
+<html>
+<body>
+
+    <script>
+        var xmlhttp;
+
+        function currentTime() {
+            xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+                    if ( xmlhttp.status == 0 ) {
+                        // failed
+                        document.write('<p>Server shut down.</p>');
+                        return;
+                    }
+
+                    document.write('<p>' + xmlhttp.responseText + '</p>');
+                    console.log("Request finished with status: " + xmlhttp.status);
+                    currentTime();
+                }
+            };
+
+            xmlhttp.open("GET", "/time_ajax", true);
+            xmlhttp.send();
+        }
+
+        currentTime();
+
+        window.addEventListener('onunload', function () {
+            xmlhttp.abort();
+            console.log('on unload');
+        });
+    </script>
+
+</body>
+</html>
+
