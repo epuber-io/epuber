@@ -1,4 +1,4 @@
-require 'rubygems'
+# encoding: utf-8
 
 module Epuber
   require_relative 'epuber/version'

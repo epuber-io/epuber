@@ -1,0 +1,61 @@
+
+Style/Encoding:
+  Enabled: true
+
+Style/GlobalVars:
+  AllowedVariables:
+    - $global_xpath # used in test/matchers/xml.rb
+
+# I want empty lines!
+Style/EmptyLines:
+  Enabled: false
+
+Style/RegexpLiteral:
+  MaxSlashes: 0
+
+
+# We adopted raise instead of fail.
+SignalException:
+  EnforcedStyle: only_raise
+
+
+# We all have wide screen monitors, so why only 80?
+Metrics/LineLength:
+  Max: 120
+
+# WTF: why is default 10?
+Metrics/MethodLength:
+  Max: 50
+
+Metrics/ClassLength:
+  Max: 300
+
+# It will be obvious which code is complex, Rubocop should only lint simple
+# rules for us.
+Metrics/AbcSize:
+  Enabled: false
+
+# It will be obvious which code is complex, Rubocop should only lint simple
+# rules for us.
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+# It will be obvious which code is complex, Rubocop should only lint simple
+# rules for us.
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+
+
+# At the moment not ready to be used
+# https://github.com/bbatsov/rubocop/issues/947
+Documentation:
+  Enabled: false
+
+# Having these make it easier to *not* forget to add one when adding a new
+# value and you can simply copy the previous line.
+TrailingComma:
+  EnforcedStyleForMultiline: comma
+
+Lint/RequireParentheses:
+  Enabled: true

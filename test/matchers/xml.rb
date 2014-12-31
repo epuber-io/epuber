@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'nokogiri'
 require 'rspec'
 
@@ -5,19 +7,17 @@ require 'rspec'
 # @return [String]
 #
 def xpath_namespace_hack(xpath)
-
-  # HACK for dealing with namespaces
+  # HACK: for dealing with namespaces
   # implicit namespace
-  xpath.split('/').map { |node|
-    nodename = node.gsub(/^([A-Za-z0-9_:]+).*/) { $1 }
+  xpath.split('/').map do |node|
+    nodename = node.gsub(/^([A-Za-z0-9_:]+).*/, '\1')
     if nodename.length == 0 || nodename.start_with?('@') || nodename.include?(':')
       node
     else
       "xmlns:#{node}"
     end
-  }.join('/')
+  end.join('/')
 end
-
 
 $global_xpath = nil
 
@@ -34,7 +34,6 @@ def with_xpath(doc, xpath, &block)
   $global_xpath = nil
 end
 
-
 RSpec::Matchers.define :have_xpath do |xpath, text|
   def test_with_message(message, &block)
     @possible_error_message = message
@@ -46,10 +45,8 @@ RSpec::Matchers.define :have_xpath do |xpath, text|
     @original_xpath = xpath
 
     xpath = xpath_namespace_hack(xpath)
+    xpath = $global_xpath + xpath unless $global_xpath.nil?
 
-    unless $global_xpath.nil?
-      xpath = $global_xpath + xpath
-    end
 
     doc = if body.is_a? Nokogiri::XML::Document
             body
@@ -66,7 +63,8 @@ RSpec::Matchers.define :have_xpath do |xpath, text|
 
     if text
       nodes.each do |node|
-        test_with_message "founded value '#{node.content}' doesn't match for required value '#{text}' at xpath #{@original_xpath}" do
+        message = "founded value '#{node.content}' doesn't match required value '#{text}' at xpath #{@original_xpath}"
+        test_with_message message do
           expect(node.content).to eq text
         end
       end

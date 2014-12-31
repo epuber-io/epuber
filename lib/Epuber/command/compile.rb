@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_relative '../command'
 
 module Epuber
@@ -5,7 +7,7 @@ module Epuber
     class Compile < Command
       self.summary = 'Compile targets into multiple epubs.'
       self.arguments = [
-        CLAide::Argument.new('TARGETS', false, true)
+        CLAide::Argument.new('TARGETS', false, true),
       ]
 
       def self.options
@@ -41,9 +43,7 @@ module Epuber
           compiler.compile(build_dir, check: @should_check)
           archive_path = compiler.archive
 
-          if @should_check
-            system(%Q{epubcheck "#{archive_path}"})
-          end
+          system(%(epubcheck "#{archive_path}")) if @should_check
         end
       end
 
@@ -59,15 +59,13 @@ module Epuber
           if targets.empty?
             book.targets
           else
-            targets.map { |target_name|
-              book.target_named(target_name)
-            }
+            targets.map { |target_name| book.target_named(target_name) }
           end
         )
       end
 
       def verify_all_targets_exists!
-        index = targets.index { |t| t.nil? }
+        index = targets.index(&:nil?)
         help! "Not found target `#{@targets_names[index]}' in bookspec `#{@book.file_path}'" unless index.nil?
       end
     end

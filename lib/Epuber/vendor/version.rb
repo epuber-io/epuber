@@ -1,3 +1,4 @@
+# encoding: utf-8
 
 # Most of this code is taken from github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/vendor/version.rb
 
@@ -5,7 +6,7 @@ module Epuber
   class Version
     include Comparable
 
-    VERSION_RE ||= %r(\A[0-9]+(\.[0-9a-zA-Z]+)*\z)
+    VERSION_RE ||= /\A[0-9]+(\.[0-9a-zA-Z]+)*\z/
 
     # True if the +version+ string matches RubyGems' requirements.
     #
@@ -58,8 +59,8 @@ module Epuber
         i += 1
 
         next      if lhs == rhs
-        return -1 if String  === lhs && Numeric === rhs
-        return  1 if Numeric === lhs && String  === rhs
+        return -1 if String  == lhs && Numeric == rhs
+        return  1 if Numeric == lhs && String  == rhs
 
         return lhs <=> rhs
       end

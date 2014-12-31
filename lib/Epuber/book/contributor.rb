@@ -1,7 +1,8 @@
+# encoding: utf-8
+
 module Epuber
   module Book
     class Contributor
-
       # File-as of contributor used in .opf file
       # @return [String] pretty name
       #
@@ -42,9 +43,9 @@ module Epuber
             NormalContributor.new(components.first(components.length - 1).join(' '), components.last, role)
           end
         elsif obj.is_a?(Hash)
-          if obj.has_key?(:first_name)
+          if obj.key?(:first_name)
             NormalContributor.new(obj[:first_name], obj[:last_name], role)
-          elsif obj.has_key?(:file_as)
+          elsif obj.key?(:file_as)
             Contributor.new(obj[:pretty_name], obj[:file_as], role)
           end
         end
@@ -53,7 +54,6 @@ module Epuber
 
 
     class NormalContributor < Contributor
-
       # @return [String] first name of contributor
       #
       attr_accessor :first_name

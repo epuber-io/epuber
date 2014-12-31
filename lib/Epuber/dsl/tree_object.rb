@@ -1,9 +1,10 @@
+# encoding: utf-8
+
 require_relative 'object'
 
 module Epuber
   module DSL
     class TreeObject < Object
-
       # @param [DSLTreeObject] parent
       #
       def initialize(parent = nil)
@@ -12,9 +13,7 @@ module Epuber
         @parent      = parent
         @child_items = []
 
-        unless parent.nil?
-          parent.child_items << self
-        end
+        parent.child_items << self unless parent.nil?
       end
 
       # @return [TreeObject] reference to parent
@@ -27,8 +26,10 @@ module Epuber
 
 
       protected
+
       attr_writer :parent
       attr_writer :child_items
+
       public
 
 
@@ -41,7 +42,7 @@ module Epuber
 
       def validate
         super
-        self.child_items.each { |item| item.validate }
+        child_items.each(&:validate)
       end
 
 

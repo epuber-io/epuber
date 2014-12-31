@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'time'
 
 require 'mime-types'
@@ -9,7 +11,6 @@ require_relative '../book/toc_item'
 module Epuber
   class Compiler
     class OPFGenerator < Generator
-
       EPUB2_NAMESPACES = {
         'xmlns'    => 'http://www.idpf.org/2007/opf',
         'xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
@@ -67,14 +68,14 @@ module Epuber
       # @return [Nokogiri::XML::Document]
       #
       def generate_opf
-        generate_xml { |xml|
-          xml.package(package_namespaces, :version => @target.epub_version, 'unique-identifier' => OPF_UNIQUE_ID) {
+        generate_xml do |xml|
+          xml.package(package_namespaces, :version => @target.epub_version, 'unique-identifier' => OPF_UNIQUE_ID) do
             generate_metadata
             generate_manifest
             generate_spine
             generate_guide
-          }
-        }
+          end
+        end
       end
 
       # @return [Epuber::Book::File]
@@ -94,8 +95,7 @@ module Epuber
       def generate_metadata
         epub_version = @target.epub_version
 
-        @xml.metadata {
-
+        @xml.metadata do
           # identifier
           @xml['dc'].identifier("urn:isbn:#{@target.isbn}", id: OPF_UNIQUE_ID)
 
@@ -111,8 +111,7 @@ module Epuber
 
           # authors
           authors = @book.authors || []
-          authors.each_index { |idx|
-            author        = authors[idx]
+          authors.each_with_index do |author, idx|
             author_id     = "author_#{idx + 1}"
             author_id_ref = "##{author_id}"
 
@@ -123,13 +122,14 @@ module Epuber
             else
               @xml['dc'].creator(author.pretty_name)
             end
-          }
+          end
 
           @xml['dc'].publisher(@book.publisher) unless @book.publisher.nil?
           @xml['dc'].language(@book.language) unless @book.language.nil?
           @xml['dc'].date(@book.published.iso8601) unless @book.published.nil?
 
-          @xml.meta(name: 'cover', content: create_id_from_path(@target.cover_image.destination_path)) unless @target.cover_image.nil?
+          cover_image = @target.cover_image
+          @xml.meta(name: 'cover', content: create_id_from_path(cover_image.destination_path)) unless cover_image.nil?
 
           if epub_version >= 3
             @xml.meta(Time.now.utc.iso8601, property: 'dcterms:modified')
@@ -139,24 +139,25 @@ module Epuber
               @xml.meta(@book.custom_fonts, property: 'ibooks:specified-fonts') unless @book.custom_fonts.nil?
             end
           end
-        }
+        end
       end
 
       # --------- MANIFEST --------------------------
 
       def generate_manifest
-        @xml.manifest {
-          all_files = @target.all_files
-          all_files.each { |file|
-            attrs = {}
-            attrs['id'] = create_id_from_path(file.destination_path)
-            attrs['href'] = file.destination_path
+        @xml.manifest do
+          @target.all_files.each do |file|
+            attrs               = {}
+            attrs['id']         = create_id_from_path(file.destination_path)
+            attrs['href']       = file.destination_path
             attrs['media-type'] = mime_type_for(file)
-            attrs['properties'] = file.properties.to_a.join(' ') if file.properties.length > 0 && @target.epub_version >= 3
+
+            properties          = file.properties
+            attrs['properties'] = properties.to_a.join(' ') if properties.length > 0 && @target.epub_version >= 3
 
             @xml.item(attrs)
-          }
-        }
+          end
+        end
       end
 
       # --------- SPINE --------------------------
@@ -171,17 +172,17 @@ module Epuber
                  { toc: create_id_from_path(nav_file.destination_path) }
                end
 
-        @xml.spine(args) {
+        @xml.spine(args) do
           visit_toc_items(@book.root_toc.child_items)
-        }
+        end
       end
 
       # @param toc_items [Array<Epuber::Book::TocItem>]
       #
       def visit_toc_items(toc_items)
-        toc_items.each { |child_item|
+        toc_items.each do |child_item|
           visit_toc_item(child_item)
-        }
+        end
       end
 
       # @param toc_item [Epuber::Book::TocItem]
@@ -199,32 +200,31 @@ module Epuber
       # --------- GUIDE --------------------------
 
       def generate_guide
-        unless @target.epub_version >= 3
-          @xml.guide {
-            guide_visit_toc_item(@book.root_toc)
-          }
+        return if @target.epub_version >= 3
+
+        @xml.guide do
+          guide_visit_toc_item(@book.root_toc)
         end
       end
 
       # @param toc_items [Array<Epuber::Book::TocItem>]
       #
       def guide_visit_toc_items(toc_items)
-        toc_items.each { |child_item|
+        toc_items.each do |child_item|
           guide_visit_toc_item(child_item)
-        }
+        end
       end
 
       # @param toc_item [Epuber::Book::TocItem]
       #
       def guide_visit_toc_item(toc_item)
-        landmarks = toc_item.landmarks
-        landmarks.each { |landmark|
+        toc_item.landmarks.each do |landmark|
           type = LANDMARKS_MAP[landmark]
 
           raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP}" if type.nil?
 
           @xml.reference(type: type, href: toc_item.file_obj.destination_path)
-        }
+        end
 
         guide_visit_toc_items(toc_item.child_items)
       end
@@ -257,7 +257,7 @@ module Epuber
       # @return [Hash<String, String>]
       #
       def package_namespaces
-        namespaces = [ EPUB2_NAMESPACES ]
+        namespaces = [EPUB2_NAMESPACES]
         namespaces << EPUB3_NAMESPACES if @target.epub_version >= 3
         namespaces << IBOOKS_NAMESPACES if @target.epub_version >= 3 && @target.is_ibooks?
         namespaces.reduce(:merge)

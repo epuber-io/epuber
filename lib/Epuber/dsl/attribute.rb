@@ -1,17 +1,19 @@
+# encoding: utf-8
+
 require 'date'
 
 require 'active_support/core_ext/string/inflections'
 
 module Epuber
   module DSL
-
     # Stores the information of an attribute. It also provides logic to implement any required logic.
     #
     class Attribute
-
       # @return [Symbol] name of attribute
       #
       attr_reader :name
+
+      # rubocop:disable Metrics/ParameterLists
 
       # Returns a new attribute initialized with the given options.
       #
@@ -43,7 +45,7 @@ module Epuber
         @keys          = keys
         @default_value = default_value
         @auto_convert  = auto_convert
-        @types         = if not types.nil?
+        @types         = if !types.nil?
                            types
                          elsif @default_value
                            [@default_value.class]
@@ -51,6 +53,8 @@ module Epuber
                            [String]
                          end
       end
+
+      # rubocop:enable Metrics/ParameterLists
 
       # @return [String] A string representation suitable for UI.
       #
@@ -102,30 +106,26 @@ module Epuber
       # @return [Bool] whether the specification should be considered invalid if a value for the attribute
       #         is not specified.
       #
-      def required?
-        @required
-      end
+      attr_reader :required
+      alias_method :required?, :required
 
       # @return [Bool] whether the attribute should be specified only on the root specification.
       #
-      def root_only?
-        @root_only
-      end
+      attr_reader :root_only
+      alias_method :root_only?, :root_only
 
 
       # @return [Bool] whether there should be a singular alias for the attribute writer.
       #
-      def singularize?
-        @singularize
-      end
+      attr_reader :singularize
+      alias_method :singularize?, :singularize
 
       # @return [Bool] whether the attribute describes file patterns.
       #
       # @note   This is mostly used by the linter.
       #
-      def file_patterns?
-        @file_patterns
-      end
+      attr_reader :file_patterns
+      alias_method :file_patterns?, :file_patterns
 
       # @return [Bool] defines whether the attribute reader should join the values with the parent.
       #
@@ -164,9 +164,9 @@ module Epuber
       #
       def validate_type(value)
         return if value.nil?
-        unless supported_types.any? { |klass| value.class == klass }
-          raise StandardError, "Non acceptable type `#{value.class}` for #{self}. Allowed types: `#{types.inspect}`"
-        end
+        return if supported_types.any? { |klass| value.class == klass }
+
+        raise StandardError, "Non acceptable type `#{value.class}` for #{self}. Allowed types: `#{types.inspect}`"
       end
 
       # Validates a value before storing.
@@ -218,32 +218,30 @@ module Epuber
         begin
           validate_type(value)
         rescue StandardError
-          if @auto_convert.nil?
-            raise
-          else
-            begin
-              destination_class = @auto_convert[value.class]
+          raise if @auto_convert.nil?
 
-              if destination_class.nil?
-                array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
-                array_keys_with_type = array_keys.select { |k, _v| k.include?(value.class) }
+          begin
+            dest_class = @auto_convert[value.class]
 
-                if array_keys_with_type.count > 0
-                  destination_class = array_keys_with_type.values.first
-                end
+            if dest_class.nil?
+              array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
+              array_keys_with_type = array_keys.select { |k, _v| k.include?(value.class) }
+
+              if array_keys_with_type.count > 0
+                dest_class = array_keys_with_type.values.first
               end
-
-              if destination_class.is_a?(Proc)
-                return destination_class.call(value)
-              elsif destination_class.respond_to?(:parse)
-                return destination_class.parse(value)
-              else
-                return destination_class.new(value)
-              end
-
-            rescue
-              raise StandardError, "Unknown auto-conversion from class #{value.class} into class #{destination_class.class}"
             end
+
+            if dest_class.is_a?(Proc)
+              return dest_class.call(value)
+            elsif dest_class.respond_to?(:parse)
+              return dest_class.parse(value)
+            else
+              return dest_class.new(value)
+            end
+
+          rescue
+            raise StandardError, "Unknown auto-conversion from class #{value.class} into class #{dest_class.class}"
           end
         end
 

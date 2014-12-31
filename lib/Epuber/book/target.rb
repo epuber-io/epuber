@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_relative '../dsl/tree_object'
 
 require_relative '../vendor/version'
@@ -7,7 +9,6 @@ require_relative 'file'
 module Epuber
   module Book
     class Target < DSL::TreeObject
-
       # @param [Target] parent
       # @param [String] name
       #
@@ -48,26 +49,28 @@ module Epuber
 
       # @return [Bool]
       #
-      def is_ibooks?
-        if self.is_ibooks.nil?
+      def ibooks?
+        if is_ibooks.nil?
           name.to_s.include?('ibooks')
         else
-          self.is_ibooks
+          is_ibooks
         end
       end
+      alias_method :is_ibooks?, :ibooks?
+
 
       # Returns all files
       # @return [Array<Epuber::Book::File>]
       #
       def files
         # parent files plus our files
-        ((self.parent && self.parent.files) || []) + @files
+        ((parent && parent.files) || []) + @files
       end
 
       # @return [Array<Epuber::Book::File>]
       #
       def all_files
-        ((self.parent && self.parent.all_files) || []) + @all_files
+        ((parent && parent.all_files) || []) + @all_files
       end
 
       def add_to_all_files(file)
@@ -90,13 +93,13 @@ module Epuber
             @all_files.delete_at(index)
             @all_files.insert(index, *files)
           end
-        elsif !self.parent.nil?
-          self.parent.replace_file_with_files(file, files)
+        elsif !parent.nil?
+          parent.replace_file_with_files(file, files)
         end
       end
 
       def constants
-        ((self.parent && self.parent.constants) || {}).merge(@constants)
+        ((parent && parent.constants) || {}).merge(@constants)
       end
 
       #----------------------- DSL items ---------------------------
@@ -132,7 +135,7 @@ module Epuber
       attribute :cover_image,
                 types:        [Epuber::Book::File],
                 inherited:    true,
-                auto_convert: { [String] => lambda { |value| Epuber::Book::File.new(value, group: :image, properties: ['cover-image']) } }
+                auto_convert: { [String] => ->(value) { File.new(value, group: :image, properties: ['cover-image']) } }
 
 
       # @param file_path [String | Epuber::Book::File]
@@ -149,6 +152,7 @@ module Epuber
 
         @files << file unless @files.include?(file)
         @all_files << file unless @all_files.include?(file)
+
         file
       end
 
@@ -157,10 +161,10 @@ module Epuber
       # @return [void]
       #
       def add_files(*file_paths)
-        file_paths.each { |file_path|
-          file_obj = add_file(file_path)
+        file_paths.each do |file_path|
+          file_obj          = add_file(file_path)
           file_obj.only_one = false
-        }
+        end
       end
 
       # @param key [String]
@@ -172,7 +176,7 @@ module Epuber
         @constants[key] = value
       end
 
-      # TODO store url
+      # TODO: store url
     end
   end
 end

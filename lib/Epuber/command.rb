@@ -1,3 +1,4 @@
+# encoding: utf-8
 
 require 'claide'
 
@@ -20,7 +21,7 @@ module Epuber
     self.command = 'epuber'
     self.version = VERSION
     self.description = 'Epuber, easy creating and maintaining e-book.'
-    self.plugin_prefixes = self.plugin_prefixes + %w(epuber)
+    self.plugin_prefixes = plugin_prefixes + %w(epuber)
 
     def run
       puts "Running command with class #{self.class}"
@@ -32,7 +33,11 @@ module Epuber
     #
     def book
       require_relative 'book'
-      @book ||= (book = Epuber::Book::Book.from_file(self.class.find_bookspec_files.first); book.validate; book)
+      @book ||= (
+        book = Epuber::Book::Book.from_file(self.class.find_bookspec_files.first)
+        book.validate
+        book
+      )
     end
 
     # @return [void]

@@ -1,17 +1,18 @@
+# encoding: utf-8
+
 require_relative '../lib/epuber/book'
 
 module Epuber
   module Book
     describe Book do
-
       before do
         @book = Book.new do |book|
           book.title    = 'Práce na dálku'
           book.subtitle = 'Abc'
 
           book.author = {
-            :first_name => 'Abc',
-            :last_name  => 'def'
+            first_name: 'Abc',
+            last_name: 'def',
           }
 
           book.publisher  = 'AAABBB'
@@ -41,7 +42,6 @@ module Epuber
       end
 
       context 'attributes' do
-
         context '#authors, #author' do
           it 'automatically converts into NormalContributor' do
             book = @book
@@ -56,23 +56,17 @@ module Epuber
               b.subtitle = 'Abc'
             end
 
-            expect {
-              book.validate
-            }.to raise_error
+            expect { book.validate }.to raise_error
           end
 
           it 'supports array' do
             book = Book.new do |b|
               b.title    = 'Práce na dálku'
               b.subtitle = 'Abc'
-              b.authors  = [
-                'Abc def'
-              ]
+              b.authors  = ['Abc def']
             end
 
-            expect {
-              book.validate
-            }.to_not raise_error
+            expect { book.validate }.to_not raise_error
 
             expect(book.authors).to contain_exactly(a_kind_of NormalContributor)
           end
@@ -83,14 +77,12 @@ module Epuber
             b.subtitle = 'Abc'
 
             b.author = {
-              :first_name => 'Abc',
-              :last_name  => 'def'
+              first_name: 'Abc',
+              last_name: 'def',
             }
           end
 
-          expect {
-            book.validate
-          }.to raise_error
+          expect { book.validate }.to raise_error
         end
 
         context '#published' do
@@ -110,45 +102,39 @@ module Epuber
         it '#version is optional' do
           @book.version = '1.0.1'
 
-          expect {
-            @book.validate
-          }.to_not raise_error
+          expect { @book.validate }.to_not raise_error
         end
 
         it '#is_ibooks is stored and optional' do
           @book.is_ibooks = true
 
-          expect {
+          expect do
             @book.validate
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
 
       it 'block is optional, you can build whatever you like' do
-        expect {
-          Book.new
-        }.to_not raise_error
+        expect { Book.new }.to_not raise_error
       end
 
       it 'can parse from string' do
         string = <<-END_BOOK
-							Epuber::Book::Book.new do |book|
+              Epuber::Book::Book.new do |book|
 
-								book.title = 'Práce na dálku'
-								book.subtitle = 'Zn.: Kancelář zbytečná'
+                book.title = 'Práce na dálku'
+                book.subtitle = 'Zn.: Kancelář zbytečná'
 
-								book.author = 'Jason Fried'
+                book.author = 'Jason Fried'
 
-							end
+              end
         END_BOOK
 
         book = Book.from_string(string)
 
         expect(book).to be_a Book
 
-        expect {
-          book.validate
-        }.to_not raise_error
+        expect { book.validate }.to_not raise_error
       end
 
       context 'targets' do
@@ -230,7 +216,7 @@ module Epuber
           end
 
           cover = @book.root_toc.child_items[0]
-          expect(cover.options).to contain_exactly({ linear: false })
+          expect(cover.options).to contain_exactly(linear: false)
           expect(cover.title).to be_nil
           expect(cover.file_obj).to eq 'cover'
         end
@@ -241,7 +227,7 @@ module Epuber
           end
 
           cover = @book.root_toc.child_items[0]
-          expect(cover.options).to contain_exactly(:landmarks_cover, { linear: false })
+          expect(cover.options).to contain_exactly(:landmarks_cover, linear: false)
           expect(cover.title).to be_nil
           expect(cover.file_obj).to eq 'cover'
         end

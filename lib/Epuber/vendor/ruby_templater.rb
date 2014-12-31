@@ -1,7 +1,9 @@
+# encoding: utf-8
+
+# rubocop:disable Lint/Eval
 
 module Epuber
   class RubyTemplater
-
     # @param string [String]
     # @param variables [Hash]
     #
@@ -9,7 +11,7 @@ module Epuber
       require_relative 'hash_binding'
       hash_binding = HashBinding.new(variables)
       b = hash_binding.get_binding
-      eval_string = %Q{%Q{#{string}}}
+      eval_string = %(%(#{string}))
       eval(eval_string, b)
     end
 
@@ -21,9 +23,10 @@ module Epuber
       hash_binding = HashBinding.new(variables)
       b = hash_binding.get_binding
       string = ::File.read(file_path)
-      eval_string = %Q{%Q{#{string}}}
+      eval_string = %(%(#{string}))
       eval(eval_string, b, file_path)
     end
-
   end
 end
+
+# rubocop:enable Lint/Eval

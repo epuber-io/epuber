@@ -1,8 +1,8 @@
+# encoding: utf-8
 
 module Epuber
   module Book
     class File
-
       # @return [String]
       #
       attr_accessor :destination_path

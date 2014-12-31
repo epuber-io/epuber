@@ -1,9 +1,10 @@
+# encoding: utf-8
+
 require_relative '../lib/epuber/book'
 
 include Epuber::Book
 
 describe Contributor do
-
   before do
     @contributor = Contributor.new('Jason Fried', 'FRIED, Jason', 'aut')
   end
@@ -16,7 +17,6 @@ describe Contributor do
 end
 
 describe NormalContributor do
-
   before do
     @contributor = NormalContributor.new('Jason', 'Fried', 'aut')
   end
@@ -30,24 +30,23 @@ describe NormalContributor do
   end
 
   it 'pretty_name is readonly' do
-    expect {
+    expect do
       @contributor.pretty_name = ''
-    }.to raise_error
+    end.to raise_error
   end
 
   it 'file_as is readonly' do
-    expect {
+    expect do
       @contributor.file_as = ''
-    }.to raise_error
+    end.to raise_error
   end
 end
 
 describe 'Epuber::Contributor.from_ruby' do
-
   it 'parse Contributor from Hash with symbols :file_as and :pretty_name' do
     hash = {
-      :pretty_name => 'Jason Fried',
-      :file_as     => 'FRIED, Jason'
+      pretty_name: 'Jason Fried',
+      file_as:     'FRIED, Jason',
     }
 
     contributor = Contributor.from_ruby(hash, 'aut')
@@ -59,8 +58,8 @@ describe 'Epuber::Contributor.from_ruby' do
 
   it 'parse Contributor from Hash with symbols :first_name and :last_name' do
     hash = {
-      :first_name => 'Jason',
-      :last_name  => 'Fried'
+      first_name: 'Jason',
+      last_name:  'Fried',
     }
 
     contributor = Contributor.from_ruby(hash, 'aut')
@@ -87,4 +86,3 @@ describe 'Epuber::Contributor.from_ruby' do
     expect(contributor.last_name).to eq 'Hansson'
   end
 end
-

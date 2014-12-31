@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'rspec'
 
 require_relative '../lib/epuber/dsl/object'
@@ -6,7 +8,6 @@ require_relative '../lib/epuber/dsl/object'
 module Epuber
   module DSL
     describe Object do
-
       context 'simple attributes' do
         class TestClass < Object
           attribute :optional_string
@@ -32,16 +33,16 @@ module Epuber
         end
 
         it 'optional value should validate without problem' do
-          expect {
+          expect do
             @example.validate
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
 
       context 'required attributes' do
         class TestRequiredClass < Object
           attribute :required_string,
-                    :required => true
+                    required: true
         end
 
         before do
@@ -49,17 +50,17 @@ module Epuber
         end
 
         it 'should not validate without specified attribute' do
-          expect {
+          expect do
             @example.validate
-          }.to raise_error
+          end.to raise_error
         end
 
         it 'should validate with specified attribute' do
           @example.required_string = 'abc'
 
-          expect {
+          expect do
             @example.validate
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
 
@@ -71,10 +72,10 @@ module Epuber
 
           attribute :lambda,
                     types:        [Fixnum],
-                    auto_convert: { String => lambda { |str| str.to_i } }
+                    auto_convert: { String => ->(str) { str.to_i } }
 
           attribute :multi,
-                    auto_convert: { [Fixnum, Regexp] => lambda { |str| str.to_s } }
+                    auto_convert: { [Fixnum, Regexp] => ->(str) { str.to_s } }
         end
 
         before do

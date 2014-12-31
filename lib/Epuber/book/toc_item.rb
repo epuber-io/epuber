@@ -1,10 +1,11 @@
+# encoding: utf-8
+
 require_relative '../dsl/tree_object'
 require_relative 'file'
 
 module Epuber
   module Book
     class TocItem < DSL::TreeObject
-
       # @return [Epuber::Book::File]
       #
       attribute :file_obj,
@@ -28,17 +29,17 @@ module Epuber
       # @return [Array<Symbol>]
       #
       def landmarks
-        options.select { |item|
+        options.select do |item|
           item.is_a?(Symbol) && item.to_s.start_with?('landmark')
-        }
+        end
       end
 
       # @return [Bool]
       #
       def linear?
-        first = options.select { |item|
+        first = options.select do |item|
           item.is_a?(Hash) && (item.include?(:linear) || item.include?('linear'))
-        }.first
+        end.first
 
         if first.nil?
           true
@@ -61,11 +62,8 @@ module Epuber
       # @param [String] file_path
       # @param [String] title
       #
-      # TODO check opts for :landmark_*, linear: true
-      #
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
-
           unless file_path.nil?
             file_obj = Epuber::Book::File.new(file_path, group: :text)
             item.file_obj = file_obj
@@ -78,7 +76,7 @@ module Epuber
           end
 
           item.options = opts.map do |i|
-            if i.kind_of? Hash
+            if i.is_a?(Hash)
               i.map do |j_key, j_value|
                 { j_key => j_value }
               end
@@ -96,10 +94,6 @@ module Epuber
       def item(title, *opts)
         file(nil, title, *opts)
       end
-
-
-      # TODO glob
-      # TODO files
     end
   end
 end

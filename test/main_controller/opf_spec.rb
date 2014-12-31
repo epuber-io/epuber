@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_relative '../matchers/xml'
 
 require_relative '../../lib/epuber/compiler'
@@ -56,7 +58,7 @@ module Epuber
         ### expect(metadata).to have_xpath("/meta[@property='cover']", 'cover.jpg')
       end
 
-      with_xpath(opf_xml, '/package/manifest') do |manifest|
+      with_xpath(opf_xml, '/package/manifest') do |_manifest|
         ### expect(manifest).to have_xpath("/item[@properties='cover-image']")
       end
     end

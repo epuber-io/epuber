@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_relative 'dsl/object'
 
 require_relative 'book/contributor'
@@ -11,7 +13,6 @@ module Epuber
     class StandardError < ::StandardError; end
 
     class Book < DSL::Object
-
       def initialize
         super
 
@@ -30,8 +31,6 @@ module Epuber
       attr_reader :default_target
 
 
-      private
-
       # Defines setter and getter for default target attribute
       #
       # @param [Symbol] sym  attribute name
@@ -39,7 +38,6 @@ module Epuber
       # @return [Void]
       #
       def self.default_target_attribute(sym, readonly: false)
-
         # getter
         define_method(sym) do
           @default_target.send(sym)
@@ -56,7 +54,6 @@ module Epuber
 
 
       #-------------- Targets ----------------------------------
-      public
 
       # All targets
       #
@@ -109,7 +106,7 @@ module Epuber
                 container:    Array,
                 required:     true,
                 singularize:  true,
-                auto_convert: { [String, Hash] => lambda { |value| Contributor.from_ruby(value, 'aut') } }
+                auto_convert: { [String, Hash] => ->(value) { Contributor.from_ruby(value, 'aut') } }
 
 
       # @return [String] publisher name
@@ -204,19 +201,17 @@ module Epuber
       # @return [Epuber::Book::Target, nil]
       #
       def target_named(target_name)
-        if target_name.is_a?(Epuber::Book::Target)
-          return target_name
-        end
+        return target_name if target_name.is_a?(Epuber::Book::Target)
 
-        targets.find { |target|
+        targets.find do |target|
           target.name == target_name || target.name.to_s == target_name.to_s
-        }
+        end
       end
 
-      # TODO footnotes customization
-      # TODO custom metadata
-      # TODO custom user informations (just global available Hash<String, Any>)
-      # TODO url (book url) // http://melvil.cz/kniha-prace-na-dalku
+      # TODO: footnotes customization
+      # TODO: custom metadata
+      # TODO: custom user informations (just global available Hash<String, Any>)
+      # TODO: url (book url) // http://melvil.cz/kniha-prace-na-dalku
     end
   end
 end
