@@ -43,9 +43,9 @@ module Epuber
       def initialize(source_path, group: nil, properties: [])
         @source_path_pattern = source_path
 
-        @only_one = true
-        @group = group
-        @properties = properties.to_set
+        @only_one         = true
+        @group            = group
+        @properties       = properties.to_set
         @real_source_path = nil
         @destination_path = nil
       end
@@ -87,6 +87,8 @@ module Epuber
       end
 
       # @param file [Epuber::Book::File]
+      #
+      # TODO: rename to merge!
       #
       def merge_with(file)
         @properties = file.properties
