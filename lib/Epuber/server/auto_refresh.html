@@ -1,0 +1,238 @@
+<script type="text/javascript">
+    var ckrphna = "ws://10.0.0.103:5758",
+            ckrphnba = "ws://Atlantis.local:5758",
+            ckrislocal1 = "://10.0.0.103:5757",
+            ckrislocal2 = "Atlantis.local:5757";
+
+    function updateQueryString(e, t, n) {
+        var o = new RegExp("(\\?|\\&)" + t + "=.*?(?=(&|$))"), i = e.toString().split("#"), r = i[0], a = i[1], l = /\?.+$/, c = r;
+        return c = o.test(r) ? r.replace(o, "$1" + t + "=" + n) : l.test(r) ? r + "&" + t + "=" + n : r + "?" + t + "=" + n, a && (c += "#" + a), c
+    }
+
+    function lpckSetCookie(e, t, n, o, i, r) {
+        n || (n = new Date);
+        var a = "undefined" == typeof n ? "" : "; expires=" + n.toGMTString(), l = "undefined" == typeof o ? "" : "; path=" + o, c = "undefined" == typeof i ? "" : "; domain=" + i, s = "undefined" == typeof r ? "" : "; secure";
+        document.cookie = e + "=" + encodeURIComponent(t) + a + l + c + s
+    }
+
+    function lpckGetCookieVal(e) {
+        var t = document.cookie.indexOf(";", e);
+        return -1 === t && (t = document.cookie.length), decodeURIComponent(document.cookie.substring(e, t))
+    }
+
+    function lpckGetCookie(e) {
+        for (var t = e + "=", n = t.length, o = document.cookie.length, i = 0; o > i;) {
+            var r = i + n;
+            if (document.cookie.substring(i, r) === t)return lpckGetCookieVal(r);
+            if (i = document.cookie.indexOf(" ", i) + 1, 0 === i)break
+        }
+        return null
+    }
+
+    function lpckss() {
+        var e = new Date;
+        e.setTime(e.getTime() + 864e5);
+        var t = window.pageXOffset, n = window.pageYOffset, o = t + "_" + n;
+        lpckSetCookie("ckrp_ypos", o, e)
+    }
+
+    function lpckls() {
+        var e = lpckGetCookie("ckrp_ypos");
+        if (e) {
+            var t = e.split("_");
+            2 === t.length && window.scrollTo(parseInt(t[0]), parseInt(t[1])), lpckSetCookie("ckrp_ypos", "0_0", new Date("January 01, 1970 01:01:00"))
+        }
+    }
+
+    function ckReload(e) {
+        if (ckRefreshIsAvailable === !1)return void console.warn("A refresh was requested, but the page is already refreshing. The new refresh request was ignored.");
+        cleanupIsDone = !1, ckRefreshIsAvailable = !1;
+        var t = {}, n = {}, o = 0, i = {
+            ckrstyl: function (e) {
+                function o(e) {
+                    var t = document.location, n = new RegExp("^\\.|^/(?!/)|^[\\w]((?!://).)*$|" + t.host + "|" + ckrislocal1 + "|" + ckrislocal2);
+                    return e.match(n)
+                }
+
+                var i = document.getElementsByTagName("head")[0];
+                if (e === !0) {
+                    if (!document.getElementById("LPCodeKitLiveTransitionRule")) {
+                        var r = document.createElement("style"), a = "transition: all .3s ease-out;", l = [".lpcodekit-loading * { ", a, " -webkit-", a, "-moz-", a, "-o-", a, "}"].join("");
+                        r.setAttribute("type", "text/css"), r.setAttribute("id", "LPCodeKitLiveTransitionRule"), i.appendChild(r), r.styleSheet ? r.styleSheet.cssText = l : r.appendChild(document.createTextNode(l))
+                    }
+                } else {
+                    var c = document.getElementById("LPCodeKitLiveTransitionRule");
+                    c && i.removeChild(c)
+                }
+                for (var s = document.styleSheets, d = document.styleSheets.length, u = 0; d > u; u++) {
+                    var p = s[u];
+                    if (p) {
+                        var h = p.media.mediaText, f = p.href;
+                        if (f && o(f)) {
+                            var m = f.search(/ckMarkedForRemoval/i);
+                            if (-1 === m) {
+                                var k = f.split("?"), g = k[0], v = k.length > 1 ? k[1] : "";
+                                v = v.replace(/(&)?now=[0-9]*/gi, ""), v = v.length > 0 ? "?" + v + "&now=" + 1 * new Date : "?now=" + 1 * new Date;
+                                var b = p.ownerNode, y = b.id, w = document.body.parentNode, x = document.createElement("link");
+                                w.className = w.className.replace(/\s*lpcodekit\-loading/gi, "") + " lpcodekit-loading", x.setAttribute("type", "text/css"), x.setAttribute("rel", "stylesheet"), x.setAttribute("href", g + v), h && x.setAttribute("media", h), y && x.setAttribute("id", y);
+                                var C = b.parentNode, T = b.nextSibling;
+                                T ? C.insertBefore(x, T) : C.appendChild(x), t[g] = x, n[g] = b, /firefox/i.test(navigator.userAgent) && b.setAttribute("href", "ckMarkedForRemoval" + f)
+                            }
+                        }
+                    }
+                }
+            }, ckrllcn: function () {
+                var e = document.body.parentNode;
+                e.className = e.className.replace(/\s*lpcodekit\-loading/gi, "")
+            }, ckrole: function () {
+                if (o > 100) {
+                    for (var e in n) {
+                        var r = n[e];
+                        r.parentNode.removeChild(r), delete n[e]
+                    }
+                    return cleanupIsDone = !0, i.ckrllcn(), void console.warn("CodeKit told this page to refresh its stylesheets, but one or more did not download correctly from the preview server. This is almost always caused by a laggy LAN. (Are you on public WiFi?) The page's state may not reflect your latest changes. Reload it manually or save your file again to have CodeKit attempt another stylesheet injection.")
+                }
+                for (var a in n) {
+                    var l = t[a], c = n[a];
+                    try {
+                        var s = l.sheet || l.styleSheet, d;
+                        if ("undefined" != typeof s && (d = s.rules || s.cssRules), !s || !d)return o++, void setTimeout(i.ckrole, 50);
+                        d.length >= 0 ? (o = 0, c.parentNode.removeChild(c), delete n[a]) : (o++, setTimeout(i.ckrole, 50))
+                    } catch (u) {
+                        return console.log("Exception in CKROLE: " + u), o++, void setTimeout(i.ckrole, 50)
+                    }
+                }
+                var p = 0;
+                for (var h in n) {
+                    ++p;
+                    break
+                }
+                0 === p && (cleanupIsDone = !0, setTimeout(i.ckrllcn, 50))
+            }, ckroleicwfurl: function () {
+                for (var e in n) {
+                    var t = n[e];
+                    t.parentNode.removeChild(t), delete n[e], setTimeout(i.ckrllcn, 100)
+                }
+            }, ckcup: function () {
+                var e = navigator.userAgent.toLowerCase().indexOf("chrome") > -1, t = document.URL.indexOf("file://") > -1;
+                e && t ? setTimeout(i.ckroleicwfurl, 400) : i.ckrole()
+            }, ckurs: function () {
+                cleanupIsDone === !0 || cleanupChecksCount > 4 ? (cleanupChecksCount = 0, ckRefreshIsAvailable = !0) : (++cleanupChecksCount, setTimeout(i.ckurs, 1500))
+            }
+        };
+        switch ("undefined" != typeof ckinjectionnotpossible && (20 === e || 30 === e) && (e = 40), e) {
+            case 20:
+                i.ckrstyl(!0), setTimeout(i.ckcup, 70), setTimeout(i.ckurs, 2e3);
+                break;
+            case 30:
+                i.ckrstyl(!1), setTimeout(i.ckcup, 70), setTimeout(i.ckurs, 2e3);
+                break;
+            case 40:
+                var r = Math.round(+new Date / 1e3), a = updateQueryString(window.location, "ckcachecontrol", r);
+                lpckss(), window.location.assign(a);
+                break;
+            case 50:
+                var l = window.location.host;
+                window.location.assign(previewPathAddition ? "http://" + l + "/" + previewPathAddition : "http://" + l)
+        }
+    }
+    function lphwoc(e) {
+        ckReload(40)
+    }
+    function lagBannerClickHandler(e) {
+        lagBannerCanShow = !1;
+        var t = document.getElementById("lpckLagWarningOverlay");
+        null !== t && t.parentNode.removeChild(t)
+    }
+    function establishckrp(e) {
+        function t() {
+            if (!document.getElementById("lpckWarningOverlay")) {
+                i();
+                var e = document.createElement("div");
+                e.id = "lpckWarningOverlay", e.setAttribute("style", "display:block; position:fixed; top:0px; left:0px; width:100%; background-color:red; border-bottom: 1px solid #980000; padding: 20px 0px; z-index:99999999; cursor:pointer; box-shadow: 0px 1px 5px 0px black;"), e.setAttribute("onclick", "lphwoc()"), e.innerHTML = '<p style="margin: 0 15px; color:white; font-size:20px; font-weight: medium; line-height:1.4em; font-family:sans-serif; text-align:center;">This page has lost contact with CodeKit and will no longer auto-refresh.</p><p style="margin: 10px 20px; color:white; font-size:11px; line-height:1.2em; font-family:sans-serif; text-align:center;">Click this banner to reload the entire page.</p>', document.body.firstChild ? document.body.insertBefore(e, document.body.firstChild) : document.body.appendChild(e)
+            }
+        }
+
+        function n() {
+            var e = document.getElementById("lpckWarningOverlay");
+            null !== e && e.parentNode.removeChild(e)
+        }
+
+        function o() {
+            if (!document.getElementById("lpckWarningOverlay") && !document.getElementById("lpckLagWarningOverlay") && lagBannerCanShow === !0) {
+                var e = document.createElement("div");
+                e.id = "lpckLagWarningOverlay", e.setAttribute("style", "display:block; position:fixed; top:0px; left:0px; width:100%; background-color:orange; border-bottom: 1px solid #980000; padding: 20px 0px; z-index:99999999; cursor:pointer; box-shadow: 0px 1px 5px 0px black;"), e.setAttribute("onclick", "lagBannerClickHandler()"), e.innerHTML = '<p style="margin: 0 15px; color:white; font-size:20px; font-weight: medium; line-height:1.4em; font-family:sans-serif; text-align:center;">The connection to CodeKit is unstable.</p><p style="margin: 10px 20px; color:white; font-size:11px; line-height:1.2em; font-family:sans-serif; text-align:center;">This page has not had contact with CodeKit for 15+ seconds. This can be caused by changing networks, putting your Mac to sleep, or just a laggy LAN (e.g. public Wifi). Auto-refreshing may be slow or unreliable. Refresh manually to reconnect to CodeKit or, if the connection is still working, tap this banner to hide it.</p>', document.body.firstChild ? document.body.insertBefore(e, document.body.firstChild) : document.body.appendChild(e)
+            }
+        }
+
+        function i() {
+            var e = document.getElementById("lpckLagWarningOverlay");
+            null !== e && e.parentNode.removeChild(e)
+        }
+
+        function r() {
+            if (!document.getElementById("lpckConMessageOverlay")) {
+                var e = document.createElement("div");
+                e.id = "lpckConMessageOverlay", e.setAttribute("style", "display:block; position:fixed; top:0px; left:0px; width:100%; background-color:orange; border-bottom: 1px solid black; padding: 20px 0px; z-index:99999999; cursor:pointer; box-shadow: 0px 1px 5px 0px black;"), e.innerHTML = '<p style="margin: 0 15px; color:white; font-size:20px; font-weight: medium; line-height:1.4em; font-family:sans-serif; text-align:center;">Connecting to CodeKit\'s refresh server...</p><p style="margin: 10px 20px; color:white; font-size:11px; line-height:1.0em; font-family:sans-serif; text-align:center;">(Auto-refreshing will not work until this completes.)</p>', document.body.firstChild ? document.body.insertBefore(e, document.body.firstChild) : document.body.appendChild(e)
+            }
+        }
+
+        function a() {
+            var e = document.getElementById("lpckConMessageOverlay");
+            null !== e && e.parentNode.removeChild(e)
+        }
+
+        function l() {
+            null === heartbeatInterval && (heartbeatInterval = setInterval(function () {
+                try {
+                    ++missedHeartbeats > 3 && (o(), console.warn("CodeKit has not sent a heartbeat message in 15+ seconds. The connection to CodeKit MAY have failed, but it is also possible that your network is simply very laggy. Auto-refreshing may be slow or unreliable."))
+                } catch (e) {
+                    clearInterval(heartbeatInterval), heartbeatInterval = null, missedHeartbeats = 0, console.warn("Exception in heartbeatInterval: " + e.message)
+                }
+            }, 5e3))
+        }
+
+        function c() {
+            null !== heartbeatInterval && (clearInterval(heartbeatInterval), heartbeatInterval = null, missedHeartbeats = 0)
+        }
+
+        function s() {
+            return d.onclose = function () {
+            }, d.close(), null
+        }
+
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+        var d, u;
+        u = haveTriedLocalhostForSocket === !1 ? "ws://127.0.0.1:5758" : e === !0 ? ckrphnba : ckrphna, ckSocketConnectionAttempts++, d = new WebSocket(u, ["ckrp"]), setTimeout(function () {
+            0 === d.readyState && r()
+        }, 1e3), d.onopen = function () {
+            ckSocketConnectionAttempts = 0, n(), i(), a(), l()
+        }, d.onerror = function (e) {
+            "ws://127.0.0.1:5758" === u && haveTriedLocalhostForSocket === !1 ? (d.onclose = function () {
+            }, haveTriedLocalhostForSocket = !0, establishckrp(!1)) : console.warn("Error connecting to CodeKit's refresh server: " + e.message)
+        }, d.onclose = function (e) {
+            e.wasClean || null !== heartbeatInterval ? t() : "ws://127.0.0.1:5758" === u && haveTriedLocalhostForSocket === !1 && (haveTriedLocalhostForSocket = !0, establishckrp(!1))
+        }, d.onmessage = function (e) {
+            var n = e.data.split(/[;]{3}/);
+            switch (missedHeartbeats = 0, i(), n[0]) {
+                case"ia":
+                    ckReload(20);
+                    break;
+                case"ina":
+                    ckReload(30);
+                    break;
+                case"r":
+                    ckReload(40);
+                    break;
+                case"rtr":
+                    previewPathAddition = "undefined" == typeof n[1] ? n[1] : null, ckReload(50);
+                    break;
+                case"sd":
+                    c(), d.onclose = function () {
+                    }, d.close(), t()
+            }
+        }, window.addEventListener("beforeunload", s, !1), window.addEventListener("load", lpckls, !1)
+    }
+    var ckRefreshIsAvailable = !0, ckSocketConnectionAttempts = 0, haveTriedLocalhostForSocket = !1, previewPathAddition = null, heartbeatInterval = null, missedHeartbeats = 0, lagBannerCanShow = !0, cleanupIsDone = !0, cleanupChecksCount = 0;
+    establishckrp(!1);
+</script>
