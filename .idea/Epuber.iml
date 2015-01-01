@@ -48,7 +48,7 @@
       <ConfigurationWrapper RunnerId="RubyRunner" />
       <method />
     </configuration>
-    <configuration default="false" name="Run bin/epuber on test_project" type="RubyRunConfigurationType" factoryName="Ruby" singleton="true">
+    <configuration default="false" name="Run `bin/epuber compile` on test_project" type="RubyRunConfigurationType" factoryName="Ruby" singleton="true">
       <module name="Epuber" />
       <RUBY_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
       <RUBY_RUN_CONFIG NAME="WORK DIR" VALUE="$MODULE_DIR$/test_project" />
@@ -72,7 +72,7 @@
       <ConfigurationWrapper RunnerId="RubyRunner" />
       <method />
     </configuration>
-    <configuration default="false" name="Run epuber init in test_init_project" type="RubyRunConfigurationType" factoryName="Ruby" singleton="true">
+    <configuration default="false" name="Run `bin/epuber init` in test_init_project" type="RubyRunConfigurationType" factoryName="Ruby" singleton="true">
       <module name="Epuber" />
       <RUBY_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
       <RUBY_RUN_CONFIG NAME="WORK DIR" VALUE="$MODULE_DIR$/test_init_project" />
@@ -96,7 +96,7 @@
       <ConfigurationWrapper RunnerId="RubyRunner" />
       <method />
     </configuration>
-    <configuration default="false" name="Run bin/epuber server in test_project" type="RubyRunConfigurationType" factoryName="Ruby" singleton="true">
+    <configuration default="false" name="Run `bin/epuber server` in test_project" type="RubyRunConfigurationType" factoryName="Ruby" singleton="true">
       <module name="Epuber" />
       <RUBY_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
       <RUBY_RUN_CONFIG NAME="WORK DIR" VALUE="$MODULE_DIR$/test_project" />
