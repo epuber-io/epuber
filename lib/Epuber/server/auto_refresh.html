@@ -1,8 +1,8 @@
 <script type="text/javascript">
-    var ckrphna = "ws://10.0.0.103:5758",
-            ckrphnba = "ws://Atlantis.local:5758",
-            ckrislocal1 = "://10.0.0.103:5757",
-            ckrislocal2 = "Atlantis.local:5757";
+    var ckrphna = "ws://10.0.0.103:4567",
+            ckrphnba = "ws://Atlantis.local:4567",
+            ckrislocal1 = "://10.0.0.103:4567",
+            ckrislocal2 = "Atlantis.local:4567";
 
     function updateQueryString(e, t, n) {
         var o = new RegExp("(\\?|\\&)" + t + "=.*?(?=(&|$))"), i = e.toString().split("#"), r = i[0], a = i[1], l = /\?.+$/, c = r;
@@ -12,7 +12,7 @@
     function lpckSetCookie(e, t, n, o, i, r) {
         n || (n = new Date);
         var a = "undefined" == typeof n ? "" : "; expires=" + n.toGMTString(), l = "undefined" == typeof o ? "" : "; path=" + o, c = "undefined" == typeof i ? "" : "; domain=" + i, s = "undefined" == typeof r ? "" : "; secure";
-        document.cookie = e + "=" + encodeURIComponent(t) + a + l + c + s
+        document.cookie = e + "=" + encodeURIComponent(t) + a + l + c + s;
     }
 
     function lpckGetCookieVal(e) {
@@ -203,15 +203,15 @@
 
         window.WebSocket = window.WebSocket || window.MozWebSocket;
         var d, u;
-        u = haveTriedLocalhostForSocket === !1 ? "ws://127.0.0.1:5758" : e === !0 ? ckrphnba : ckrphna, ckSocketConnectionAttempts++, d = new WebSocket(u, ["ckrp"]), setTimeout(function () {
+        u = haveTriedLocalhostForSocket === !1 ? "ws://127.0.0.1:4567" : e === !0 ? ckrphnba : ckrphna, ckSocketConnectionAttempts++, d = new WebSocket(u, ["ckrp"]), setTimeout(function () {
             0 === d.readyState && r()
         }, 1e3), d.onopen = function () {
             ckSocketConnectionAttempts = 0, n(), i(), a(), l()
         }, d.onerror = function (e) {
-            "ws://127.0.0.1:5758" === u && haveTriedLocalhostForSocket === !1 ? (d.onclose = function () {
+            "ws://127.0.0.1:4567" === u && haveTriedLocalhostForSocket === !1 ? (d.onclose = function () {
             }, haveTriedLocalhostForSocket = !0, establishckrp(!1)) : console.warn("Error connecting to CodeKit's refresh server: " + e.message)
         }, d.onclose = function (e) {
-            e.wasClean || null !== heartbeatInterval ? t() : "ws://127.0.0.1:5758" === u && haveTriedLocalhostForSocket === !1 && (haveTriedLocalhostForSocket = !0, establishckrp(!1))
+            e.wasClean || null !== heartbeatInterval ? t() : "ws://127.0.0.1:4567" === u && haveTriedLocalhostForSocket === !1 && (haveTriedLocalhostForSocket = !0, establishckrp(!1))
         }, d.onmessage = function (e) {
             var n = e.data.split(/[;]{3}/);
             switch (missedHeartbeats = 0, i(), n[0]) {
