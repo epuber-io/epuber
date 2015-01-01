@@ -54,7 +54,7 @@ module Epuber
     # @return [void]
     #
     def compile(build_folder, check: false)
-      @all_files = []
+      @all_files    = []
       @should_check = check
 
       FileUtils.mkdir_p(build_folder)
@@ -127,8 +127,8 @@ module Epuber
     def remove_unnecessary_files
       requested_paths = @all_files.map do |file|
         # files have paths from EPUB_CONTENT_FOLDER
-        pathname = Pathname.new(File.join(@output_dir, EPUB_CONTENT_FOLDER, file.destination_path))
-        pathname.relative_path_from(Pathname.new(@output_dir)).to_s
+        abs_path = File.expand_path(file.destination_path, File.join(@output_dir, EPUB_CONTENT_FOLDER))
+        abs_path.sub(File.join(@output_dir, ''), '')
       end
 
       existing_paths = nil
