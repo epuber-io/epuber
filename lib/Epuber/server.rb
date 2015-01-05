@@ -1,19 +1,20 @@
 # encoding: utf-8
 
-require 'sinatra/base'
-
-require 'nokogiri'
 require 'pathname'
 
+require 'sinatra/base'
+require 'sinatra-websocket'
+
+require 'nokogiri'
+require 'listen'
+
 require_relative 'book'
+require_relative 'config'
 
 
 module Epuber
 
   # API:
-  #    /  -- starting point / landing page / dashboard (landibook cover, book version, ...)
-  #    /toc   -- only toc
-  #    /toc/:file_pattern -- text file matching pattern (for example: /toc/s01)
   # [LATER]   /file/<path-or-pattern> -- displays pretty file (image, text file) (for example: /file/text/s01.xhtml or /file/text/s01.bade)
   #
   class Server < Sinatra::Base
@@ -25,16 +26,33 @@ module Epuber
       # @return [Epuber::Book::Target]
       #
       attr_accessor :target
-
-      # @return [String]
-      #
-      attr_accessor :base_path
     end
 
-    def method_missing(name, *args)
-      return self.class.send(name) if self.class.respond_to?(name)
-      super
+    # @return [Epuber::Book::Book]
+    #
+    def book
+      self.class.book
     end
+
+    # @return [Epuber::Book::Target]
+    #
+    def target
+      @target ||= self.class.target
+    end
+
+    attr_writer :target
+
+
+    # @return [String] base path
+    #
+    def build_path
+      Config.instance.build_path(target)
+    end
+
+    # @return [Array<SinatraWebsocket::Connection>]
+    #
+    attr_reader :sockets
+
 
 
     # -------------------------------------------------- #
@@ -48,7 +66,7 @@ module Epuber
     def find_file(pattern = params[:splat].first)
       paths = nil
 
-      Dir.chdir(base_path) do
+      Dir.chdir(build_path) do
         paths = Dir.glob(pattern)
         paths = Dir.glob("**/#{pattern}") if paths.empty?
 
@@ -67,13 +85,55 @@ module Epuber
     def fix_links(html_doc, context_path, css_selector, attribute_name)
       img_nodes = html_doc.css(css_selector)
       img_nodes.each do |node|
-        img_path = Pathname(node[attribute_name])
-
-        abs_path = img_path.expand_path(File.join(base_path, File.dirname(context_path)))
-        relative_path = abs_path.relative_path_from(Pathname(File.expand_path(base_path)))
+        abs_path      = File.expand_path(node[attribute_name], File.join(build_path, File.dirname(context_path)))
+        relative_path = abs_path.sub(File.expand_path(build_path), '')
 
         node[attribute_name] = File.join('', 'raw', relative_path.to_s)
       end
+    end
+
+    # @param html_doc [Nokogiri::HTML::Document]
+    #
+    def add_auto_refresh_script(html_doc)
+      head = html_doc.css('head').first
+      head << File.read(File.expand_path(File.join('server', 'auto_refresh.html'), File.dirname(__FILE__)))
+    end
+
+    def compile
+      require_relative 'compiler'
+      Epuber::Compiler.new(book, target).compile(Epuber::Config.instance.build_path(target))
+    end
+
+    def notify_clients
+      puts "sockets.count = #{sockets.count}"
+      sockets.each do |ws|
+        ws.send('ia')
+      end
+    end
+
+    def changes_detected(_modified, _added, _removed)
+      puts 'Compiling'.yellow
+      compile
+
+      puts 'Notifying clients'.yellow
+      notify_clients
+    end
+
+
+    # -------------------------------------------------- #
+
+    def initialize
+      super
+      @sockets = []
+
+      @listener = Listen.to(Config.instance.project_path, debug: true) do |modified, added, removed|
+        changes_detected(modified, added, removed)
+      end
+
+      @listener.start
+
+      @listener.ignore(%r{#{Config.instance.working_path}})
+      @listener.ignore(%r{#{Config::WORKING_PATH}/})
     end
 
 
@@ -83,15 +143,50 @@ module Epuber
 
     enable :sessions
 
-    connections = []
-
+    # Book page
+    #
     get '/' do
-      nokogiri do |xml|
-        xml.pre book.inspect
+      if !request.websocket?
+        puts 'normal / request'.green
+
+        nokogiri do |xml|
+          xml.pre book.inspect
+        end
+      else
+
+          puts 'websocket / request'.green
+          request.websocket do |ws|
+
+            thread = nil
+
+            ws.onopen do
+              sockets << ws
+
+              thread = Thread.new do
+                loop do
+                  sleep(10)
+                  ws.send('heartbeat')
+                end
+              end
+            end
+
+            ws.onmessage do |msg|
+              puts "WS: Received message: #{msg}".green
+            end
+
+            ws.onclose do
+              puts 'websocket closed'.red
+              sockets.delete(ws)
+              thread.kill
+            end
+          end
+
+
       end
     end
 
-
+    # TOC page
+    #
     get '/toc' do
       nokogiri do |xml|
         xml.pre book.root_toc.inspect
@@ -102,56 +197,36 @@ module Epuber
       path = find_file
       next [404] if path.nil?
 
-      puts "/toc/*: founded file #{path}"
-      html_doc = Nokogiri::HTML(File.open(File.join(base_path, path)))
+      puts "/toc/*: founded file #{path}".green
+      html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
 
       fix_links(html_doc, path, 'img', 'src') # images
       fix_links(html_doc, path, 'script', 'src') # javascript
       fix_links(html_doc, path, 'link', 'href') # css styles
+      add_auto_refresh_script(html_doc)
 
       html_doc.to_html
     end
-
 
     # Returns file with path or pattern, base_path is epub root
     #
     get '/raw/*' do
       path = find_file
-
       next [404] if path.nil?
-      puts "/raw/*: founded file #{path}"
-      send_file(File.expand_path(path, base_path))
+
+      puts "/raw/*: founded file #{path}".green
+      send_file(File.expand_path(path, build_path))
     end
 
 
-
-    get '/time' do
-      File.read('../json_ajax_experiment.html')
+    def watch_connections
+      @watch_connections ||= []
     end
 
-    get '/time_ajax' do
+    get '/ajax/watch_changes' do
       stream(:keep_open) do |out|
-        connections << out
+        watch_connections << out
       end
     end
-
-    Thread.new {
-      loop do
-        sleep(100)
-
-        puts "Checking, connections count = #{connections.count}"
-
-        connections.each { |out|
-          time = Time.now.to_s
-          out << time
-          out.close
-          puts "Just sent #{time}"
-        }
-
-        connections.reject!(&:closed?)
-      end
-    }
   end
 end
-
-

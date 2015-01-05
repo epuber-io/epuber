@@ -16,8 +16,6 @@ module Epuber
     require_relative 'command/init'
     require_relative 'command/server'
 
-    BASE_PATH = '.epuber'
-
     self.abstract_command = true
     self.command = 'epuber'
     self.version = VERSION

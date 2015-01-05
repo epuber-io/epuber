@@ -537,6 +537,8 @@
             }
         };
         socket.onmessage = function (e) {
+            console.log('Received data `' + e.data + '`');
+
             var n = e.data.split(/[;]{3}/);
 
             missedHeartbeats = 0;

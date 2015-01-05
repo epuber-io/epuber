@@ -318,7 +318,7 @@ module Epuber
       file_paths = Dir.glob(pattern)
 
       file_paths.select! do |file_path|
-        !file_path.include?(Command::BASE_PATH)
+        !file_path.include?(Config::WORKING_PATH)
       end
 
       # filter depend on group

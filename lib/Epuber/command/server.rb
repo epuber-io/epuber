@@ -13,10 +13,9 @@ module Epuber
 
       def run
         require_relative '../server'
+
         Epuber::Server.book = book
-        target = book.targets.first
-        Epuber::Server.target = target
-        Epuber::Server.base_path = File.join(BASE_PATH, 'build', target.name.to_s)
+        Epuber::Server.target = book.targets.first
         Epuber::Server.run!
       end
     end

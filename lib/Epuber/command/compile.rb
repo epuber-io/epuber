@@ -38,9 +38,7 @@ module Epuber
 
         targets.each do |target|
           compiler = Epuber::Compiler.new(book, target)
-
-          build_dir = File.join(BASE_PATH, 'build', target.name.to_s)
-          compiler.compile(build_dir, check: @should_check)
+          compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check)
           archive_path = compiler.archive
 
           system(%(epubcheck "#{archive_path}")) if @should_check

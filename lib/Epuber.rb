@@ -6,4 +6,5 @@ module Epuber
   autoload :Compiler, 'epuber/compiler'
 
   require_relative 'epuber/command'
+  require_relative 'epuber/config'
 end
