@@ -10,6 +10,8 @@ require 'listen'
 
 require 'deep_clone'
 
+require 'active_support/core_ext/object/try'
+
 require_relative 'book'
 require_relative 'config'
 require_relative 'compiler'
@@ -45,6 +47,10 @@ module Epuber
 
     attr_writer :target
 
+    # @return [Array<Epuber::Book::File>]
+    #
+    attr_accessor :spine
+
 
     # @return [String] base path
     #
@@ -69,7 +75,7 @@ module Epuber
       when :info
         puts "INFO: #{message}"
       else
-        raise "Unknown level #{level}"
+        raise "Unknown log level #{level}"
       end
     end
 
@@ -110,17 +116,39 @@ module Epuber
       end
     end
 
-    # @param html_doc [Nokogiri::HTML::Document]
-    #
-    def add_auto_refresh_script(html_doc)
-      auto_refresh_source = File.read(File.expand_path('server/auto_refresh.js', File.dirname(__FILE__)))
-      script_node = html_doc.create_element('script', auto_refresh_source, type: 'text/javascript')
+    def add_script_file_to_head(html_doc, file_name, *args)
+      source = File.read(File.expand_path("server/#{file_name}", File.dirname(__FILE__)))
+
+      args.each do |hash|
+        hash.each do |key, value|
+          source.gsub!(key, value) unless value.nil?
+        end
+      end
+
+      script_node = html_doc.create_element('script', source, type: 'text/javascript')
+
       head = html_doc.css('head').first
       head.add_child(script_node)
     end
 
+    # @param html_doc [Nokogiri::HTML::Document]
+    #
+    def add_auto_refresh_script(html_doc)
+      add_script_file_to_head(html_doc, 'auto_refresh.js')
+    end
+
+    # @param html_doc [Nokogiri::HTML::Document]
+    #
+    def add_keyboard_control_script(html_doc, previous_path, next_path)
+      add_script_file_to_head(html_doc, 'keyboard_control.js',
+                              '$previous_path' => previous_path,
+                              '$next_path' => next_path)
+    end
+
     def compile
-      Epuber::Compiler.new(DeepClone.clone(book), DeepClone.clone(target)).compile(build_path)
+      compiler = Epuber::Compiler.new(DeepClone.clone(book), DeepClone.clone(target))
+      compiler.compile(build_path)
+      self.spine = compiler.spine
     end
 
     # @param message [String]
@@ -246,6 +274,13 @@ module Epuber
       fix_links(html_doc, path, 'script', 'src') # javascript
       fix_links(html_doc, path, 'link', 'href') # css styles
       add_auto_refresh_script(html_doc)
+
+      current_index = spine.index { |file| path.end_with?(file.destination_path.to_s) }
+      previous_path = spine.at(current_index - 1).try(:destination_path).try(:to_s)
+      next_path     = spine.at(current_index + 1).try(:destination_path).try(:to_s)
+      add_keyboard_control_script(html_doc, previous_path, next_path)
+
+      session[:current_page] = path
 
       html_doc.to_html
     end
