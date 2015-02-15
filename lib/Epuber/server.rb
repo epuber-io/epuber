@@ -113,8 +113,10 @@ module Epuber
     # @param html_doc [Nokogiri::HTML::Document]
     #
     def add_auto_refresh_script(html_doc)
+      auto_refresh_source = File.read(File.expand_path('server/auto_refresh.js', File.dirname(__FILE__)))
+      script_node = html_doc.create_element('script', auto_refresh_source, type: 'text/javascript')
       head = html_doc.css('head').first
-      head << File.read(File.expand_path(File.join('server', 'auto_refresh.html'), File.dirname(__FILE__)))
+      head.add_child(script_node)
     end
 
     def compile
