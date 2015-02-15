@@ -74,6 +74,10 @@ module Epuber
         puts message
       when :info
         puts "INFO: #{message}"
+      when :get
+        puts " GET: #{message}"
+      when :ws
+        puts "  WS: #{message}"
       else
         raise "Unknown log level #{level}"
       end
@@ -224,6 +228,35 @@ module Epuber
       compile
     end
 
+    # -------------------------------------------------- #
+
+    def handle_websocket(path)
+      _log :ws, "#{path}: start"
+      request.websocket do |ws|
+        thread = nil
+
+        ws.onopen do
+          sockets << ws
+
+          thread = Thread.new do
+            loop do
+              sleep(10)
+              ws.send('heartbeat')
+            end
+          end
+        end
+
+        ws.onmessage do |msg|
+          _log :ws, "#{path}: received message: #{msg.inspect}"
+        end
+
+        ws.onclose do
+          _log :ws, "#{path}: socket closed"
+          sockets.delete(ws)
+          thread.kill
+        end
+      end
+    end
 
     # -------------------------------------------------- #
 
@@ -234,38 +267,10 @@ module Epuber
     # Book page
     #
     get '/' do
-      if !request.websocket?
-        _log :info, '/ -- normal request'
+      _log :get, '/'
 
-        nokogiri do |xml|
-          xml.pre book.inspect
-        end
-      else
-        _log :info, '/ -- websocket request'
-        request.websocket do |ws|
-          thread = nil
-
-          ws.onopen do
-            sockets << ws
-
-            thread = Thread.new do
-              loop do
-                sleep(10)
-                ws.send('heartbeat')
-              end
-            end
-          end
-
-          ws.onmessage do |msg|
-            _log :info, "WS: Received message: #{msg}"
-          end
-
-          ws.onclose do
-            _log :info, 'websocket closed'
-            sockets.delete(ws)
-            thread.kill
-          end
-        end
+      nokogiri do |xml|
+        xml.pre book.inspect
       end
     end
 
@@ -278,10 +283,12 @@ module Epuber
     end
 
     get '/toc/*' do
+      next handle_websocket("/toc/#{params[:splat].first}") if request.websocket?
+
       path = find_file
       next [404] if path.nil?
 
-      _log :info, "/toc/#{params[:splat].first}: founded file #{path}"
+      _log :get, "/toc/#{params[:splat].first}: founded file #{path}"
       html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
 
       fix_links(html_doc, path, 'img', 'src') # images
@@ -305,19 +312,8 @@ module Epuber
       path = find_file
       next [404] if path.nil?
 
-      _log :info, "/raw/#{params[:splat].first}: founded file #{path}"
+      _log :get, "/raw/#{params[:splat].first}: founded file #{path}"
       send_file(File.expand_path(path, build_path))
-    end
-
-
-    def watch_connections
-      @watch_connections ||= []
-    end
-
-    get '/ajax/watch_changes' do
-      stream(:keep_open) do |out|
-        watch_connections << out
-      end
     end
   end
 end
