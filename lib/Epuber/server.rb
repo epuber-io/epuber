@@ -8,8 +8,11 @@ require 'sinatra-websocket'
 require 'nokogiri'
 require 'listen'
 
+require 'deep_clone'
+
 require_relative 'book'
 require_relative 'config'
+require_relative 'compiler'
 
 
 module Epuber
@@ -46,7 +49,7 @@ module Epuber
     # @return [String] base path
     #
     def build_path
-      Config.instance.build_path(target)
+      Epuber::Config.instance.build_path(target)
     end
 
     # @return [Array<SinatraWebsocket::Connection>]
@@ -54,6 +57,21 @@ module Epuber
     attr_reader :sockets
 
 
+    # @param level [Symbol]
+    # @param message [String]
+    #
+    # @return nil
+    #
+    def _log(level, message)
+      case level
+      when :ui
+        puts message
+      when :info
+        puts "INFO: #{message}"
+      else
+        raise "Unknown level #{level}"
+      end
+    end
 
     # -------------------------------------------------- #
 
@@ -100,23 +118,46 @@ module Epuber
     end
 
     def compile
-      require_relative 'compiler'
-      Epuber::Compiler.new(book, target).compile(Epuber::Config.instance.build_path(target))
+      Epuber::Compiler.new(DeepClone.clone(book), DeepClone.clone(target)).compile(build_path)
     end
 
-    def notify_clients
-      puts "sockets.count = #{sockets.count}"
+    # @param message [String]
+    #
+    def send_to_clients(message)
+      _log :info, "sending message to clients #{message.inspect}"
+
       sockets.each do |ws|
-        ws.send('ia')
+        ws.send(message)
       end
     end
 
+    # @param type [Symbol]
+    def notify_clients(type)
+      _log :info, "Notifying clients with type #{type.inspect}"
+      case type
+      when :styles
+        send_to_clients('ia')
+      when :reload
+        send_to_clients('r')
+      else
+        raise 'Not known type'
+      end
+    end
+
+    # @param _modified [Array<String>]
+    # @param _added [Array<String>]
+    # @param _removed [Array<String>]
+    #
     def changes_detected(_modified, _added, _removed)
-      puts 'Compiling'.yellow
+      _log :ui, 'Compiling'
       compile
 
-      puts 'Notifying clients'.yellow
-      notify_clients
+      _log :ui, 'Notifying clients'
+      if _modified.all? { |file| file.end_with?(*Epuber::Compiler::GROUP_EXTENSIONS[:style]) }
+        notify_clients(:styles)
+      else
+        notify_clients(:reload)
+      end
     end
 
 
@@ -134,6 +175,9 @@ module Epuber
 
       @listener.ignore(%r{#{Config.instance.working_path}})
       @listener.ignore(%r{#{Config::WORKING_PATH}/})
+
+      _log :ui, 'Init compile'
+      compile
     end
 
 
@@ -147,41 +191,37 @@ module Epuber
     #
     get '/' do
       if !request.websocket?
-        puts 'normal / request'.green
+        _log :info, '/ -- normal request'
 
         nokogiri do |xml|
           xml.pre book.inspect
         end
       else
+        _log :info, '/ -- websocket request'
+        request.websocket do |ws|
+          thread = nil
 
-          puts 'websocket / request'.green
-          request.websocket do |ws|
+          ws.onopen do
+            sockets << ws
 
-            thread = nil
-
-            ws.onopen do
-              sockets << ws
-
-              thread = Thread.new do
-                loop do
-                  sleep(10)
-                  ws.send('heartbeat')
-                end
+            thread = Thread.new do
+              loop do
+                sleep(10)
+                ws.send('heartbeat')
               end
-            end
-
-            ws.onmessage do |msg|
-              puts "WS: Received message: #{msg}".green
-            end
-
-            ws.onclose do
-              puts 'websocket closed'.red
-              sockets.delete(ws)
-              thread.kill
             end
           end
 
+          ws.onmessage do |msg|
+            _log :info, "WS: Received message: #{msg}"
+          end
 
+          ws.onclose do
+            _log :info, 'websocket closed'
+            sockets.delete(ws)
+            thread.kill
+          end
+        end
       end
     end
 
@@ -197,7 +237,7 @@ module Epuber
       path = find_file
       next [404] if path.nil?
 
-      puts "/toc/*: founded file #{path}".green
+      _log :info, "/toc/#{params[:splat].first}: founded file #{path}"
       html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
 
       fix_links(html_doc, path, 'img', 'src') # images
@@ -214,7 +254,7 @@ module Epuber
       path = find_file
       next [404] if path.nil?
 
-      puts "/raw/*: founded file #{path}".green
+      _log :info, "/raw/#{params[:splat].first}: founded file #{path}"
       send_file(File.expand_path(path, build_path))
     end
 

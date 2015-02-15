@@ -15,3 +15,5 @@ gem 'sinatra-websocket'
 gem 'thin'
 
 gem 'listen'
+
+gem 'ruby_deep_clone', '~> 0.6.0'
