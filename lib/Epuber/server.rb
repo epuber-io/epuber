@@ -101,6 +101,15 @@ module Epuber
       paths.first
     end
 
+    # @param index [Fixnum]
+    # @return [Epuber::Book::File, nil]
+    #
+    def spine_file_at(index)
+      if index >= 0 && index < spine.count
+        spine[index]
+      end
+    end
+
     # @param html_doc [Nokogiri::HTML::Document]
     # @param context_path [String]
     # @param css_selector [String]
@@ -121,7 +130,12 @@ module Epuber
 
       args.each do |hash|
         hash.each do |key, value|
-          source.gsub!(key, value) unless value.nil?
+          opt_value = if value
+                        "'#{value}'"
+                      else
+                        'null'
+                      end
+          source.gsub!(key, opt_value)
         end
       end
 
@@ -276,8 +290,8 @@ module Epuber
       add_auto_refresh_script(html_doc)
 
       current_index = spine.index { |file| path.end_with?(file.destination_path.to_s) }
-      previous_path = spine.at(current_index - 1).try(:destination_path).try(:to_s)
-      next_path     = spine.at(current_index + 1).try(:destination_path).try(:to_s)
+      previous_path = spine_file_at(current_index - 1).try(:destination_path).try(:to_s)
+      next_path     = spine_file_at(current_index + 1).try(:destination_path).try(:to_s)
       add_keyboard_control_script(html_doc, previous_path, next_path)
 
       session[:current_page] = path
