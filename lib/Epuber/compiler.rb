@@ -39,12 +39,19 @@ module Epuber
       '.md'     => '.xhtml',
     }.freeze
 
+    # @return [Array<Epuber::Book::File>]
+    #
+    def spine
+      @spine.dup
+    end
+
     # @param book [Epuber::Book::Book]
     # @param target [Epuber::Book::Target]
     #
     def initialize(book, target)
       @book = book
       @target = target
+      @spine = []
     end
 
     # Compile target to build folder
@@ -213,6 +220,7 @@ module Epuber
         puts "    processing toc item #{file.source_path_pattern}"
 
         @target.add_to_all_files(file)
+        @spine << file
         process_file(file)
       end
 
