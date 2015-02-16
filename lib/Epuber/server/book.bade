@@ -1,18 +1,45 @@
 
+mixin book_meta(key, format: nil)
+	tr
+		td.book_meta_key= key
+		- value = book.send(key.to_sym)
+		- if value.is_a?(Array)
+		td.book_meta_value= value.map(&format).join(', ')
+		- else
+		td.book_meta_value= value
+		- end
+
+mixin metas
+	table
+		- default_block.call!
+
+mixin section(name)
+	h1.meta_section= name
+
+
+
 html
 	head
-		title= book.title
+		title #{book.title} | Epuber
 
-	style
-		| p {
-		|     margin: 0em;
-		|     text-indent: 0;
-		| }
+		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
 
 	body
-		p= book.title
+		div(class:'header')
+			ul
+				li(class: 'selected'): a(href: '/')= book.title
+				li: a(href: '/files/') Files
+				li: a(href: '/toc/') Toc
+		div.cover_image
+			img(src: book.cover_image.real_source_path || '/server/raw/default_cover.png')
+		+section('Metadata')
+		+metas
+			+book_meta('title')
+			+book_meta('subtitle')
+			+book_meta('authors', format: lambda { |author| author.pretty_name })
 
-		h1 Targets
+
+		+section('Targets')
 		- book.targets.each do |target|
 			p= target.name
 		- end

@@ -17,6 +17,13 @@ require_relative 'config'
 require_relative 'compiler'
 require_relative 'vendor/hash_binding'
 
+require 'bade/runtime/block'
+
+
+def block(*args, &block)
+  Bade::Runtime::Block.new(*args, &block)
+end
+
 
 class Proc
   def call_with_vars(vars, *args)
@@ -280,6 +287,7 @@ module Epuber
       source_path = File.expand_path('server/book.bade', File.dirname(__FILE__))
       parsed      = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
       lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
+      _log :get, "/ lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
       result      = lam.call_with_vars(book: book)
       [200, result]
     end
@@ -296,7 +304,7 @@ module Epuber
       next handle_websocket("/toc/#{params[:splat].first}") if request.websocket?
 
       path = find_file
-      next [404, 'File not found'] if path.nil?
+      next not_found if path.nil?
 
       _log :get, "/toc/#{params[:splat].first}: founded file #{path}"
       html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
@@ -324,6 +332,25 @@ module Epuber
 
       _log :get, "/raw/#{params[:splat].first}: founded file #{path}"
       send_file(File.expand_path(path, build_path))
+    end
+
+    get '/server/raw/*' do
+      file_path = File.expand_path("server/#{params[:splat].first}", File.dirname(__FILE__))
+      _log :get, "/server/raw/#{params[:splat].first} -> #{file_path}"
+
+      next not_found unless File.exists?(file_path)
+
+      last_modified(File.mtime(file_path))
+
+      case File.extname(file_path)
+      when '.styl'
+        require 'stylus'
+        _log :get, 'rendering'
+        body(Stylus.compile(::File.new(file_path)))
+      else
+        _log :get, 'sending file'
+        send_file(file_path)
+      end
     end
   end
 end

@@ -1,0 +1,79 @@
+
+main_font_family = AvenirNext-Regular
+text_color = #B87B4A
+
+body, div, html, p
+  margin 0
+  padding 0
+
+
+
+body
+  font-family main_font_family
+
+p
+  margin 0
+  text-indent 0
+
+
+normal_color = rgba(255, 255, 255, 0.82)
+selected_color = #6D3102
+
+div.header
+  height 70px
+  width 100%
+  background-color #C5946C
+  position relative
+
+  ul
+    padding 0
+    margin 0 0 0 40px
+    position absolute
+    bottom 10px
+
+    li
+      display inline
+      list-style none
+      padding 0
+      margin 0 10px
+      font-size 36px
+      color normal_color
+      border-bottom solid 10px normal_color
+
+      a
+        text-decoration inherit
+        color inherit
+
+      &:hover
+        text-decoration underline
+        color selected_color
+        border-bottom solid 10px selected_color
+
+      &.selected
+        color selected_color
+        border-bottom solid 10px selected_color
+
+div.cover_image
+  float left
+  margin-right 40px
+  margin-left 40px
+  margin-top 20px
+
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.4)
+
+h1.meta_section
+  font-weight normal
+  font-size 36px
+  color text_color
+  margin-bottom 0
+
+td.book_meta_key
+  text-align right
+  font-size 14px
+  color text_color
+  vertical-align baseline
+  padding-right 8px
+
+td.book_meta_value
+  font-size 20px
+  vertical-align baseline
