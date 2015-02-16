@@ -15,6 +15,14 @@ require 'active_support/core_ext/object/try'
 require_relative 'book'
 require_relative 'config'
 require_relative 'compiler'
+require_relative 'vendor/hash_binding'
+
+
+class Proc
+  def call_with_vars(vars, *args)
+    Struct.new(*vars.keys).new(*vars.values).instance_exec(*args, &self)
+  end
+end
 
 
 module Epuber
@@ -269,9 +277,11 @@ module Epuber
     get '/' do
       _log :get, '/'
 
-      nokogiri do |xml|
-        xml.pre book.inspect
-      end
+      source_path = File.expand_path('server/book.bade', File.dirname(__FILE__))
+      parsed      = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
+      lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
+      result      = lam.call_with_vars(book: book)
+      [200, result]
     end
 
     # TOC page
@@ -286,7 +296,7 @@ module Epuber
       next handle_websocket("/toc/#{params[:splat].first}") if request.websocket?
 
       path = find_file
-      next [404] if path.nil?
+      next [404, 'File not found'] if path.nil?
 
       _log :get, "/toc/#{params[:splat].first}: founded file #{path}"
       html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))

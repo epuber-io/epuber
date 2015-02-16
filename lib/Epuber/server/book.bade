@@ -1,0 +1,18 @@
+
+html
+	head
+		title= book.title
+
+	style
+		| p {
+		|     margin: 0em;
+		|     text-indent: 0;
+		| }
+
+	body
+		p= book.title
+
+		h1 Targets
+		- book.targets.each do |target|
+			p= target.name
+		- end
