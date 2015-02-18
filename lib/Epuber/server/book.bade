@@ -1,12 +1,14 @@
 
 mixin book_meta(key, format: nil)
 	tr
-		td.book_meta_key= key
 		- value = book.send(key.to_sym)
 		- if value.is_a?(Array)
-		td.book_meta_value= value.map(&format).join(', ')
-		- else
-		td.book_meta_value= value
+			- value = value.map(&format).join(', ')
+		- end
+
+		- unless value.nil?
+			td.book_meta_key= key.gsub('_', ' ')
+			td.book_meta_value= value
 		- end
 
 mixin metas
@@ -37,6 +39,11 @@ html
 			+book_meta('title')
 			+book_meta('subtitle')
 			+book_meta('authors', format: lambda { |author| author.pretty_name })
+
+			+book_meta('publisher')
+			+book_meta('language')
+			+book_meta('version')
+			+book_meta('build_version')
 
 
 		+section('Targets')

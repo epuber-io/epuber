@@ -44,6 +44,9 @@ div.header
         text-decoration inherit
         color inherit
 
+      &:first-child
+        margin-left 0
+
       &:hover
         text-decoration underline
         color selected_color
@@ -59,7 +62,12 @@ div.cover_image
   margin-left 40px
   margin-top 20px
 
-  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.4)
+  max-width 250px;
+
+  box-shadow 1px 1px 10px rgba(0, 0, 0, 0.4)
+
+  img
+    width 100%
 
 h1.meta_section
   font-weight normal
