@@ -53,7 +53,7 @@ module Epuber
         @targets ||= (
           targets = @targets_names
 
-          # when the list of targets is nil use them all
+          # when the list of targets is nil pick all available targets
           if targets.empty?
             book.targets
           else

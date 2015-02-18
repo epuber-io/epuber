@@ -80,7 +80,7 @@ module Epuber
 
       #-------------- TOC --------------------------------------
 
-      # @return [TocItem]
+      # @return [Epuber::Book::TocItem]
       #
       attr_reader :root_toc
 
