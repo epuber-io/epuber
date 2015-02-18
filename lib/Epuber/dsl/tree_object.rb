@@ -45,16 +45,27 @@ module Epuber
         child_items.each(&:validate)
       end
 
+      class << self
+        # @return [Self]
+        #
+        attr_accessor :current_parent_object
+      end
 
       # @return [self.class]
       #
       def create_child_item(*args)
         child = self.class.new(*args)
 
-        child.parent = self
-        @child_items << child
+        parent_object_before = self.class.current_parent_object
 
+        child.parent = parent_object_before || self
+        child.parent.child_items << child
+
+        self.class.current_parent_object = child
         yield child if block_given?
+
+
+        self.class.current_parent_object = parent_object_before
 
         child
       end
