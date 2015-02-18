@@ -235,6 +235,13 @@ module Epuber
       FileUtils.mkdir_p(dest_path.dirname)
 
       if !file.content.nil?
+        if !file.real_source_path.nil? && !FileUtils.uptodate?(dest_path.to_s, [file.real_source_path])
+          # invalidate old content
+          file.content = nil
+          return process_file(file)
+        end
+
+        #    puts "writing file with content to #{dest_path}"
         # write file
         File.open(dest_path.to_s, 'w') do |file_handle|
           file_handle.write(file.content)
@@ -253,6 +260,8 @@ module Epuber
         else
           raise "unknown file extension #{file_pathname.extname} for file #{file.inspect}"
         end
+      else
+        raise "don't know what to do with file #{file.inspect} at path #{file.real_source_path}"
       end
 
       @all_files << file
@@ -290,6 +299,7 @@ module Epuber
     #
     def process_static_file(file)
       dest_path = destination_path_of_file(file)
+      #    puts "copying file from #{file.real_source_path} to #{dest_path}"
       FileUtils.cp(file.real_source_path, dest_path)
     end
 
