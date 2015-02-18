@@ -33,22 +33,33 @@ html
 				li(class: 'selected'): a(href: '/')= book.title
 				li: a(href: '/files/') Files
 				li: a(href: '/toc/') Toc
-		#content
+		#main
 			.cover_image
-				img(src: book.cover_image.real_source_path || '/server/raw/default_cover.png')
-			+section('Metadata')
-			+metas
-				+book_meta('title')
-				+book_meta('subtitle')
-				+book_meta('authors', format: lambda { |author| author.pretty_name })
+				div
+					- if book.cover_image.real_source_path.nil?
+						img(src: '/server/raw/default_cover.png')
+					- else
+						img(src: "/raw/#{book.cover_image.real_source_path}")
+					- end
+			#content
+				+section('Metadata')
+				+metas
+					+book_meta('title')
+					+book_meta('subtitle')
+					+book_meta('authors', format: lambda { |author| author.pretty_name })
 
-				+book_meta('publisher')
-				+book_meta('language')
-				+book_meta('version')
-				+book_meta('build_version')
+					+book_meta('publisher')
+					+book_meta('language')
+					+book_meta('version')
+					+book_meta('build_version')
 
 
-			+section('Targets')
-			- book.targets.each do |target|
-				p= target.name
-			- end
+				+section('Targets')
+				- book.targets.each do |target|
+					p= target.name
+				- end
+
+				+section('Spine')
+				- book.root_toc.child_items.each do |item|
+					p: a(href: "/toc/#{item.file_obj.destination_path}")= item.file_obj.source_path_pattern
+				- end

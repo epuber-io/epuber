@@ -18,6 +18,7 @@ p
 
 normal_color = rgba(255, 255, 255, 0.82)
 selected_color = #6D3102
+left_align = 40px
 
 #header_bg
   height 70px
@@ -35,7 +36,7 @@ selected_color = #6D3102
 
   ul
     padding 0
-    margin 0 0 0 40px
+    margin 0 0 0 left_align
     position absolute
     bottom 10px
 
@@ -46,7 +47,7 @@ selected_color = #6D3102
       margin 0 10px
       font-size 36px
       color normal_color
-      border-bottom solid 10px normal_color
+      border-bottom solid 10px transparent
 
       a
         text-decoration inherit
@@ -65,28 +66,40 @@ selected_color = #6D3102
         border-bottom solid 10px selected_color
 
 
-#content
+#main
+  display -webkit-flex // Safari
+  display flex
+  flex-flow row wrap
+
   max-width 1200px
+
   margin 0 auto
+  margin-top 20px
+
+#content
+  flex 5
 
 div.cover_image
-  float left
+  flex 1
   margin-right 40px
-  margin-left 40px
-  margin-top 20px
+  margin-left left_align
 
   max-width 250px
 
-  box-shadow 1px 1px 10px rgba(0, 0, 0, 0.4)
+  div
+    box-shadow 1px 1px 10px rgba(0, 0, 0, 0.4)
 
-  img
-    width 100%
+    img
+      width 100%
 
 h1.meta_section
   font-weight normal
   font-size 36px
   color text_color
   margin-bottom 0
+  
+  &:first-child
+    margin-top 0
 
 td.book_meta_key
   text-align right
