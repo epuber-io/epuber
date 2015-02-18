@@ -161,6 +161,11 @@ module Epuber
       script_node = html_doc.create_element('script', source, type: 'text/javascript')
 
       head = html_doc.css('head').first
+
+      if head.nil?
+        head = html_doc.create_element('head')
+        html_doc.css('html').first.add_child(head)
+      end
       head.add_child(script_node)
     end
 
