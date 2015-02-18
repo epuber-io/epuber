@@ -8,8 +8,6 @@ require 'sinatra-websocket'
 require 'nokogiri'
 require 'listen'
 
-require 'deep_clone'
-
 require 'active_support/core_ext/object/try'
 
 require_relative 'book'
@@ -57,7 +55,7 @@ module Epuber
     # @return [Epuber::Book::Target]
     #
     def target
-      @target ||= self.class.target
+      self.class.target
     end
 
     attr_writer :target
@@ -184,7 +182,7 @@ module Epuber
     end
 
     def compile
-      compiler = Epuber::Compiler.new(DeepClone.clone(book), DeepClone.clone(target))
+      compiler = Epuber::Compiler.new(book, target)
       compiler.compile(build_path)
       self.spine = compiler.spine
     end
