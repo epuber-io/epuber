@@ -10,10 +10,19 @@ body, div, html, p
 
 body
   font-family main_font_family
+  font-size 20px
 
 p
   margin 0
   text-indent 0
+
+a
+  text-decoration inherit
+  text-decoration-color inherit
+  color inherit
+
+  &:hover
+    text-decoration underline
 
 
 normal_color = rgba(255, 255, 255, 0.82)
@@ -97,7 +106,7 @@ h1.meta_section
   font-size 36px
   color text_color
   margin-bottom 0
-  
+
   &:first-child
     margin-top 0
 
@@ -111,3 +120,20 @@ td.book_meta_key
 td.book_meta_value
   font-size 20px
   vertical-align baseline
+
+
+
+
+ul.spine
+  padding-left 0
+  margin-top 0
+
+  & &
+    padding-left 30px
+
+  li
+    list-style none
+
+    span.title
+      color text_color
+      text-decoration-color text_color

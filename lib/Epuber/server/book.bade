@@ -17,7 +17,22 @@ mixin metas
 
 mixin section(name)
 	h1.meta_section= name
+	- default_block.call
 
+
+mixin iterate_spine(toc_item)
+	- if toc_item.child_items.count > 0
+		ul.spine
+			- toc_item.child_items.each do |item|
+				li
+					- item_href = "/toc/#{item.file_obj.destination_path}"
+					a.href(href: item_href)= item.file_obj.source_path_pattern
+					- unless item.title.nil?
+						span(class: 'title'): a.title(href: item_href)= item.title
+					- end
+					+iterate_spine(item)
+			- end
+	- end
 
 
 html
@@ -43,23 +58,21 @@ html
 					- end
 			#content
 				+section('Metadata')
-				+metas
-					+book_meta('title')
-					+book_meta('subtitle')
-					+book_meta('authors', format: lambda { |author| author.pretty_name })
+					+metas
+						+book_meta('title')
+						+book_meta('subtitle')
+						+book_meta('authors', format: lambda { |author| author.pretty_name })
 
-					+book_meta('publisher')
-					+book_meta('language')
-					+book_meta('version')
-					+book_meta('build_version')
+						+book_meta('publisher')
+						+book_meta('language')
+						+book_meta('version')
+						+book_meta('build_version')
 
 
 				+section('Targets')
-				- book.targets.each do |target|
-					p= target.name
-				- end
+					- book.targets.each do |target|
+						p= target.name
+					- end
 
 				+section('Spine')
-				- book.root_toc.child_items.each do |item|
-					p: a(href: "/toc/#{item.file_obj.destination_path}")= item.file_obj.source_path_pattern
-				- end
+					+iterate_spine(book.root_toc)
