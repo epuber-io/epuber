@@ -80,3 +80,6 @@ html
 
 				+section('Spine')
 					+iterate_spine(book.root_toc)
+
+		#footer
+			p Epuber | © 2015 Roman Kříž
