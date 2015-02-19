@@ -30,6 +30,10 @@ mixin iterate_spine(toc_item)
 					- unless item.title.nil?
 						span(class: 'title'): a.title(href: item_href)= item.title
 					- end
+					- item.options.each do |opt|
+						- next if opt.nil?
+						span.option= opt.inspect
+					- end
 					+iterate_spine(item)
 			- end
 	- end
