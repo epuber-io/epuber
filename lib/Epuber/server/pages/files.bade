@@ -1,0 +1,12 @@
+
++page(title: 'Files', header_id: 'files')
+	#content
+		- target.all_files.each do |file|
+			p.file
+				- href = "/files/#{file.real_source_path}"
+				a.source_pattern(href: href)= file.source_path_pattern
+				= ' '
+				span.arrow =>
+				= '  '
+				a.source_path(href: href)= file.real_source_path
+		- end

@@ -59,6 +59,8 @@ module Epuber
       end
     end
 
+    BINARY_FILES_EXTNAMES = %w(.png .jpeg .jpg .otf .ttf )
+
     class << self
       # @return [Epuber::Book::Book]
       #
@@ -125,10 +127,10 @@ module Epuber
     #
     # @return [String] path to file
     #
-    def find_file(pattern = params[:splat].first)
+    def find_file(pattern = params[:splat].first, source_path: build_path)
       paths = nil
 
-      Dir.chdir(build_path) do
+      Dir.chdir(source_path) do
         paths = Dir.glob(pattern)
         paths = Dir.glob("**/#{pattern}") if paths.empty?
 
@@ -337,8 +339,6 @@ module Epuber
     # ------------------------------------------
     # @group TOC
 
-    # TOC page
-    #
     namespace '/toc' do
       get '/?' do
         render_bade('toc.bade')
@@ -366,6 +366,26 @@ module Epuber
         session[:current_page] = path
 
         html_doc.to_html
+      end
+    end
+
+    namespace '/files' do
+      get '/?' do
+        render_bade('files.bade')
+      end
+
+      get '/*' do
+        path = find_file(source_path: Config.instance.project_path)
+        next [404] if path.nil?
+
+        _log :get, "/files/#{params[:splat].first}: founded file #{path}"
+
+        extname = ::File.extname(path)
+        type    = unless BINARY_FILES_EXTNAMES.include?(extname)
+                    'text/plain'
+                  end
+
+        send_file(File.expand_path(path, Config.instance.project_path), type: type)
       end
     end
 
