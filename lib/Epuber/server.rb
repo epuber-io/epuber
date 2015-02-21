@@ -3,6 +3,7 @@
 require 'pathname'
 
 require 'sinatra/base'
+require 'sinatra/namespace'
 require 'sinatra-websocket'
 
 require 'nokogiri'
@@ -79,8 +80,6 @@ module Epuber
     def target
       self.class.target
     end
-
-    attr_writer :target
 
     # @return [Array<Epuber::Book::File>]
     #
@@ -248,6 +247,14 @@ module Epuber
       end
     end
 
+    def render_bade(name, *args)
+      source_path = File.expand_path("server/#{name}", File.dirname(__FILE__))
+      parsed      = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
+      _log :get, "#{name} lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
+      lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
+      result      = lam.call_with_vars(*args, book: book, target: target)
+      [200, result]
+    end
 
     # -------------------------------------------------- #
 
@@ -302,6 +309,9 @@ module Epuber
 
     # @!group Sinatra things
 
+    register Sinatra::Namespace
+
+    enable :logging
     enable :sessions
     disable :show_exceptions
     disable :dump_errors
@@ -316,46 +326,48 @@ module Epuber
     #
     get '/' do
       _log :get, '/'
-
-      source_path = File.expand_path('server/book.bade', File.dirname(__FILE__))
-      parsed      = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
-      lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
-      _log :get, "/ lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
-      result      = lam.call_with_vars(book: book)
-      [200, result]
+      render_bade('book.bade')
     end
+
+
+
+    # ------------------------------------------
+    # @group TOC
 
     # TOC page
     #
-    get '/toc' do
-      nokogiri do |xml|
-        xml.pre book.root_toc.inspect
+    namespace '/toc' do
+      get '/?' do
+        render_bade('toc.bade')
+      end
+
+      get '/*' do
+        next handle_websocket("/toc/#{params[:splat].first}") if request.websocket?
+
+        path = find_file
+        next not_found if path.nil?
+
+        _log :get, "/toc/#{params[:splat].first}: founded file #{path}"
+        html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
+
+        fix_links(html_doc, path, 'img', 'src') # images
+        fix_links(html_doc, path, 'script', 'src') # javascript
+        fix_links(html_doc, path, 'link', 'href') # css styles
+        add_auto_refresh_script(html_doc)
+
+        current_index = spine.index { |file| path.end_with?(file.destination_path.to_s) }
+        previous_path = spine_file_at(current_index - 1).try(:destination_path).try(:to_s)
+        next_path     = spine_file_at(current_index + 1).try(:destination_path).try(:to_s)
+        add_keyboard_control_script(html_doc, previous_path, next_path)
+
+        session[:current_page] = path
+
+        html_doc.to_html
       end
     end
 
-    get '/toc/*' do
-      next handle_websocket("/toc/#{params[:splat].first}") if request.websocket?
-
-      path = find_file
-      next not_found if path.nil?
-
-      _log :get, "/toc/#{params[:splat].first}: founded file #{path}"
-      html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
-
-      fix_links(html_doc, path, 'img', 'src') # images
-      fix_links(html_doc, path, 'script', 'src') # javascript
-      fix_links(html_doc, path, 'link', 'href') # css styles
-      add_auto_refresh_script(html_doc)
-
-      current_index = spine.index { |file| path.end_with?(file.destination_path.to_s) }
-      previous_path = spine_file_at(current_index - 1).try(:destination_path).try(:to_s)
-      next_path     = spine_file_at(current_index + 1).try(:destination_path).try(:to_s)
-      add_keyboard_control_script(html_doc, previous_path, next_path)
-
-      session[:current_page] = path
-
-      html_doc.to_html
-    end
+    # ----------------------------------
+    # @group Raw files
 
     # Returns file with path or pattern, base_path is epub root
     #
@@ -367,22 +379,23 @@ module Epuber
       send_file(File.expand_path(path, build_path))
     end
 
-    get '/server/raw/*' do
-      file_path = File.expand_path("server/#{params[:splat].first}", File.dirname(__FILE__))
-      _log :get, "/server/raw/#{params[:splat].first} -> #{file_path}"
 
-      next not_found unless File.exists?(file_path)
+    namespace '/server' do
+      get '/raw/*' do
+        file_path = File.expand_path("server/#{params[:splat].first}", File.dirname(__FILE__))
+        _log :get, "/server/raw/#{params[:splat].first} -> #{file_path}"
 
-      last_modified(File.mtime(file_path))
+        next not_found unless File.exists?(file_path)
 
-      case File.extname(file_path)
-      when '.styl'
-        require 'stylus'
-        _log :get, 'rendering'
-        body(Stylus.compile(::File.new(file_path)))
-      else
-        _log :get, 'sending file'
-        send_file(file_path)
+        last_modified(File.mtime(file_path))
+
+        case File.extname(file_path)
+        when '.styl'
+          require 'stylus'
+          body(Stylus.compile(::File.new(file_path)))
+        else
+          send_file(file_path)
+        end
       end
     end
   end

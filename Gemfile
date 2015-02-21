@@ -12,6 +12,7 @@ gem 'rerun', group: :test, require: false
 
 gem 'sinatra'
 gem 'sinatra-websocket'
+gem 'sinatra-contrib'
 gem 'thin'
 
 gem 'listen'

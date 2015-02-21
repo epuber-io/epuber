@@ -1,0 +1,61 @@
+
+mixin book_meta(key, format: nil)
+	tr
+		- value = book.send(key.to_sym)
+		- if value.is_a?(Array)
+			- value = value.map(&format).join(', ')
+		- end
+
+		- unless value.nil?
+			td.book_meta_key= key.gsub('_', ' ')
+			td.book_meta_value= value
+		- end
+
+mixin metas
+	table
+		- default_block.call!
+
+mixin section(name)
+	h1.meta_section= name
+	- default_block.call
+
+
+mixin iterate_toc(toc_item)
+	- if toc_item.child_items.count > 0
+		ul.spine
+			- toc_item.child_items.each do |item|
+				- unless item.nil?
+					li
+						- item_href = "/toc/#{item.file_obj.destination_path}"
+						a.href(href: item_href)= item.file_obj.source_path_pattern
+						- unless item.title.nil?
+							span(class: 'title'): a.title(href: item_href)= item.title
+						- end
+						- item.options.each do |opt|
+							- next if opt.nil?
+							span.option= opt.inspect
+						- end
+						+iterate_spine(item)
+				- end
+			- end
+	- end
+
+
+html
+	head
+		title TOC | #{book.title} | Epuber
+		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
+
+	body
+		#header_bg
+		#header
+			ul
+				li: a(href: '/')= book.title
+				li: a(href: '/files/') Files
+				li(class: 'selected'): a(href: '/toc/') Toc
+		#main
+			#content
+				+iterate_toc(book.root_toc)
+
+		#footer
+			p Epuber | © 2015 Roman Kříž
