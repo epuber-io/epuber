@@ -329,12 +329,21 @@ module Epuber
 
     # Book page
     #
-    get '/' do
-      _log :get, '/'
-      render_bade('book.bade')
+    namespace '' do
+      get '/?' do
+        render_bade('book.bade')
+      end
+
+      get '/change_target/:target_name' do |target_name|
+        selected_target = book.target_named(target_name)
+
+        next [404, 'Target not found'] if selected_target.nil?
+
+        self.class.target = selected_target
+        compile_book
+        redirect '/'
+      end
     end
-
-
 
     # ------------------------------------------
     # @group TOC
