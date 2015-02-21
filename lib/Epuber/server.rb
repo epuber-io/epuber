@@ -59,7 +59,7 @@ module Epuber
       end
     end
 
-    BINARY_FILES_EXTNAMES = %w(.png .jpeg .jpg .otf .ttf )
+    BINARY_FILES_EXTNAMES = %w(.png .jpeg .jpg .otf .ttf)
 
     class << self
       # @return [Epuber::Book::Book]
