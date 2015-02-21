@@ -248,10 +248,13 @@ module Epuber
     end
 
     def render_bade(name, *args)
+      common_path = File.expand_path('server/common.bade', File.dirname(__FILE__))
       source_path = File.expand_path("server/#{name}", File.dirname(__FILE__))
-      parsed      = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
-      _log :get, "#{name} lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
+      source      = ::File.read(common_path) + "\n" + ::File.read(source_path)
+
+      parsed      = Bade::Parser.new(file: source_path).parse(source)
       lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
+      #_log :get, "#{name} lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
       result      = lam.call_with_vars(*args, book: book, target: target)
       [200, result]
     end

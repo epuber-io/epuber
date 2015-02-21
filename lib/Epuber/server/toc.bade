@@ -1,25 +1,4 @@
 
-mixin book_meta(key, format: nil)
-	tr
-		- value = book.send(key.to_sym)
-		- if value.is_a?(Array)
-			- value = value.map(&format).join(', ')
-		- end
-
-		- unless value.nil?
-			td.book_meta_key= key.gsub('_', ' ')
-			td.book_meta_value= value
-		- end
-
-mixin metas
-	table
-		- default_block.call!
-
-mixin section(name)
-	h1.meta_section= name
-	- default_block.call
-
-
 mixin iterate_toc(toc_item)
 	- if toc_item.child_items.count > 0
 		ul.spine
@@ -46,12 +25,7 @@ html
 		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
 
 	body
-		#header_bg
-		#header
-			ul
-				li: a(href: '/')= book.title
-				li: a(href: '/files/') Files
-				li(class: 'selected'): a(href: '/toc/') Toc
+		+body_header('toc')
 		#main
 			#content
 				+iterate_toc(book.root_toc)

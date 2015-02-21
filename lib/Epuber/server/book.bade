@@ -46,12 +46,7 @@ html
 		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
 
 	body
-		#header_bg
-		#header
-			ul
-				li(class: 'selected'): a(href: '/')= book.title
-				li: a(href: '/files/') Files
-				li: a(href: '/toc/') Toc
+		+body_header('home')
 		#main
 			.cover_image
 				div

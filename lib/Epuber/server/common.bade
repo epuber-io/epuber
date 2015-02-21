@@ -1,0 +1,8 @@
+
+mixin body_header(current)
+	#header_bg
+	#header
+		ul
+			li(class: 'selected' if current == 'home'): a(href: '/')= book.title
+			li(class: 'selected' if current == 'files'): a(href: '/files/') Files
+			li(class: 'selected' if current == 'toc'): a(href: '/toc/') Toc
