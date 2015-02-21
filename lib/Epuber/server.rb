@@ -248,8 +248,8 @@ module Epuber
     end
 
     def render_bade(name, *args)
-      common_path = File.expand_path('server/common.bade', File.dirname(__FILE__))
-      source_path = File.expand_path("server/#{name}", File.dirname(__FILE__))
+      common_path = File.expand_path('server/pages/common.bade', File.dirname(__FILE__))
+      source_path = File.expand_path("server/pages/#{name}", File.dirname(__FILE__))
       source      = ::File.read(common_path) + "\n" + ::File.read(source_path)
 
       parsed      = Bade::Parser.new(file: source_path).parse(source)
