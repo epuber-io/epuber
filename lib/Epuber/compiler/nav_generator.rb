@@ -124,7 +124,6 @@ module Epuber
             @xml.text_(@book.title)
           end
 
-          @nav_play_order   = 1
           @nav_nav_point_id = 1
 
           # nav map
@@ -164,14 +163,13 @@ module Epuber
             visit_toc_items(toc_item.child_items)
           end
         else
-          @xml.navPoint(id: "navPoint_#{@nav_nav_point_id}", playOrder: @nav_play_order) do
+          @xml.navPoint(id: "navPoint_#{@nav_nav_point_id}") do
             @xml.navLabel do
               @xml.text_(toc_item.title)
             end
             @xml.content(src: toc_item.file_obj.destination_path)
 
             @nav_nav_point_id += 1
-            @nav_play_order   += 1
 
             visit_toc_items(toc_item.child_items)
           end
