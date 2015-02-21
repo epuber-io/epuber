@@ -28,6 +28,7 @@ a
 normal_color = rgba(255, 255, 255, 0.82)
 selected_color = #6D3102
 left_align = 40px
+header_underline_height = 6px
 
 #header_bg
   height 70px
@@ -47,7 +48,7 @@ left_align = 40px
     padding 0
     margin 0 0 0 left_align
     position absolute
-    bottom 10px
+    bottom header_underline_height
 
     li
       display inline
@@ -56,7 +57,7 @@ left_align = 40px
       margin 0 10px
       font-size 36px
       color normal_color
-      border-bottom solid 10px transparent
+      border-bottom solid header_underline_height transparent
 
       a
         text-decoration inherit
@@ -68,11 +69,11 @@ left_align = 40px
       &:hover
         text-decoration underline
         color selected_color
-        border-bottom solid 10px selected_color
+        border-bottom-color selected_color
 
       &.selected
         color selected_color
-        border-bottom solid 10px selected_color
+        border-bottom-color selected_color
 
 
 #main
@@ -139,14 +140,15 @@ ul.spine
       text-decoration-color text_color
 
     span.option
-      opacity .57
+      opacity .5
       padding .1em .3em
       font-size 12px
       background-color #D8D8D8
       border solid 1px #979797
       border-radius 5px
 
-
+    a.toc_href
+      color rgba(0, 0, 0, 0.5)
 
 
 
@@ -154,6 +156,8 @@ ul.spine
   margin-top 50px
   border-top solid 1px text_color
   padding 10px 0
+  width 100%
+
   p
     text-align center
     color gray

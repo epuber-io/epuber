@@ -24,10 +24,9 @@ mixin iterate_toc(toc_item)
 	- if toc_item.child_items.count > 0
 		ul.spine
 			- toc_item.child_items.each do |item|
-				- unless item.nil?
+				- unless item.title.nil?
 					li
 						- item_href = "/toc/#{item.file_obj.destination_path}"
-						a.href(href: item_href)= item.file_obj.source_path_pattern
 						- unless item.title.nil?
 							span(class: 'title'): a.title(href: item_href)= item.title
 						- end
@@ -35,7 +34,7 @@ mixin iterate_toc(toc_item)
 							- next if opt.nil?
 							span.option= opt.inspect
 						- end
-						+iterate_spine(item)
+						+iterate_toc(item)
 				- end
 			- end
 	- end
