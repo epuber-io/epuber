@@ -36,6 +36,28 @@ module Epuber
   # [LATER]   /file/<path-or-pattern> -- displays pretty file (image, text file) (for example: /file/text/s01.xhtml or /file/text/s01.bade)
   #
   class Server < Sinatra::Base
+    class ShowExceptions < Sinatra::ShowExceptions
+      def call(env)
+        e = env['sinatra.error']
+
+        if prefers_plain_text?(env)
+          content_type = 'text/plain'
+          body = [dump_exception(e)]
+        else
+          content_type = 'text/html'
+          body = pretty(env, e)
+        end
+
+        unless body.is_a?(Array)
+          body = [body]
+        end
+
+        [500, { 'Content-Type'   => content_type,
+                'Content-Length' => Rack::Utils.bytesize(body.join).to_s },
+         body]
+      end
+    end
+
     class << self
       # @return [Epuber::Book::Book]
       #
@@ -281,6 +303,14 @@ module Epuber
     # @!group Sinatra things
 
     enable :sessions
+    disable :show_exceptions
+    disable :dump_errors
+    disable :raise_errors
+
+    error do
+      ShowExceptions.new(self).call(env)
+    end
+
 
     # Book page
     #
