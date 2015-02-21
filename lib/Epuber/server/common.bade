@@ -3,6 +3,28 @@ mixin body_header(current)
 	#header_bg
 	#header
 		ul
-			li(class: 'selected' if current == 'home'): a(href: '/')= book.title
+			li(class: 'selected' if current == 'home' || current.nil?): a(href: '/')= book.title
 			li(class: 'selected' if current == 'files'): a(href: '/files/') Files
 			li(class: 'selected' if current == 'toc'): a(href: '/toc/') Toc
+
+mixin body_footer
+	#footer
+		p Epuber | © 2015 Roman Kříž
+
+mixin page(title: nil, header_id: nil)
+	html
+    	head
+    		- if title.nil?
+    			title #{book.title} | Epuber
+    		- else
+    			title #{title} | #{book.title} | Epuber
+    		- end
+    		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
+
+    	body
+    		+body_header(header_id)
+
+			#main
+            	- default_block.call
+
+    		+body_footer

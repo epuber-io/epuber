@@ -38,43 +38,31 @@ mixin iterate_spine(toc_item)
 			- end
 	- end
 
++page(header_id: 'home')
+	.cover_image
+		div
+			- if book.cover_image.real_source_path.nil?
+				img(src: '/server/raw/default_cover.png')
+			- else
+				img(src: "/raw/#{book.cover_image.real_source_path}")
+			- end
+	#content
+		+section('Metadata')
+			+metas
+				+book_meta('title')
+				+book_meta('subtitle')
+				+book_meta('authors', format: lambda { |author| author.pretty_name })
 
-html
-	head
-		title #{book.title} | Epuber
-
-		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
-
-	body
-		+body_header('home')
-		#main
-			.cover_image
-				div
-					- if book.cover_image.real_source_path.nil?
-						img(src: '/server/raw/default_cover.png')
-					- else
-						img(src: "/raw/#{book.cover_image.real_source_path}")
-					- end
-			#content
-				+section('Metadata')
-					+metas
-						+book_meta('title')
-						+book_meta('subtitle')
-						+book_meta('authors', format: lambda { |author| author.pretty_name })
-
-						+book_meta('publisher')
-						+book_meta('language')
-						+book_meta('version')
-						+book_meta('build_version')
+				+book_meta('publisher')
+				+book_meta('language')
+				+book_meta('version')
+				+book_meta('build_version')
 
 
-				+section('Targets')
-					- book.targets.each do |target|
-						p= target.name
-					- end
+		+section('Targets')
+			- book.targets.each do |target|
+				p= target.name
+			- end
 
-				+section('Spine')
-					+iterate_spine(book.root_toc)
-
-		#footer
-			p Epuber | © 2015 Roman Kříž
+		+section('Spine')
+			+iterate_spine(book.root_toc)

@@ -18,17 +18,6 @@ mixin iterate_toc(toc_item)
 			- end
 	- end
 
-
-html
-	head
-		title TOC | #{book.title} | Epuber
-		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
-
-	body
-		+body_header('toc')
-		#main
-			#content
-				+iterate_toc(book.root_toc)
-
-		#footer
-			p Epuber | © 2015 Roman Kříž
++page(title: 'TOC', header_id: 'toc')
+	#content
+		+iterate_toc(book.root_toc)
