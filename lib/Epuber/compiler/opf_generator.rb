@@ -134,7 +134,7 @@ module Epuber
           if epub_version >= 3
             @xml.meta(Time.now.utc.iso8601, property: 'dcterms:modified')
 
-            if @target.is_ibooks
+            if @target.ibooks?
               @xml.meta(@book.version, property: 'ibooks:version') unless @book.version.nil?
               @xml.meta(@book.custom_fonts, property: 'ibooks:specified-fonts') unless @book.custom_fonts.nil?
             end
