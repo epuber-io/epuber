@@ -60,8 +60,8 @@ mixin iterate_spine(toc_item)
 
 
 		+section('Targets')
-			- book.targets.each do |target|
-				p= target.name
+			- book.targets.each do |b_target|
+				p(class: 'target_selected' if target == b_target)= b_target.name
 			- end
 
 		+section('Spine')
