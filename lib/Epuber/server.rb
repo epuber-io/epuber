@@ -327,7 +327,8 @@ module Epuber
     end
 
 
-    # Book page
+    # ----------------------------------
+    # @group Home page
     #
     namespace '' do
       get '/?' do
@@ -347,7 +348,7 @@ module Epuber
 
     # ------------------------------------------
     # @group TOC
-
+    #
     namespace '/toc' do
       get '/?' do
         render_bade('toc.bade')
@@ -378,6 +379,9 @@ module Epuber
       end
     end
 
+    # ----------------------------------
+    # @group Pretty files
+    #
     namespace '/files' do
       get '/?' do
         render_bade('files.bade')
@@ -411,7 +415,9 @@ module Epuber
       send_file(File.expand_path(path, build_path))
     end
 
-
+    # ----------------------------------
+    # @group Server files
+    #
     namespace '/server' do
       get '/raw/*' do
         file_path = File.expand_path("server/#{params[:splat].first}", File.dirname(__FILE__))
