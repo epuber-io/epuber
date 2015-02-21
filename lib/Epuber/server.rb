@@ -204,7 +204,7 @@ module Epuber
                               '$next_path' => next_path)
     end
 
-    def compile
+    def compile_book
       compiler = Epuber::Compiler.new(book, target)
       compiler.compile(build_path)
       self.spine = compiler.spine
@@ -239,7 +239,7 @@ module Epuber
     #
     def changes_detected(_modified, _added, _removed)
       _log :ui, 'Compiling'
-      compile
+      compile_book
 
       _log :ui, 'Notifying clients'
       if _modified.all? { |file| file.end_with?(*Epuber::Compiler::GROUP_EXTENSIONS[:style]) }
@@ -277,7 +277,7 @@ module Epuber
       @listener.ignore(%r{#{Config::WORKING_PATH}/})
 
       _log :ui, 'Init compile'
-      compile
+      compile_book
     end
 
     # -------------------------------------------------- #
