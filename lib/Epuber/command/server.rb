@@ -32,6 +32,7 @@ module Epuber
 
         Epuber::Server.book = book
         Epuber::Server.target = target
+        Epuber::Server.bind = '0.0.0.0'
         Epuber::Server.run!
       end
     end

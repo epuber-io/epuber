@@ -179,6 +179,8 @@ module Epuber
         end
       end
 
+      source = yield source if block_given?
+
       script_node = html_doc.create_element('script', source, type: 'text/javascript')
 
       head = html_doc.css('head').first
@@ -193,7 +195,15 @@ module Epuber
     # @param html_doc [Nokogiri::HTML::Document]
     #
     def add_auto_refresh_script(html_doc)
-      add_script_file_to_head(html_doc, 'auto_refresh.js')
+      add_script_file_to_head(html_doc, 'auto_refresh.js') do |script|
+        bonjour_name = "#{`hostname`.chomp}.local"
+
+        script.gsub!('GSUB_PORT', settings.port.to_s)
+        script.gsub!('GSUB_IP_ADDRESS', request.ip)
+        script.gsub!('GSUB_BONJOUR_NAME', bonjour_name)
+
+        script
+      end
     end
 
     # @param html_doc [Nokogiri::HTML::Document]
