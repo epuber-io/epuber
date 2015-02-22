@@ -139,6 +139,9 @@ module Epuber
               @xml.meta(@book.custom_fonts, property: 'ibooks:specified-fonts') unless @book.custom_fonts.nil?
             end
           end
+
+          @xml.meta(name: 'Created by', content: Epuber.to_s)
+          @xml.meta(name: 'Epuber version', content: Epuber::VERSION)
         end
       end
 
