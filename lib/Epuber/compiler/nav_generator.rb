@@ -95,13 +95,13 @@ module Epuber
           @xml.body do
             # toc
             @xml.nav('epub:type' => 'toc') do
-              visit_toc_items(@book.root_toc.child_items)
+              visit_toc_items(@target.root_toc.child_items)
             end
 
             # landmarks
             @xml.nav('epub:type' => 'landmarks') do
               @xml.ol do
-                landmarks_visit_toc_item(@book.root_toc)
+                landmarks_visit_toc_item(@target.root_toc)
               end
             end
           end
@@ -128,7 +128,7 @@ module Epuber
 
           # nav map
           @xml.navMap do
-            visit_toc_items(@book.root_toc.child_items)
+            visit_toc_items(@target.root_toc.child_items)
           end
         end
       end

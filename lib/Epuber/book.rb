@@ -16,10 +16,18 @@ module Epuber
       def initialize
         super
 
-        @default_target   = Target.new(:default)
-        @root_toc         = TocItem.new
+        @default_target = Target.new(nil)
+        @toc_blocks     = []
 
         yield self if block_given?
+      end
+
+      def finish_toc
+        @toc_blocks.each do |block|
+          flat_all_targets.each do |target|
+            target.toc(&block)
+          end
+        end
       end
 
       def validate
@@ -67,6 +75,14 @@ module Epuber
         end
       end
 
+      def flat_all_targets
+        if @default_target.sub_targets.length == 0
+          [@default_target]
+        else
+          @default_target.flat_child_items
+        end
+      end
+
       # Defines new target
       #
       # @return [Target] result target
@@ -80,12 +96,8 @@ module Epuber
 
       #-------------- TOC --------------------------------------
 
-      # @return [Epuber::Book::TocItem]
-      #
-      attr_reader :root_toc
-
       def toc(&block)
-        @root_toc.create_child_items(&block)
+        @toc_blocks << block
       end
 
       #------------- DSL attributes ------------------------------------------------------------------------------------

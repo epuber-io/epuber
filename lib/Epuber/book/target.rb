@@ -20,6 +20,7 @@ module Epuber
         @files     = []
         @all_files = []
         @constants = {}
+        @root_toc  = TocItem.new
       end
 
       # @return [String] target name
@@ -29,6 +30,11 @@ module Epuber
       # @return [Array<self.class>] list of sub targets
       #
       alias_method :sub_targets, :child_items
+
+
+      # @return [Epuber::Book::TocItem]
+      #
+      attr_reader :root_toc
 
 
       # Create new sub_target with name
@@ -174,6 +180,16 @@ module Epuber
       #
       def add_const(key, value)
         @constants[key] = value
+      end
+
+      # @yield [toc_item, target]
+      # @yieldparam toc_item [TocItem] root toc item
+      # @yieldparam target [self] current target
+      #
+      # @return nil
+      #
+      def toc
+        yield(@root_toc, self) if block_given?
       end
 
       # TODO: store url

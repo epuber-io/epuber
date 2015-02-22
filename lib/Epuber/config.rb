@@ -28,6 +28,7 @@ module Epuber
       require_relative 'book'
       @bookspec ||= (
         book = Epuber::Book::Book.from_file(bookspec_path)
+        book.finish_toc
         book.validate
         book
       )

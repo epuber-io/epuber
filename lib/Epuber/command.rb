@@ -31,12 +31,7 @@ module Epuber
     # @return [Epuber::Book::Book]
     #
     def book
-      require_relative 'book'
-      @book ||= (
-        book = Epuber::Book::Book.from_file(self.class.find_bookspec_files.first)
-        book.validate
-        book
-      )
+      Config.instance.bookspec
     end
 
     # @return [void]

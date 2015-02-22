@@ -72,7 +72,7 @@ module Epuber
 
       puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
 
-      process_toc_item(@book.root_toc)
+      process_toc_item(@target.root_toc)
       process_target_files
       generate_other_files
 

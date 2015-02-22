@@ -39,13 +39,13 @@ Epuber::Book::Book.new do |book|
   book.add_files '*.{png,jpg,jpeg}'
   book.add_files '*.{otf,ttf}'
 
-  book.toc do |toc|
+  book.toc do |toc, target|
     toc.file 'cover', :landmark_cover, :landmark_start_page
     toc.file 'vakat'
 
     toc.file 'copyright', :landmark_copyright
 
-    toc.file 'toc', :landmark_toc
+    toc.file 'toc', :landmark_toc if target.name != :ibooks
 
     toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do
       toc.file 's01ch01'

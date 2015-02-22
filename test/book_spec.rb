@@ -22,6 +22,8 @@ module Epuber
           book.isbn       = '978-80-87270-98-2'
           book.print_isbn = '978-80-87270-98-0'
         end
+
+        @target = @book.default_target
       end
 
       it 'should parse simple book and store all informations' do
@@ -36,6 +38,8 @@ module Epuber
 
         expect(book.print_isbn).to eq '978-80-87270-98-0'
         expect(book.isbn).to eq '978-80-87270-98-2'
+
+        expect(@target).to_not be_nil
       end
 
       it 'has defaults' do
@@ -178,13 +182,15 @@ module Epuber
 
       context 'toc' do
         it 'can add toc items' do
-          expect(@book.root_toc.child_items.length).to eq 0
+          expect(@target.root_toc.child_items.length).to eq 0
 
           @book.toc do |toc|
             toc.file 'ch01', 'Chapter 1'
           end
 
-          expect(@book.root_toc.child_items.length).to eq 1
+          @book.finish_toc
+
+          expect(@target.root_toc.child_items.length).to eq 1
         end
 
         it 'can define landmarks' do
@@ -193,10 +199,12 @@ module Epuber
             toc.file 'ch02', 'Chapter 2', :landmarks_start_page
           end
 
-          ch1 = @book.root_toc.child_items[0]
+          @book.finish_toc
+
+          ch1 = @target.root_toc.child_items[0]
           expect(ch1.options).to contain_exactly(:landmarks_cover)
 
-          ch2 = @book.root_toc.child_items[1]
+          ch2 = @target.root_toc.child_items[1]
           expect(ch2.options).to contain_exactly(:landmarks_start_page)
         end
 
@@ -206,7 +214,9 @@ module Epuber
             toc.file 'ch01', 'Chapter 1', :landmarks_start_page
           end
 
-          cover = @book.root_toc.child_items[0]
+          @book.finish_toc
+
+          cover = @target.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover)
           expect(cover.title).to be_nil
           expect(cover.file_obj).to eq 'cover'
@@ -217,7 +227,9 @@ module Epuber
             toc.file 'cover', linear: false
           end
 
-          cover = @book.root_toc.child_items[0]
+          @book.finish_toc
+
+          cover = @target.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(linear: false)
           expect(cover.title).to be_nil
           expect(cover.file_obj).to eq 'cover'
@@ -228,7 +240,9 @@ module Epuber
             toc.file 'cover', :landmarks_cover, linear: false
           end
 
-          cover = @book.root_toc.child_items[0]
+          @book.finish_toc
+
+          cover = @target.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover, linear: false)
           expect(cover.title).to be_nil
           expect(cover.file_obj).to eq 'cover'

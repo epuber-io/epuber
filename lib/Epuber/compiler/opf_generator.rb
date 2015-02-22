@@ -176,7 +176,7 @@ module Epuber
                end
 
         @xml.spine(args) do
-          visit_toc_items(@book.root_toc.child_items)
+          visit_toc_items(@target.root_toc.child_items)
         end
       end
 
@@ -206,7 +206,7 @@ module Epuber
         return if @target.epub_version >= 3
 
         @xml.guide do
-          guide_visit_toc_item(@book.root_toc)
+          guide_visit_toc_item(@target.root_toc)
         end
       end
 
