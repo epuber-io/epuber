@@ -231,34 +231,33 @@ module Epuber
     # @param file [Epuber::Book::File]
     #
     def process_file(file)
-      dest_path = Pathname.new(destination_path_of_file(file))
-      FileUtils.mkdir_p(dest_path.dirname)
+      dest_path = destination_path_of_file(file)
+      FileUtils.mkdir_p(File.dirname(dest_path))
 
       if !file.content.nil?
-        if !file.real_source_path.nil? && !FileUtils.uptodate?(dest_path.to_s, [file.real_source_path])
+        from_source_and_old = !file.real_source_path.nil? && !FileUtils.uptodate?(dest_path, [file.real_source_path])
+        if from_source_and_old
           # invalidate old content
           file.content = nil
+
           return process_file(file)
         end
 
-        #    puts "writing file with content to #{dest_path}"
-        # write file
-        File.open(dest_path.to_s, 'w') do |file_handle|
-          file_handle.write(file.content)
-        end
+        file_write(file)
       elsif !file.real_source_path.nil?
-        file_pathname = Pathname.new(file.real_source_path)
+        file_source_path = file.real_source_path
+        file_extname = File.extname(file_source_path)
 
-        case file_pathname.extname
+        case file_extname
         when *GROUP_EXTENSIONS[:text]
           process_text_file(file)
         when *STATIC_EXTENSIONS
-          process_static_file(file)
+          file_copy(file)
         when '.styl'
-          file.content = Stylus.compile(::File.new(file_pathname))
-          return process_file(file)
+          file.content = Stylus.compile(::File.new(file_source_path))
+          file_write(file)
         else
-          raise "unknown file extension #{file_pathname.extname} for file #{file.inspect}"
+          raise "unknown file extension #{file_extname} for file #{file.inspect}"
         end
       else
         raise "don't know what to do with file #{file.inspect} at path #{file.real_source_path}"
@@ -270,37 +269,58 @@ module Epuber
     # @param file [Epuber::Book::File]
     #
     def process_text_file(file)
-      source_pathname = Pathname.new(file.real_source_path)
+      source_path = file.real_source_path
+      source_extname = File.extname(source_path)
 
-      xhtml_content   = case source_pathname.extname
+      xhtml_content   = case source_extname
                         when '.xhtml'
-                          ::File.read(source_pathname.to_s)
+                          ::File.read(source_path)
                         when '.rxhtml'
-                          RubyTemplater.render_file(source_pathname.to_s)
+                          RubyTemplater.render_file(source_path)
                         when '.bade'
-                          parsed = Bade::Parser.new(file: source_pathname.to_s).parse(::File.read(source_pathname.to_s))
+                          parsed = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
                           lam    = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
                           lam.call
                         else
-                          raise "Unknown text file extension #{source_pathname.extname}"
+                          raise "Unknown text file extension #{source_extname}"
                         end
 
       # TODO: perform text transform
       # TODO: perform analysis
 
       file.content = xhtml_content
+      file_write(file)
+    end
 
-      File.open(destination_path_of_file(file), 'w') do |file_handle|
-        file_handle.write(xhtml_content)
+    # @param file [Epuber::Book::File]
+    #
+    def file_write(file)
+      dest_path = destination_path_of_file(file)
+
+      original_content = if ::File.exists?(dest_path)
+                           ::File.read(dest_path)
+                         end
+
+      return if original_content == file.content || original_content == file.content.to_s
+
+      puts "DEBUG: writing to file #{dest_path}"
+
+      ::File.open(dest_path, 'w') do |file_handle|
+        file_handle.write(file.content)
       end
     end
 
     # @param file [Epuber::Book::File]
     #
-    def process_static_file(file)
+    def file_copy(file)
       dest_path = destination_path_of_file(file)
-      #    puts "copying file from #{file.real_source_path} to #{dest_path}"
-      FileUtils.cp(file.real_source_path, dest_path)
+      source_path = file.real_source_path
+
+      return if FileUtils.uptodate?(dest_path, [source_path])
+      return if File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
+
+      puts "DEBUG: copying file from #{source_path} to #{dest_path}"
+      FileUtils.cp(source_path, dest_path)
     end
 
     # @param file [Epuber::Book::File]
