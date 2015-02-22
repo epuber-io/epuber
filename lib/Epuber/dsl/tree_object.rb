@@ -16,6 +16,11 @@ module Epuber
         parent.child_items << self unless parent.nil?
       end
 
+      def freeze
+        super
+        @child_items.freeze
+      end
+
       # @return [self] reference to parent
       #
       attr_reader :parent

@@ -10,19 +10,28 @@ module Epuber
       #     attribute :title, required: true, inherited: true
       #
       # @param name [Symbol] attribute name
-      # @param options [Dict]
+      # @param options [Hash]
       #
-      # @see Epuber::DSL::Attribute
+      # @see Attribute
       #
       def attribute(name, options = {})
         attr = Attribute.new(name, options)
 
-        @attributes       ||= {}
-        @attributes[name] = attr
+        dsl_attributes[name] = attr
 
         define_method_attr(name, attr)
       end
 
+      # All DSL attributes
+      #
+      # @return [Hash<Symbol, Attribute>]
+      #
+      def dsl_attributes
+        @dsl_attributes ||= {}
+      end
+
+      # @return [Object]
+      #
       def find_root(instance)
         return unless instance.respond_to?(:parent)
 

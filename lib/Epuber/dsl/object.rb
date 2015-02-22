@@ -9,7 +9,7 @@ require 'active_support/core_ext/string/inflections'
 module Epuber
   module DSL
     class Object
-      # @return [String]
+      # @return [String, nil]
       #
       attr_reader :file_path
 
@@ -17,6 +17,11 @@ module Epuber
         super
         @attributes_values = {}
         @file_path = nil
+
+        # iterate over all attributes to write default values
+        self.class.dsl_attributes.each do |key, _attr|
+          self.send(key)
+        end
       end
 
       def to_s
@@ -33,7 +38,7 @@ module Epuber
       # @note it only check for required values for now
       #
       def validate
-        self.class.attributes.each do |key, attr|
+        self.class.dsl_attributes.each do |key, attr|
           value = @attributes_values[key] || attr.converted_value(attr.default_value)
 
           attr.validate_type(value)

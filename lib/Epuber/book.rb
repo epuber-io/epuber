@@ -32,8 +32,12 @@ module Epuber
 
       def validate
         super
-
         @default_target.validate
+      end
+
+      def freeze
+        super
+        @default_target.freeze
       end
 
       attr_reader :default_target
