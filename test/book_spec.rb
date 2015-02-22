@@ -182,7 +182,7 @@ module Epuber
 
       context 'toc' do
         it 'can add toc items' do
-          expect(@target.root_toc.child_items.length).to eq 0
+          expect(@target.root_toc.sub_items.length).to eq 0
 
           @book.toc do |toc|
             toc.file 'ch01', 'Chapter 1'
@@ -190,7 +190,7 @@ module Epuber
 
           @book.finish_toc
 
-          expect(@target.root_toc.child_items.length).to eq 1
+          expect(@target.root_toc.sub_items.length).to eq 1
         end
 
         it 'can define landmarks' do
@@ -201,10 +201,10 @@ module Epuber
 
           @book.finish_toc
 
-          ch1 = @target.root_toc.child_items[0]
+          ch1 = @target.root_toc.sub_items[0]
           expect(ch1.options).to contain_exactly(:landmarks_cover)
 
-          ch2 = @target.root_toc.child_items[1]
+          ch2 = @target.root_toc.sub_items[1]
           expect(ch2.options).to contain_exactly(:landmarks_start_page)
         end
 
@@ -216,7 +216,7 @@ module Epuber
 
           @book.finish_toc
 
-          cover = @target.root_toc.child_items[0]
+          cover = @target.root_toc.sub_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover)
           expect(cover.title).to be_nil
           expect(cover.file_request).to eq 'cover'
@@ -229,7 +229,7 @@ module Epuber
 
           @book.finish_toc
 
-          cover = @target.root_toc.child_items[0]
+          cover = @target.root_toc.sub_items[0]
           expect(cover.options).to contain_exactly(linear: false)
           expect(cover.title).to be_nil
           expect(cover.file_request).to eq 'cover'
@@ -242,7 +242,7 @@ module Epuber
 
           @book.finish_toc
 
-          cover = @target.root_toc.child_items[0]
+          cover = @target.root_toc.sub_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover, linear: false)
           expect(cover.title).to be_nil
           expect(cover.file_request).to eq 'cover'

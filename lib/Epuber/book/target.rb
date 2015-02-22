@@ -34,7 +34,7 @@ module Epuber
 
       # @return [Array<self>] list of sub targets
       #
-      alias_method :sub_targets, :child_items
+      alias_method :sub_targets, :sub_items
 
       # @return [Epuber::Book::TocItem]
       #

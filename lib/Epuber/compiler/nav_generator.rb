@@ -90,7 +90,7 @@ module Epuber
           @xml.body do
             # toc
             @xml.nav('epub:type' => 'toc') do
-              visit_toc_items(@target.root_toc.child_items)
+              visit_toc_items(@target.root_toc.sub_items)
             end
 
             # landmarks
@@ -123,7 +123,7 @@ module Epuber
 
           # nav map
           @xml.navMap do
-            visit_toc_items(@target.root_toc.child_items)
+            visit_toc_items(@target.root_toc.sub_items)
           end
         end
       end
@@ -152,12 +152,12 @@ module Epuber
         result_file = @file_resolver.find_file_from_request(toc_item.file_request)
 
         if toc_item.title.nil?
-          visit_toc_items(toc_item.child_items)
+          visit_toc_items(toc_item.sub_items)
         elsif @target.epub_version >= 3
           @xml.li do
             @xml.a(toc_item.title, href: pretty_path(result_file))
 
-            visit_toc_items(toc_item.child_items)
+            visit_toc_items(toc_item.sub_items)
           end
         else
           @xml.navPoint(id: "navPoint_#{@nav_nav_point_id}") do
@@ -168,7 +168,7 @@ module Epuber
 
             @nav_nav_point_id += 1
 
-            visit_toc_items(toc_item.child_items)
+            visit_toc_items(toc_item.sub_items)
           end
         end
       end
@@ -212,7 +212,7 @@ module Epuber
           end
         end
 
-        landmarks_visit_toc_items(toc_item.child_items)
+        landmarks_visit_toc_items(toc_item.sub_items)
       end
     end
   end

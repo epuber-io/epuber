@@ -183,7 +183,7 @@ module Epuber
                end
 
         @xml.spine(args) do
-          @target.root_toc.flat_child_items.each do |toc_item|
+          @target.root_toc.flat_sub_items.each do |toc_item|
             result_file = @file_resolver.find_file_from_request(toc_item.file_request)
 
             attrs = {}
@@ -226,7 +226,7 @@ module Epuber
           @xml.reference(type: type, href: pretty_path(result_file))
         end
 
-        guide_visit_toc_items(toc_item.child_items)
+        guide_visit_toc_items(toc_item.sub_items)
       end
 
       # --------- other methods --------------------------

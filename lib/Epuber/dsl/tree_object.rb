@@ -11,14 +11,14 @@ module Epuber
         super()
 
         @parent      = parent
-        @child_items = []
+        @sub_items = []
 
-        parent.child_items << self unless parent.nil?
+        parent.sub_items << self unless parent.nil?
       end
 
       def freeze
         super
-        @child_items.freeze
+        @sub_items.freeze
       end
 
       # @return [self] reference to parent
@@ -27,16 +27,16 @@ module Epuber
 
       # @return [Array<self>] child items
       #
-      attr_reader :child_items
+      attr_reader :sub_items
 
       # @return [Array<self>] child items
       #
-      def flat_child_items
+      def flat_sub_items
         all = []
 
-        child_items.each do |item|
+        sub_items.each do |item|
           all << item
-          all.concat(item.flat_child_items)
+          all.concat(item.flat_sub_items)
         end
 
         all
@@ -50,7 +50,7 @@ module Epuber
 
       def validate
         super
-        child_items.each(&:validate)
+        sub_items.each(&:validate)
       end
 
       class << self
@@ -70,7 +70,7 @@ module Epuber
         parent_object_before = self.class.current_parent_object
 
         child.parent = parent_object_before || self
-        child.parent.child_items << child
+        child.parent.sub_items << child
 
         self.class.current_parent_object = child
         yield child if block_given?
@@ -89,7 +89,7 @@ module Epuber
       protected
 
       attr_writer :parent
-      attr_writer :child_items
+      attr_writer :sub_items
     end
   end
 end

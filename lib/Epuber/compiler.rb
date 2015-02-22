@@ -213,7 +213,7 @@ module Epuber
       end
 
       # process recursively other files
-      toc_item.child_items.each do |child|
+      toc_item.sub_items.each do |child|
         process_toc_item(child)
       end
     end

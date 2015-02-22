@@ -21,11 +21,11 @@ module Epuber
       context 'sub items creating' do
         context '.file' do
           it 'should add item' do
-            expect(@root.child_items.length).to be 0
+            expect(@root.sub_items.length).to be 0
 
             @root.file 'ch01', 'Chapter 1'
 
-            expect(@root.child_items.length).to be 1
+            expect(@root.sub_items.length).to be 1
           end
 
           it 'store information after creating sub item' do

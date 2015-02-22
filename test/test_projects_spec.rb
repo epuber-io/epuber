@@ -13,7 +13,7 @@ describe 'Test project' do
       # FileUtils.rmtree(Epuber::Config::WORKING_PATH)
       # FileUtils.remove(Dir.glob('*.epub'))
 
-      system('ruby ../bin/epuber compile')
+      system('ruby ../bin/epuber compile --check')
     end
   end
 end

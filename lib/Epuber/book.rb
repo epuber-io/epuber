@@ -82,7 +82,7 @@ module Epuber
       if @default_target.sub_targets.length == 0
         [@default_target]
       else
-        @default_target.flat_child_items
+        @default_target.flat_sub_items
       end
     end
 
