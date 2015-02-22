@@ -3,7 +3,7 @@
 require 'mime-types'
 
 require_relative 'generator'
-require_relative '../book/file'
+require_relative '../book/file_request'
 
 
 module Epuber
@@ -42,19 +42,19 @@ module Epuber
         end
       end
 
-      # @return [Array<Epuber::Book::File>]
+      # @return [Array<Epuber::Compiler::File>]
       #
       def generate_all_files
         all = []
-        container_xml = Epuber::Book::File.new(nil)
-        container_xml.destination_path = '../META-INF/container.xml'
-        container_xml.content = generate_container_xml
+        container_xml                          = File.new(nil)
+        container_xml.package_destination_path = 'META-INF/container.xml'
+        container_xml.content                  = generate_container_xml
         all << container_xml
 
-        if @target.custom_fonts && @target.is_ibooks?
-          display_options = Epuber::Book::File.new(nil)
-          display_options.destination_path = '../META-INF/com.apple.ibooks.display-options.xml'
-          display_options.content = generate_ibooks_display_options_xml
+        if @target.custom_fonts && @target.ibooks?
+          display_options                          = File.new(nil)
+          display_options.package_destination_path = 'META-INF/com.apple.ibooks.display-options.xml'
+          display_options.content                  = generate_ibooks_display_options_xml
           all << display_options
         end
 

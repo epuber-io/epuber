@@ -7,6 +7,8 @@ require_relative '../book/toc_item'
 module Epuber
   class Compiler
     class NavGenerator < Generator
+      require_relative 'file_resolver'
+
       NCX_NAMESPACES = {
         'xmlns' => 'http://www.daisy.org/z3986/2005/ncx/',
       }.freeze
@@ -29,15 +31,6 @@ module Epuber
         landmark_toc:        { type: 'toc', text: 'Table of contents' },
       }.freeze
 
-
-      # @param target [Epuber::Book::Target]
-      # @param book [Epuber::Book::Book]
-      #
-      def initialize(book, target)
-        @book = book
-        @target = target
-      end
-
       # Generates XML for toc document, the structure differs depend on epub_version
       #
       # Use method #to_s to generate nice string from XML document
@@ -57,16 +50,18 @@ module Epuber
       # @return [Epuber::Book::File]
       #
       def generate_nav_file
-        nav_file = Epuber::Book::File.new(nil)
+        nav_file = Epuber::Compiler::File.new(nil)
 
-        nav_file.destination_path = if @target.epub_version >= 3
-                                      'nav.xhtml'
-                                    else
-                                      'nav.ncx'
-                                    end
+        name = if @target.epub_version >= 3
+                 'nav.xhtml'
+               else
+                 'nav.ncx'
+               end
+
+        nav_file.package_destination_path = ::File.join(Epuber::Compiler::EPUB_CONTENT_FOLDER, name)
 
         nav_file.content = generate_nav
-        nav_file.add_property('nav')
+        nav_file.add_property(:navigation)
         nav_file
       end
 
@@ -79,7 +74,7 @@ module Epuber
       def nav_namespaces
         if @target.epub_version >= 3
           dict = XHTML_NAMESPACES
-          dict = dict.merge(XHTML_IBOOKS_NAMESPACES) if @target.is_ibooks?
+          dict = dict.merge(XHTML_IBOOKS_NAMESPACES) if @target.ibooks?
           dict
         else
           NCX_NAMESPACES
@@ -154,11 +149,13 @@ module Epuber
       # @param toc_item [Epuber::Book::TocItem]
       #
       def visit_toc_item(toc_item)
+        result_file = @file_resolver.find_file_from_request(toc_item.file_request)
+
         if toc_item.title.nil?
           visit_toc_items(toc_item.child_items)
         elsif @target.epub_version >= 3
           @xml.li do
-            @xml.a(toc_item.title, href: toc_item.file_obj.destination_path)
+            @xml.a(toc_item.title, href: pretty_path(result_file))
 
             visit_toc_items(toc_item.child_items)
           end
@@ -167,7 +164,7 @@ module Epuber
             @xml.navLabel do
               @xml.text_(toc_item.title)
             end
-            @xml.content(src: toc_item.file_obj.destination_path)
+            @xml.content(src: pretty_path(result_file))
 
             @nav_nav_point_id += 1
 
@@ -204,11 +201,13 @@ module Epuber
                      end
 
           # filter out ibooks specific when the target is not ibooks
-          types.select! { |type| !type.to_s.start_with?('ibooks:') } unless @target.is_ibooks?
+          types.select! { |type| !type.to_s.start_with?('ibooks:') } unless @target.ibooks?
+
+          result_file = @file_resolver.find_file_from_request(toc_item.file_request)
 
           types.each do |type|
             @xml.li do
-              @xml.a(dict[:text], 'epub:type' => type, 'href' => toc_item.file_obj.destination_path)
+              @xml.a(dict[:text], 'epub:type' => type, 'href' => pretty_path(result_file))
             end
           end
         end

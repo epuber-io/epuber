@@ -3,11 +3,11 @@
 require_relative '../dsl/tree_object'
 
 require_relative '../vendor/version'
-require_relative 'file'
+require_relative 'file_request'
 
 
 module Epuber
-  module Book
+  class Book
     class Target < DSL::TreeObject
       # @param [Target] parent
       # @param [String] name
@@ -18,19 +18,23 @@ module Epuber
         @name      = name
         @is_ibooks = nil
         @files     = []
-        @all_files = []
         @constants = {}
         @root_toc  = TocItem.new
+      end
+
+      def freeze
+        super
+        @files.freeze
+        @files.each(&:freeze)
       end
 
       # @return [String] target name
       #
       attr_reader :name
 
-      # @return [Array<self.class>] list of sub targets
+      # @return [Array<self>] list of sub targets
       #
       alias_method :sub_targets, :child_items
-
 
       # @return [Epuber::Book::TocItem]
       #
@@ -62,48 +66,24 @@ module Epuber
           is_ibooks
         end
       end
-      alias_method :is_ibooks?, :ibooks?
-
 
       # Returns all files
-      # @return [Array<Epuber::Book::File>]
+      # @return [Array<Epuber::Book::FileRequest>]
       #
       def files
         # parent files plus our files
-        ((parent && parent.files) || []) + @files
-      end
+        all_files = ((parent && parent.files) || []) + @files
 
-      # @return [Array<Epuber::Book::File>]
-      #
-      def all_files
-        ((parent && parent.all_files) || []) + @all_files
-      end
-
-      def add_to_all_files(file)
-        @all_files << file
-      end
-
-      # @param file [Epuber::Book::File]
-      # @param files [Array<Epuber::Book::Files>]
-      #
-      def replace_file_with_files(file, files)
-        if @files.include?(file) || @all_files.include?(file)
-          index = @files.index(file)
-          unless index.nil?
-            @files.delete_at(index)
-            @files.insert(index, *files)
-          end
-
-          index = @all_files.index(file)
-          unless index.nil?
-            @all_files.delete_at(index)
-            @all_files.insert(index, *files)
-          end
-        elsif !parent.nil?
-          parent.replace_file_with_files(file, files)
+        unless @attributes_values[:cover_image].nil?
+          all_files << @attributes_values[:cover_image]
         end
+
+        all_files
       end
 
+      # Returns all constants
+      # @return [Hash<String, Object>]
+      #
       def constants
         ((parent && parent.constants) || {}).merge(@constants)
       end
@@ -139,9 +119,9 @@ module Epuber
                 inherited: true
 
       attribute :cover_image,
-                types:        [Epuber::Book::File],
+                types:        [FileRequest],
                 inherited:    true,
-                auto_convert: { [String] => ->(value) { File.new(value, group: :image, properties: ['cover-image']) } }
+                auto_convert: { [String] => ->(value) { FileRequest.new(value, group: :image, properties: [:cover_image]) } }
 
 
       # @param file_path [String | Epuber::Book::File]
@@ -150,14 +130,13 @@ module Epuber
       # @return [Epuber::Book::File] created file
       #
       def add_file(file_path, group: nil)
-        file = if file_path.is_a?(Epuber::Book::File)
+        file = if file_path.is_a?(FileRequest)
                  file_path
                else
-                 Epuber::Book::File.new(file_path, group: group)
+                 FileRequest.new(file_path, group: group)
                end
 
         @files << file unless @files.include?(file)
-        @all_files << file unless @all_files.include?(file)
 
         file
       end
@@ -191,8 +170,6 @@ module Epuber
       def toc
         yield(@root_toc, self) if block_given?
       end
-
-      # TODO: store url
     end
   end
 end

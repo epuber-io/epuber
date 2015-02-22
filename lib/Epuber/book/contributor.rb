@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 module Epuber
-  module Book
+  class Book
     class Contributor
       # File-as of contributor used in .opf file
       # @return [String] pretty name

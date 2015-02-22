@@ -1,17 +1,19 @@
 # encoding: utf-8
 
 require_relative '../dsl/tree_object'
-require_relative 'file'
+
 
 module Epuber
-  module Book
+  class Book
+    require_relative 'file_request'
+
     class TocItem < DSL::TreeObject
-      # @return [Epuber::Book::File]
+      # @return [Epuber::Book::FileRequest]
       #
-      attribute :file_obj,
-                types: [Epuber::Book::File],
-                auto_convert: { String => Epuber::Book::File },
-                inherited: true
+      attribute :file_request,
+                types:        [Epuber::Book::FileRequest],
+                auto_convert: { String => Epuber::Book::FileRequest },
+                inherited:    true
 
       # @return [String]
       #
@@ -24,7 +26,7 @@ module Epuber
 
 
 
-      # -------------- creating sub items -----------------
+      # --------------
 
       # @return [Array<Symbol>]
       #
@@ -65,8 +67,8 @@ module Epuber
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
           unless file_path.nil?
-            file_obj = Epuber::Book::File.new(file_path, group: :text)
-            item.file_obj = file_obj
+            file_obj = Epuber::Book::FileRequest.new(file_path, group: :text)
+            item.file_request = file_obj
           end
 
           if title.is_a?(String)

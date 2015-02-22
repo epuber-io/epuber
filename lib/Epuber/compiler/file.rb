@@ -1,15 +1,22 @@
 # encoding: utf-8
 
 module Epuber
-  module Book
+  class Compiler
     class File
+      # require_relative '../book/file_request'
+
+      # @return [Epuber::Book::FileRequest]
+      #
+      attr_reader :file_request
+
+
       # @return [String]
       #
       attr_accessor :destination_path
 
       # @return [String]
       #
-      attr_accessor :source_path_pattern
+      attr_accessor :package_destination_path
 
       # @return [String]
       #
@@ -23,30 +30,32 @@ module Epuber
       #
       attr_accessor :content
 
-      # When looking for file, the resulted list should contain only one file
-      #
-      # Default: true
-      #
-      # @return [Bool]
-      #
-      attr_accessor :only_one
-
       # @return [Set<String>]
       #
       attr_accessor :properties
 
       # @return [String]
       #
-      attr_accessor :real_source_path
+      attr_accessor :source_path
 
 
-      def initialize(source_path, group: nil, properties: [])
-        @source_path_pattern = source_path
+      # @param file_request_or_path [String, Epuber::Book::FileRequest]
+      #
+      def initialize(file_request_or_path, group: nil, properties: [])
+        @file_request = if file_request_or_path.is_a?(Epuber::Book::FileRequest)
+                          file_request_or_path
+                        elsif file_request_or_path.is_a?(String)
+                          Epuber::Book::FileRequest.new(file_request_or_path)
+                        end
 
-        @only_one         = true
+        @properties = if @file_request.nil?
+                        properties.to_set
+                      else
+                        (@file_request.properties + properties).to_set
+                      end
+
         @group            = group
-        @properties       = properties.to_set
-        @real_source_path = nil
+        @source_path      = nil
         @destination_path = nil
       end
 
@@ -61,29 +70,33 @@ module Epuber
       end
 
       def hash
-        if !@destination_path.nil?
+        if !@file_request.nil?
+          @file_request.hash
+        elsif !@destination_path.nil?
           @destination_path.hash
-        elsif !@real_source_path.nil?
-          @real_source_path.hash
-        else
-          @source_path_pattern.hash ^ @group.hash
+        elsif !@source_path.nil?
+          @source_path.hash
         end
       end
 
-      # @param other [String, Epuber::Book::File]
+      # @param other [String, Epuber::Book::FileRequest]
       #
       def ==(other)
-        if other.is_a?(String)
-          @source_path_pattern == other
+        if other.is_a?(String) || other.is_a?(Epuber::Book::FileRequest)
+          @file_request == other
         else
           if !@destination_path.nil? && !other.destination_path.nil?
             @destination_path == other.destination_path
-          elsif !@real_source_path.nil? && !other.real_source_path.nil?
-            @real_source_path == other.real_source_path
+          elsif !@source_path.nil? && !other.source_path.nil?
+            @source_path == other.source_path
           else
-            @source_path_pattern == other.source_path_pattern && @group == other.group
+            @source_path == other.source_path && @group == other.group
           end
         end
+      end
+
+      def group
+        @group || file_request.group
       end
 
       # @param file [Epuber::Book::File]

@@ -11,8 +11,8 @@ require_relative '../../lib/epuber/book'
 module Epuber
   describe Compiler::OPFGenerator do
     before do
-      book = Book::Book.new
-      @sut = Compiler::OPFGenerator.new(book, book.targets.first)
+      book = Book.new
+      @sut = Compiler::OPFGenerator.new(book, book.targets.first, Compiler::FileResolver.new('', ''))
     end
 
     it 'creates minimal xml structure for empty book' do
@@ -25,7 +25,7 @@ module Epuber
     end
 
     it 'creates full metadata structure for default epub 3.0' do
-      book = Book::Book.new do |b|
+      book = Book.new do |b|
         b.title        = 'Práce na dálku'
         b.author       = 'Jared Diamond'
         b.published    = '10. 12. 2014'
@@ -37,7 +37,7 @@ module Epuber
         ### b.cover_image = 'cover.jpg'
       end
 
-      @sut = Compiler::OPFGenerator.new(book, book.targets.first)
+      @sut = Compiler::OPFGenerator.new(book, book.targets.first, Compiler::FileResolver.new('', ''))
 
       opf_xml = @sut.generate_opf
       with_xpath(opf_xml, '/package/metadata') do |metadata|

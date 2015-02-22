@@ -13,15 +13,17 @@ require 'bade'
 
 require 'RMagick'
 
-require_relative 'compiler/opf_generator'
-require_relative 'compiler/nav_generator'
-require_relative 'compiler/meta_inf_generator'
-
 require_relative 'book'
 
 
 module Epuber
   class Compiler
+    require_relative 'compiler/opf_generator'
+    require_relative 'compiler/nav_generator'
+    require_relative 'compiler/meta_inf_generator'
+    require_relative 'compiler/file'
+    require_relative 'compiler/file_resolver'
+
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
     GROUP_EXTENSIONS = {
@@ -41,19 +43,12 @@ module Epuber
       '.md'     => '.xhtml',
     }.freeze
 
-    # @return [Array<Epuber::Book::File>]
-    #
-    def spine
-      @spine.dup
-    end
-
     # @param book [Epuber::Book::Book]
     # @param target [Epuber::Book::Target]
     #
     def initialize(book, target)
       @book = book
       @target = target
-      @spine = []
     end
 
     # Compile target to build folder
@@ -63,16 +58,15 @@ module Epuber
     # @return [void]
     #
     def compile(build_folder, check: false)
-      @all_files    = []
+      @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       @should_check = check
 
       FileUtils.mkdir_p(build_folder)
 
-      @output_dir = File.expand_path(build_folder)
-
       puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
 
       process_toc_item(@target.root_toc)
+
       process_target_files
       generate_other_files
 
@@ -88,9 +82,9 @@ module Epuber
     # @return [String] path
     #
     def archive(path = epub_name)
-      epub_path = File.expand_path(path)
+      epub_path = ::File.expand_path(path)
 
-      Dir.chdir(@output_dir) do
+      Dir.chdir(@file_resolver.destination_path) do
         all_files = Dir.glob('**/*')
 
         run_command(%(zip -q0X "#{epub_path}" mimetype))
@@ -108,7 +102,7 @@ module Epuber
       epub_name = if !@book.output_base_name.nil?
                     @book.output_base_name
                   elsif @book.from_file?
-                    File.basename(@book.file_path, File.extname(@book.file_path))
+                    ::File.basename(@book.file_path, ::File.extname(@book.file_path))
                   else
                     @book.title
                   end
@@ -122,9 +116,9 @@ module Epuber
     private
 
     def remove_empty_folders
-      Dir.chdir(@output_dir) do
+      Dir.chdir(@file_resolver.destination_path) do
         Dir.glob('**/*')
-          .select { |d| File.directory?(d) }
+          .select { |d| ::File.directory?(d) }
           .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
           .each do |d|
           puts "removing empty folder `#{d}`"
@@ -134,15 +128,17 @@ module Epuber
     end
 
     def remove_unnecessary_files
-      requested_paths = @all_files.map do |file|
+      output_dir = @file_resolver.destination_path
+
+      requested_paths = @file_resolver.files_of(:package).map do |file|
         # files have paths from EPUB_CONTENT_FOLDER
-        abs_path = File.expand_path(file.destination_path, File.join(@output_dir, EPUB_CONTENT_FOLDER))
-        abs_path.sub(File.join(@output_dir, ''), '')
+        abs_path = ::File.expand_path(file.destination_path, ::File.join(output_dir, EPUB_CONTENT_FOLDER))
+        abs_path.sub(::File.join(output_dir, ''), '')
       end
 
       existing_paths = nil
 
-      Dir.chdir(@output_dir) do
+      Dir.chdir(output_dir) do
         existing_paths = Dir.glob('**/*')
       end
 
@@ -150,94 +146,86 @@ module Epuber
 
       # absolute path
       unnecessary_paths.map! do |path|
-        File.join(@output_dir, path)
+        ::File.join(output_dir, path)
       end
 
       # remove directories
       unnecessary_paths.select! do |path|
-        !File.directory?(path)
+        !::File.directory?(path)
       end
 
       unnecessary_paths.each do |path|
         puts "removing unnecessary file: `#{path}`"
-        File.delete(path)
+        ::File.delete(path)
       end
     end
 
     def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
-      nav_file = NavGenerator.new(@book, @target).generate_nav_file
-      @target.add_to_all_files(nav_file)
+      nav_file = NavGenerator.new(@book, @target, @file_resolver).generate_nav_file
+      @file_resolver.add_file(nav_file, type: :manifest)
       process_file(nav_file)
 
       # generate .opf file
-      opf_file = OPFGenerator.new(@book, @target).generate_opf_file
+      opf_file = OPFGenerator.new(@book, @target, @file_resolver).generate_opf_file
+      @file_resolver.add_file(opf_file, type: :package)
       process_file(opf_file)
 
       # generate mimetype file
-      mimetype_file                  = Epuber::Book::File.new(nil)
-      mimetype_file.destination_path = '../mimetype'
+      mimetype_file                  = Epuber::Compiler::File.new(nil)
+      mimetype_file.package_destination_path = 'mimetype'
       mimetype_file.content          = 'application/epub+zip'
+      @file_resolver.add_file(mimetype_file, type: :package)
       process_file(mimetype_file)
 
       # generate META-INF files
-      opf_path = File.join(EPUB_CONTENT_FOLDER, opf_file.destination_path)
+      opf_path = opf_file.package_destination_path
       meta_inf_files = MetaInfGenerator.new(@book, @target, opf_path).generate_all_files
       meta_inf_files.each do |meta_file|
+        @file_resolver.add_file(meta_file, type: :package)
         process_file(meta_file)
       end
     end
 
     def process_target_files
-      @target.files
-        .select { |file| !file.only_one }
-        .each do |file|
-        files = find_files(file).map { |path| Epuber::Book::File.new(path) }
-        @target.replace_file_with_files(file, files)
+      @target.files.each do |file_request|
+        if file_request.only_one
+          @file_resolver.add_file(File.new(file_request))
+        else
+          @file_resolver.add_files(file_request)
+        end
       end
 
-      @target.files.each { |file| process_file(file) }
-
-      cover_image = @target.cover_image
-      return if cover_image.nil?
-
-      # resolve destination path
-      destination_path_of_file(cover_image)
-
-      index = @target.all_files.index(cover_image)
-      if index.nil?
-        @target.add_to_all_files(cover_image)
-      else
-        file = @target.all_files[index]
-        file.merge_with(cover_image)
+      @file_resolver.files_of(:manifest).each do |file|
+        process_file(file)
       end
     end
 
     # @param toc_item [Epuber::Book::TocItem]
     #
     def process_toc_item(toc_item)
-      unless toc_item.file_obj.nil?
-        file = toc_item.file_obj
+      unless toc_item.file_request.nil?
+        file_request = toc_item.file_request
 
-        puts "    processing toc item #{file.source_path_pattern}"
+        puts "    processing toc item #{file_request.source_pattern}"
 
-        @target.add_to_all_files(file)
-        @spine << file
-        process_file(file)
+        @file_resolver.add_file(File.new(file_request), type: :spine)
       end
 
       # process recursively other files
-      toc_item.child_items.each { |child| process_toc_item(child) }
+      toc_item.child_items.each do |child|
+        process_toc_item(child)
+      end
     end
 
-    # @param file [Epuber::Book::File]
+    # @param file [Epuber::Compiler::File]
     #
     def process_file(file)
-      dest_path = destination_path_of_file(file)
-      FileUtils.mkdir_p(File.dirname(dest_path))
+      dest_path = file.destination_path
+      FileUtils.mkdir_p(::File.dirname(dest_path))
 
       if !file.content.nil?
-        from_source_and_old = !file.real_source_path.nil? && !FileUtils.uptodate?(dest_path, [file.real_source_path])
+        from_source_and_old = !file.source_path.nil? && !FileUtils.uptodate?(dest_path, [file.source_path])
         if from_source_and_old
           # invalidate old content
           file.content = nil
@@ -246,9 +234,9 @@ module Epuber
         end
 
         file_write(file)
-      elsif !file.real_source_path.nil?
-        file_source_path = file.real_source_path
-        file_extname = File.extname(file_source_path)
+      elsif !file.source_path.nil?
+        file_source_path = file.source_path
+        file_extname = ::File.extname(file_source_path)
 
         case file_extname
         when *GROUP_EXTENSIONS[:text]
@@ -264,17 +252,15 @@ module Epuber
           raise "unknown file extension #{file_extname} for file #{file.inspect}"
         end
       else
-        raise "don't know what to do with file #{file.inspect} at path #{file.real_source_path}"
+        raise "don't know what to do with file #{file.inspect} at path #{file.source_path}"
       end
-
-      @all_files << file
     end
 
-    # @param file [Epuber::Book::File]
+    # @param file [Epuber::Book::FileRequest]
     #
     def process_text_file(file)
-      source_path = file.real_source_path
-      source_extname = File.extname(source_path)
+      source_path = file.source_path
+      source_extname = ::File.extname(source_path)
 
       xhtml_content   = case source_extname
                         when '.xhtml'
@@ -296,11 +282,11 @@ module Epuber
       file_write(file)
     end
 
-    # @param file [Epuber::Book::File]
+    # @param file [Epuber::Compiler::File]
     #
     def process_image_file(file)
-      dest_path = destination_path_of_file(file)
-      source_path = file.real_source_path
+      dest_path = file.destination_path
+      source_path = file.source_path
 
       return if FileUtils.uptodate?(dest_path, [source_path])
 
@@ -318,10 +304,10 @@ module Epuber
       end
     end
 
-    # @param file [Epuber::Book::File]
+    # @param file [Epuber::Compiler::File]
     #
     def file_write(file)
-      dest_path = destination_path_of_file(file)
+      dest_path = file.destination_path
 
       original_content = if ::File.exists?(dest_path)
                            ::File.read(dest_path)
@@ -336,108 +322,17 @@ module Epuber
       end
     end
 
-    # @param file [Epuber::Book::File]
+    # @param file [Epuber::Compiler::File]
     #
     def file_copy(file)
-      dest_path = destination_path_of_file(file)
-      source_path = file.real_source_path
+      dest_path = file.destination_path
+      source_path = file.source_path
 
       return if FileUtils.uptodate?(dest_path, [source_path])
-      return if File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
+      return if ::File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
 
       puts "DEBUG: copying file from #{source_path} to #{dest_path}"
       FileUtils.cp(source_path, dest_path)
-    end
-
-    # @param file [Epuber::Book::File]
-    # @return [String]
-    #
-    def destination_path_of_file(file)
-      if file.destination_path.nil?
-        real_source_path = find_file(file)
-
-        extname = Pathname.new(real_source_path).extname
-        new_extname = EXTENSIONS_RENAME[extname]
-
-        dest_path = if new_extname.nil?
-                      real_source_path
-                    else
-                      real_source_path.sub(/#{extname}$/, new_extname)
-                    end
-
-        file.destination_path = dest_path
-        file.real_source_path = real_source_path
-
-        File.join(@output_dir, EPUB_CONTENT_FOLDER, dest_path)
-      else
-        File.join(@output_dir, EPUB_CONTENT_FOLDER, file.destination_path)
-      end
-    end
-
-    # @param pattern [String]
-    # @param group [Symbol]
-    # @return [Array<String>]
-    #
-    def file_paths_with_pattern(pattern, group = nil)
-      file_paths = Dir.glob(pattern)
-
-      file_paths.select! do |file_path|
-        !file_path.include?(Config::WORKING_PATH)
-      end
-
-      # filter depend on group
-      unless group.nil?
-        file_paths.select! do |file_path|
-          extname     = Pathname.new(file_path).extname
-          group_array = GROUP_EXTENSIONS[group]
-
-          raise "Uknown file group #{group.inspect}" if group_array.nil?
-
-          group_array.include?(extname)
-        end
-      end
-
-      file_paths
-    end
-
-    # @param file_or_pattern [String, Epuber::Book::File]
-    # @return [String] only pattern
-    #
-    def pattern_from(file_or_pattern)
-      if file_or_pattern.is_a?(Epuber::Book::File)
-        file_or_pattern.source_path_pattern
-      else
-        file_or_pattern
-      end
-    end
-
-    # @param file_or_pattern [String, Epuber::Book::File]
-    # @param group [Symbol]
-    # @return [Array<String>]
-    #
-    def find_files(file_or_pattern, group = nil)
-      pattern = pattern_from(file_or_pattern)
-
-      group = file_or_pattern.group if group.nil? && file_or_pattern.is_a?(Epuber::Book::File)
-
-      file_paths = file_paths_with_pattern("**/#{pattern}", group)
-      file_paths = file_paths_with_pattern("**/#{pattern}.*", group) if file_paths.empty?
-
-      file_paths
-    end
-
-    # @param file_or_pattern [String, Epuber::Book::File]
-    # @param group [Symbol]
-    # @return [String]
-    #
-    def find_file(file_or_pattern, group = nil)
-      pattern = pattern_from(file_or_pattern)
-      file_paths = find_files(file_or_pattern, group)
-
-      raise "not found file matching pattern `#{pattern}`" if file_paths.empty?
-      raise "found too many files for pattern `#{pattern}`" if file_paths.count >= 2
-
-      file_paths.first
     end
 
     # @param cmd [String]

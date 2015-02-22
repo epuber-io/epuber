@@ -5,7 +5,7 @@ require_relative 'helpers/spec_helper'
 require_relative '../lib/epuber/book'
 
 module Epuber
-  module Book
+  class Book
     describe Book do
       before do
         @book = Book.new do |book|
@@ -126,7 +126,7 @@ module Epuber
 
       it 'can parse from string' do
         string = <<-END_BOOK
-              Epuber::Book::Book.new do |book|
+              Epuber::Book.new do |book|
 
                 book.title = 'Práce na dálku'
                 book.subtitle = 'Zn.: Kancelář zbytečná'
@@ -219,7 +219,7 @@ module Epuber
           cover = @target.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover)
           expect(cover.title).to be_nil
-          expect(cover.file_obj).to eq 'cover'
+          expect(cover.file_request).to eq 'cover'
         end
 
         it 'support for linear = false' do
@@ -232,7 +232,7 @@ module Epuber
           cover = @target.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(linear: false)
           expect(cover.title).to be_nil
-          expect(cover.file_obj).to eq 'cover'
+          expect(cover.file_request).to eq 'cover'
         end
 
         it 'support options and linear = false together' do
@@ -245,7 +245,7 @@ module Epuber
           cover = @target.root_toc.child_items[0]
           expect(cover.options).to contain_exactly(:landmarks_cover, linear: false)
           expect(cover.title).to be_nil
-          expect(cover.file_obj).to eq 'cover'
+          expect(cover.file_request).to eq 'cover'
         end
       end
     end
