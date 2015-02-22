@@ -16,3 +16,6 @@ gem 'sinatra-contrib'
 gem 'thin'
 
 gem 'listen'
+
+
+gem 'rmagick', '2.13.2'

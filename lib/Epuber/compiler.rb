@@ -11,6 +11,8 @@ require 'fileutils'
 require 'stylus'
 require 'bade'
 
+require 'RMagick'
+
 require_relative 'compiler/opf_generator'
 require_relative 'compiler/nav_generator'
 require_relative 'compiler/meta_inf_generator'
@@ -251,6 +253,8 @@ module Epuber
         case file_extname
         when *GROUP_EXTENSIONS[:text]
           process_text_file(file)
+        when *GROUP_EXTENSIONS[:image]
+          process_image_file(file)
         when *STATIC_EXTENSIONS
           file_copy(file)
         when '.styl'
@@ -290,6 +294,28 @@ module Epuber
 
       file.content = xhtml_content
       file_write(file)
+    end
+
+    # @param file [Epuber::Book::File]
+    #
+    def process_image_file(file)
+      dest_path = destination_path_of_file(file)
+      source_path = file.real_source_path
+
+      return if FileUtils.uptodate?(dest_path, [source_path])
+
+      img = Magick::Image::read(source_path).first
+
+      resolution = img.columns * img.rows
+      max_resolution = 2_000_000
+      if resolution > max_resolution
+        scale = max_resolution.to_f / resolution.to_f
+        puts "DEBUG: downscaling image #{source_path} with scale #{scale}"
+        img.scale!(scale)
+        img.write(dest_path)
+      else
+        file_copy(file)
+      end
     end
 
     # @param file [Epuber::Book::File]
