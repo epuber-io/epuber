@@ -16,29 +16,32 @@ module Epuber
         parent.child_items << self unless parent.nil?
       end
 
-      # @return [TreeObject] reference to parent
+      # @return [self] reference to parent
       #
       attr_reader :parent
 
-      # @return [Array<self.class>] child items
+      # @return [Array<self>] child items
       #
       attr_reader :child_items
 
+      # @return [Array<self>] child items
+      #
+      def flat_child_items
+        all = []
 
-      protected
+        child_items.each do |item|
+          all << item
+          all.concat(item.flat_child_items)
+        end
 
-      attr_writer :parent
-      attr_writer :child_items
-
-      public
-
+        all
+      end
 
       # @return [Bool] receiver is root
       #
       def root?
         @parent.nil?
       end
-
 
       def validate
         super
@@ -51,7 +54,10 @@ module Epuber
         attr_accessor :current_parent_object
       end
 
-      # @return [self.class]
+      # @yield [child_item]
+      # @yieldparam child_item [self] created child item
+      #
+      # @return [self]
       #
       def create_child_item(*args)
         child = self.class.new(*args)
@@ -73,6 +79,12 @@ module Epuber
       def create_child_items
         yield self if block_given?
       end
+
+
+      protected
+
+      attr_writer :parent
+      attr_writer :child_items
     end
   end
 end
