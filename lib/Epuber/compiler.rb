@@ -10,6 +10,7 @@ require 'fileutils'
 
 require 'stylus'
 require 'bade'
+require 'zip'
 
 require 'RMagick'
 
@@ -91,12 +92,26 @@ module Epuber
     #
     def archive(path = epub_name)
       epub_path = ::File.expand_path(path)
+      base_path = ::File.join(@file_resolver.destination_path, '')
 
       Dir.chdir(@file_resolver.destination_path) do
-        all_files = Dir.glob('**/*')
+        new_paths = @file_resolver.files_of(:package).map(&:destination_path).map do |file_path|
+          file_path.sub(base_path, '')
+        end
+
+        if ::File.exists?(epub_path)
+          Zip::File.open(epub_path, true) do |zip_file|
+            old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
+            diff = old_paths - new_paths
+            diff.each do |file_to_remove|
+              puts "DEBUG: removing file from result EPUB: #{file_to_remove}"
+              zip_file.remove(file_to_remove)
+            end
+          end
+        end
 
         run_command(%(zip -q0X "#{epub_path}" mimetype))
-        run_command(%(zip -qXr9D "#{epub_path}" "#{all_files.join('" "')}" --exclude \\*.DS_Store))
+        run_command(%(zip -qXr9D "#{epub_path}" "#{new_paths.join('" "')}" --exclude \\*.DS_Store))
       end
 
       path
@@ -163,7 +178,7 @@ module Epuber
       end
 
       unnecessary_paths.each do |path|
-        puts "removing unnecessary file: `#{path}`"
+        puts "DEBUG: removing unnecessary file: `#{path}`"
         ::File.delete(path)
       end
     end
