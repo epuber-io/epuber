@@ -20,12 +20,17 @@ module Epuber
         @files     = []
         @constants = {}
         @root_toc  = TocItem.new
+
+        @default_styles = []
       end
 
       def freeze
         super
         @files.freeze
         @files.each(&:freeze)
+
+        @default_styles.freeze
+        @default_styles.each(&:freeze)
       end
 
       # @return [String] target name
@@ -72,7 +77,7 @@ module Epuber
       #
       def files
         # parent files plus our files
-        all_files = ((parent && parent.files) || []) + @files
+        all_files = ((parent && parent.files) || []) + @files + @default_styles
 
         unless @attributes_values[:cover_image].nil?
           all_files << @attributes_values[:cover_image]
@@ -86,6 +91,12 @@ module Epuber
       #
       def constants
         ((parent && parent.constants) || {}).merge(@constants)
+      end
+
+      # @return [Array<Epuber::Book::FileRequest>]
+      #
+      def default_styles
+        ((parent && parent.default_styles) || []) + @default_styles
       end
 
       #----------------------- DSL items ---------------------------
@@ -136,9 +147,15 @@ module Epuber
                  FileRequest.new(file_path, group: group)
                end
 
-        @files << file unless @files.include?(file)
 
-        file
+        old_file = @files.find { |f| f == file }
+
+        if old_file.nil?
+          @files << file
+          file
+        else
+          old_file
+        end
       end
 
       # @param file_paths [Array<String>]
@@ -159,6 +176,35 @@ module Epuber
       #
       def add_const(key, value)
         @constants[key] = value
+      end
+
+      # @param file_paths [Array<String>]
+      #
+      # @return [void]
+      #
+      def add_default_style(*file_paths)
+        file_paths.map do |file_path|
+          file_obj          = add_file(file_path, group: :style)
+          file_obj.only_one = true
+
+          @default_styles << file_obj unless @default_styles.include?(file_obj)
+        end
+      end
+
+      # Add default styles to default target, default styles will be automatically added to xhtml document
+      #
+      # Only difference with #add_default_style is it adds multiple files with one pattern
+      # @param file_paths [Array<String>]
+      #
+      # @return [void]
+      #
+      def add_default_styles(*file_paths)
+        file_paths.map do |file_path|
+          file_obj          = add_file(file_path, group: :style)
+          file_obj.only_one = false
+
+          @default_styles << file_obj unless @default_styles.include?(file_obj)
+        end
       end
 
       # @yield [toc_item, target]

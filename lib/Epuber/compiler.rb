@@ -259,7 +259,7 @@ module Epuber
       end
     end
 
-    # @param file [Epuber::Book::FileRequest]
+    # @param file [Epuber::Compiler::File]
     #
     def process_text_file(file)
       source_path = file.source_path
@@ -282,12 +282,12 @@ module Epuber
       # @type xhtml_doc [Nokogiri::XML::Document]
 
       # add missing body element
-      if xhtml_doc.css('body').first.nil?
+      if xhtml_doc.at_css('body').nil?
         xhtml_doc.root.surround_with_element('body')
       end
 
       # add missing root html element
-      if xhtml_doc.css('html').first.nil?
+      if xhtml_doc.at_css('html').nil?
         attrs = {}
         attrs['xmlns'] = 'http://www.w3.org/1999/xhtml'
         attrs['xmlns:epub'] = 'http://www.idpf.org/2007/ops' if @target.epub_version >= 3
@@ -295,12 +295,27 @@ module Epuber
       end
 
       # add missing head in html
-      if xhtml_doc.css('html > head').first.nil?
+      if xhtml_doc.at_css('html > head').nil?
         html = xhtml_doc.css('html').first
         head = xhtml_doc.create_element('head')
         head << xhtml_doc.create_element('title', @book.title)
 
         html.children.first.before(head)
+      end
+
+      head = xhtml_doc.at_css('html > head')
+      styles_hrefs = head.css('link[rel="stylesheet"]').map { |element| element.attribute('href').value }
+
+      paths_to_insert = @target.default_styles.map do |default_style_request|
+        @file_resolver.find_files_from_request(default_style_request) || []
+      end.flatten.map do |style_file|
+        @file_resolver.relative_path(file, style_file)
+      end.reject do |path|
+        styles_hrefs.include?(path)
+      end
+
+      paths_to_insert.each do |path_to_insert|
+        head << xhtml_doc.create_element('link', rel: 'stylesheet', href: path_to_insert, type: 'text/css')
       end
 
       # TODO: perform text transform

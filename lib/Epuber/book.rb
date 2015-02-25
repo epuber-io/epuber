@@ -202,7 +202,17 @@ module Epuber
       @default_target.add_const(*args)
     end
 
+    # Add default styles to default target, default styles will be automatically added to xhtml document
+    #
+    def add_default_style(*file_paths)
+      @default_target.add_default_style(*file_paths)
+    end
 
+    # Add default styles to default target, default styles will be automatically added to xhtml document
+    #
+    def add_default_styles(*file_paths)
+      @default_target.add_default_styles(*file_paths)
+    end
 
 
 

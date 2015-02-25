@@ -72,11 +72,36 @@ module Epuber
 
         files_of.find do |file|
           if file.file_request == file_request
-            next true
+            true
           elsif !file.source_path.nil?
             file.source_path == find_file(file_request, file_request.group)
           end
         end
+      end
+
+      # @param file_request [FileRequest]
+      #
+      # @return [Array<File>]
+      #
+      def find_files_from_request(file_request)
+        return if file_request.nil?
+
+        files_of.select do |file|
+          if file.file_request == file_request
+            true
+          elsif !file.source_path.nil?
+            file.source_path == find_file(file_request, file_request.group)
+          end
+        end
+      end
+
+      # @param from [File]
+      # @param to [File]
+      #
+      # @return [String]
+      #
+      def relative_path(from, to)
+        Pathname.new(to.destination_path).relative_path_from(Pathname.new(::File.dirname(from.destination_path))).to_s
       end
 
 
@@ -156,7 +181,7 @@ module Epuber
             extname     = ::File.extname(file_path)
             group_array = GROUP_EXTENSIONS[group]
 
-            raise "Uknown file group #{group.inspect}" if group_array.nil?
+            raise "Unknown file group #{group.inspect}" if group_array.nil?
 
             group_array.include?(extname)
           end

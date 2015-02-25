@@ -33,7 +33,7 @@ Epuber::Book.new do |book|
     t.add_const 'restart_store_url', 'http://melvil.cz/kniha-restart'
   end
 
-  book.add_file 'prace_na_dalku.css'
+  book.add_default_style 'prace_na_dalku.css'
   book.add_file 'prace_na_dalku-stylus.styl'
 
   book.add_files '*.{png,jpg,jpeg}'
