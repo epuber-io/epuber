@@ -15,6 +15,9 @@ require 'RMagick'
 
 require_relative 'book'
 
+require_relative 'vendor/nokogiri_extensions'
+
+
 
 module Epuber
   class Compiler
@@ -275,10 +278,35 @@ module Epuber
                           raise "Unknown text file extension #{source_extname}"
                         end
 
+      xhtml_doc = Nokogiri::XML.parse(xhtml_content, nil, 'UTF-8')
+      # @type xhtml_doc [Nokogiri::XML::Document]
+
+      # add missing body element
+      if xhtml_doc.css('body').first.nil?
+        xhtml_doc.root.surround_with_element('body')
+      end
+
+      # add missing root html element
+      if xhtml_doc.css('html').first.nil?
+        attrs = {}
+        attrs['xmlns'] = 'http://www.w3.org/1999/xhtml'
+        attrs['xmlns:epub'] = 'http://www.idpf.org/2007/ops' if @target.epub_version >= 3
+        xhtml_doc.root.surround_with_element('html', attrs)
+      end
+
+      # add missing head in html
+      if xhtml_doc.css('html > head').first.nil?
+        html = xhtml_doc.css('html').first
+        head = xhtml_doc.create_element('head')
+        head << xhtml_doc.create_element('title', @book.title)
+
+        html.children.first.before(head)
+      end
+
       # TODO: perform text transform
       # TODO: perform analysis
 
-      file.content = xhtml_content
+      file.content = xhtml_doc
       file_write(file)
     end
 
