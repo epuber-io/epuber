@@ -56,7 +56,8 @@ module Epuber
 
       PROPERTIES_MAP = {
         cover_image: 'cover-image',
-        navigation:  'nav'
+        navigation:  'nav',
+        scripted:    'scripted',
       }.freeze
 
       OPF_UNIQUE_ID = 'bookid'

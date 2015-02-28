@@ -84,6 +84,33 @@ module Epuber
         xhtml_doc = Nokogiri::XML.parse(xhtml_content, nil, 'UTF-8')
         # @type xhtml_doc [Nokogiri::XML::Document]
 
+        text_add_missing_root_elements(xhtml_doc)
+        text_add_default_styles(file, xhtml_doc)
+        text_detect_usage_of_javascript(file, xhtml_doc)
+
+        # TODO: perform text transform
+        # TODO: perform analysis
+
+        file.content = xhtml_doc
+        file_write(file)
+      end
+
+      # @param file [Epuber::Compiler::File]
+      # @param xhtml_doc [Nokogiri::XML::Document]
+      #
+      # @return nil
+      #
+      def text_detect_usage_of_javascript(file, xhtml_doc)
+        unless xhtml_doc.at_css('script').nil?
+          file.add_property(:scripted)
+        end
+      end
+
+      # @param xhtml_doc [Nokogiri::XML::Document]
+      #
+      # @return nil
+      #
+      def text_add_missing_root_elements(xhtml_doc)
         # add missing body element
         if xhtml_doc.at_css('body').nil?
           xhtml_doc.root.surround_with_element('body')
@@ -91,8 +118,8 @@ module Epuber
 
         # add missing root html element
         if xhtml_doc.at_css('html').nil?
-          attrs = {}
-          attrs['xmlns'] = 'http://www.w3.org/1999/xhtml'
+          attrs               = {}
+          attrs['xmlns']      = 'http://www.w3.org/1999/xhtml'
           attrs['xmlns:epub'] = 'http://www.idpf.org/2007/ops' if @target.epub_version >= 3
           xhtml_doc.root.surround_with_element('html', attrs)
         end
@@ -105,8 +132,15 @@ module Epuber
 
           html.children.first.before(head)
         end
+      end
 
-        head = xhtml_doc.at_css('html > head')
+      # @param file [Epuber::Compiler::File]
+      # @param xhtml_doc [Nokogiri::XML::Document]
+      #
+      # @return nil
+      #
+      def text_add_default_styles(file, xhtml_doc)
+        head         = xhtml_doc.at_css('html > head')
         styles_hrefs = head.css('link[rel="stylesheet"]').map { |element| element.attribute('href').value }
 
         paths_to_insert = @target.default_styles.map do |default_style_request|
@@ -120,12 +154,6 @@ module Epuber
         paths_to_insert.each do |path_to_insert|
           head << xhtml_doc.create_element('link', rel: 'stylesheet', href: path_to_insert, type: 'text/css')
         end
-
-        # TODO: perform text transform
-        # TODO: perform analysis
-
-        file.content = xhtml_doc
-        file_write(file)
       end
 
 
