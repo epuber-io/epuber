@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+require_relative 'lockfile'
+
+
 module Epuber
   class Config
     WORKING_PATH = '.epuber'
@@ -20,6 +23,12 @@ module Epuber
     #
     def bookspec_path
       @bookspec_path ||= find_all_bookspecs.first
+    end
+
+    # @return [String]
+    #
+    def bookspec_lockfile_path
+      "#{bookspec_path}.lock"
     end
 
     # @return [Array<String>]
@@ -45,6 +54,20 @@ module Epuber
       )
     end
 
+    # @return [Epuber::Lockfile]
+    #
+    def bookspec_lockfile
+      @bookspec_lockfile ||= (
+        lockfile = Lockfile.from_file(bookspec_lockfile_path)
+        lockfile.version = Epuber::VERSION
+        lockfile
+      )
+    end
+
+    def save_lockfile
+      bookspec_lockfile.write_to_file
+    end
+
     # @param target [Epuber::Book::Target]
     #
     # @return [String]
@@ -52,7 +75,6 @@ module Epuber
     def build_path(target)
       File.join(working_path, 'build', target.name.to_s)
     end
-
 
     # ---------------------------------------------------------------------------------------------------------------- #
 
@@ -64,4 +86,10 @@ module Epuber
       @instance ||= new
     end
   end
+end
+
+
+at_exit do
+  puts 'DEBUG: Saving lockfile'
+  Epuber::Config.instance.save_lockfile
 end
