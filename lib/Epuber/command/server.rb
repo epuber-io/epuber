@@ -16,6 +16,7 @@ module Epuber
       end
 
       def validate!
+        super
         verify_one_bookspec_exists!
       end
 

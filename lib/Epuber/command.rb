@@ -39,15 +39,9 @@ module Epuber
     # @raise PlainInformative if no .bookspec file don't exists or there are too many
     #
     def verify_one_bookspec_exists!
-      bookspec_files = self.class.find_bookspec_files
+      bookspec_files = Config.instance.find_all_bookspecs
       raise PlainInformative, "No `.bookspec' found in the project directory." if bookspec_files.empty?
       raise PlainInformative, "Multiple `.bookspec' found in current directory" if bookspec_files.count > 1
-    end
-
-    # @return [Array<String>]
-    #
-    def self.find_bookspec_files
-      Dir.glob('*.bookspec')
     end
   end
 end

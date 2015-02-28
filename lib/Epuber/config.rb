@@ -19,7 +19,17 @@ module Epuber
     # @return [String]
     #
     def bookspec_path
-      @bookspec_path ||= Dir.glob('*.bookspec').first
+      @bookspec_path ||= find_all_bookspecs.first
+    end
+
+    # @return [Array<String>]
+    #
+    def find_all_bookspecs
+      Dir.chdir(project_path) do
+        Dir.glob('*.bookspec').map do |path|
+          File.expand_path(path)
+        end
+      end
     end
 
     # @return [Epuber::Book::Book]
