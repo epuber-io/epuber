@@ -425,7 +425,7 @@ module Epuber
                     'text/plain'
                   end
 
-        send_file(File.expand_path(path, Config.instance.project_path), type: type)
+        send_file(File.expand_path(path, build_path), type: type)
       end
     end
 
