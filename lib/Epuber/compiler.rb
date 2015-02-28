@@ -231,9 +231,6 @@ module Epuber
     def parse_toc_item(toc_item)
       unless toc_item.file_request.nil?
         file_request = toc_item.file_request
-
-        puts "    processing toc item #{file_request.source_pattern}"
-
         @file_resolver.add_file(File.new(file_request), type: :spine)
       end
 
