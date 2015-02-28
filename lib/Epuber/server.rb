@@ -71,6 +71,16 @@ module Epuber
       attr_accessor :target
     end
 
+    # @return nil
+    #
+    def self.run!(book, target)
+      self.book = book
+      self.target = target
+      self.bind = '0.0.0.0'
+
+      super()
+    end
+
     # @return [Epuber::Book::Book]
     #
     def book

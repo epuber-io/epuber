@@ -31,10 +31,7 @@ module Epuber
 
         help!('Not existing target') if target.nil?
 
-        Epuber::Server.book = book
-        Epuber::Server.target = target
-        Epuber::Server.bind = '0.0.0.0'
-        Epuber::Server.run!
+        Epuber::Server.run!(book, target)
       end
     end
   end
