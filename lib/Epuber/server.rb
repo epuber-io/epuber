@@ -87,6 +87,9 @@ module Epuber
     #
     attr_accessor :spine
 
+    # @return [Epuber::Compiler::FileResolver]
+    #
+    attr_accessor :file_resolver
 
     # @return [String] base path
     #
@@ -130,6 +133,11 @@ module Epuber
     def find_file(pattern = params[:splat].first, source_path: build_path)
       paths = nil
 
+      exact_path = ::File.join(source_path, pattern)
+      if ::File.file?(exact_path)
+        return exact_path.sub(::File.join(source_path, ''), '')
+      end
+
       Dir.chdir(source_path) do
         paths = Dir.glob(pattern)
         paths = Dir.glob("**/#{pattern}") if paths.empty?
@@ -158,10 +166,14 @@ module Epuber
     def fix_links(html_doc, context_path, css_selector, attribute_name)
       img_nodes = html_doc.css(css_selector)
       img_nodes.each do |node|
-        abs_path      = File.expand_path(node[attribute_name], File.join(build_path, File.dirname(context_path)))
-        relative_path = abs_path.sub(File.expand_path(build_path), '')
+        src = node[attribute_name]
 
-        node[attribute_name] = File.join('', 'raw', relative_path.to_s)
+        unless src.nil?
+          abs_path      = File.expand_path(src, File.join(build_path, File.dirname(context_path)))
+          relative_path = abs_path.sub(File.expand_path(build_path), '')
+
+          node[attribute_name] = File.join('', 'raw', relative_path.to_s)
+        end
       end
     end
 
@@ -217,7 +229,8 @@ module Epuber
     def compile_book
       compiler = Epuber::Compiler.new(book, target)
       compiler.compile(build_path)
-      self.spine = compiler.spine
+      self.spine = compiler.file_resolver.files_of(:spine)
+      self.file_resolver = compiler.file_resolver
     end
 
     # @param message [String]
@@ -267,7 +280,7 @@ module Epuber
       parsed      = Bade::Parser.new(file: source_path).parse(source)
       lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
       #_log :get, "#{name} lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
-      result      = lam.call_with_vars(*args, book: book, target: target)
+      result      = lam.call_with_vars(*args, book: book, target: target, file_resolver: file_resolver)
       [200, result]
     end
 
@@ -336,6 +349,10 @@ module Epuber
       ShowExceptions.new(self).call(env)
     end
 
+    not_found do
+      [404, 'Epuber: Not found']
+    end
+
 
     # ----------------------------------
     # @group Home page
@@ -378,14 +395,14 @@ module Epuber
         fix_links(html_doc, path, 'link', 'href') # css styles
         add_auto_refresh_script(html_doc)
 
-        current_index = spine.index { |file| path.end_with?(file.destination_path.to_s) }
-        previous_path = spine_file_at(current_index - 1).try(:destination_path).try(:to_s)
-        next_path     = spine_file_at(current_index + 1).try(:destination_path).try(:to_s)
+        current_index = spine.index { |file| file_resolver.relative_path_from_package_root(file) == path }
+        previous_path = file_resolver.relative_path_from_package_root(spine_file_at(current_index - 1))
+        next_path     = file_resolver.relative_path_from_package_root(spine_file_at(current_index + 1))
         add_keyboard_control_script(html_doc, previous_path, next_path)
 
         session[:current_page] = path
 
-        html_doc.to_html
+        [200, html_doc.to_html]
       end
     end
 
@@ -398,7 +415,7 @@ module Epuber
       end
 
       get '/*' do
-        path = find_file(source_path: Config.instance.project_path)
+        path = find_file
         next [404] if path.nil?
 
         _log :get, "/files/#{params[:splat].first}: founded file #{path}"

@@ -21,12 +21,12 @@ mixin section(name)
 
 
 mixin iterate_spine(toc_item)
-	- if toc_item.child_items.count > 0
+	- if toc_item.sub_items.count > 0
 		ul.spine
-			- toc_item.child_items.each do |item|
+			- toc_item.sub_items.each do |item|
 				li
-					- item_href = "/toc/#{item.file_obj.destination_path}"
-					a.href(href: item_href)= item.file_obj.source_path_pattern
+					- item_href = "/toc/#{pretty_path(item.file_request)}"
+					a.href(href: item_href)= item.file_request.source_pattern
 					- unless item.title.nil?
 						span(class: 'title'): a.title(href: item_href)= item.title
 					- end
@@ -41,10 +41,10 @@ mixin iterate_spine(toc_item)
 +page(header_id: 'home')
 	.cover_image
 		div
-			- if book.cover_image.real_source_path.nil?
+			- if book.cover_image.nil?
 				img(src: '/server/raw/default_cover.png')
 			- else
-				img(src: "/raw/#{book.cover_image.real_source_path}")
+				img(src: "/raw/#{pretty_path(book.cover_image)}")
 			- end
 	#content
 		+section('Metadata')
@@ -65,4 +65,4 @@ mixin iterate_spine(toc_item)
 			- end
 
 		+section('Spine')
-			+iterate_spine(book.root_toc)
+			+iterate_spine(target.root_toc)

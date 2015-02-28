@@ -1,4 +1,9 @@
 
+- def pretty_path(file_request)
+-     file_resolver.relative_path_from_package_root(file_request)
+- end
+
+
 mixin body_header(current)
 	#header_bg
 	#header

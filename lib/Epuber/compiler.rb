@@ -25,6 +25,7 @@ module Epuber
     require_relative 'compiler/opf_generator'
     require_relative 'compiler/nav_generator'
     require_relative 'compiler/meta_inf_generator'
+
     require_relative 'compiler/file'
     require_relative 'compiler/file_resolver'
 
@@ -50,6 +51,10 @@ module Epuber
       '.rxhtml' => '.xhtml',
       '.md'     => '.xhtml',
     }.freeze
+
+    # @return [Epuber::Compiler::FileResolver]
+    #
+    attr_reader :file_resolver
 
     # @param book [Epuber::Book::Book]
     # @param target [Epuber::Book::Target]

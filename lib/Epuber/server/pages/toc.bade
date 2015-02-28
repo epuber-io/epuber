@@ -1,11 +1,11 @@
 
 mixin iterate_toc(toc_item)
-	- if toc_item.child_items.count > 0
+	- if toc_item.sub_items.count > 0
 		ul.spine
-			- toc_item.child_items.each do |item|
+			- toc_item.sub_items.each do |item|
 				- unless item.title.nil?
 					li
-						- item_href = "/toc/#{item.file_obj.destination_path}"
+						- item_href = "/toc/#{pretty_path(item.file_request)}"
 						- unless item.title.nil?
 							span(class: 'title'): a.title(href: item_href)= item.title
 						- end
@@ -20,4 +20,4 @@ mixin iterate_toc(toc_item)
 
 +page(title: 'TOC', header_id: 'toc')
 	#content
-		+iterate_toc(book.root_toc)
+		+iterate_toc(target.root_toc)

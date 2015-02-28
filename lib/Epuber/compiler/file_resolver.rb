@@ -95,13 +95,40 @@ module Epuber
         end
       end
 
-      # @param from [File]
-      # @param to [File]
+      # @param from [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
+      # @param to [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
       #
       # @return [String]
       #
       def relative_path(from, to)
-        Pathname.new(to.destination_path).relative_path_from(Pathname.new(::File.dirname(from.destination_path))).to_s
+        from_path = if from.is_a?(String)
+                      from
+                    elsif from.is_a?(Epuber::Compiler::File)
+                      from.destination_path
+                    elsif from.is_a?(Epuber::Book::FileRequest)
+                      find_file_from_request(from).destination_path
+                    end
+
+        from_path = ::File.dirname(from_path) unless ::File.directory?(from_path)
+
+        to_path = if to.is_a?(String)
+                    to
+                  elsif to.is_a?(Epuber::Compiler::File)
+                    to.destination_path
+                  elsif to.is_a?(Epuber::Book::FileRequest)
+                    find_file_from_request(to).destination_path
+                  end
+
+        Pathname.new(to_path).relative_path_from(Pathname.new(from_path)).to_s
+      end
+
+      # @param file [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
+      #
+      # @return [String]
+      #
+      def relative_path_from_package_root(file)
+        return if file.nil?
+        relative_path(self.destination_path, file)
       end
 
 

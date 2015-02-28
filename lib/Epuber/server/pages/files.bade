@@ -1,12 +1,15 @@
 
 +page(title: 'Files', header_id: 'files')
 	#content
-		- target.all_files.each do |file|
+		- file_resolver.files_of.each do |file|
 			p.file
-				- href = "/files/#{file.real_source_path}"
-				a.source_pattern(href: href)= file.source_path_pattern
-				= ' '
-				span.arrow =>
-				= '  '
-				a.source_path(href: href)= file.real_source_path
+				- href = "/files/#{pretty_path(file)}"
+				- unless file.file_request.nil?
+					a.source_pattern(href: href)= file.file_request.source_pattern
+					= ' '
+					span.arrow =>
+					= '  '
+				- end
+
+				a.source_path(href: href)= pretty_path(file)
 		- end
