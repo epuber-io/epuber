@@ -7,7 +7,7 @@ mixin iterate_toc(toc_item)
 					li
 						- item_href = "/toc/#{pretty_path(item.file_request)}"
 						- unless item.title.nil?
-							span(class: 'title'): a.title(href: item_href)= item.title
+							span.title: a.title(href: item_href)= item.title
 						- end
 						- item.options.each do |opt|
 							- next if opt.nil?
