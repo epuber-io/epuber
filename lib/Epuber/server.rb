@@ -16,19 +16,7 @@ require_relative 'config'
 require_relative 'compiler'
 require_relative 'vendor/hash_binding'
 
-require 'bade/runtime/block'
-
-
-def block(*args, &block)
-  Bade::Runtime::Block.new(*args, &block)
-end
-
-
-class Proc
-  def call_with_vars(vars, *args)
-    Struct.new(*vars.keys).new(*vars.values).instance_exec(*args, &self)
-  end
-end
+require 'bade'
 
 
 module Epuber
@@ -282,15 +270,17 @@ module Epuber
       end
     end
 
-    def render_bade(name, *args)
+    def render_bade(name)
+
       common_path = File.expand_path('server/pages/common.bade', File.dirname(__FILE__))
       source_path = File.expand_path("server/pages/#{name}", File.dirname(__FILE__))
       source      = ::File.read(common_path) + "\n" + ::File.read(source_path)
 
-      parsed      = Bade::Parser.new(file: source_path).parse(source)
-      lam         = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
-      #_log :get, "#{name} lambda = #{Bade::RubyGenerator.node_to_lambda_string(parsed, new_line: '', indent: '')}"
-      result      = lam.call_with_vars(*args, book: book, target: target, file_resolver: file_resolver)
+      renderer = Bade::Renderer.from_source(source)
+                               .with_locals({book: book, target: target, file_resolver: file_resolver})
+
+      result = renderer.render
+
       [200, result]
     end
 
@@ -353,7 +343,7 @@ module Epuber
     enable :sessions
     disable :show_exceptions
     disable :dump_errors
-    disable :raise_errors
+    enable :raise_errors
 
     error do
       ShowExceptions.new(self).call(env)
