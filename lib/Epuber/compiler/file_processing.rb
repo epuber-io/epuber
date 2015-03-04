@@ -72,15 +72,22 @@ module Epuber
         source_path    = file.source_path
         source_extname = ::File.extname(source_path)
 
+        variables = {
+          book: @book,
+          target: @target,
+          file_resolver: @file_resolver,
+          file: file,
+        }
+
         xhtml_content   = case source_extname
                           when '.xhtml'
                             ::File.read(source_path)
                           when '.rxhtml'
-                            RubyTemplater.render_file(source_path)
+                            RubyTemplater.render_file(source_path, variables)
                           when '.bade'
-                            parsed = Bade::Parser.new(file: source_path).parse(::File.read(source_path))
-                            lam    = Bade::RubyGenerator.node_to_lambda(parsed, new_line: '\n', indent: '  ')
-                            lam.call
+                            Bade::Renderer.from_file(source_path)
+                                          .with_locals(variables)
+                                          .render(new_line: '\n', indent: '  ')
                           else
                             raise "Unknown text file extension #{source_extname}"
                           end

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?><!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
   <head>
-    <title>Práce na dálku</title>
+    <title>#{book.title}</title>
     <link href="../styles/prace_na_dalku.css" rel="stylesheet" type="text/css"/>
   </head>
   <body>
-    <h1 class="section">NADEŠEL ČAS PRO PRÁCI NA DÁLKU</h1>
+    h1.section NADEŠEL ČAS PRO PRÁCI NA DÁLKU
   </body>
 </html>
