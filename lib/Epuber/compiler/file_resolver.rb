@@ -126,6 +126,15 @@ module Epuber
       #
       # @return [String]
       #
+      def relative_path_from_source_root(file)
+        return if file.nil?
+        relative_path(self.source_path, file)
+      end
+
+      # @param file [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
+      #
+      # @return [String]
+      #
       def relative_path_from_package_root(file)
         return if file.nil?
         relative_path(self.destination_path, file)

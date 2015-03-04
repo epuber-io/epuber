@@ -36,7 +36,8 @@ Epuber::Book.new do |book|
   book.add_default_style 'prace_na_dalku.css'
   book.add_file 'prace_na_dalku-stylus.styl'
 
-  book.add_files '*.{png,jpg,jpeg}'
+  # not needed since it parse result xhtml and take all images and use them as dependency
+  # book.add_files '*.{png,jpg,jpeg}'
   book.add_files '*.{otf,ttf}'
 
   book.toc do |toc, target|

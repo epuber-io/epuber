@@ -1,4 +1,8 @@
 
+require_relative 'file_resolver'
+require_relative 'file'
+require_relative '../book/file_request'
+
 module Epuber
   class Compiler
     module FileProcessing
@@ -87,12 +91,33 @@ module Epuber
         text_add_missing_root_elements(xhtml_doc)
         text_add_default_styles(file, xhtml_doc)
         text_detect_usage_of_javascript(file, xhtml_doc)
+        text_parse_images(file, xhtml_doc)
 
         # TODO: perform text transform
         # TODO: perform analysis
 
         file.content = xhtml_doc
         file_write(file)
+      end
+
+      # @param file [Epuber::Compiler::File]
+      # @param xhtml_doc [Nokogiri::XML::Document]
+      #
+      # @return nil
+      #
+      def text_parse_images(file, xhtml_doc)
+        xhtml_doc.css('img').each do |img|
+          path = img['src']
+          next if path.nil?
+
+          abs_path = ::File.expand_path(path, ::File.dirname(file.source_path))
+          package_path = @file_resolver.relative_path_from_source_root(abs_path)
+
+          file_request = Epuber::Book::FileRequest.new(package_path, group: :image)
+          file = File.new(file_request)
+
+          @file_resolver.add_file(file)
+        end
       end
 
       # @param file [Epuber::Compiler::File]
