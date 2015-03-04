@@ -73,10 +73,10 @@ module Epuber
         source_extname = ::File.extname(source_path)
 
         variables = {
-          book: @book,
-          target: @target,
-          file_resolver: @file_resolver,
-          file: file,
+          __book: @book,
+          __target: @target,
+          __file_resolver: @file_resolver,
+          __file: file,
         }
 
         xhtml_content   = case source_extname
