@@ -49,55 +49,58 @@ module Epuber
 
     BINARY_FILES_EXTNAMES = %w(.png .jpeg .jpg .otf .ttf)
 
-    class << self
-      # @return [Epuber::Book::Book]
-      #
-      attr_accessor :book
+    def self.settings_accessor(name)
+      # call set to define class methods
+      set(name, nil)
 
-      # @return [Epuber::Book::Target]
-      #
-      attr_accessor :target
+      define_method(name) do
+        self.class.settings.send(name)
+      end
+
+      define_method("#{name}=") do |new_value|
+        self.class.set(name, new_value)
+      end
     end
+
+    # @return [Epuber::Book::Book]
+    #
+    settings_accessor :book
+
+    # @return [Epuber::Book::Target]
+    #
+    settings_accessor :target
+
+    # @return [Epuber::Compiler::FileResolver]
+    #
+    settings_accessor :file_resolver
+
+    # @return [Array<Epuber::Compiler::File>]
+    #
+    settings_accessor :spine
+
+    # @return [Array<SinatraWebsocket::Connection>]
+    #
+    settings_accessor :sockets
+
+    # @return [Listener]
+    #
+    settings_accessor :listener
 
     # @return nil
     #
     def self.run!(book, target)
       self.book = book
       self.target = target
-      self.bind = '0.0.0.0'
 
       super()
     end
 
-    # @return [Epuber::Book::Book]
-    #
-    def book
-      self.class.book
-    end
-
-    # @return [Epuber::Book::Target]
-    #
-    def target
-      self.class.target
-    end
-
-    # @return [Array<Epuber::Book::File>]
-    #
-    attr_accessor :spine
-
-    # @return [Epuber::Compiler::FileResolver]
-    #
-    attr_accessor :file_resolver
 
     # @return [String] base path
     #
     def build_path
       Epuber::Config.instance.build_path(target)
     end
-
-    # @return [Array<SinatraWebsocket::Connection>]
-    #
-    attr_reader :sockets
 
 
     # @param level [Symbol]
@@ -285,16 +288,16 @@ module Epuber
 
     def initialize
       super
-      @sockets = []
+      self.sockets = []
 
-      @listener = Listen.to(Config.instance.project_path, debug: true) do |modified, added, removed|
+      self.listener = Listen.to(Config.instance.project_path, debug: true) do |modified, added, removed|
         changes_detected(modified, added, removed)
       end
 
-      @listener.start
+      self.listener.ignore(%r{#{Config.instance.working_path}})
+      self.listener.ignore(%r{#{Config::WORKING_PATH}/})
 
-      @listener.ignore(%r{#{Config.instance.working_path}})
-      @listener.ignore(%r{#{Config::WORKING_PATH}/})
+      self.listener.start
 
       _log :ui, 'Init compile'
       compile_book
@@ -341,6 +344,8 @@ module Epuber
     disable :show_exceptions
     disable :dump_errors
     enable :raise_errors
+
+    set :bind, '0.0.0.0'
 
     error do
       ShowExceptions.new(self).call(env)
