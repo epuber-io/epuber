@@ -271,12 +271,9 @@ module Epuber
     end
 
     def render_bade(name)
-
-      common_path = File.expand_path('server/pages/common.bade', File.dirname(__FILE__))
       source_path = File.expand_path("server/pages/#{name}", File.dirname(__FILE__))
-      source      = ::File.read(common_path) + "\n" + ::File.read(source_path)
 
-      renderer = Bade::Renderer.from_source(source)
+      renderer = Bade::Renderer.from_file(source_path)
                                .with_locals({book: book, target: target, file_resolver: file_resolver})
 
       result = renderer.render

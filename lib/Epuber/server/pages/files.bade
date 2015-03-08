@@ -1,4 +1,6 @@
 
+import "common"
+
 +page(title: 'Files', header_id: 'files')
 	#content
 		- file_resolver.files_of.each do |file|
