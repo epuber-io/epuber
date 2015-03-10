@@ -22,6 +22,7 @@ module Epuber
         @root_toc  = TocItem.new
 
         @default_styles = []
+        @plugins = []
       end
 
       def freeze
@@ -97,6 +98,12 @@ module Epuber
       #
       def default_styles
         ((parent && parent.default_styles) || []) + @default_styles
+      end
+
+      # @return [Array<String>]
+      #
+      def plugins
+        ((parent && parent.plugins) || []) + @plugins
       end
 
       #----------------------- DSL items ---------------------------
@@ -215,6 +222,14 @@ module Epuber
       #
       def toc
         yield(@root_toc, self) if block_given?
+      end
+
+      # @param path [String] use some file/module/package
+      #
+      # @return [nil]
+      #
+      def use(path)
+        @plugins << path
       end
     end
   end

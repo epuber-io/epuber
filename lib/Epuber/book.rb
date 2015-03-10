@@ -214,6 +214,10 @@ module Epuber
       @default_target.add_default_styles(*file_paths)
     end
 
+    def use(path)
+      @default_target.use(path)
+    end
+
 
 
     # --------------------------------------------------------------------- #

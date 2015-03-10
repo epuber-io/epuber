@@ -70,4 +70,7 @@ Epuber::Book.new do |book|
 
     toc.file 'footnotes', linear: false
   end
+
+  # load file simple_checkers.rb
+  book.use 'simple_checkers.rb'
 end

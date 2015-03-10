@@ -2,6 +2,8 @@
 require_relative 'file_resolver'
 require_relative 'file'
 require_relative '../book/file_request'
+require_relative '../checker'
+
 
 module Epuber
   class Compiler
@@ -103,7 +105,21 @@ module Epuber
         # TODO: perform text transform
         # TODO: perform analysis
 
-        file.content = xhtml_doc
+        result_xhtml_s = xhtml_doc.to_s
+
+        if @should_check
+          plugins.each do |plugin|
+            plugin.checkers.each do |checker|
+              # @type checker [Epuber::Checker]
+              next if checker.type != :result_text_xhtml_string
+              next if checker.configuration != :all
+
+              checker.call(file.destination_path, result_xhtml_s)
+            end
+          end
+        end
+
+        file.content = result_xhtml_s
         file_write(file)
       end
 

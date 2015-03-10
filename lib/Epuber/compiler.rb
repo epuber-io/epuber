@@ -15,6 +15,7 @@ require 'zip'
 require 'RMagick'
 
 require_relative 'book'
+require_relative 'plugin'
 
 require_relative 'vendor/nokogiri_extensions'
 
@@ -56,6 +57,10 @@ module Epuber
     #
     attr_reader :file_resolver
 
+    # @return [Array<Epuber::Plugin>]
+    #
+    attr_reader :plugins
+
     # @param book [Epuber::Book::Book]
     # @param target [Epuber::Book::Target]
     #
@@ -73,10 +78,14 @@ module Epuber
     def compile(build_folder, check: false)
       @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       @should_check = check
+      @plugins = []
 
       FileUtils.mkdir_p(build_folder)
 
       puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
+
+      # parse plugins
+      parse_plugins
 
       parse_toc_item(@target.root_toc)
       parse_target_file_requests
@@ -87,6 +96,14 @@ module Epuber
       # build folder cleanup
       remove_unnecessary_files
       remove_empty_folders
+    end
+
+    # Parse uses from current target
+    #
+    def parse_plugins
+      @plugins += @target.plugins.map do |path|
+        Plugin.new(::File.expand_path(path, Config.instance.project_path))
+      end
     end
 
     # Archives current target files to epub
