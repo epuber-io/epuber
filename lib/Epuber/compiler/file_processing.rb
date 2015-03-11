@@ -111,8 +111,8 @@ module Epuber
           plugins.each do |plugin|
             plugin.checkers.each do |checker|
               # @type checker [Epuber::Checker]
-              next if checker.type != :result_text_xhtml_string
-              next if checker.configuration != :all
+              next if checker.source_type != :result_text_xhtml_string
+              next if checker.run_when != :always
 
               checker.call(file.destination_path, result_xhtml_s)
             end

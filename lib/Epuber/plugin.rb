@@ -30,7 +30,7 @@ module Epuber
     # @return [Checker]
     #
     def check(type, configuration, &block)
-      checker_class = Checker.checker_class_for_type(type)
+      checker_class = Checker.class_for_source_type(type)
       checker = checker_class.new(type, configuration, &block)
 
       instances << checker
@@ -62,7 +62,7 @@ module Epuber
 
     def checkers
       files.map do |plugin_file|
-        plugin_file.instances.select { |inst| inst.class < Checker }
+        plugin_file.instances.select { |inst| inst.is_a?(Checker) }
       end.flatten
     end
   end
