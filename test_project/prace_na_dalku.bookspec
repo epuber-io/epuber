@@ -73,4 +73,7 @@ Epuber::Book.new do |book|
 
   # load file simple_checkers.rb
   book.use 'simple_checkers.rb'
+
+  # load file simple_transformers.rb with sample transformers
+  book.use 'simple_transformers.rb'
 end

@@ -3,6 +3,7 @@ require_relative 'file_resolver'
 require_relative 'file'
 require_relative '../book/file_request'
 require_relative '../checker'
+require_relative '../transformer'
 
 
 module Epuber
@@ -106,6 +107,16 @@ module Epuber
         # TODO: perform analysis
 
         result_xhtml_s = xhtml_doc.to_s
+
+        plugins.each do |plugin|
+          plugin.transformers.each do |transformer|
+            # @type transformer [Epuber::Transformer]
+            next if transformer.source_type != :result_text_xhtml_string
+            next if transformer.run_when != :always
+
+            result_xhtml_s = transformer.call(file.destination_path, result_xhtml_s)
+          end
+        end
 
         if @should_check
           plugins.each do |plugin|
