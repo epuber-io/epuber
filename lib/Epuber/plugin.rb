@@ -23,15 +23,15 @@ module Epuber
 
     # Method for creating new instance of checker in packages
     #
-    # @param type [Symbol] type of checker, see #type
-    # @param configuration [Symbol] configuration for this checker, see #configuration
+    # @param source_type [Symbol] source type of checker, see Checker#source_type
+    # @param run_when [Symbol] when should this checker run, see Checker#run_when
     # @yield value for checking, depends on type of checker
     #
     # @return [Checker]
     #
-    def check(type, configuration, &block)
-      checker_class = Checker.class_for_source_type(type)
-      checker = checker_class.new(type, configuration, &block)
+    def check(source_type, run_when, &block)
+      checker_class = Checker.class_for_source_type(source_type)
+      checker = checker_class.new(source_type, run_when, &block)
 
       instances << checker
 

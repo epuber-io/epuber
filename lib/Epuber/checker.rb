@@ -17,7 +17,7 @@ module Epuber
 
 
 
-    # When should In which configuration should this checker run, valid values:
+    # When should this checker run, valid values:
     #     :always            every time
     #     :before_release    just before creating final version
     #
