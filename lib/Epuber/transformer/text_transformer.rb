@@ -15,8 +15,8 @@ module Epuber
       attr_accessor :file_path
 
 
-      # @param file_path [String]
-      # @param text [String]
+      # @param [String] file_path  path to transforming file
+      # @param [String] text  text file content
       #
       # @return [String] new transformed text
       #
@@ -34,12 +34,15 @@ module Epuber
         new_text
       end
 
-      def replace_all(regex, sub = nil, &block)
-        if sub.nil?
-          @text = @text.gsub(regex, &block)
-        else
-          @text = @text.gsub(regex, sub, &block)
-        end
+      def replace_all(regex, sub = nil, multiple_times: false, &block)
+        result = if sub.nil?
+                   @text.gsub!(regex, &block)
+                 else
+                   @text.gsub!(regex, sub, &block)
+                 end
+
+        result = replace_all(regex, sub, multiple_times: multiple_times, &block) if multiple_times && !result.nil?
+        result
       end
     end
   end
