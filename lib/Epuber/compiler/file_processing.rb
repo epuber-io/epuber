@@ -101,6 +101,7 @@ module Epuber
         text_add_missing_root_elements(xhtml_doc)
         text_add_default_styles(file, xhtml_doc)
         text_detect_usage_of_javascript(file, xhtml_doc)
+        text_resolve_links(file, xhtml_doc)
         text_parse_images(file, xhtml_doc)
 
         result_xhtml_s = xhtml_doc.to_s
@@ -119,6 +120,46 @@ module Epuber
 
         file.content = result_xhtml_s
         file_write(file)
+      end
+
+      # @param [Epuber::Compiler::File] file
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      #
+      # @return [nil]
+      #
+      def text_resolve_links(file, xhtml_doc)
+        attribute_name = 'href'
+        img_nodes = xhtml_doc.css("a[#{attribute_name}]")
+        img_nodes.each do |node|
+          src = node[attribute_name]
+          # @type [String] src
+
+          unless src.nil?
+            begin
+              uri = URI(src)
+            rescue
+              # skip not valid uri
+              next
+            end
+
+            # skip uri with scheme (links to web pages)
+            next unless uri.scheme.nil?
+
+            pattern = uri.path
+
+            begin
+              target_file = @file_resolver.find_file_with_destination_path(::File.expand_path(pattern, ::File.dirname(file.destination_path)))
+            rescue
+              target_file = @file_resolver.find_file_with_destination_pattern("#{Regexp.escape(pattern)}.*")
+            rescue => e
+              raise "Not found file with path #{pattern} from file #{file.source_path}, original error #{e.inspect}"
+            end
+
+            uri.path = @file_resolver.relative_path(file, target_file)
+
+            node[attribute_name] = uri.to_s
+          end
+        end
       end
 
       # @param [Class] klass class of thing you want to perform (Checker or Transformer)

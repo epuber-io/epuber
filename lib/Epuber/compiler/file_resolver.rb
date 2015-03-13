@@ -95,6 +95,36 @@ module Epuber
         end
       end
 
+      # @param [String] destination_path
+      #
+      # @return [File]
+      #
+      def find_file_with_destination_path(destination_path)
+        file_paths = files_of.select do |file|
+          file.destination_path == destination_path
+        end
+
+        assert_one_file_path(file_paths, pattern)
+
+        file_paths.first
+      end
+
+      # @param [String] pattern
+      #
+      # @return [File]
+      #
+      def find_file_with_destination_pattern(pattern)
+        regex = Regexp.new(pattern)
+
+        file_paths = files_of.select do |file|
+          regex =~ file.destination_path
+        end
+
+        assert_one_file_path(file_paths, pattern)
+
+        file_paths.first
+      end
+
       # @param from [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
       # @param to [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
       #
@@ -179,8 +209,7 @@ module Epuber
         pattern = pattern_from(file_or_pattern)
         file_paths = find_files(file_or_pattern, group)
 
-        raise "not found file matching pattern `#{pattern}`" if file_paths.empty?
-        raise "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
+        assert_one_file_path(file_paths, pattern)
 
         file_paths.first
       end
@@ -198,6 +227,11 @@ module Epuber
         file_paths = file_paths_with_pattern("**/#{pattern}.*", group) if file_paths.empty?
 
         file_paths
+      end
+
+      def assert_one_file_path(file_paths, pattern)
+        raise "not found file matching pattern `#{pattern}`" if file_paths.empty?
+        raise "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
       end
 
       # @param pattern [String]
