@@ -34,14 +34,23 @@ module Epuber
         new_text
       end
 
-      def replace_all(regex, sub = nil, multiple_times: false, &block)
-        result = if sub.nil?
-                   @text.gsub!(regex, &block)
+      # Shortcut for performing substitutions in text
+      #
+      # @param [Regexp, String] pattern
+      # @param [String, nil] replacement
+      # @param [Bool] multiple_times  run the replacement multiple times, while there is something to replace
+      # @param [Proc] block  optional block for creating replacements, see String#gsub!
+      #
+      # @return [String, nil] see String#gsub!
+      #
+      def replace_all(pattern, replacement = nil, multiple_times: false, &block)
+        result = if replacement.nil?
+                   @text.gsub!(pattern, &block)
                  else
-                   @text.gsub!(regex, sub, &block)
+                   @text.gsub!(pattern, replacement, &block)
                  end
 
-        result = replace_all(regex, sub, multiple_times: multiple_times, &block) if multiple_times && !result.nil?
+        result = replace_all(pattern, replacement, multiple_times: multiple_times, &block) if multiple_times && !result.nil?
         result
       end
     end
