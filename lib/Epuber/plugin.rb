@@ -21,40 +21,38 @@ module Epuber
       eval(::File.read(file_path), binding, file_path)
     end
 
+    # @param [Symbol] name  name of the plugin function
+    # @param [Class] klass  class of what it should create
+    #
+    def self.plugin_instance_function(name, klass)
+      define_method(name) do |source_type, *options, &block|
+        checker_class = klass.class_for_source_type(source_type)
+        checker = checker_class.new(source_type, *options, &block)
+        instances << checker
+        checker
+      end
+    end
+
 
     # Method for creating new instance of checker in packages
     #
-    # @param source_type [Symbol] source type of checker, see Checker#source_type
-    # @param run_when [Symbol] when should this checker run, see Checker#run_when
+    # @param [Symbol] source_type  source type of checker, see Checker#source_type
+    # @param [Array<Symbol>] options list of other arguments, usually flags
     # @yield value for checking, depends on type of checker
     #
     # @return [Checker]
     #
-    def check(source_type, run_when, &block)
-      checker_class = Checker.class_for_source_type(source_type)
-      checker = checker_class.new(source_type, run_when, &block)
-
-      instances << checker
-
-      checker
-    end
+    plugin_instance_function(:check, Checker)
 
     # Method for creating new instance of checker in packages
     #
-    # @param type [Symbol] source type of transformer, see Transformer#source_type
-    # @param configuration [Symbol] configuration for this checker, see Transformer#run_when
+    # @param [Symbol] source_type source type of transformer, see Transformer#source_type
+    # @param [Array<Symbol>] options list of other arguments, usually flags
     # @yield value for checking, depends on type of checker
     #
     # @return [Transformer]
     #
-    def transform(type, configuration, &block)
-      transformer_class = Transformer.class_for_source_type(type)
-      transformer = transformer_class.new(type, configuration, &block)
-
-      instances << transformer
-
-      transformer
-    end
+    plugin_instance_function(:transform, Transformer)
   end
 
   class Plugin
@@ -82,20 +80,27 @@ module Epuber
                end
     end
 
+    # @param [Class] klass  base class of all instances
+    #
+    # @return [Array<CheckerTransformerBase>]
+    #
+    def instances(klass)
+      files.map do |plugin_file|
+        plugin_file.instances.select { |inst| inst.is_a?(klass) }
+      end.flatten
+    end
+
+
     # @return [Array<Checker>]
     #
     def checkers
-      files.map do |plugin_file|
-        plugin_file.instances.select { |inst| inst.is_a?(Checker) }
-      end.flatten
+      instances(Checker)
     end
 
     # @return [Array<Transformer>]
     #
     def transformers
-      files.map do |plugin_file|
-        plugin_file.instances.select { |inst| inst.is_a?(Transformer) }
-      end.flatten
+      instances(Transformer)
     end
   end
 end

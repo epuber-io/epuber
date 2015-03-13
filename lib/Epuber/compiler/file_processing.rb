@@ -103,35 +103,41 @@ module Epuber
         text_detect_usage_of_javascript(file, xhtml_doc)
         text_parse_images(file, xhtml_doc)
 
-        # TODO: perform text transform
-        # TODO: perform analysis
-
         result_xhtml_s = xhtml_doc.to_s
 
-        plugins.each do |plugin|
-          plugin.transformers.each do |transformer|
-            # @type transformer [Epuber::Transformer]
-            next if transformer.source_type != :result_text_xhtml_string
-            next if transformer.run_when != :always
-
-            result_xhtml_s = transformer.call(file.destination_path, result_xhtml_s)
-          end
+        # perform transformations
+        perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
+          result_xhtml_s = transformer.call(file.destination_path, result_xhtml_s)
         end
 
+        # perform custom validation
         if @should_check
-          plugins.each do |plugin|
-            plugin.checkers.each do |checker|
-              # @type checker [Epuber::Checker]
-              next if checker.source_type != :result_text_xhtml_string
-              next if checker.run_when != :always
-
-              checker.call(file.destination_path, result_xhtml_s)
-            end
+          perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
+            checker.call(file.destination_path, result_xhtml_s)
           end
         end
 
         file.content = result_xhtml_s
         file_write(file)
+      end
+
+      # @param [Class] klass class of thing you want to perform (Checker or Transformer)
+      # @param [Symbol] source_type source type of that thing (Checker or Transformer)
+      #
+      # @yield
+      # @yieldparam [Epuber::CheckerTransformerBase] instance of checker or transformer
+      #
+      def perform_plugin_things(klass, source_type)
+        plugins.each do |plugin|
+          plugin.instances(klass).each do |instance|
+            # @type checker [Epuber::CheckerTransformerBase]
+
+            next if instance.source_type != source_type
+            next if instance.options.include?(:run_only_before_release)
+
+            yield instance
+          end
+        end
       end
 
       # @param file [Epuber::Compiler::File]

@@ -41,6 +41,8 @@ module Epuber
       #
       attr_accessor :file_path
 
+
+
       # @param file_path [String]
       # @param text [String]
       #
