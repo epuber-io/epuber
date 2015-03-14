@@ -4,6 +4,24 @@ module Epuber
   class Compiler
     class FileResolver
 
+
+      GROUP_EXTENSIONS = {
+        text:  %w(.xhtml .html .bade .rxhtml),
+        image: %w(.png .jpg .jpeg),
+        font:  %w(.otf .ttf),
+        style: %w(.css .styl),
+      }.freeze
+
+      STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css).freeze
+
+      EXTENSIONS_RENAME = {
+        '.styl'   => '.css',
+
+        '.bade'   => '.xhtml',
+        '.rxhtml' => '.xhtml',
+        '.md'     => '.xhtml',
+      }.freeze
+
       # @return [String]
       #
       attr_reader :source_path

@@ -30,11 +30,11 @@ module Epuber
           file_extname = ::File.extname(file_source_path)
 
           case file_extname
-          when *GROUP_EXTENSIONS[:text]
+          when *FileResolver::GROUP_EXTENSIONS[:text]
             process_text_file(file)
-          when *GROUP_EXTENSIONS[:image]
+          when *FileResolver::GROUP_EXTENSIONS[:image]
             process_image_file(file)
-          when *STATIC_EXTENSIONS
+          when *FileResolver::STATIC_EXTENSIONS
             file_copy(file)
           when '.styl'
             file.content = Stylus.compile(::File.new(file_source_path))
