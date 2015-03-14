@@ -148,12 +148,13 @@ module Epuber
             pattern = uri.path
 
             begin
-              target_file = @file_resolver.find_file_with_destination_path(::File.expand_path(pattern, ::File.dirname(file.destination_path)))
-            rescue
-              target_file = @file_resolver.find_file_with_destination_pattern("#{Regexp.escape(pattern)}.*")
-            rescue => e
-              raise "Not found file with path #{pattern} from file #{file.source_path}, original error #{e.inspect}"
+              # try to find it in files folder
+              target_file = @file_resolver.find_file_with_destination_pattern(pattern, ::File.dirname(file.destination_path), :text)
+            rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError
+              # try to find it in all files
+              target_file = @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, :text)
             end
+
 
             uri.path = @file_resolver.relative_path(file, target_file)
 

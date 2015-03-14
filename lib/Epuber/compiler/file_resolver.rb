@@ -3,6 +3,8 @@
 module Epuber
   class Compiler
     class FileResolver
+      class FileNotFoundError < ::StandardError; end
+      class MultipleFilesFoundError < ::StandardError; end
 
 
       GROUP_EXTENSIONS = {
@@ -122,25 +124,56 @@ module Epuber
           file.destination_path == destination_path
         end
 
-        assert_one_file_path(file_paths, pattern)
+        assert_one_file_path(file_paths, destination_path)
 
         file_paths.first
       end
 
       # @param [String] pattern
+      # @param [String] context_path
+      # @param [Symbol] group
       #
       # @return [File]
       #
-      def find_file_with_destination_pattern(pattern)
-        regex = Regexp.new(pattern)
+      def find_file_with_destination_pattern(pattern, context_path, group)
+        unless pattern.include?('*')
+          # don't even try, when there is star char
+          begin
+            # try to find file with exact path
+            return find_file_with_destination_path(::File.expand_path(pattern, context_path))
 
-        file_paths = files_of.select do |file|
-          regex =~ file.destination_path
+          rescue FileNotFoundError
+            # not found, skip this and try to find with pattern
+          end
         end
 
-        assert_one_file_path(file_paths, pattern)
+        extensions = GROUP_EXTENSIONS[group]
+        raise "Unknown group #{group.inspect}" if extensions.nil?
 
-        file_paths.first
+        regexp_extensions = extensions.map { |ext| Regexp.escape(ext) }.join('|')
+        complete_path = ::File.expand_path(::File.dirname(pattern), context_path)
+        shorter_pattern = ::File.basename(pattern)
+
+        regex = /^#{Regexp.escape(complete_path)}\/#{shorter_pattern}(?:#{regexp_extensions})$/
+
+        _find_file_obj(pattern) do |file|
+          regex =~ file.destination_path
+        end
+      end
+
+      # @param [String] failure_message
+      #
+      # @yieldparam [Epuber::Compiler::File]
+      #
+      # @return [Epuber::Compiler::File]
+      #
+      def _find_file_obj(failure_message)
+        file_objs = files_of.select do |file|
+          yield file
+        end
+
+        assert_one_file_path(file_objs, failure_message)
+        file_objs.first
       end
 
       # @param from [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
@@ -248,8 +281,8 @@ module Epuber
       end
 
       def assert_one_file_path(file_paths, pattern)
-        raise "not found file matching pattern `#{pattern}`" if file_paths.empty?
-        raise "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
+        raise FileNotFoundError, "not found file matching pattern `#{pattern}`" if file_paths.empty?
+        raise MultipleFilesFoundError, "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
       end
 
       # @param pattern [String]
