@@ -128,8 +128,11 @@ module Epuber
       # @return [nil]
       #
       def text_resolve_links(file, xhtml_doc)
+        tag_name = 'a'
         attribute_name = 'href'
-        img_nodes = xhtml_doc.css("a[#{attribute_name}]")
+        group = :text
+
+        img_nodes = xhtml_doc.css("#{tag_name}[#{attribute_name}]")
         img_nodes.each do |node|
           src = node[attribute_name]
           # @type [String] src
@@ -149,10 +152,10 @@ module Epuber
 
             begin
               # try to find it in files folder
-              target_file = @file_resolver.find_file_with_destination_pattern(pattern, ::File.dirname(file.destination_path), :text)
+              target_file = @file_resolver.find_file_with_destination_pattern(pattern, ::File.dirname(file.destination_path), group)
             rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError
               # try to find it in all files
-              target_file = @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, :text)
+              target_file = @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, group)
             end
 
 
@@ -192,13 +195,21 @@ module Epuber
           path = img['src']
           next if path.nil?
 
-          abs_path = ::File.expand_path(path, ::File.dirname(file.source_path))
-          package_path = @file_resolver.relative_path_from_source_root(abs_path)
+          begin
+            # try to find it in same folder
+            package_path = @file_resolver.find_file(path, :image, context_path: ::File.dirname(file.source_path))
+          rescue FileResolver::FileNotFoundError
+            # try to find in project folder
+            package_path = @file_resolver.find_file(path, :image)
+          end
 
           file_request = Epuber::Book::FileRequest.new(package_path, group: :image)
-          file = File.new(file_request)
+          image_file = File.new(file_request, group: :image)
 
-          @file_resolver.add_file(file)
+          @file_resolver.add_file(image_file)
+
+          relative_path = @file_resolver.relative_path(file, image_file)
+          img['src'] = relative_path
         end
       end
 

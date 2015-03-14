@@ -161,21 +161,6 @@ module Epuber
         end
       end
 
-      # @param [String] failure_message
-      #
-      # @yieldparam [Epuber::Compiler::File]
-      #
-      # @return [Epuber::Compiler::File]
-      #
-      def _find_file_obj(failure_message)
-        file_objs = files_of.select do |file|
-          yield file
-        end
-
-        assert_one_file_path(file_objs, failure_message)
-        file_objs.first
-      end
-
       # @param from [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
       # @param to [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
       #
@@ -222,6 +207,21 @@ module Epuber
       end
 
 
+
+      # @param file_or_pattern [String, Epuber::Compiler::File]
+      # @param group [Symbol]
+      # @return [String]
+      #
+      def find_file(file_or_pattern, group = nil, context_path: source_path)
+        pattern = pattern_from(file_or_pattern)
+        file_paths = find_files(file_or_pattern, group, context_path: context_path)
+
+        assert_one_file_path(file_paths, pattern)
+
+        file_paths.first
+      end
+
+
       private
 
       # @param file [Epuber::Compiler::File]
@@ -252,30 +252,34 @@ module Epuber
         end
       end
 
-      # @param file_or_pattern [String, Epuber::Compiler::File]
-      # @param group [Symbol]
-      # @return [String]
+      # @param [String] failure_message
       #
-      def find_file(file_or_pattern, group = nil)
-        pattern = pattern_from(file_or_pattern)
-        file_paths = find_files(file_or_pattern, group)
+      # @yieldparam [Epuber::Compiler::File]
+      #
+      # @return [Epuber::Compiler::File]
+      #
+      def _find_file_obj(failure_message)
+        file_objs = files_of.select do |file|
+          yield file
+        end
 
-        assert_one_file_path(file_paths, pattern)
-
-        file_paths.first
+        assert_one_file_path(file_objs, failure_message)
+        file_objs.first
       end
+
+
 
       # @param file_or_pattern [String, Epuber::Book::FileRequest]
       # @param group [Symbol]
       # @return [Array<String>]
       #
-      def find_files(file_or_pattern, group = nil)
+      def find_files(file_or_pattern, group = nil, context_path: source_path)
         pattern = pattern_from(file_or_pattern)
 
         group = file_or_pattern.group if group.nil? && file_or_pattern.is_a?(Epuber::Book::FileRequest)
 
-        file_paths = file_paths_with_pattern("**/#{pattern}", group)
-        file_paths = file_paths_with_pattern("**/#{pattern}.*", group) if file_paths.empty?
+        file_paths = file_paths_with_pattern("**/#{pattern}", group, context_path: context_path)
+        file_paths = file_paths_with_pattern("**/#{pattern}.*", group, context_path: context_path) if file_paths.empty?
 
         file_paths
       end
@@ -289,11 +293,12 @@ module Epuber
       # @param group [Symbol]
       # @return [Array<String>]
       #
-      def file_paths_with_pattern(pattern, group = nil)
-        file_paths = Dir.glob(pattern)
+      def file_paths_with_pattern(pattern, group = nil, context_path: source_path)
+        full_pattern = ::File.expand_path(pattern, context_path)
+        file_paths = Dir.glob(full_pattern)
 
-        file_paths.select! do |file_path|
-          !file_path.include?(Config::WORKING_PATH)
+        file_paths.reject! do |file_path|
+          file_path.include?(Config::WORKING_PATH)
         end
 
         # filter depend on group
@@ -308,7 +313,9 @@ module Epuber
           end
         end
 
-        file_paths
+        file_paths.map do |path|
+          path.sub(::File.join(context_path, ''), '')
+        end
       end
 
       # @param file_or_pattern [String, File, FileRequest]
