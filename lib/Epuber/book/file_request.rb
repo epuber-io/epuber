@@ -48,6 +48,11 @@ module Epuber
           @source_pattern == other.source_pattern && @group == other.group && @only_one == other.only_one
         end
       end
+
+
+      def to_s
+        "#<#{self.class} pattern:`#{@source_pattern}` group:`#{@group}` only_one:`#{@only_one}`>"
+      end
     end
   end
 end

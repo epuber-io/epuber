@@ -90,6 +90,5 @@ end
 
 
 at_exit do
-  puts 'DEBUG: Saving lockfile'
   Epuber::Config.instance.save_lockfile
 end

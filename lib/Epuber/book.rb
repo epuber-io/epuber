@@ -239,7 +239,5 @@ module Epuber
 
     # TODO: footnotes customization
     # TODO: custom metadata
-    # TODO: custom user informations (just global available Hash<String, Any>)
-    # TODO: url (book url) // http://melvil.cz/kniha-prace-na-dalku
   end
 end
