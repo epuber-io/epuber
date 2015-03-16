@@ -1,8 +1,7 @@
 # encoding: utf-8
 
-require_relative '../helpers/spec_helper'
+require_relative '../spec_helper'
 
-require_relative '../matchers/xml'
 
 require_relative '../../lib/epuber/compiler'
 require_relative '../../lib/epuber/book/target'

@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 
-require_relative '../helpers/spec_helper'
+require_relative '../spec_helper'
 
 # @param xpath [String]
 # @return [String]
