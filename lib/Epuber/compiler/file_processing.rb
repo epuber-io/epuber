@@ -82,14 +82,24 @@ module Epuber
           __file: file,
         }
 
+        file_content = ::File.read(source_path)
+
+        if @should_write
+          perform_plugin_things(Transformer, :source_file) do |transformer|
+            file_content = transformer.call(file.destination_path, file_content)
+          end
+
+          _write(file_content, source_path)
+        end
+
         xhtml_content   = case source_extname
                           when '.xhtml'
-                            ::File.read(source_path)
+                            file_content
                           when '.rxhtml'
-                            RubyTemplater.render_file(source_path, variables)
+                            RubyTemplater.from_source(file_content, source_path).with_locals(variables)
+                                         .render
                           when '.bade'
-                            Bade::Renderer.from_file(source_path)
-                                          .with_locals(variables)
+                            Bade::Renderer.from_source(file_content, source_path).with_locals(variables)
                                           .render(new_line: '\n', indent: '  ')
                           else
                             raise "Unknown text file extension #{source_extname}"
@@ -125,7 +135,7 @@ module Epuber
       # @param [Epuber::Compiler::File] file
       # @param [Nokogiri::XML::Document] xhtml_doc
       #
-      # @return [nil]
+      # @return nil
       #
       def text_resolve_links(file, xhtml_doc)
         tag_name = 'a'
@@ -280,26 +290,17 @@ module Epuber
         end
       end
 
-
       # @param file [Epuber::Compiler::File]
       #
+      # @return nil
+      #
       def file_write(file)
-        dest_path = file.destination_path
-
-        original_content = if ::File.exists?(dest_path)
-                             ::File.read(dest_path)
-                           end
-
-        return if original_content == file.content || original_content == file.content.to_s
-
-        puts "DEBUG: writing to file #{dest_path}"
-
-        ::File.open(dest_path, 'w') do |file_handle|
-          file_handle.write(file.content)
-        end
+        _write(file.content, file.destination_path)
       end
 
       # @param file [Epuber::Compiler::File]
+      #
+      # @return nil
       #
       def file_copy(file)
         dest_path = file.destination_path
@@ -312,6 +313,32 @@ module Epuber
         FileUtils.cp(source_path, dest_path)
       end
 
+      # @param [#to_s] content anything, that can be converted to string and should be written to file
+      # @param [String] to_path destination path
+      #
+      # @return nil
+      #
+      def _write(content, to_path)
+        original_content = if ::File.exists?(to_path)
+                             ::File.read(to_path)
+                           end
+
+        should_write = if original_content.nil?
+                         true
+                       elsif content.is_a?(String)
+                         original_content != content
+                       else
+                         original_content != content.to_s
+                       end
+
+        return unless should_write
+
+        puts "DEBUG: writing to file #{to_path}"
+
+        ::File.open(to_path, 'w') do |file_handle|
+          file_handle.write(content)
+        end
+      end
     end
   end
 end

@@ -6,7 +6,8 @@ module Epuber
 
     def self.map_source_type__class
       {
-        :result_text_xhtml_string => TextTransformer
+        :result_text_xhtml_string => TextTransformer,
+        :source_file              => TextTransformer
       }.merge(super)
     end
   end

@@ -56,9 +56,10 @@ module Epuber
     #
     # @return [void]
     #
-    def compile(build_folder, check: false)
+    def compile(build_folder, check: false, write: false)
       @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       @should_check = check
+      @should_write = write
       @plugins = []
 
       FileUtils.mkdir_p(build_folder)

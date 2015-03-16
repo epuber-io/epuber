@@ -49,7 +49,6 @@ module Epuber
         end
       end
 
-
       def to_s
         "#<#{self.class} pattern:`#{@source_pattern}` group:`#{@group}` only_one:`#{@only_one}`>"
       end

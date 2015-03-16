@@ -64,8 +64,11 @@ END
       # @return [void]
       #
       def write_bookspec(book_title, book_id)
-          template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
-        rendered = RubyTemplater.render_file(template_path, book_title: book_title, book_id: book_id)
+        template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
+        rendered = RubyTemplater.from_file(template_path)
+                                .with_locals(book_title: book_title, book_id: book_id)
+                                .render
+
         write("#{book_id}.bookspec", rendered)
       end
 

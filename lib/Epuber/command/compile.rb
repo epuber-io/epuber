@@ -12,7 +12,8 @@ module Epuber
 
       def self.options
         [
-          ['--check', 'Performs additional validation on sources + checks result epub with epubcheck'],
+          ['--check', 'Performs additional validation on sources + checks result epub with epubcheck.'],
+          ['--write', 'Performs additional transformations which writes to source files.']
         ].concat(super)
       end
 
@@ -21,6 +22,8 @@ module Epuber
       def initialize(argv)
         @targets_names = argv.arguments!
         @should_check = argv.flag?('check', false)
+        @should_write = argv.flag?('write', false)
+
         super(argv)
       end
 
@@ -32,13 +35,11 @@ module Epuber
 
       def run
         super
-        require_relative '../compiler'
-
         puts "compiling book `#{book.file_path}`"
 
         targets.each do |target|
           compiler = Epuber::Compiler.new(book, target)
-          compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check)
+          compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check, write: @should_write)
           archive_path = compiler.archive
 
           system(%(epubcheck "#{archive_path}")) if @should_check
