@@ -46,7 +46,7 @@ module Epuber
         }.freeze
       end
 
-      # @param file [File, FileRequest]
+      # @param file [Epuber::Compiler::File, FileRequest]
       # @param type [Symbol]
       #      one of: :spine, :manifest or :package
       #
@@ -63,6 +63,10 @@ module Epuber
 
         if type == :spine || type == :manifest || type == :package
           @files[:package] << file unless @files[:package].include?(file)
+        end
+
+        unless file.file_request.nil?
+          _request_to_file_map_cache[file.file_request] = file
         end
       end
 
@@ -90,13 +94,20 @@ module Epuber
       def find_file_from_request(file_request)
         return if file_request.nil?
 
-        files_of.find do |file|
+        cached = _request_to_file_map_cache[file_request]
+        return cached unless cached.nil?
+
+        founded = files_of.find do |file|
           if file.file_request == file_request
             true
           elsif !file.source_path.nil?
             file.source_path == find_file(file_request, file_request.group)
           end
         end
+
+        _request_to_file_map_cache[file_request] = founded
+
+        founded
       end
 
       # @param file_request [FileRequest]
@@ -223,6 +234,10 @@ module Epuber
 
 
       private
+
+      def _request_to_file_map_cache
+        @request_to_file_map_cache ||= {}
+      end
 
       # @param file [Epuber::Compiler::File]
       # @return [nil]

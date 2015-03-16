@@ -252,6 +252,14 @@ module Epuber
         end
       end
 
+      # @return [Array<Epuber::Compiler::File>]
+      #
+      def default_styles
+        @default_styles ||= @target.default_styles.map do |default_style_request|
+          @file_resolver.find_files_from_request(default_style_request) || []
+        end.flatten
+      end
+
       # @param file [Epuber::Compiler::File]
       # @param xhtml_doc [Nokogiri::XML::Document]
       #
@@ -261,9 +269,7 @@ module Epuber
         head         = xhtml_doc.at_css('html > head')
         styles_hrefs = head.css('link[rel="stylesheet"]').map { |element| element.attribute('href').value }
 
-        paths_to_insert = @target.default_styles.map do |default_style_request|
-          @file_resolver.find_files_from_request(default_style_request) || []
-        end.flatten.map do |style_file|
+        paths_to_insert = default_styles.map do |style_file|
           @file_resolver.relative_path(file, style_file)
         end.reject do |path|
           styles_hrefs.include?(path)
