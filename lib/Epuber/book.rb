@@ -1,14 +1,13 @@
 # encoding: utf-8
 
-require_relative 'dsl/object'
-
-require_relative 'vendor/version'
-
 module Epuber
+  require_relative 'dsl/object'
+
   class Book < DSL::Object
     require_relative 'book/contributor'
-    require_relative 'book/toc_item'
     require_relative 'book/target'
+    require_relative 'book/toc_item'
+    require_relative 'book/file_request'
 
     class StandardError < ::StandardError; end
 

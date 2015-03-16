@@ -2,12 +2,13 @@
 
 require_relative '../dsl/tree_object'
 
-require_relative '../vendor/version'
-require_relative 'file_request'
-
 
 module Epuber
+  require_relative '../vendor/version'
+
   class Book
+    require_relative 'file_request'
+
     class Target < DSL::TreeObject
       # @param [Target] parent
       # @param [String] name
@@ -32,6 +33,12 @@ module Epuber
 
         @default_styles.freeze
         @default_styles.each(&:freeze)
+
+        @plugins.freeze
+        @plugins.each(&:freeze)
+
+        @root_toc.freeze
+        @constants.freeze
       end
 
       # @return [String] target name

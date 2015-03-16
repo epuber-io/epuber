@@ -8,7 +8,6 @@ gemspec
 gem 'bade', path: '../Bade'
 
 gem 'rubocop', group: :test, require: false
-gem 'rerun', group: :test, require: false
 
 gem 'sinatra'
 gem 'sinatra-websocket'

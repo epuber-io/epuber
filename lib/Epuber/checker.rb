@@ -2,9 +2,10 @@
 
 require_relative 'checker_transformer_base'
 
+
 module Epuber
   class Checker < CheckerTransformerBase
-    require_relative 'checker/text_checker'
+    require 'epuber/checker/text_checker'
 
     def self.map_source_type__class
       {

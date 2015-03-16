@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require 'pathname'
-
 require 'sinatra/base'
 require 'sinatra/namespace'
 require 'sinatra-websocket'
@@ -11,9 +9,6 @@ require 'listen'
 
 require 'active_support/core_ext/object/try'
 
-require_relative 'book'
-require_relative 'config'
-require_relative 'compiler'
 require_relative 'vendor/hash_binding'
 
 require 'bade'

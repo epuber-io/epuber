@@ -1,8 +1,5 @@
 # encoding: utf-8
 
-require 'bundler/setup'
-Bundler.setup
-
 require 'English'
 
 require 'pathname'
@@ -14,15 +11,14 @@ require 'zip'
 
 require 'RMagick'
 
-require_relative 'book'
-require_relative 'plugin'
-
 require_relative 'vendor/nokogiri_extensions'
 
 
 
 module Epuber
   class Compiler
+    require_relative 'plugin'
+
     require_relative 'compiler/opf_generator'
     require_relative 'compiler/nav_generator'
     require_relative 'compiler/meta_inf_generator'

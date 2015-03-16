@@ -3,10 +3,6 @@
 require_relative '../spec_helper'
 
 
-require_relative '../../lib/epuber/compiler'
-require_relative '../../lib/epuber/book/target'
-require_relative '../../lib/epuber/book'
-
 module Epuber
   describe Compiler::OPFGenerator do
     before do

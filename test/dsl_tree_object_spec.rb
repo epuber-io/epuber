@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-
-require_relative '../lib/epuber/dsl/tree_object'
 require_relative 'spec_helper'
 
 module Epuber

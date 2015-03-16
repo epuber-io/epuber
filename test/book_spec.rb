@@ -2,7 +2,6 @@
 
 require_relative 'spec_helper'
 
-require_relative '../lib/epuber/book'
 
 module Epuber
   class Book

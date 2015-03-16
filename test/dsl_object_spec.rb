@@ -2,7 +2,6 @@
 
 require_relative 'spec_helper'
 
-require_relative '../lib/epuber/dsl/object'
 
 
 module Epuber

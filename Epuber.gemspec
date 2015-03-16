@@ -1,6 +1,10 @@
 # encoding: utf-8
 
-require_relative 'lib/epuber'
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+require 'epuber'
+
 
 Gem::Specification.new do |spec|
   spec.name     = 'epuber'
