@@ -85,7 +85,7 @@ module Epuber
         file_content = ::File.read(source_path)
 
         if @should_write
-          perform_plugin_things(Transformer, :source_file) do |transformer|
+          perform_plugin_things(Transformer, :source_text_file) do |transformer|
             file_content = transformer.call(file.destination_path, file_content)
           end
 
