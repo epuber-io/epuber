@@ -188,7 +188,7 @@ module Epuber
             # @type checker [Epuber::CheckerTransformerBase]
 
             next if instance.source_type != source_type
-            next if instance.options.include?(:run_only_before_release)
+            next if instance.options.include?(:run_only_before_release) && !@release_build
 
             yield instance
           end

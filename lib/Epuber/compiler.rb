@@ -53,13 +53,17 @@ module Epuber
     # Compile target to build folder
     #
     # @param build_folder [String] path to folder, where will be stored all compiled files
+    # @param [Bool] check should run non-release checkers
+    # @param [Bool] write should perform transformations of source files and write them back
+    # @param [Bool] release this is release build
     #
     # @return [void]
     #
-    def compile(build_folder, check: false, write: false)
+    def compile(build_folder, check: false, write: false, release: false)
       @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       @should_check = check
       @should_write = write
+      @release_build = release
       @plugins = []
 
       FileUtils.mkdir_p(build_folder)
@@ -94,7 +98,9 @@ module Epuber
     #
     # @return [String] path
     #
-    def archive(path = epub_name)
+    def archive(path = nil, configuration_suffix: nil)
+      path ||= epub_name(configuration_suffix)
+
       epub_path = ::File.expand_path(path)
       base_path = ::File.join(@file_resolver.destination_path, '')
 
@@ -125,7 +131,7 @@ module Epuber
     #
     # @return [String] name of result epub file
     #
-    def epub_name
+    def epub_name(configuration_suffix = nil)
       epub_name = if !@book.output_base_name.nil?
                     @book.output_base_name
                   elsif @book.from_file?
@@ -136,6 +142,7 @@ module Epuber
 
       epub_name += @book.build_version.to_s unless @book.build_version.nil?
       epub_name += "-#{@target.name}" if @target != @book.default_target
+      epub_name += "-#{configuration_suffix}" unless configuration_suffix.nil?
       epub_name + '.epub'
     end
 

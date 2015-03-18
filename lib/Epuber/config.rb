@@ -76,6 +76,14 @@ module Epuber
       File.join(working_path, 'build', target.name.to_s)
     end
 
+    # @param target [Epuber::Book::Target]
+    #
+    # @return [String]
+    #
+    def release_build_path(target)
+      File.join(working_path, 'release_build', target.name.to_s)
+    end
+
     # ---------------------------------------------------------------------------------------------------------------- #
 
     # Singleton

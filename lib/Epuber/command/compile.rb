@@ -1,6 +1,8 @@
 # encoding: utf-8
+require 'fileutils'
 
 require_relative '../command'
+
 
 module Epuber
   class Command
@@ -12,8 +14,9 @@ module Epuber
 
       def self.options
         [
-          ['--check', 'Performs additional validation on sources + checks result epub with epubcheck.'],
-          ['--write', 'Performs additional transformations which writes to source files.']
+          ['--check',   'Performs additional validation on sources + checks result epub with epubcheck.'],
+          ['--write',   'Performs additional transformations which writes to source files.'],
+          ['--release', 'Create release version of the book, no caching, everything creates from scratch.'],
         ].concat(super)
       end
 
@@ -23,6 +26,7 @@ module Epuber
         @targets_names = argv.arguments!
         @should_check = argv.flag?('check', false)
         @should_write = argv.flag?('write', false)
+        @release_version = argv.flag?('release', false)
 
         super(argv)
       end
@@ -35,14 +39,42 @@ module Epuber
 
       def run
         super
+
         puts "compiling book `#{book.file_path}`"
 
-        targets.each do |target|
-          compiler = Epuber::Compiler.new(book, target)
-          compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check, write: @should_write)
-          archive_path = compiler.archive
+        if @release_version
+          # Remove all previous versions of compiled files
+          targets.each do |target|
+            build_path = Epuber::Config.instance.release_build_path(target)
 
-          system(%(epubcheck "#{archive_path}")) if @should_check
+            if ::File.directory?(build_path)
+              FileUtils.remove_dir(build_path, true)
+            end
+          end
+
+          # Build all targets to always clean directory
+          targets.each do |target|
+            compiler = Epuber::Compiler.new(book, target)
+            compiler.compile(Epuber::Config.instance.release_build_path(target), check: true, write: @should_write, release: true)
+
+            archive_name = compiler.epub_name
+
+            if ::File.exists?(archive_name)
+              FileUtils.remove_file(archive_name)
+            end
+
+            archive_path = compiler.archive(archive_name)
+
+            system(%(epubcheck "#{archive_path}"))
+          end
+        else
+          targets.each do |target|
+            compiler = Epuber::Compiler.new(book, target)
+            compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check, write: @should_write)
+            archive_path = compiler.archive(configuration_suffix: 'debug')
+
+            system(%(epubcheck "#{archive_path}")) if @should_check
+          end
         end
       end
 
