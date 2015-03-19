@@ -120,7 +120,7 @@ module Epuber
               container:    Array,
               required:     true,
               singularize:  true,
-              auto_convert: { [String, Hash] => ->(value) { Contributor.from_ruby(value, 'aut') } }
+              auto_convert: { [String, Hash] => ->(value) { Contributor.from_obj(value, 'aut') } }
 
 
     # @return [String] publisher name

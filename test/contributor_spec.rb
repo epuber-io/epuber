@@ -43,14 +43,14 @@ module Epuber
       end
     end
 
-    describe 'Epuber::Contributor.from_ruby' do
+    describe 'Epuber::Contributor.from_obj' do
       it 'parse Contributor from Hash with symbols :file_as and :pretty_name' do
         hash = {
           pretty_name: 'Jason Fried',
           file_as:     'FRIED, Jason',
         }
 
-        contributor = Contributor.from_ruby(hash, 'aut')
+        contributor = Contributor.from_obj(hash, 'aut')
 
         expect(contributor).to be_a(Contributor)
         expect(contributor.pretty_name).to eq 'Jason Fried'
@@ -63,7 +63,7 @@ module Epuber
           last_name:  'Fried',
         }
 
-        contributor = Contributor.from_ruby(hash, 'aut')
+        contributor = Contributor.from_obj(hash, 'aut')
 
         expect(contributor).to be_a(NormalContributor)
         expect(contributor.first_name).to eq 'Jason'
@@ -72,7 +72,7 @@ module Epuber
       end
 
       it 'parse Contributor from simple name in string' do
-        contributor = Contributor.from_ruby('Jason Fried', 'aut')
+        contributor = Contributor.from_obj('Jason Fried', 'aut')
 
         expect(contributor).to be_a(NormalContributor)
         expect(contributor.first_name).to eq 'Jason'
@@ -80,7 +80,7 @@ module Epuber
       end
 
       it 'parse Contributor from simple name with middle name in string' do
-        contributor = Contributor.from_ruby('David Heinemeier Hansson', 'aut')
+        contributor = Contributor.from_obj('David Heinemeier Hansson', 'aut')
 
         expect(contributor).to be_a(NormalContributor)
         expect(contributor.first_name).to eq 'David Heinemeier'

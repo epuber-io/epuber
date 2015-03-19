@@ -6,17 +6,17 @@ module Epuber
       # File-as of contributor used in .opf file
       # @return [String] pretty name
       #
-      attr_accessor :file_as
+      attr_reader :file_as
 
       # Pretty name of contributor used in .opf file and copyright page
       # @return [String] pretty name
       #
-      attr_accessor :pretty_name
+      attr_reader :pretty_name
 
       # Role of contributor
       # @return [String] role
       #
-      attr_accessor :role
+      attr_reader :role
 
 
       # @param [String] pretty_name  pretty name of contributor
@@ -36,7 +36,7 @@ module Epuber
       #
       # @return [Contributor]
       #
-      def self.from_ruby(obj, role)
+      def self.from_obj(obj, role)
         if obj.is_a?(String)
           components = obj.split(' ')
           if components.length >= 2
@@ -51,7 +51,6 @@ module Epuber
         end
       end
     end
-
 
     class NormalContributor < Contributor
       # @return [String] first name of contributor
@@ -91,9 +90,6 @@ module Epuber
       def file_as
         "#{@last_name.upcase}, #{@first_name}"
       end
-
-      undef_method :pretty_name= # pretty_name is read-only in this class
-      undef_method :file_as= # file_as is read-only in this class
     end
   end
 end
