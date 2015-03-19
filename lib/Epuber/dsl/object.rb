@@ -103,6 +103,20 @@ module Epuber
       # @return [Hash<Symbol, Any>]
       #
       attr_accessor :attributes_values
+
+      # Raise exception when there is used some unknown method or attribute
+      #
+      # This is just for creating better message
+      #
+      def method_missing(name, *args)
+        if /([^=]+)=?/ =~ name
+          attr_name = $1
+          location = caller_locations.first
+          raise NameError, "Unknown attribute or method `#{attr_name}` for class `#{self.class}` in file `#{location.path}:#{location.lineno}`"
+        else
+          super
+        end
+      end
     end
   end
 end
