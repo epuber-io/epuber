@@ -20,6 +20,7 @@ module Epuber
       }.freeze
 
       EPUB3_NAMESPACES = {
+        'prefix'     => 'rendition: http://www.idpf.org/vocab/rendition/',
         'xmlns:epub' => 'http://www.idpf.org/2007/ops',
       }.freeze
 
@@ -137,6 +138,12 @@ module Epuber
 
           if epub_version >= 3
             @xml.meta(Time.now.utc.iso8601, property: 'dcterms:modified')
+
+            if @target.fixed_layout
+              @xml.meta('pre-paginated', property: 'rendition:layout')
+              @xml.meta('auto', property: 'rendition:orientation')
+              @xml.meta('auto', property: 'rendition:spread')
+            end
 
             if @target.ibooks?
               @xml.meta(@book.version, property: 'ibooks:version') unless @book.version.nil?

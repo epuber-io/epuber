@@ -36,7 +36,8 @@ module Epuber
         generate_xml do |xml|
           xml.display_options do
             xml.platform(name: '*') do
-              xml.option(true.to_s, name: 'specified-fonts')
+              xml.option(true.to_s, name: 'specified-fonts') if @target.custom_fonts
+              xml.option(true.to_s, name: 'fixed-layout') if @target.fixed_layout
             end
           end
         end
@@ -51,7 +52,7 @@ module Epuber
         container_xml.content                  = generate_container_xml
         all << container_xml
 
-        if @target.custom_fonts && @target.ibooks?
+        if @target.ibooks?
           display_options                          = File.new(nil)
           display_options.package_destination_path = 'META-INF/com.apple.ibooks.display-options.xml'
           display_options.content                  = generate_ibooks_display_options_xml

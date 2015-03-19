@@ -143,6 +143,12 @@ module Epuber
                 types:     [TrueClass, FalseClass],
                 inherited: true
 
+      # @return [Bool] whether the target uses fixed layout
+      #
+      attribute :fixed_layout,
+                types:     [TrueClass, FalseClass],
+                inherited: true
+
       attribute :cover_image,
                 types:        [FileRequest],
                 inherited:    true,

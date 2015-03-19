@@ -147,9 +147,15 @@ module Epuber
     #
     default_target_attribute :custom_fonts
 
+    # @return [Bool] whether the book uses fixed layout
+    #
+    default_target_attribute :fixed_layout
+
     # @return [String] path or name of cover image
     #
     default_target_attribute :cover_image
+
+
 
     # @return [String] isbn of printed book
     #

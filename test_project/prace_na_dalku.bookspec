@@ -17,6 +17,7 @@ Epuber::Book.new do |book|
   book.build_version = '5'
 
   book.custom_fonts = true
+  book.fixed_layout = true
 
   book.cover_image = 'cover'
 
