@@ -4,17 +4,18 @@ PATH
     epuber (0.2.0)
       activesupport (>= 3.2.15)
       claide (~> 0.8)
-      colorize
-      listen
+      colorize (~> 0.7)
+      epubcheck (>= 3.0.1)
+      listen (~> 2.9)
       mime-types (~> 2.4)
-      nokogiri
+      nokogiri (~> 1.6)
       rmagick (= 2.13.2)
       rubyzip (~> 1.0)
-      sinatra
-      sinatra-contrib
-      sinatra-websocket
+      sinatra (~> 1.4)
+      sinatra-contrib (~> 1.4)
+      sinatra-websocket (~> 0.3)
       stylus
-      thin
+      thin (~> 1.6)
 
 PATH
   remote: ../Bade
@@ -132,7 +133,6 @@ PLATFORMS
 DEPENDENCIES
   bade!
   bundler (~> 1)
-  epubcheck
   epuber!
   rspec
   rubocop
