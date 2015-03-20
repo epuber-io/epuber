@@ -1,6 +1,6 @@
 # This is template for .bookspec
 
-Epuber::Book::Book.new do |book|
+Epuber::Book.new do |book|
 
   # Name of the book, REQUIRED
   book.title = '#{book_title}'
@@ -52,7 +52,7 @@ Epuber::Book::Book.new do |book|
 
   # Build version, RECOMMENDED
   #
-  # Is used in result epub file name, see book.output_base_name
+  # Is used in result epub file name, see book#output_base_name
   #
   book.build_version = '1'
 
@@ -67,6 +67,12 @@ Epuber::Book::Book.new do |book|
   # This tell iBooks to use your fonts instead of system fonts only
   #
   # book.custom_fonts = true
+
+  # Flag for iBooks and other epub3 readers, OPTIONAL
+  #
+  # Book has fixed layout
+  #
+  # book.fixed_layout = true
 
 
   # Path to cover image, OPTIONAL
@@ -94,16 +100,18 @@ Epuber::Book::Book.new do |book|
   # end
 
   # Add some files, for example css styles
-  book.add_file 'styles/#{book_id}.styl'
+  book.add_default_style 'styles/#{book_id}.styl'
 
   # Add other files like images, fonts
-  book.add_files '*.{png,jpg,jpeg}'
   book.add_files '*.{otf,ttf}'
+
+  # Not needed for images since it parse result xhtml and take all images and use them as dependency
+  # book.add_files '*.{png,jpg,jpeg}'
 
 
   # Definition of TOC, with some informations like landmarks, linearity
   #
-  book.toc do |toc|
+  book.toc do |toc, target|
     # add file with name: cover (searching is same as cover image), with landmarks cover and start page
     #
     # toc.file 'cover', :landmark_cover, :landmark_start_page
@@ -111,7 +119,7 @@ Epuber::Book::Book.new do |book|
 
     # toc.file 'copyright', :landmark_copyright
 
-    # toc.file 'toc', :landmark_toc
+    # toc.file 'toc', :landmark_toc if target.name != :ibooks
 
     # you can also nest the structure and specify title
     #
@@ -127,4 +135,7 @@ Epuber::Book::Book.new do |book|
     #
     # toc.file 'footnotes', linear: false
   end
+
+  # load file simple_checkers.rb as plugin
+  # book.use 'simple_checkers.rb'
 end

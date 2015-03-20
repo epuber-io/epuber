@@ -4,6 +4,7 @@ require 'fileutils'
 require 'colorize'
 
 require_relative '../command'
+require_relative '../vendor/ruby_templater'
 
 
 module Epuber
@@ -65,9 +66,9 @@ END
       #
       def write_bookspec(book_title, book_id)
         template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
-        rendered = RubyTemplater.from_file(template_path)
-                                .with_locals(book_title: book_title, book_id: book_id)
-                                .render
+        rendered = Epuber::RubyTemplater.from_file(template_path)
+                                        .with_locals(book_title: book_title, book_id: book_id)
+                                        .render
 
         write("#{book_id}.bookspec", rendered)
       end
@@ -109,8 +110,6 @@ END
       # @return [String] returned text without new line
       #
       def ask(text)
-        puts Dir.pwd
-
         print text
         result = $stdin.gets.chomp
 
