@@ -62,7 +62,7 @@ module Epuber
     #
     def render
       hash_binding = HashBinding.new(locals)
-      eval_string = %(%(#{string}))
+      eval_string = %(%(#{source_text}))
       eval(eval_string, hash_binding.get_binding)
     end
   end
