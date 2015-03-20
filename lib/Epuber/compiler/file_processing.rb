@@ -117,6 +117,7 @@ module Epuber
 
         text_add_missing_root_elements(xhtml_doc)
         text_add_default_styles(file, xhtml_doc)
+        text_add_default_viewport(file, xhtml_doc)
         text_detect_usage_of_javascript(file, xhtml_doc)
         text_resolve_links(file, xhtml_doc)
         text_parse_images(file, xhtml_doc)
@@ -137,6 +138,21 @@ module Epuber
 
         file.content = result_xhtml_s
         file_write(file)
+      end
+
+      # @param [Epuber::Compiler::File] file
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      #
+      # @return nil
+      #
+      def text_add_default_viewport(file, xhtml_doc)
+        return if @target.default_viewport.nil?
+
+        head = xhtml_doc.at_css('html > head')
+        return unless head.at_css("meta[name='viewport']").nil?
+
+        s = @target.default_viewport
+        head << xhtml_doc.create_element('meta', name: 'viewport', content: "width=#{s.width},height=#{s.height}")
       end
 
       # @param [Epuber::Compiler::File] file

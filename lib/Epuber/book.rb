@@ -166,6 +166,9 @@ module Epuber
     #
     default_target_attribute :cover_image
 
+    # @return [Size] default view port size
+    #
+    default_target_attribute :default_viewport
 
 
     # @return [String] isbn of printed book

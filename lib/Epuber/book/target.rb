@@ -3,6 +3,7 @@
 require_relative 'file_request'
 
 require_relative '../vendor/version'
+require_relative '../vendor/size'
 require_relative '../dsl/tree_object'
 
 
@@ -148,10 +149,18 @@ module Epuber
                 types:     [TrueClass, FalseClass],
                 inherited: true
 
+      # @return [FileRequest] file request to cover image
+      #
       attribute :cover_image,
                 types:        [FileRequest],
                 inherited:    true,
                 auto_convert: { [String] => ->(value) { FileRequest.new(value, group: :image, properties: [:cover_image]) } }
+
+      # @return [Size] size of view port, mainly this is used for fixed layout
+      #
+      attribute :default_viewport,
+                types:     [Size],
+                inherited: true
 
 
       # @param file_path [String | Epuber::Book::File]

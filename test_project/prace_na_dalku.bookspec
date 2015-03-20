@@ -18,6 +18,7 @@ Epuber::Book.new do |book|
 
   book.custom_fonts = true
   book.fixed_layout = true
+  book.default_viewport = Size.new(200, 300)
 
   book.cover_image = 'cover'
 
