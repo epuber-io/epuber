@@ -2,10 +2,10 @@ PATH
   remote: .
   specs:
     epuber (0.2.0)
-      activesupport (>= 3.2.15)
+      activesupport (~> 4.2)
       claide (~> 0.8)
       colorize (~> 0.7)
-      epubcheck (>= 3.0.1)
+      epubcheck (~> 3.0, >= 3.0.1)
       listen (~> 2.9)
       mime-types (~> 2.4)
       nokogiri (~> 1.6)
@@ -14,7 +14,7 @@ PATH
       sinatra (~> 1.4)
       sinatra-contrib (~> 1.4)
       sinatra-websocket (~> 0.3)
-      stylus
+      stylus (~> 1.0)
       thin (~> 1.6)
 
 PATH
@@ -134,5 +134,5 @@ DEPENDENCIES
   bade!
   bundler (~> 1)
   epuber!
-  rspec
-  rubocop
+  rspec (~> 3.2)
+  rubocop (~> 0.29)
