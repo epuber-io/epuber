@@ -1,8 +1,9 @@
 # encoding: utf-8
 
-module Epuber
-  require_relative 'dsl/object'
+require_relative 'dsl/object'
 
+
+module Epuber
   class Book < DSL::Object
     require_relative 'book/contributor'
     require_relative 'book/target'
@@ -20,6 +21,8 @@ module Epuber
       yield self if block_given?
     end
 
+    # @return nil
+    #
     def finish_toc
       @toc_blocks.each do |block|
         flat_all_targets.each do |target|
@@ -28,16 +31,22 @@ module Epuber
       end
     end
 
+    # @return nil
+    #
     def validate
       super
       @default_target.validate
     end
 
+    # @return nil
+    #
     def freeze
       super
       @default_target.freeze
     end
 
+    # @return [Epuber::Book::Target]
+    #
     attr_reader :default_target
 
 
@@ -98,6 +107,8 @@ module Epuber
 
     #-------------- TOC --------------------------------------
 
+    # @return nil
+    #
     def toc(&block)
       @toc_blocks << block
     end

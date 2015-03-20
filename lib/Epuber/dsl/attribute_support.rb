@@ -14,6 +14,8 @@ module Epuber
       #
       # @see Attribute
       #
+      # @return nil
+      #
       def attribute(name, options = {})
         attr = Attribute.new(name, options)
 
@@ -44,6 +46,8 @@ module Epuber
 
       # @param name [Symbol]
       # @param attr [Attribute]
+      #
+      # @return nil
       #
       def define_method_attr(name, attr)
         key = name

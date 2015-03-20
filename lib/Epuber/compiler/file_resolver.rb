@@ -6,7 +6,6 @@ module Epuber
       class FileNotFoundError < ::StandardError; end
       class MultipleFilesFoundError < ::StandardError; end
 
-
       GROUP_EXTENSIONS = {
         text:  %w(.xhtml .html .bade .rxhtml),
         image: %w(.png .jpg .jpeg),
@@ -24,17 +23,17 @@ module Epuber
         '.md'     => '.xhtml',
       }.freeze
 
-      # @return [String]
+      # @return [String] path where should look for source files
       #
       attr_reader :source_path
 
-      # @return [String]
+      # @return [String] path where will be stored result files
       #
       attr_reader :destination_path
 
 
-      # @param source_path [String]
-      # @param destination_path [String]
+      # @param [String] source_path
+      # @param [String] destination_path
       #
       def initialize(source_path, destination_path)
         @source_path      = source_path
@@ -46,8 +45,8 @@ module Epuber
         }.freeze
       end
 
-      # @param file [Epuber::Compiler::File, FileRequest]
-      # @param type [Symbol]
+      # @param [Epuber::Compiler::File, FileRequest] file
+      # @param [Symbol] type
       #      one of: :spine, :manifest or :package
       #
       def add_file(file, type: :manifest)
@@ -70,7 +69,7 @@ module Epuber
         end
       end
 
-      # @param file_request [FileRequest]
+      # @param [FileRequest] file_request
       #
       def add_files(file_request)
         find_files(file_request).each do |path|
@@ -78,7 +77,7 @@ module Epuber
         end
       end
 
-      # @param type [Symbol]
+      # @param [Symbol] type
       #      one of: :spine, :manifest or :package
       #
       # @return [Array<File>, nil]
@@ -87,7 +86,7 @@ module Epuber
         @files[type] if @files.include?(type)
       end
 
-      # @param file_request [FileRequest]
+      # @param [FileRequest] file_request
       #
       # @return [File, nil]
       #
@@ -110,7 +109,7 @@ module Epuber
         founded
       end
 
-      # @param file_request [FileRequest]
+      # @param [FileRequest] file_request
       #
       # @return [Array<File>]
       #
@@ -172,8 +171,8 @@ module Epuber
         end
       end
 
-      # @param from [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
-      # @param to [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
+      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] from
+      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] to
       #
       # @return [String]
       #
@@ -199,7 +198,7 @@ module Epuber
         Pathname.new(to_path).relative_path_from(Pathname.new(from_path)).to_s
       end
 
-      # @param file [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
+      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] file
       #
       # @return [String]
       #
@@ -208,7 +207,7 @@ module Epuber
         relative_path(self.source_path, file)
       end
 
-      # @param file [Epuber::Compiler::File, Epuber::Book::FileRequest, String]
+      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] file
       #
       # @return [String]
       #
@@ -217,11 +216,10 @@ module Epuber
         relative_path(self.destination_path, file)
       end
 
-
-
       # @param file_or_pattern [String, Epuber::Compiler::File]
       # @param group [Symbol]
-      # @return [String]
+      #
+      # @return [String] relative path from source path to founded file
       #
       def find_file(file_or_pattern, group = nil, context_path: source_path)
         pattern = pattern_from(file_or_pattern)
@@ -240,6 +238,7 @@ module Epuber
       end
 
       # @param file [Epuber::Compiler::File]
+      #
       # @return [nil]
       #
       def resolve_destination_path(file)
@@ -282,10 +281,9 @@ module Epuber
         file_objs.first
       end
 
-
-
       # @param file_or_pattern [String, Epuber::Book::FileRequest]
       # @param group [Symbol]
+      #
       # @return [Array<String>]
       #
       def find_files(file_or_pattern, group = nil, context_path: source_path)
@@ -299,13 +297,21 @@ module Epuber
         file_paths
       end
 
+      # @param [Array<String>] file_paths list of founded paths to files
+      # @param [String] pattern pattern which will be included in raised error
+      #
+      # @raise FileNotFoundError
+      # @raise MultipleFilesFoundError
+      #
+      # @return nil
+      #
       def assert_one_file_path(file_paths, pattern)
         raise FileNotFoundError, "not found file matching pattern `#{pattern}`" if file_paths.empty?
         raise MultipleFilesFoundError, "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
       end
 
-      # @param pattern [String]
-      # @param group [Symbol]
+      # @param [String] pattern
+      # @param [Symbol] group
       # @return [Array<String>]
       #
       def file_paths_with_pattern(pattern, group = nil, context_path: source_path)
@@ -333,7 +339,7 @@ module Epuber
         end
       end
 
-      # @param file_or_pattern [String, File, FileRequest]
+      # @param [String, File, FileRequest] file_or_pattern
       # @return [String] only pattern
       #
       def pattern_from(file_or_pattern)

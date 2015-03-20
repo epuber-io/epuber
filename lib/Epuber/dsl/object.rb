@@ -24,10 +24,14 @@ module Epuber
         end
       end
 
+      # @return [String]
+      #
       def to_s
         "<#{self.class} #{@attributes_values}>"
       end
 
+      # @return nil
+      #
       def freeze
         super
         @attributes_values.freeze
@@ -36,6 +40,8 @@ module Epuber
       # Validates all values of attributes, if there is some error, StandardError will be raised
       #
       # @note it only check for required values for now
+      #
+      # @return nil
       #
       def validate
         self.class.dsl_attributes.each do |key, attr|
@@ -82,6 +88,8 @@ module Epuber
         obj
       end
 
+      # @return [Bool] is created from file
+      #
       def from_file?
         !file_path.nil?
       end
@@ -106,7 +114,9 @@ module Epuber
 
       # Raise exception when there is used some unknown method or attribute
       #
-      # This is just for creating better message
+      # This is just for creating better message in raised exception
+      #
+      # @return nil
       #
       def method_missing(name, *args)
         if /([^=]+)=?/ =~ name

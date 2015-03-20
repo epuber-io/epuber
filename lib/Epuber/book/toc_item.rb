@@ -1,12 +1,12 @@
 # encoding: utf-8
 
+require_relative 'file_request'
+
 require_relative '../dsl/tree_object'
 
 
 module Epuber
   class Book
-    require_relative 'file_request'
-
     class TocItem < DSL::TreeObject
       # @return [Epuber::Book::FileRequest]
       #
@@ -61,8 +61,8 @@ module Epuber
       #      toc.file 'ch03', :linear => false
       #      toc.file 'ch04', linear: false
       #
-      # @param [String] file_path
-      # @param [String] title
+      # @param [String] file_path pattern describing path to file
+      # @param [String] title title of this item
       #
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
@@ -91,6 +91,8 @@ module Epuber
         end
       end
 
+      # Creating sub item without reference to file
+      #
       # @param [String] title
       #
       def item(title, *opts)

@@ -5,10 +5,9 @@ require 'nokogiri'
 module Epuber
   class Compiler
     class Generator
-
-      # @param target [Epuber::Book::Target]
-      # @param book [Epuber::Book::Book]
-      # @param file_resolver [FileResolver]
+      # @param [Epuber::Book::Target] target
+      # @param [Epuber::Book::Book] book
+      # @param [FileResolver] file_resolver
       #
       def initialize(book, target, file_resolver)
         @book = book
@@ -20,13 +19,18 @@ module Epuber
 
       # @param file [Epuber::Compiler::File]
       #
+      # @return [String]
+      #
       def pretty_path(file)
         base_path = ::File.join(@file_resolver.destination_path, Epuber::Compiler::EPUB_CONTENT_FOLDER, '')
         file.destination_path.sub(base_path, '')
       end
 
       # Helper function for generating XML
-      # @param block
+      #
+      # @yields xml_builder
+      # @yieldsparam [Nokogiri::XML::Builder] xml_builder
+      #
       # @return [Nokogiri::XML::Document]
       #
       def generate_xml(&block)
@@ -37,6 +41,7 @@ module Epuber
 
           @xml = nil
         end
+
         builder.doc
       end
     end

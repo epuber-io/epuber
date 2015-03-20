@@ -2,6 +2,7 @@
 
 require_relative '../command'
 
+
 module Epuber
   class Command
     class Server < Command
@@ -10,6 +11,8 @@ module Epuber
         CLAide::Argument.new('TARGET', false, false),
       ]
 
+      # @param argv [CLAide::ARGV]
+      #
       def initialize(args)
         super
         @selected_target_name = args.shift_argument

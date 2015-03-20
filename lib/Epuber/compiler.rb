@@ -13,12 +13,11 @@ require 'RMagick'
 
 require_relative 'vendor/nokogiri_extensions'
 
+require_relative 'plugin'
 
 
 module Epuber
   class Compiler
-    require_relative 'plugin'
-
     require_relative 'compiler/opf_generator'
     require_relative 'compiler/nav_generator'
     require_relative 'compiler/meta_inf_generator'
@@ -86,6 +85,8 @@ module Epuber
 
     # Parse uses from current target
     #
+    # @return nil
+    #
     def parse_plugins
       @plugins += @target.plugins.map do |path|
         Plugin.new(::File.expand_path(path, Config.instance.project_path))
@@ -149,6 +150,8 @@ module Epuber
 
     private
 
+    # @return nil
+    #
     def remove_empty_folders
       Dir.chdir(@file_resolver.destination_path) do
         Dir.glob('**/*')
@@ -161,6 +164,8 @@ module Epuber
       end
     end
 
+    # @return nil
+    #
     def remove_unnecessary_files
       output_dir = @file_resolver.destination_path
 
@@ -194,6 +199,8 @@ module Epuber
       end
     end
 
+    # @return nil
+    #
     def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
       nav_file = NavGenerator.new(@book, @target, @file_resolver).generate_nav_file
@@ -221,6 +228,8 @@ module Epuber
       end
     end
 
+    # @return nil
+    #
     def parse_target_file_requests
       @target.files.each do |file_request|
         if file_request.only_one
@@ -231,6 +240,8 @@ module Epuber
       end
     end
 
+    # @return nil
+    #
     def process_all_target_files
       @file_resolver.files_of(:manifest).each do |file|
         process_file(file)

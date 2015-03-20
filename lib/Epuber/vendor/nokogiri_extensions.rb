@@ -4,8 +4,8 @@ require 'nokogiri'
 
 
 class Nokogiri::XML::Node
-  # @param name [String]
-  # @param args [Hash, String]
+  # @param [String] name
+  # @param [Hash, String] args
   #
   # @return [Nokogiri::XML::Node] new parent node
   #

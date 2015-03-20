@@ -94,6 +94,8 @@ module Epuber
 
       # --------- METADATA --------------------------
 
+      # @return nil
+      #
       def generate_metadata
         epub_version = @target.epub_version
 
@@ -158,6 +160,8 @@ module Epuber
 
       # --------- MANIFEST --------------------------
 
+      # @return nil
+      #
       def generate_manifest
         @xml.manifest do
           @file_resolver.files_of(:manifest).each do |file|
@@ -180,6 +184,8 @@ module Epuber
 
       # --------- SPINE --------------------------
 
+      # @return nil
+      #
       def generate_spine
         args = if @target.epub_version >= 3
                  {}
@@ -215,6 +221,8 @@ module Epuber
 
       # @param toc_items [Array<Epuber::Book::TocItem>]
       #
+      # @return nil
+      #
       def guide_visit_toc_items(toc_items)
         toc_items.each do |child_item|
           guide_visit_toc_item(child_item)
@@ -222,6 +230,8 @@ module Epuber
       end
 
       # @param toc_item [Epuber::Book::TocItem]
+      #
+      # @return nil
       #
       def guide_visit_toc_item(toc_item)
         result_file = @file_resolver.find_file_from_request(toc_item.file_request)

@@ -17,6 +17,8 @@ module Epuber
     attr_reader :version, :segments
 
 
+    # @param [String, Numeric] version input primitive value for version
+    #
     def initialize(version)
       unless self.class.correct?(version)
         raise StandardError, "Malformed version number string #{version}"
@@ -25,12 +27,16 @@ module Epuber
       @version = version.to_s.strip
     end
 
+    # @return [Array<Numeric>]
+    #
     def segments
       @segments ||= @version.scan(/[0-9]+|[a-z]+/i).map do |s|
         /^\d+$/ =~ s ? s.to_i : s
       end
     end
 
+    # @return [String]
+    #
     def to_s
       "#{segments.join('.')}"
     end
@@ -38,6 +44,8 @@ module Epuber
     # Compares this version with +other+ returning -1, 0, or 1 if the
     # other version is larger, the same, or smaller than this
     # one.
+    #
+    # @return [Numeric]
     #
     def <=>(other)
       return unless other.is_a?(Version) || other.is_a?(String) || other.is_a?(Float) || other.is_a?(Fixnum)

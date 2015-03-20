@@ -57,13 +57,14 @@ module Epuber
       #
       attr_accessor :first_name
 
-      # @return [String] lase name of contributor
+      # @return [String] last name of contributor
       #
       attr_accessor :last_name
 
 
       # @param [String] first_name first name of contributor
       # @param [String] last_name last name of contributor
+      # @param [String] role contributor role
       #
       def initialize(first_name, last_name, role)
         super(nil, nil, role)
@@ -73,18 +74,12 @@ module Epuber
       end
 
 
-      # ---- Overriden Getters -----
-
-      # Creates pretty name
-      #
       # @return [String]
       #
       def pretty_name
         "#{@first_name} #{@last_name}"
       end
 
-      # Creates file as string
-      #
       # @return [String]
       #
       def file_as

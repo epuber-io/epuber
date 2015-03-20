@@ -64,6 +64,8 @@ module Epuber
       )
     end
 
+    # @return nil
+    #
     def save_lockfile
       bookspec_lockfile.write_to_file
     end
@@ -96,7 +98,8 @@ module Epuber
   end
 end
 
-
+# HACK: this should be done with nicer way
+#
 at_exit do
   Epuber::Config.instance.save_lockfile
 end

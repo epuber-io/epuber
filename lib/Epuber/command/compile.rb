@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require 'fileutils'
 
 require_relative '../command'
@@ -7,7 +8,7 @@ require_relative '../command'
 module Epuber
   class Command
     class Compile < Command
-      self.summary = 'Compile targets into multiple epubs.'
+      self.summary = 'Compile targets into multiple EPUB files.'
       self.arguments = [
         CLAide::Argument.new('TARGETS', false, true),
       ]

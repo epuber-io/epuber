@@ -34,6 +34,8 @@ module Epuber
       @options = options
     end
 
+    # @return [Array<Symbol>]
+    #
     def valid_options
       [:run_only_before_release, :interactive]
     end
@@ -49,6 +51,8 @@ module Epuber
     # ------------------------------------------------------------------ #
     # @group Registration
 
+    # @return [Hash<Symbol, Class>]
+    #
     def self.map_source_type__class
       {}
     end

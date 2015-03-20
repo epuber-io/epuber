@@ -9,9 +9,9 @@ require_relative '../book/file_request'
 module Epuber
   class Compiler
     class MetaInfGenerator < Generator
-      # @param book [Epuber::Book::Book]
-      # @param target [Epuber::Book::Target]
-      # @param content_opf_path [String]
+      # @param [Epuber::Book::Book] book
+      # @param [Epuber::Book::Target] target
+      # @param [String] content_opf_path
       #
       def initialize(book, target, content_opf_path)
         @book = book
@@ -32,6 +32,8 @@ module Epuber
         end
       end
 
+      # @return nil
+      #
       def generate_ibooks_display_options_xml
         generate_xml do |xml|
           xml.display_options do

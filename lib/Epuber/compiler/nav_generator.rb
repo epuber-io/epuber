@@ -81,6 +81,8 @@ module Epuber
         end
       end
 
+      # @return nil
+      #
       def generate_xhtml_content
         @xml.doc.create_internal_subset('html', nil, nil)
         @xml.html(nav_namespaces) do

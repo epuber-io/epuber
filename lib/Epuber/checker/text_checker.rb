@@ -1,6 +1,7 @@
+# encoding: utf-8
 
-require_relative '../checker'
 require_relative '../ruby_extensions/match_data'
+require_relative '../checker'
 
 
 module Epuber
@@ -59,6 +60,7 @@ module Epuber
       end
 
       # @param regexp [Regexp]
+      # @param [String] message  message to display, when the regexp found something
       #
       def should_not_contain(regexp, message)
         # find all matches

@@ -1,14 +1,13 @@
 # encoding: utf-8
 
+require_relative 'file_request'
+
+require_relative '../vendor/version'
 require_relative '../dsl/tree_object'
 
 
 module Epuber
-  require_relative '../vendor/version'
-
   class Book
-    require_relative 'file_request'
-
     class Target < DSL::TreeObject
       # @param [Target] parent
       # @param [String] name

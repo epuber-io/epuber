@@ -1,3 +1,4 @@
+# encoding: utf-8
 
 require 'yaml'
 
@@ -6,6 +7,8 @@ module Epuber
   class Lockfile
     attr_accessor :defined_from_file
 
+    # @param [Hash] data
+    #
     def initialize(data = {})
       @internal_data = data
     end
@@ -24,6 +27,8 @@ module Epuber
       inst
     end
 
+    # @return nil
+    #
     def write_to_file
       File.open(defined_from_file, 'w') do |f|
         f.write(YAML.dump(@internal_data))
@@ -31,15 +36,18 @@ module Epuber
     end
 
 
-
-
-
+    # @return [Epuber::Version]
+    #
     def version
       @internal_data['version']
     end
+
+    # @param [Epuber::Version] new_version
+    #
+    # @return [Epuber::Version]
+    #
     def version=(new_version)
       @internal_data['version'] = new_version
     end
-
   end
 end

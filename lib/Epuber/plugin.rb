@@ -1,9 +1,10 @@
 # encoding: utf-8
 
-module Epuber
-  require_relative 'checker'
-  require_relative 'transformer'
+require_relative 'checker'
+require_relative 'transformer'
 
+
+module Epuber
   class Plugin
     class PluginFile
       # @return [String]
@@ -14,6 +15,8 @@ module Epuber
       #
       attr_reader :instances
 
+      # @param [String] file_path path to plugin file
+      #
       def initialize(file_path)
         @file_path = file_path
         @instances = []
@@ -23,6 +26,8 @@ module Epuber
 
       # @param [Symbol] name  name of the plugin function
       # @param [Class] klass  class of what it should create
+      #
+      # @return nil
       #
       def self.plugin_instance_function(name, klass)
         define_method(name) do |source_type, *options, &block|

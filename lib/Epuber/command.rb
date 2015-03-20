@@ -23,7 +23,7 @@ module Epuber
     self.plugin_prefixes = plugin_prefixes + %w(epuber)
 
     def run
-      puts "Running command with class #{self.class}"
+      # puts "Running command with class #{self.class}"
     end
 
     protected

@@ -2,9 +2,10 @@
 
 # rubocop:disable Lint/Eval
 
-module Epuber
-  require_relative 'hash_binding'
+require_relative 'hash_binding'
 
+
+module Epuber
   class RubyTemplater
     # @return [String]
     #

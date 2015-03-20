@@ -24,6 +24,10 @@ module Epuber
       attr_accessor :properties
 
 
+      # @param [String] source_pattern pattern describing path to file
+      # @param [Symbol] group group of file, see Epuber::Compiler::FileResolver::GROUP_EXTENSIONS
+      # @param [Array<Symbol>, Set<Symbol>] properties list of properties, TODO add list of supported properties, and validate them
+      #
       def initialize(source_pattern, group: nil, properties: [])
         @source_pattern = source_pattern
         @only_one       = true
@@ -31,10 +35,14 @@ module Epuber
         @properties     = properties.to_set
       end
 
+      # @return [Bool]
+      #
       def eql?(other)
         self == other
       end
 
+      # @return [Numeric]
+      #
       def hash
         @source_pattern.hash ^ @group.hash ^ @only_one.hash
       end
@@ -49,6 +57,8 @@ module Epuber
         end
       end
 
+      # @return [String]
+      #
       def to_s
         "#<#{self.class} pattern:`#{@source_pattern}` group:`#{@group}` only_one:`#{@only_one}`>"
       end

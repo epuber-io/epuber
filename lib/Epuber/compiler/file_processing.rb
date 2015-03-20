@@ -1,15 +1,18 @@
+# encoding: utf-8
 
 require_relative 'file_resolver'
 require_relative 'file'
+
 require_relative '../book/file_request'
 require_relative '../checker'
 require_relative '../transformer'
-
 
 module Epuber
   class Compiler
     module FileProcessing
       # @param file [Epuber::Compiler::File]
+      #
+      # @return nil
       #
       def process_file(file)
         dest_path = file.destination_path
@@ -49,6 +52,8 @@ module Epuber
 
       # @param file [Epuber::Compiler::File]
       #
+      # @return nil
+      #
       def process_image_file(file)
         dest_path = file.destination_path
         source_path = file.source_path
@@ -70,6 +75,8 @@ module Epuber
       end
 
       # @param file [Epuber::Compiler::File]
+      #
+      # @return nil
       #
       def process_text_file(file)
         source_path    = file.source_path
@@ -181,6 +188,8 @@ module Epuber
       #
       # @yield
       # @yieldparam [Epuber::CheckerTransformerBase] instance of checker or transformer
+      #
+      # @return nil
       #
       def perform_plugin_things(klass, source_type)
         plugins.each do |plugin|

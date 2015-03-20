@@ -1,45 +1,44 @@
 # encoding: utf-8
 
+require_relative '../book/file_request'
+
+
 module Epuber
   class Compiler
     class File
-      # require_relative '../book/file_request'
-
-      # @return [Epuber::Book::FileRequest]
+      # @return [Epuber::Book::FileRequest] original file request
       #
       attr_reader :file_request
 
 
-      # @return [String]
+      # @return [String] absolute destination path
       #
       attr_accessor :destination_path
 
-      # @return [String]
+      # @return [String] destination path in package, is used only for resolving destination path
       #
       attr_accessor :package_destination_path
 
-      # @return [String]
-      #
-      attr_accessor :mime_type
-
-      # @return [Symbol]
+      # @return [Symbol] group of this file (:text, :image, :font, ...)
       #
       attr_accessor :group
 
-      # @return [String]
+      # @return [String] content of this file, it can be used for creating file with generated content
       #
       attr_accessor :content
 
-      # @return [Set<String>]
+      # @return [Set<String>] list of properties
       #
       attr_accessor :properties
 
-      # @return [String]
+      # @return [String] resolved source path to source file
       #
       attr_accessor :source_path
 
 
       # @param file_request_or_path [String, Epuber::Book::FileRequest]
+      # @param [Symbol] group group of file, see Epuber::Compiler::FileResolver::GROUP_EXTENSIONS
+      # @param [Array<Symbol>, Set<Symbol>] properties list of properties, TODO add list of supported properties, and validate them
       #
       def initialize(file_request_or_path, group: nil, properties: [])
         @file_request = if file_request_or_path.is_a?(Epuber::Book::FileRequest)
@@ -59,16 +58,16 @@ module Epuber
         @destination_path = nil
       end
 
-      # @param property [String]
+      # @param [Self] other
       #
-      def add_property(property)
-        @properties << property
-      end
-
+      # @return [Bool]
+      #
       def eql?(other)
         self == other
       end
 
+      # @return [Numeric]
+      #
       def hash
         if !@file_request.nil?
           @file_request.hash
@@ -80,6 +79,8 @@ module Epuber
       end
 
       # @param other [String, Epuber::Book::FileRequest]
+      #
+      # @return [Bool]
       #
       def ==(other)
         if other.is_a?(String) || other.is_a?(Epuber::Book::FileRequest)
@@ -95,16 +96,17 @@ module Epuber
         end
       end
 
-      def group
-        @group || file_request.group
+
+      # @param property [String, Symbol]
+      #
+      # @return [nil]
+      #
+      def add_property(property)
+        @properties << property
       end
 
-      # @param file [Epuber::Book::File]
-      #
-      # TODO: rename to merge!
-      #
-      def merge_with(file)
-        @properties = file.properties
+      def group
+        @group || file_request.group
       end
     end
   end

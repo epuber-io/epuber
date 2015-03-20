@@ -5,7 +5,7 @@ require_relative 'object'
 module Epuber
   module DSL
     class TreeObject < Object
-      # @param [DSLTreeObject] parent
+      # @param [TreeObject] parent
       #
       def initialize(parent = nil)
         super()
@@ -16,6 +16,8 @@ module Epuber
         parent.sub_items << self unless parent.nil?
       end
 
+      # @return nil
+      #
       def freeze
         super
         @sub_items.freeze
@@ -48,6 +50,8 @@ module Epuber
         @parent.nil?
       end
 
+      # @return nil
+      #
       def validate
         super
         sub_items.each(&:validate)
@@ -81,6 +85,8 @@ module Epuber
         child
       end
 
+      # @return nil
+      #
       def create_child_items
         yield self if block_given?
       end
