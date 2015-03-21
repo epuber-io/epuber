@@ -44,42 +44,51 @@ module Epuber
 
     BINARY_FILES_EXTNAMES = %w(.png .jpeg .jpg .otf .ttf)
 
-    def self.settings_accessor(name)
-      # call set to define class methods
-      set(name, nil)
+    def self.instance_class_accessor(name)
+      instance_name = "@#{name}"
 
-      define_method(name) do
-        self.class.settings.send(name)
+      define_singleton_method(name) do
+        instance_variable_get(instance_name)
+      end
+      define_singleton_method("#{name}=") do |new_value|
+        instance_variable_set(instance_name, new_value)
       end
 
+      define_method(name) do
+        self.class.send(name)
+      end
       define_method("#{name}=") do |new_value|
-        self.class.set(name, new_value)
+        self.class.send("#{name}=", new_value)
       end
     end
 
     # @return [Epuber::Book::Book]
     #
-    settings_accessor :book
+    instance_class_accessor :book
 
     # @return [Epuber::Book::Target]
     #
-    settings_accessor :target
+    instance_class_accessor :target
 
     # @return [Epuber::Compiler::FileResolver]
     #
-    settings_accessor :file_resolver
+    instance_class_accessor :file_resolver
 
     # @return [Array<Epuber::Compiler::File>]
     #
-    settings_accessor :spine
+    instance_class_accessor :spine
 
     # @return [Array<SinatraWebsocket::Connection>]
     #
-    settings_accessor :sockets
+    instance_class_accessor :sockets
+
+    def self.sockets
+      @sockets ||= []
+    end
 
     # @return [Listener]
     #
-    settings_accessor :listener
+    instance_class_accessor :listener
 
     # @return nil
     #
@@ -87,14 +96,47 @@ module Epuber
       self.book = book
       self.target = target
 
+      start_listening_if_needed
+
       super()
     end
 
+    def initialize
+      super
+      _log :ui, 'Init compile'
+      self.class.compile_book
+    end
+
+    def self.start_listening_if_needed
+      return unless self.listener.nil?
+
+      self.listener = Listen.to(Config.instance.project_path, debug: true) do |modified, added, removed|
+        begin
+          changes_detected(modified, added, removed)
+        rescue => e
+          # print error, do not send error further, listener will die otherwise
+          $stderr.puts e
+          $stderr.puts e.backtrace
+        end
+      end
+
+      listener.ignore(%r{\.idea})
+      listener.ignore(%r{#{Config.instance.working_path}})
+      listener.ignore(%r{#{Config::WORKING_PATH}/})
+
+      listener.start
+    end
+
+    # @return [String] base path
+    #
+    def self.build_path
+      Epuber::Config.instance.build_path(target)
+    end
 
     # @return [String] base path
     #
     def build_path
-      Epuber::Config.instance.build_path(target)
+      self.class.build_path
     end
 
 
@@ -103,7 +145,7 @@ module Epuber
     #
     # @return nil
     #
-    def _log(level, message)
+    def self._log(level, message)
       case level
       when :ui
         puts message
@@ -117,6 +159,11 @@ module Epuber
         raise "Unknown log level #{level}"
       end
     end
+
+    def _log(level, message)
+      self.class._log(level, message)
+    end
+
 
     # -------------------------------------------------- #
 
@@ -222,7 +269,7 @@ module Epuber
                               '$next_path' => next_path)
     end
 
-    def compile_book
+    def self.compile_book
       compiler = Epuber::Compiler.new(book, target)
       compiler.compile(build_path)
       self.spine = compiler.file_resolver.files_of(:spine)
@@ -231,7 +278,7 @@ module Epuber
 
     # @param message [String]
     #
-    def send_to_clients(message)
+    def self.send_to_clients(message)
       _log :info, "sending message to clients #{message.inspect}"
 
       sockets.each do |ws|
@@ -240,7 +287,7 @@ module Epuber
     end
 
     # @param type [Symbol]
-    def notify_clients(type)
+    def self.notify_clients(type)
       _log :info, "Notifying clients with type #{type.inspect}"
       case type
       when :styles
@@ -256,47 +303,30 @@ module Epuber
     # @param _added [Array<String>]
     # @param _removed [Array<String>]
     #
-    def changes_detected(_modified, _added, _removed)
+    def self.changes_detected(_modified, _added, _removed)
       _log :ui, 'Compiling'
       compile_book
 
       _log :ui, 'Notifying clients'
-      if _modified.all? { |file| file.end_with?(*Epuber::Compiler::GROUP_EXTENSIONS[:style]) }
+
+      if _modified.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
         notify_clients(:styles)
       else
         notify_clients(:reload)
       end
     end
 
-    def render_bade(name)
+    def self.render_bade(name)
       source_path = File.expand_path("server/pages/#{name}", File.dirname(__FILE__))
 
       renderer = Bade::Renderer.from_file(source_path)
-                               .with_locals({book: book, target: target, file_resolver: file_resolver})
+                               .with_locals(book: book, target: target, file_resolver: file_resolver)
 
       result = renderer.render
 
       [200, result]
     end
 
-    # -------------------------------------------------- #
-
-    def initialize
-      super
-      self.sockets = []
-
-      self.listener = Listen.to(Config.instance.project_path, debug: true) do |modified, added, removed|
-        changes_detected(modified, added, removed)
-      end
-
-      self.listener.ignore(%r{#{Config.instance.working_path}})
-      self.listener.ignore(%r{#{Config::WORKING_PATH}/})
-
-      self.listener.start
-
-      _log :ui, 'Init compile'
-      compile_book
-    end
 
     # -------------------------------------------------- #
 
@@ -356,7 +386,7 @@ module Epuber
     #
     namespace '' do
       get '/?' do
-        render_bade('book.bade')
+        self.class.render_bade('book.bade')
       end
 
       get '/change_target/:target_name' do |target_name|
@@ -364,8 +394,8 @@ module Epuber
 
         next [404, 'Target not found'] if selected_target.nil?
 
-        self.class.target = selected_target
-        compile_book
+        self.target = selected_target
+        self.class.compile_book
         redirect '/'
       end
     end
@@ -375,7 +405,7 @@ module Epuber
     #
     namespace '/toc' do
       get '/?' do
-        render_bade('toc.bade')
+        self.class.render_bade('toc.bade')
       end
 
       get '/*' do
@@ -397,8 +427,6 @@ module Epuber
         next_path     = file_resolver.relative_path_from_package_root(spine_file_at(current_index + 1))
         add_keyboard_control_script(html_doc, previous_path, next_path)
 
-        session[:current_page] = path
-
         [200, html_doc.to_html]
       end
     end
@@ -408,7 +436,7 @@ module Epuber
     #
     namespace '/files' do
       get '/?' do
-        render_bade('files.bade')
+        self.class.render_bade('files.bade')
       end
 
       get '/*' do
