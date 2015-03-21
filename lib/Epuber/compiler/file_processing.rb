@@ -147,21 +147,22 @@ module Epuber
       # @return [Nokogiri::XML::Document]
       #
       def xml_document_from_string(text)
-        fragment = Nokogiri::XML.fragment(text)
-
-        doc = Nokogiri::XML::Document.new
+        doc = Nokogiri::XML.parse(text)
         doc.encoding = 'UTF-8'
 
+        fragment = Nokogiri::XML.fragment(text)
         root_elements = fragment.children.select { |el| el.element? }
 
-        doc.root = if root_elements.count == 1
-                     root_elements.first
-                   elsif fragment.at_css('body').nil?
-                     doc.create_element('body')
-                   end
+        if root_elements.count == 1
+          doc.root = root_elements.first
+        elsif fragment.at_css('body').nil?
+          doc.root = doc.create_element('body')
 
-        fragment.children.each do |child|
-          doc.root.add_child(child)
+          fragment.children.select do |child|
+            child.element? || child.comment? || child.text?
+          end.each do |child|
+            doc.root.add_child(child)
+          end
         end
 
         doc
