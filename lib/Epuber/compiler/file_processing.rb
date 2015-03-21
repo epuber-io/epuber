@@ -63,11 +63,14 @@ module Epuber
         img = Magick::Image::read(source_path).first
 
         resolution = img.columns * img.rows
-        max_resolution = 2_000_000
+        max_resolution = 3_000_000
+
         if resolution > max_resolution
-          scale = max_resolution.to_f / resolution.to_f
-          puts "DEBUG: downscaling image #{source_path} with scale #{scale}"
-          img.scale!(scale)
+          img = img.change_geometry("#{max_resolution}@>") do |width, height, img|
+            puts "DEBUG: downscaling image #{source_path} from resolution #{img.columns}x#{img.rows} to #{width}x#{height}"
+            img.resize!(width, height)
+          end
+
           img.write(dest_path)
         else
           file_copy(file)
