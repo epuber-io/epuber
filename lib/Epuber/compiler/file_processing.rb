@@ -115,8 +115,7 @@ module Epuber
                             raise "Unknown text file extension #{source_extname}"
                           end
 
-        xhtml_doc = Nokogiri::XML.parse(xhtml_content, nil, 'UTF-8')
-        # @type xhtml_doc [Nokogiri::XML::Document]
+        xhtml_doc = xml_document_from_string(xhtml_content)
 
         text_add_missing_root_elements(xhtml_doc)
         text_add_default_styles(file, xhtml_doc)
@@ -141,6 +140,31 @@ module Epuber
 
         file.content = result_xhtml_s
         file_write(file)
+      end
+
+      # @param [String] text
+      #
+      # @return [Nokogiri::XML::Document]
+      #
+      def xml_document_from_string(text)
+        fragment = Nokogiri::XML.fragment(text)
+
+        doc = Nokogiri::XML::Document.new
+        doc.encoding = 'UTF-8'
+
+        root_elements = fragment.children.select { |el| el.element? }
+
+        doc.root = if root_elements.count == 1
+                     root_elements.first
+                   elsif fragment.at_css('body').nil?
+                     doc.create_element('body')
+                   end
+
+        fragment.children.each do |child|
+          doc.root.add_child(child)
+        end
+
+        doc
       end
 
       # @param [Epuber::Compiler::File] file
@@ -267,11 +291,6 @@ module Epuber
       # @return nil
       #
       def text_add_missing_root_elements(xhtml_doc)
-        # when the document is empty (has no root element)
-        if xhtml_doc.root.nil?
-          xhtml_doc.root = xhtml_doc.create_element('body')
-        end
-
         # add missing body element
         if xhtml_doc.at_css('body').nil?
           xhtml_doc.root.surround_with_element('body')
