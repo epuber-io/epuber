@@ -267,6 +267,11 @@ module Epuber
       # @return nil
       #
       def text_add_missing_root_elements(xhtml_doc)
+        # when the document is empty (has no root element)
+        if xhtml_doc.root.nil?
+          xhtml_doc.root = xhtml_doc.create_element('body')
+        end
+
         # add missing body element
         if xhtml_doc.at_css('body').nil?
           xhtml_doc.root.surround_with_element('body')
