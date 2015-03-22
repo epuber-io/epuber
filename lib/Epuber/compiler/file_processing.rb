@@ -90,6 +90,7 @@ module Epuber
           __target: @target,
           __file_resolver: @file_resolver,
           __file: file,
+          __const: @target.constants,
         }
 
         file_content = ::File.read(source_path)

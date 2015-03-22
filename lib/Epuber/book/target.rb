@@ -19,7 +19,7 @@ module Epuber
         @name      = name
         @is_ibooks = nil
         @files     = []
-        @constants = {}
+        @constants = Hash.new { |hash, key| raise "Not found key #{key}" }
         @root_toc  = TocItem.new
 
         @default_styles = []
