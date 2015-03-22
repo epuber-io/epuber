@@ -202,9 +202,14 @@ module Epuber
       #
       # @return [void]
       #
-      def add_const(key, value)
-        @constants[key] = value
+      def add_const(key, value = nil)
+        if key.is_a?(Hash) && value.nil?
+          @constants.merge!(key)
+        else
+          @constants[key] = value
+        end
       end
+
 
       # @param file_paths [Array<String>]
       #
