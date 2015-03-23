@@ -299,17 +299,29 @@ module Epuber
       end
     end
 
+    # @param [Array<String>] files_paths
+    #
+    # @return [Array<String>]
+    #
+    def self.filter_not_project_files(files_paths)
+      files_paths.select { |file| file_resolver.file_with_source_path(file) }
+    end
+
     # @param _modified [Array<String>]
     # @param _added [Array<String>]
     # @param _removed [Array<String>]
     #
     def self.changes_detected(_modified, _added, _removed)
+      changed = filter_not_project_files((_modified + _added).uniq)
+      puts "filtered files : #{changed}"
+      return if changed.count == 0
+
       _log :ui, 'Compiling'
       compile_book
 
       _log :ui, 'Notifying clients'
 
-      if _modified.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
+      if changed.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
         notify_clients(:styles)
       else
         notify_clients(:reload)

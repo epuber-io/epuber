@@ -67,6 +67,9 @@ module Epuber
         unless file.file_request.nil?
           _request_to_file_map_cache[file.file_request] = file
         end
+        unless file.source_path.nil?
+          _source_path_to_file_map[file.source_path] = file
+        end
       end
 
       # @param [FileRequest] file_request
@@ -230,11 +233,22 @@ module Epuber
         file_paths.first
       end
 
+      # @param [String] source_path
+      #
+      # @return [File]
+      #
+      def file_with_source_path(source_path)
+        _source_path_to_file_map[source_path]
+      end
 
       private
 
       def _request_to_file_map_cache
-        @request_to_file_map_cache ||= {}
+        @_request_to_file_map_cache ||= {}
+      end
+
+      def _source_path_to_file_map
+        @_source_path_to_file_map ||= {}
       end
 
       # @param file [Epuber::Compiler::File]
@@ -259,10 +273,8 @@ module Epuber
                         real_source_path.sub(/#{extname}$/, new_extname)
                       end
 
-          abs_path = ::File.join(@destination_path, Compiler::EPUB_CONTENT_FOLDER, dest_path)
-
-          file.destination_path = abs_path
-          file.source_path      = real_source_path
+          file.destination_path = ::File.join(destination_path, Compiler::EPUB_CONTENT_FOLDER, dest_path)
+          file.source_path      = ::File.join(source_path, real_source_path)
         end
       end
 
