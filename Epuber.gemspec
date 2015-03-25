@@ -11,11 +11,13 @@ Gem::Specification.new do |spec|
   spec.version  = Epuber::VERSION
   spec.authors  = ['Roman Kříž']
   spec.email    = ['samnung@gmail.com']
-  spec.summary  = 'Command line tool for easy creating ePub files with templates support.'
-  spec.homepage = ''
-  spec.license  = 'MIT'
+  spec.summary  = 'Command line tool for easy creating and maintaining ebooks.'
+  spec.description = "Command line tool for easy creating and maintaining ebooks.\n"
+                     'With support Stylus.'
+  spec.homepage = 'http://epuber.io'
+  spec.license  = 'Commercial'
 
-  spec.files         = `git ls-files -z`.split("\x0")
+  spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + ['epuber.gemspec', 'README.md']
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
@@ -38,6 +40,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rubyzip', '~> 1.0'
 
   spec.add_runtime_dependency 'epubcheck', '~> 3.0', '>= 3.0.1'
+
+  spec.add_runtime_dependency 'bade', '~> 0.1'
 
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rspec', '~> 3.2'
