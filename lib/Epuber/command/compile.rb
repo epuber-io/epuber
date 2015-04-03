@@ -98,7 +98,7 @@ module Epuber
 
       def verify_all_targets_exists!
         index = targets.index(&:nil?)
-        help! "Not found target `#{@targets_names[index]}' in bookspec `#{@book.file_path}'" unless index.nil?
+        help! "Not found target `#{@targets_names[index]}' in bookspec `#{book.file_path}'" unless index.nil?
       end
     end
   end
