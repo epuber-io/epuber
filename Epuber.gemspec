@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'sinatra-contrib', '~> 1.4'
   spec.add_runtime_dependency 'thin', '~> 1.6'
 
-  spec.add_runtime_dependency 'rmagick', '2.13.2'
+  spec.add_runtime_dependency 'rmagick', '~> 2.14'
 
   spec.add_runtime_dependency 'rubyzip', '~> 1.0'
 
