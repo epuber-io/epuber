@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'colorize', '~> 0.7'
   spec.add_runtime_dependency 'listen', '~> 2.9'
 
-  spec.add_runtime_dependency 'sinatra'
+  spec.add_runtime_dependency 'sinatra', '~> 1.4'
   spec.add_runtime_dependency 'sinatra-websocket', '~> 0.3'
   spec.add_runtime_dependency 'sinatra-contrib', '~> 1.4'
   spec.add_runtime_dependency 'thin', '~> 1.6'

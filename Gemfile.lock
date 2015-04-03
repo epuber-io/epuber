@@ -13,7 +13,7 @@ PATH
       nokogiri (~> 1.6)
       rmagick (= 2.13.2)
       rubyzip (~> 1.0)
-      sinatra
+      sinatra (~> 1.4)
       sinatra-contrib (~> 1.4)
       sinatra-websocket (~> 0.3)
       stylus (~> 1.0)
