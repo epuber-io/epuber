@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 module Epuber
-  VERSION = '0.2.1'
+  require_relative 'epuber/version'
 
   require 'bundler/setup'
 

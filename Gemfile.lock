@@ -4,6 +4,7 @@ PATH
     epuber (0.2.1)
       activesupport (~> 4.2)
       bade (~> 0.1)
+      bundler (~> 1)
       claide (~> 0.8)
       colorize (~> 0.7)
       epubcheck (~> 3.0, >= 3.0.1)
@@ -12,7 +13,7 @@ PATH
       nokogiri (~> 1.6)
       rmagick (= 2.13.2)
       rubyzip (~> 1.0)
-      sinatra (~> 1.4)
+      sinatra
       sinatra-contrib (~> 1.4)
       sinatra-websocket (~> 0.3)
       stylus (~> 1.0)
@@ -132,7 +133,6 @@ PLATFORMS
 
 DEPENDENCIES
   bade!
-  bundler (~> 1)
   epuber!
   rspec (~> 3.2)
   rubocop (~> 0.29)

@@ -3,7 +3,7 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'epuber'
+require 'epuber/version'
 
 
 Gem::Specification.new do |spec|
@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.homepage = 'http://epuber.io'
   spec.license  = 'Commercial'
 
-  spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + ['epuber.gemspec', 'README.md']
+  spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec README.md)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'colorize', '~> 0.7'
   spec.add_runtime_dependency 'listen', '~> 2.9'
 
-  spec.add_runtime_dependency 'sinatra', '~> 1.4'
+  spec.add_runtime_dependency 'sinatra'
   spec.add_runtime_dependency 'sinatra-websocket', '~> 0.3'
   spec.add_runtime_dependency 'sinatra-contrib', '~> 1.4'
   spec.add_runtime_dependency 'thin', '~> 1.6'
@@ -43,7 +43,8 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'bade', '~> 0.1'
 
-  spec.add_development_dependency 'bundler', '~> 1'
+  spec.add_runtime_dependency 'bundler', '~> 1'
+
   spec.add_development_dependency 'rspec', '~> 3.2'
   spec.add_development_dependency 'rubocop', '~> 0.29'
 end
