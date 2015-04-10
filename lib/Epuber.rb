@@ -9,4 +9,6 @@ module Epuber
   autoload :Command, 'epuber/command'
   autoload :Compiler, 'epuber/compiler'
   autoload :Config, 'epuber/config'
+  autoload :UI, 'epuber/user_interface'
+  autoload :UserInterface, 'epuber/user_interface'
 end
