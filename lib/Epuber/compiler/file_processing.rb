@@ -190,8 +190,18 @@ module Epuber
       # @return nil
       #
       def text_resolve_links(file, xhtml_doc)
-        tag_name = 'a'
-        attribute_name = 'href'
+        _text_resolve_links_for(file, xhtml_doc, 'a', 'href')
+        _text_resolve_links_for(file, xhtml_doc, 'map > area', 'href')
+      end
+
+      # @param [Epuber::Compiler::File] file
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      # @param [String] tag_name CSS selector for tag
+      # @param [String] attribute_name name of attribute
+      #
+      # @return nil
+      #
+      def _text_resolve_links_for(file, xhtml_doc, tag_name, attribute_name)
         group = :text
 
         img_nodes = xhtml_doc.css("#{tag_name}[#{attribute_name}]")
@@ -204,6 +214,7 @@ module Epuber
               uri = URI(src)
             rescue
               # skip not valid uri
+              # TODO: print some warning
               next
             end
 
