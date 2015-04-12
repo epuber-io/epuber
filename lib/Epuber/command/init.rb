@@ -82,6 +82,7 @@ END
         write('.gitignore', <<-END
 # This is generated with `epuber init`
 *.epub
+*.mobi
 !.epuber/
 .epuber/build
 .epuber/release_build

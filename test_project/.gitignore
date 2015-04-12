@@ -1,4 +1,5 @@
 *.epub
+*.mobi
 !.epuber/
 .epuber/build
 .epuber/release_build
