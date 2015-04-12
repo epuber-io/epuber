@@ -269,6 +269,21 @@ module Epuber
                               '$next_path' => next_path)
     end
 
+    # @param html_doc [Nokogiri::HTML::Document]
+    #
+    def add_file_to_head(type, html_doc, file_path)
+      head = html_doc.at_css('head')
+      node = case type
+             when :style
+               html_doc.create_element('link',  href: "/server/raw/#{file_path}" ,rel: 'stylesheet', type: 'text/css')
+             when :js
+               html_doc.create_element('script', src: "/server/raw/#{file_path}", type: 'text/javascript')
+             else
+               raise "Unknown file type `#{type}`"
+             end
+      head.add_child(node)
+    end
+
     def self.reload_bookspec
       Config.instance.bookspec = nil
       self.book = Config.instance.bookspec
@@ -299,8 +314,12 @@ module Epuber
         send_to_clients('ia')
       when :reload
         send_to_clients('r')
+      when :compile_start
+        send_to_clients('compile_start')
+      when :compile_end
+        send_to_clients('compile_end')
       else
-        raise 'Not known type'
+        raise "Not known type `#{type}`"
       end
     end
 
@@ -323,12 +342,16 @@ module Epuber
       changed = filter_not_project_files(all_changed) || []
       return if changed.count == 0
 
+      notify_clients(:compile_start)
+
       reload_bookspec if all_changed.any? { |file| file == book.file_path }
 
       _log :ui, 'Compiling'
       compile_book
 
       _log :ui, 'Notifying clients'
+
+      notify_clients(:compile_end)
 
       if changed.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
         notify_clients(:styles)
@@ -442,6 +465,9 @@ module Epuber
         fix_links(html_doc, path, 'script', 'src') # javascript
         fix_links(html_doc, path, 'link', 'href') # css styles
         add_auto_refresh_script(html_doc)
+        add_file_to_head(:js, html_doc, 'vendor/js/jquery.min.js')
+        add_file_to_head(:js, html_doc, 'vendor/js/spin.min.js')
+        add_file_to_head(:style, html_doc, 'book_content.styl')
 
         current_index = spine.index { |file| file_resolver.relative_path_from_package_root(file) == path }
         previous_path = file_resolver.relative_path_from_package_root(spine_file_at(current_index - 1))
@@ -503,6 +529,7 @@ module Epuber
         case File.extname(file_path)
         when '.styl'
           require 'stylus'
+          content_type('text/css')
           body(Stylus.compile(::File.new(file_path)))
         else
           send_file(file_path)

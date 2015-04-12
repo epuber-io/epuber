@@ -25,6 +25,9 @@ mixin page(title: nil, header_id: nil)
     			title #{title} | #{book.title} | Epuber
     		- end
     		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/js/jquery.min.js"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/js/spin.min.js"></script>
+
 
     	body
     		+body_header(header_id)
