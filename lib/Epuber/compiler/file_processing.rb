@@ -90,7 +90,7 @@ module Epuber
           __target: @target,
           __file_resolver: @file_resolver,
           __file: file,
-          __const: @target.constants,
+          __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(@target.constants),
         }
 
         file_content = ::File.read(source_path)
