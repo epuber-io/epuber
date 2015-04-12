@@ -217,9 +217,13 @@ module Epuber
           begin
             uri = URI(src)
           rescue
-            # skip not valid uri
-            UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
-            next
+            begin
+              uri = URI(URI::encode(src))
+            rescue
+              # skip not valid uri
+              UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
+              next
+            end
           end
 
           # skip uri with scheme (links to web pages)
