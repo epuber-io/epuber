@@ -162,6 +162,12 @@ module Epuber
                 types:     [Size],
                 inherited: true
 
+      # @return [Bool] whether the target should create mobi
+      #
+      attribute :create_mobi,
+                types:     [TrueClass, FalseClass],
+                inherited: true
+
 
       # @param file_path [String | Epuber::Book::File]
       # @param group [Symbol]

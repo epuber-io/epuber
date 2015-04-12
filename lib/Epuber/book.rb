@@ -170,6 +170,10 @@ module Epuber
     #
     default_target_attribute :default_viewport
 
+    # @return [Bool] whether the target should create mobi
+    #
+    default_target_attribute :create_mobi
+
 
     # @return [String] isbn of printed book
     #

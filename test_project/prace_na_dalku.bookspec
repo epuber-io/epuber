@@ -17,8 +17,8 @@ Epuber::Book.new do |book|
   book.build_version = '5'
 
   book.custom_fonts = true
-  book.fixed_layout = true
-  book.default_viewport = Size.new(200, 300)
+  # book.fixed_layout = true
+  # book.default_viewport = Size.new(200, 300)
 
   book.cover_image = 'cover'
 
@@ -33,6 +33,13 @@ Epuber::Book.new do |book|
     t.epub_version = 2.0
     t.isbn = '978-80-87270-98-3'
     t.add_const 'restart_store_url', 'http://melvil.cz/kniha-restart'
+  end
+
+  book.target :palmknihy do |t|
+    t.epub_version = 2.0
+    t.isbn = '978-80-87270-98-3'
+    t.add_const 'restart_store_url', 'http://melvil.cz/kniha-restart'
+    t.create_mobi = true
   end
 
   book.add_default_style 'prace_na_dalku.css'

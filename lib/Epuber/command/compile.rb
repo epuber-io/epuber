@@ -67,6 +67,8 @@ module Epuber
             archive_path = compiler.archive(archive_name)
 
             system(%(epubcheck "#{archive_path}"))
+
+            convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
           end
         else
           targets.each do |target|
@@ -75,6 +77,8 @@ module Epuber
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
             system(%(epubcheck "#{archive_path}")) if @should_check
+
+            convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
           end
         end
       end
@@ -99,6 +103,21 @@ module Epuber
       def verify_all_targets_exists!
         index = targets.index(&:nil?)
         help! "Not found target `#{@targets_names[index]}' in bookspec `#{book.file_path}'" unless index.nil?
+      end
+
+      def validate_dir(path)
+        if ::File.directory?(path)
+          path
+        end
+      end
+
+      def convert_epub_to_mobi(epub_path, mobi_path)
+        calibre_path = validate_dir('/Applications/calibre.app')
+        calibre_path = validate_dir(File.join(Dir.home, 'Applications/calibre.app')) if calibre_path.nil?
+        UI.error!("Can't find location of calibre.app, tried application folder /Applications and ~/Applications with application name calibre.app, please install calibre to one of those folders") if calibre_path.nil?
+
+        # convert
+        system(::File.join(calibre_path, 'Contents/MacOS/ebook-convert'), epub_path, mobi_path)
       end
     end
   end
