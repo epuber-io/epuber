@@ -41,7 +41,7 @@ module Epuber
       end
     end
 
-    # @return [Epuber::Book::Book]
+    # @return [Epuber::Book]
     #
     def bookspec
       require_relative 'book'
@@ -52,6 +52,14 @@ module Epuber
         book.freeze
         book
       )
+    end
+
+    # @param [Epuber::Book] bookspec
+    #
+    # @return [Epuber::Book]
+    #
+    def bookspec=(bookspec)
+      @bookspec = bookspec
     end
 
     # @return [Epuber::Lockfile]

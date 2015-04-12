@@ -269,6 +269,11 @@ module Epuber
                               '$next_path' => next_path)
     end
 
+    def self.reload_bookspec
+      Config.instance.bookspec = nil
+      self.book = Config.instance.bookspec
+    end
+
     def self.compile_book
       compiler = Epuber::Compiler.new(book, target)
       compiler.compile(build_path)
@@ -304,7 +309,9 @@ module Epuber
     # @return [Array<String>]
     #
     def self.filter_not_project_files(files_paths)
-      files_paths.select { |file| file_resolver.file_with_source_path(file) }
+      return nil if file_resolver.nil?
+
+      files_paths.select { |file| file_resolver.file_with_source_path(file) || book.file_path == file }
     end
 
     # @param _modified [Array<String>]
@@ -312,9 +319,11 @@ module Epuber
     # @param _removed [Array<String>]
     #
     def self.changes_detected(_modified, _added, _removed)
-      changed = filter_not_project_files((_modified + _added).uniq)
-      puts "filtered files : #{changed}"
+      all_changed = (_modified + _added).uniq
+      changed = filter_not_project_files(all_changed) || []
       return if changed.count == 0
+
+      reload_bookspec if all_changed.any? { |file| file == book.file_path }
 
       _log :ui, 'Compiling'
       compile_book
