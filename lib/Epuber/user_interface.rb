@@ -59,6 +59,19 @@ module Epuber
       end
     end
 
+    # @param [Thread::Backtrace::Location, Nokogiri::XML::Node] obj
+    #
+    # @return [#path, #lineno]
+    #
+    def self._location_from_obj(obj)
+      case obj
+      when Thread::Backtrace::Location
+        obj
+      when Nokogiri::XML::Node
+        Struct.new(:path, :lineno).new(obj.document.file_path, obj.line)
+      end
+    end
+
     # @param [Symbol] level color of the output
     # @param [String] message message of the error
     # @param [Thread::Backtrace::Location] location location of the error
@@ -66,6 +79,8 @@ module Epuber
     # @return [String] formatted message
     #
     def self._format_message(level, message, location: nil)
+      location = _location_from_obj(location)
+
       "#{message}
   (in file #{location.path} line #{location.lineno}".send(_color_from_level(level))
     end

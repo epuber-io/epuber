@@ -23,4 +23,8 @@ class Nokogiri::XML::Node
 
     new_parent
   end
+
+  # @return [String] path to original file
+  #
+  attr_accessor :file_path
 end

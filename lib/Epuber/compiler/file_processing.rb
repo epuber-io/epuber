@@ -117,6 +117,7 @@ module Epuber
                           end
 
         xhtml_doc = xml_document_from_string(xhtml_content)
+        xhtml_doc.file_path = source_path
 
         text_add_missing_root_elements(xhtml_doc)
         text_add_default_styles(file, xhtml_doc)
@@ -214,6 +215,7 @@ module Epuber
               uri = URI(src)
             rescue
               # skip not valid uri
+              UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
               # TODO: print some warning
               next
             end
