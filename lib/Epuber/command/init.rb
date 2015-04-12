@@ -18,6 +18,8 @@ module Epuber
       end
 
       def run
+        super
+
         print_welcome
 
         book_title = ask('Book title: ')

@@ -11,7 +11,7 @@ module Epuber
         CLAide::Argument.new('TARGET', false, false),
       ]
 
-      # @param argv [CLAide::ARGV]
+      # @param args [CLAide::ARGV]
       #
       def initialize(args)
         super
@@ -24,6 +24,8 @@ module Epuber
       end
 
       def run
+        super
+
         require_relative '../server'
 
         target = if @selected_target_name.nil?
