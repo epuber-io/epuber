@@ -87,9 +87,9 @@ module Epuber
 
       comps = []
       comps << message.to_s
-      comps << "(in file #{location.path} line #{location.lineno}" unless location.nil?
+      comps << "  (in file #{location.path} line #{location.lineno}" unless location.nil?
 
-      comps.join("\n").send(_color_from_level(level))
+      comps.join("\n").ansi.send(_color_from_level(level))
     end
 
     # @param [Array<Thread::Backtrace::Location>] locations locations of the error (only for verbose output)

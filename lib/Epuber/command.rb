@@ -7,7 +7,7 @@ module Epuber
     include CLAide::InformativeError
 
     def message
-      "[!] #{super}".red
+      "[!] #{super}".ansi.red
     end
   end
 

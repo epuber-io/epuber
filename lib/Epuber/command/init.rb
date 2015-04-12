@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'fileutils'
-require 'colorize'
 
 require_relative '../command'
 require_relative '../vendor/ruby_templater'
@@ -42,14 +41,14 @@ module Epuber
       private
 
       def print_welcome
-        puts <<-END.yellow
+        puts <<-END.ansi.yellow
 Welcome to epuber init script. It will create basic structure for this project.
 There will be some questions about basic information, please fill them.
 END
       end
 
       def print_good_bye(book_id)
-        puts <<-END.green
+        puts <<-END.ansi.green
 Success.
 Epuber now ends.
 
@@ -116,7 +115,7 @@ END
         result = $stdin.gets.chomp
 
         while result.empty?
-          puts 'Value cannot be empty, please fill it!'.red
+          puts 'Value cannot be empty, please fill it!'.ansi.red
           print text
           result = $stdin.gets.chomp
         end
