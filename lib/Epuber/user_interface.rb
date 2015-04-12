@@ -1,10 +1,14 @@
 
+require 'active_support/core_ext/object/try'
+
 require_relative 'ruby_extensions/thread'
 require_relative 'command'
 
 
 module Epuber
   class UserInterface
+    Location = Struct.new(:path, :lineno)
+
     class << self
       # @return [Epuber::Command]
       #
@@ -13,7 +17,7 @@ module Epuber
 
     # Fatal error, prints message and exit with return code 1
     #
-    # @param [String] message message of the error
+    # @param [Exception, String] message message of the error
     # @param [Thread::Backtrace::Location] location location of the error
     #
     def self.error!(message, location: nil)
@@ -28,7 +32,7 @@ module Epuber
     #
     def self.error(message, location: nil)
       puts(_format_message(:error, message, location: location))
-      _print_backtrace(location: location)
+      _print_backtrace(message.try(:backtrace_locations) || caller_locations, location: location)
     end
 
     # @param [String] message message of the error
@@ -61,14 +65,14 @@ module Epuber
 
     # @param [Thread::Backtrace::Location, Nokogiri::XML::Node] obj
     #
-    # @return [#path, #lineno]
+    # @return [Location]
     #
     def self._location_from_obj(obj)
       case obj
       when Thread::Backtrace::Location
-        obj
+        Location.new(obj.path, obj.lineno)
       when Nokogiri::XML::Node
-        Struct.new(:path, :lineno).new(obj.document.file_path, obj.line)
+        Location.new(obj.document.file_path, obj.line)
       end
     end
 
@@ -81,8 +85,11 @@ module Epuber
     def self._format_message(level, message, location: nil)
       location = _location_from_obj(location)
 
-      "#{message}
-  (in file #{location.path} line #{location.lineno}".send(_color_from_level(level))
+      comps = []
+      comps << message.to_s
+      comps << "(in file #{location.path} line #{location.lineno}" unless location.nil?
+
+      comps.join("\n").send(_color_from_level(level))
     end
 
     # @param [Array<Thread::Backtrace::Location>] locations locations of the error (only for verbose output)
@@ -91,7 +98,7 @@ module Epuber
     # @return [String] formatted message
     #
     def self._format_backtrace(locations, location: nil)
-      index = locations.index(location) # #second because of current location
+      index = locations.index(location) || 0
       locations[index, locations.size].map { |loc| loc.to_s }
     end
 
