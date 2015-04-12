@@ -90,7 +90,7 @@ module Epuber
           __target: @target,
           __file_resolver: @file_resolver,
           __file: file,
-          __const: @target.constants,
+          __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(@target.constants),
         }
 
         file_content = ::File.read(source_path)
@@ -117,6 +117,7 @@ module Epuber
                           end
 
         xhtml_doc = xml_document_from_string(xhtml_content)
+        xhtml_doc.file_path = source_path
 
         text_add_missing_root_elements(xhtml_doc)
         text_add_default_styles(file, xhtml_doc)
@@ -202,8 +203,6 @@ module Epuber
       # @return nil
       #
       def _text_resolve_links_for(file, xhtml_doc, tag_name, attribute_name)
-        group = :text
-
         img_nodes = xhtml_doc.css("#{tag_name}[#{attribute_name}]")
         img_nodes.each do |node|
           src = node[attribute_name]
@@ -214,29 +213,51 @@ module Epuber
               uri = URI(src)
             rescue
               # skip not valid uri
-              # TODO: print some warning
+              UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
               next
             end
 
             # skip uri with scheme (links to web pages)
             next unless uri.scheme.nil?
 
-            pattern = uri.path
+            target_file = _find_file_with_destination_pattern(uri.path, :text, ::File.dirname(file.destination_path), location: node)
 
-            begin
-              # try to find it in files folder
-              target_file = @file_resolver.find_file_with_destination_pattern(pattern, ::File.dirname(file.destination_path), group)
-            rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError
-              # try to find it in all files
-              target_file = @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, group)
-            end
-
+            # skip not found files
+            next if target_file.nil?
 
             uri.path = @file_resolver.relative_path(file, target_file)
 
             node[attribute_name] = uri.to_s
           end
         end
+      end
+
+      # @param [FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError] error
+      #
+      def _handle_file_resolver_error(error, location: nil)
+        case error
+        when FileResolver::FileNotFoundError
+          UI.warning("Can't find file with name #{error.pattern}", location: location)
+
+        when FileResolver::MultipleFilesFoundError
+          UI.warning("Too many files found for name #{error.pattern} and there should be only one, files: #{error.files_paths}", location: location)
+        end
+      end
+
+      # @param [String] pattern
+      # @param [Symbol] group
+      # @param [String] context_path
+      #
+      def _find_file_with_destination_pattern(pattern, group, context_path, location: nil)
+        begin
+          # try to find it in files folder
+          @file_resolver.find_file_with_destination_pattern(pattern, context_path, group)
+        rescue FileResolver::FileNotFoundError
+          # try to find it in all files
+          @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, group)
+        end
+      rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError => e
+        _handle_file_resolver_error(e, location: location)
       end
 
       # @param [Class] klass class of thing you want to perform (Checker or Transformer)
@@ -275,8 +296,17 @@ module Epuber
             package_path = @file_resolver.find_file(path, :image, context_path: ::File.dirname(file.source_path))
           rescue FileResolver::FileNotFoundError
             # try to find in project folder
-            package_path = @file_resolver.find_file(path, :image)
+            begin
+              package_path = @file_resolver.find_file(path, :image)
+            rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError => e
+              _handle_file_resolver_error(e, location: img)
+            end
+          rescue FileResolver::MultipleFilesFoundError => e
+            _handle_file_resolver_error(e, location: img)
           end
+
+          # skip when no file was found (message was already show with #_handle_file_resolver_error method)
+          next if package_path.nil?
 
           file_request = Epuber::Book::FileRequest.new(package_path, group: :image)
           image_file = File.new(file_request, group: :image)

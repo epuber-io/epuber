@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+
 module Epuber
   module DSL
     module AttributeSupport
@@ -45,7 +46,7 @@ module Epuber
       end
 
       # @param name [Symbol]
-      # @param attr [Attribute]
+      # @param attr [Epuber::DSL::Attribute]
       #
       # @return nil
       #
@@ -57,12 +58,20 @@ module Epuber
           value = @attributes_values[key]
 
           if !value.nil?
+            # has value -> return it
             value
-          elsif attr.inherited? && respond_to?(:parent) && parent
+
+          elsif attr.inherited? && respond_to?(:parent) && !parent.nil?
+            # hasn't value –> try to find it in parent
             parent.send(key)
+
           elsif !attr.default_value.nil?
+            # write default value on first access to root object
             root_obj = self.class.find_root(self) || self
             root_obj.send(attr.writer_name, attr.default_value)
+
+            # and return the default value
+            attr.default_value
           end
         end
 
@@ -79,7 +88,11 @@ module Epuber
 
             @attributes_values[key] = mapped
           else
-            @attributes_values[key] = attr.converted_value(value)
+            begin
+              @attributes_values[key] = attr.converted_value(value)
+            rescue Exception => e
+              UI.warning("Invalid value `#{value}` for attribute `#{name}`, original error `#{e}`", location: caller_locations[1])
+            end
           end
         end
 

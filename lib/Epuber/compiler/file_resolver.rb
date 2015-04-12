@@ -3,8 +3,34 @@
 module Epuber
   class Compiler
     class FileResolver
-      class FileNotFoundError < ::StandardError; end
-      class MultipleFilesFoundError < ::StandardError; end
+      class FileNotFoundError < ::StandardError
+        # @return [String]
+        #
+        attr_reader :pattern
+
+        # @param [String] pattern
+        #
+        def initialize(pattern)
+          @pattern = pattern
+        end
+      end
+
+      class MultipleFilesFoundError < ::StandardError
+        # @return [Array<String>]
+        #
+        attr_reader :files_paths
+
+        # @return [String]
+        #
+        attr_reader :pattern
+
+        # @param [Array<String>] files_paths
+        #
+        def initialize(pattern, files_paths)
+          @pattern = pattern
+          @files_paths = files_paths
+        end
+      end
 
       GROUP_EXTENSIONS = {
         text:  %w(.xhtml .html .bade .rxhtml),
@@ -318,8 +344,8 @@ module Epuber
       # @return nil
       #
       def assert_one_file_path(file_paths, pattern)
-        raise FileNotFoundError, "not found file matching pattern `#{pattern}`" if file_paths.empty?
-        raise MultipleFilesFoundError, "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
+        raise FileNotFoundError.new(pattern), "not found file matching pattern `#{pattern}`" if file_paths.empty?
+        raise MultipleFilesFoundError.new(pattern, file_paths), "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
       end
 
       # @param [String] pattern

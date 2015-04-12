@@ -22,8 +22,21 @@ module Epuber
     self.description = 'Epuber, easy creating and maintaining e-book.'
     self.plugin_prefixes = plugin_prefixes + %w(epuber)
 
+    def self.run(argv = [])
+      begin
+        super
+      rescue => e
+        Epuber::UI.error!(e)
+      end
+    end
+
+    def validate!
+      super
+      UI.current_command = self
+    end
+
     def run
-      # puts "Running command with class #{self.class}"
+      UI.current_command = self
     end
 
     protected

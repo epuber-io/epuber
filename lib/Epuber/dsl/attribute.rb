@@ -219,29 +219,25 @@ module Epuber
           validate_type(value)
         rescue StandardError
           raise if @auto_convert.nil?
+          dest_class = @auto_convert[value.class]
 
-          begin
-            dest_class = @auto_convert[value.class]
+          if dest_class.nil?
+            array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
+            array_keys_with_type = array_keys.select { |k, _v| k.include?(value.class) }
 
-            if dest_class.nil?
-              array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
-              array_keys_with_type = array_keys.select { |k, _v| k.include?(value.class) }
-
-              if array_keys_with_type.count > 0
-                dest_class = array_keys_with_type.values.first
-              end
+            if array_keys_with_type.count > 0
+              dest_class = array_keys_with_type.values.first
             end
+          end
 
-            if dest_class.is_a?(Proc)
-              return dest_class.call(value)
-            elsif dest_class.respond_to?(:parse)
-              return dest_class.parse(value)
-            else
-              return dest_class.new(value)
-            end
-
-          rescue
-            raise StandardError, "Unknown auto-conversion from class #{value.class} into class #{dest_class.class}"
+          if dest_class.respond_to?(:call)
+            return dest_class.call(value)
+          elsif dest_class.respond_to?(:parse)
+            return dest_class.parse(value)
+          elsif dest_class.respond_to?(:new)
+            return dest_class.new(value)
+          else
+            raise StandardError, "Object/class #{dest_class} doesn't support any convert method (#call, .parse or implicit .new)"
           end
         end
 
