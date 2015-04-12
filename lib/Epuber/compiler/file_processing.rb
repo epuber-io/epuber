@@ -207,28 +207,32 @@ module Epuber
         img_nodes.each do |node|
           src = node[attribute_name]
           # @type [String] src
+          next if src.nil?
 
-          unless src.nil?
-            begin
-              uri = URI(src)
-            rescue
-              # skip not valid uri
-              UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
-              next
-            end
-
-            # skip uri with scheme (links to web pages)
-            next unless uri.scheme.nil?
-
-            target_file = _find_file_with_destination_pattern(uri.path, :text, ::File.dirname(file.destination_path), location: node)
-
-            # skip not found files
-            next if target_file.nil?
-
-            uri.path = @file_resolver.relative_path(file, target_file)
-
-            node[attribute_name] = uri.to_s
+          if src.empty?
+            UI.warning("Empty attribute `#{attribute_name}` for tag `#{tag_name}`", location: node)
+            next
           end
+
+          begin
+            uri = URI(src)
+          rescue
+            # skip not valid uri
+            UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
+            next
+          end
+
+          # skip uri with scheme (links to web pages)
+          next unless uri.scheme.nil?
+
+          target_file = _find_file_with_destination_pattern(uri.path, :text, ::File.dirname(file.destination_path), location: node)
+
+          # skip not found files
+          next if target_file.nil?
+
+          uri.path = @file_resolver.relative_path(file, target_file)
+
+          node[attribute_name] = uri.to_s
         end
       end
 
@@ -290,6 +294,11 @@ module Epuber
         xhtml_doc.css('img').each do |img|
           path = img['src']
           next if path.nil?
+
+          if path.empty?
+            UI.warning('Empty attribute `href` for tag `img`', location: node)
+            next
+          end
 
           begin
             # try to find it in same folder
