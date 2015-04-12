@@ -203,8 +203,6 @@ module Epuber
       # @return nil
       #
       def _text_resolve_links_for(file, xhtml_doc, tag_name, attribute_name)
-        group = :text
-
         img_nodes = xhtml_doc.css("#{tag_name}[#{attribute_name}]")
         img_nodes.each do |node|
           src = node[attribute_name]
@@ -216,29 +214,42 @@ module Epuber
             rescue
               # skip not valid uri
               UI.warning("Invalid link `#{src}` in tag `#{tag_name}`", location: node)
-              # TODO: print some warning
               next
             end
 
             # skip uri with scheme (links to web pages)
             next unless uri.scheme.nil?
 
-            pattern = uri.path
+            target_file = _find_file_with_destination_pattern(uri.path, :text, ::File.dirname(file.destination_path), location: node)
 
-            begin
-              # try to find it in files folder
-              target_file = @file_resolver.find_file_with_destination_pattern(pattern, ::File.dirname(file.destination_path), group)
-            rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError
-              # try to find it in all files
-              target_file = @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, group)
-            end
-
+            # skip not found files
+            next if target_file.nil?
 
             uri.path = @file_resolver.relative_path(file, target_file)
 
             node[attribute_name] = uri.to_s
           end
         end
+      end
+
+      # @param [String] pattern
+      # @param [Symbol] group
+      # @param [String] context_path
+      #
+      def _find_file_with_destination_pattern(pattern, group, context_path, location: nil)
+        begin
+          # try to find it in files folder
+          @file_resolver.find_file_with_destination_pattern(pattern, context_path, group)
+        rescue FileResolver::FileNotFoundError
+          # try to find it in all files
+          @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, group)
+        end
+
+      rescue FileResolver::FileNotFoundError
+        UI.warning("Can't find file with name #{pattern}", location: location)
+
+      rescue FileResolver::MultipleFilesFoundError => e
+        UI.warning("Too many files found for name #{pattern} and there should be only one, files: #{e.files_paths}", location: location)
       end
 
       # @param [Class] klass class of thing you want to perform (Checker or Transformer)
