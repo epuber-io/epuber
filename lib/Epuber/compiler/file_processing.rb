@@ -111,7 +111,7 @@ module Epuber
                                          .render
                           when '.bade'
                             Bade::Renderer.from_source(file_content, source_path).with_locals(variables)
-                                          .render(new_line: '\n', indent: '  ')
+                                          .render(new_line: '', indent: '')
                           else
                             raise "Unknown text file extension #{source_extname}"
                           end
