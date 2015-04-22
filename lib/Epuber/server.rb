@@ -366,7 +366,7 @@ module Epuber
       renderer = Bade::Renderer.from_file(source_path)
                                .with_locals(book: book, target: target, file_resolver: file_resolver)
 
-      result = renderer.render
+      result = renderer.render(new_line: '', indent: '')
 
       [200, result]
     end
