@@ -229,6 +229,9 @@ module Epuber
           # skip uri with scheme (links to web pages)
           next unless uri.scheme.nil?
 
+          # skip empty path
+          next if uri.path.empty?
+
           target_file = _find_file_with_destination_pattern(uri.path, :text, ::File.dirname(file.destination_path), location: node)
 
           # skip not found files
