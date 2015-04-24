@@ -149,7 +149,7 @@ module Epuber
 
             if @target.ibooks?
               @xml.meta(@book.version, property: 'ibooks:version') unless @book.version.nil?
-              @xml.meta(@target.custom_fonts, property: 'ibooks:specified-fonts') unless @book.custom_fonts.nil?
+              @xml.meta(@target.custom_fonts, property: 'ibooks:specified-fonts') unless @target.custom_fonts.nil?
             end
           end
 
