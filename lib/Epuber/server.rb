@@ -12,6 +12,10 @@ require 'active_support/core_ext/object/try'
 require_relative 'vendor/hash_binding'
 
 require 'bade'
+require 'stylus'
+require 'coffee-script'
+
+require_relative 'third_party/bower'
 
 
 module Epuber
@@ -223,6 +227,10 @@ module Epuber
     def add_script_file_to_head(html_doc, file_name, *args)
       source = File.read(File.expand_path("server/#{file_name}", File.dirname(__FILE__)))
 
+      if File.extname(file_name) == '.coffee'
+        source = CoffeeScript.compile(source)
+      end
+
       args.each do |hash|
         hash.each do |key, value|
           opt_value = if value
@@ -235,14 +243,20 @@ module Epuber
       end
 
       source = yield source if block_given?
+      add_script_to_head(html_doc, source)
+    end
 
-      script_node = html_doc.create_element('script', source, type: 'text/javascript')
+    # @param html_doc [Nokogiri::HTML::Document]
+    # @param script_text [String]
+    #
+    def add_script_to_head(html_doc, script_text)
+      script_node = html_doc.create_element('script', script_text, type: 'text/javascript')
 
-      head = html_doc.css('head').first
+      head = html_doc.at_css('head')
 
       if head.nil?
         head = html_doc.create_element('head')
-        html_doc.css('html').first.add_child(head)
+        html_doc.at_css('html').add_child(head)
       end
       head.add_child(script_node)
     end
@@ -281,6 +295,9 @@ module Epuber
              else
                raise "Unknown file type `#{type}`"
              end
+
+      return if head.css('script, link').any? { |n| (!n['href'].nil? && n['href'] == node['href']) || (!n['src'].nil? && n['src'] == node['src']) }
+
       head.add_child(node)
     end
 
@@ -374,6 +391,8 @@ module Epuber
 
     # -------------------------------------------------- #
 
+    # @param [String] path
+    #
     def handle_websocket(path)
       _log :ws, "#{path}: start"
       request.websocket do |ws|
@@ -402,6 +421,29 @@ module Epuber
       end
     end
 
+    # @param [String] file_path
+    #
+    def handle_file(file_path)
+      return not_found unless File.exists?(file_path)
+
+      last_modified(File.mtime(file_path))
+
+      case File.extname(file_path)
+      when '.styl'
+        content_type('text/css')
+        body(Stylus.compile(::File.new(file_path)))
+      when '.coffee'
+        content_type('text/javascript')
+        body(CoffeeScript.compile(::File.read(file_path)))
+      else
+        extname = File.extname(file_path)
+        type    = unless BINARY_FILES_EXTNAMES.include?(extname)
+                    'text/plain'
+                  end
+
+        send_file(file_path, type: type)
+      end
+    end
     # -------------------------------------------------- #
 
     # @!group Sinatra things
@@ -465,8 +507,10 @@ module Epuber
         fix_links(html_doc, path, 'script', 'src') # javascript
         fix_links(html_doc, path, 'link', 'href') # css styles
         add_auto_refresh_script(html_doc)
-        add_file_to_head(:js, html_doc, 'vendor/js/jquery.min.js')
-        add_file_to_head(:js, html_doc, 'vendor/js/spin.min.js')
+        add_file_to_head(:js, html_doc, 'vendor/bower/jquery/jquery.min.js')
+        add_file_to_head(:js, html_doc, 'vendor/bower/spin/spin.js')
+        add_file_to_head(:js, html_doc, 'vendor/bower/cookies/cookies.min.js')
+        add_file_to_head(:js, html_doc, 'vendor/bower/uri/URI.min.js')
         add_file_to_head(:style, html_doc, 'book_content.styl')
 
         current_index = spine.index { |file| file_resolver.relative_path_from_package_root(file) == path }
@@ -488,16 +532,11 @@ module Epuber
 
       get '/*' do
         path = find_file
-        next [404] if path.nil?
+        next not_found if path.nil?
 
         _log :get, "/files/#{params[:splat].first}: founded file #{path}"
 
-        extname = ::File.extname(path)
-        type    = unless BINARY_FILES_EXTNAMES.include?(extname)
-                    'text/plain'
-                  end
-
-        send_file(File.expand_path(path, build_path), type: type)
+        handle_file(File.expand_path(path, build_path))
       end
     end
 
@@ -508,32 +547,22 @@ module Epuber
     #
     get '/raw/*' do
       path = find_file
-      next [404] if path.nil?
-
-      _log :get, "/raw/#{params[:splat].first}: founded file #{path}"
-      send_file(File.expand_path(path, build_path))
+      next not_found if path.nil?
+      handle_file(File.expand_path(path, build_path))
     end
 
     # ----------------------------------
     # @group Server files
     #
     namespace '/server' do
+      get '/raw/vendor/bower/:name/*' do |name, rest|
+        path = File.join(ThirdParty::Bower.path_to_js(name.to_sym), rest)
+        handle_file(path)
+      end
+
       get '/raw/*' do
         file_path = File.expand_path("server/#{params[:splat].first}", File.dirname(__FILE__))
-        _log :get, "/server/raw/#{params[:splat].first} -> #{file_path}"
-
-        next not_found unless File.exists?(file_path)
-
-        last_modified(File.mtime(file_path))
-
-        case File.extname(file_path)
-        when '.styl'
-          require 'stylus'
-          content_type('text/css')
-          body(Stylus.compile(::File.new(file_path)))
-        else
-          send_file(file_path)
-        end
+        handle_file(file_path)
       end
     end
   end

@@ -1,0 +1,8 @@
+{
+  "name": "epuber",
+  "dependencies": {
+    "cookies-js": "*",
+    "uri.js": "*",
+    "spin.js": "*"
+  }
+}
