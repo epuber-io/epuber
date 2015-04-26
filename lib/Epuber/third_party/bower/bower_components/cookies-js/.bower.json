@@ -15,6 +15,6 @@
     "commit": "0767c461ce9d72e237fc63653ffc025bcae57a2d"
   },
   "_source": "git://github.com/ScottHamper/Cookies.git",
-  "_target": "*",
+  "_target": "~1.2",
   "_originalSource": "cookies-js"
 }

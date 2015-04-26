@@ -1,8 +1,9 @@
 {
   "name": "epuber",
   "dependencies": {
-    "cookies-js": "*",
-    "uri.js": "*",
-    "spin.js": "*"
+    "cookies-js": "~1.2",
+    "uri.js": "~1.15",
+    "spin.js": "~2.0",
+    "jquery": "~2.1"
   }
 }
