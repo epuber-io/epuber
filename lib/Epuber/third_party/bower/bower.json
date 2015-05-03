@@ -4,6 +4,7 @@
     "cookies-js": "~1.2",
     "uri.js": "~1.15",
     "spin.js": "~2.0",
-    "jquery": "~2.1"
+    "jquery": "~2.1",
+    "keymaster": "*"
   }
 }

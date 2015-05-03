@@ -278,7 +278,7 @@ module Epuber
     # @param html_doc [Nokogiri::HTML::Document]
     #
     def add_keyboard_control_script(html_doc, previous_path, next_path)
-      add_script_file_to_head(html_doc, 'keyboard_control.js',
+      add_script_file_to_head(html_doc, 'keyboard_control.coffee',
                               '$previous_path' => previous_path,
                               '$next_path' => next_path)
     end
@@ -511,6 +511,7 @@ module Epuber
         add_file_to_head(:js, html_doc, 'vendor/bower/spin/spin.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/cookies/cookies.min.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/uri/URI.min.js')
+        add_file_to_head(:js, html_doc, 'vendor/bower/keymaster/keymaster.js')
         add_file_to_head(:style, html_doc, 'book_content.styl')
 
         current_index = spine.index { |file| file_resolver.relative_path_from_package_root(file) == path }

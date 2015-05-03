@@ -3,10 +3,11 @@ module Epuber
     class Bower
       class << self
         JS_COMPONENTS = {
-          jquery:  'jquery/dist/',
-          cookies: 'cookies-js/dist/',
-          uri:     'uri.js/src/',
-          spin:    'spin.js/',
+          jquery:    'jquery/dist/',
+          cookies:   'cookies-js/dist/',
+          uri:       'uri.js/src/',
+          spin:      'spin.js/',
+          keymaster: 'keymaster/',
         }
 
         def path_to_js(component)
