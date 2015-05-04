@@ -506,7 +506,9 @@ module Epuber
         fix_links(html_doc, path, 'img', 'src') # images
         fix_links(html_doc, path, 'script', 'src') # javascript
         fix_links(html_doc, path, 'link', 'href') # css styles
+        add_file_to_head(:js, html_doc, 'support.coffee')
         add_auto_refresh_script(html_doc)
+
         add_file_to_head(:js, html_doc, 'vendor/bower/jquery/jquery.min.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/spin/spin.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/cookies/cookies.min.js')
