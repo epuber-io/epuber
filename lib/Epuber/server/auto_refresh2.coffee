@@ -173,6 +173,44 @@ class @ReloaderContext
         # fail safe
         Timer.start (10 * 1000), executeCallback
 
+    _createCompilingOverlayIfNeeded: ->
+        if @spinner_container?
+            return
+
+        @spinner_container = document.createElement('div');
+        @spinner_container.id = 'epuber_spinner_container';
+        $(@spinner_container).css('opacity', '0');
+
+        opts =
+            lines: 12 # The number of lines to draw
+            length: 7 # The length of each line
+            width: 4 # The line thickness
+            radius: 9 # The radius of the inner circle
+            corners: 1 # Corner roundness (0..1)
+            rotate: 0 # The rotation offset
+            direction: 1 # 1: clockwise, -1: counterclockwise
+            color: '#fff' # #rgb or #rrggbb or array of colors
+            speed: 1 # Rounds per second
+            trail: 42 # Afterglow percentage
+            shadow: false # Whether to render a shadow
+            hwaccel: false # Whether to use hardware acceleration
+            className: 'epuber_spinner' # The CSS class to assign to the spinner
+            zIndex: 2e9 # The z-index (defaults to 2000000000)
+            top: '50%' # Top position relative to parent
+            left: '50%' # Left position relative to parent
+
+        @spinner = new Spinner(opts);
+
+    _displayCompilingOverlay: ->
+        @_createCompilingOverlayIfNeeded()
+        @spinner.spin(@spinner_container)
+        $(@spinner_container).appendTo('body').animate({opacity: '1'}, TRANSITION.duration * 1000)
+
+    _hideCompilingOverlay: ->
+        @spinner.stop()
+        $(@spinner_container).remove().animate({opacity: '0'}, TRANSITION.duration * 1000)
+
+
 
     perform: (type, changed_files_hrefs) ->
         switch type
@@ -189,6 +227,11 @@ class @ReloaderContext
                 uri.setQuery('cache_control', Math.round(+new Date / 1e3))
                 @window.location.assign(uri.toString())
 
+            when ReloadType.compilation_begin
+                @_displayCompilingOverlay()
+
+            when ReloadType.compilation_end
+                @_hideCompilingOverlay()
+
             else
                 @console.error "Unsupported reload type #{type}"
-
