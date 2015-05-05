@@ -7,7 +7,7 @@ require 'sinatra-websocket'
 require 'nokogiri'
 require 'listen'
 
-require 'active_support/core_ext/object/try'
+require 'active_support'
 
 require_relative 'vendor/hash_binding'
 
@@ -205,6 +205,16 @@ module Epuber
       end
     end
 
+    # @param [String] path
+    #
+    # @return [String]
+    #
+    def self.relative_path_to_book_file(path)
+      file = file_resolver.file_with_source_path(path)
+      abs_path = File.join(build_path, '')
+      file.destination_path.sub(abs_path, '')
+    end
+
     # @param html_doc [Nokogiri::HTML::Document]
     # @param context_path [String]
     # @param css_selector [String]
@@ -273,6 +283,8 @@ module Epuber
 
         script
       end
+
+      add_file_to_head(:js, html_doc, 'auto_refresh2.coffee')
     end
 
     # @param html_doc [Nokogiri::HTML::Document]
@@ -324,20 +336,14 @@ module Epuber
     end
 
     # @param type [Symbol]
-    def self.notify_clients(type)
+    def self.notify_clients(type, changed_files = [])
       _log :info, "Notifying clients with type #{type.inspect}"
-      case type
-      when :styles
-        send_to_clients('ia')
-      when :reload
-        send_to_clients('r')
-      when :compile_start
-        send_to_clients('compile_start')
-      when :compile_end
-        send_to_clients('compile_end')
-      else
-        raise "Not known type `#{type}`"
-      end
+      raise "Not known type `#{type}`" unless [:styles, :reload, :compile_start, :compile_end].include?(type)
+      message = {
+        message: type,
+        changed_files: changed_files,
+      }
+      send_to_clients(message.to_json)
     end
 
     # @param [Array<String>] files_paths
@@ -370,10 +376,12 @@ module Epuber
 
       notify_clients(:compile_end)
 
+      changed.map! { |file| File.join('', 'raw', relative_path_to_book_file(file)) }
+
       if changed.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
-        notify_clients(:styles)
+        notify_clients(:styles, changed)
       else
-        notify_clients(:reload)
+        notify_clients(:reload, changed)
       end
     end
 
@@ -404,7 +412,7 @@ module Epuber
           thread = Thread.new do
             loop do
               sleep(10)
-              ws.send('heartbeat')
+              ws.send({message: :heartbeat}.to_json)
             end
           end
         end
@@ -438,12 +446,18 @@ module Epuber
       else
         extname = File.extname(file_path)
         type    = unless BINARY_FILES_EXTNAMES.include?(extname)
-                    'text/plain'
+                    mime_type = MIME::Types.of(file_path).first
+                    if mime_type.nil?
+                      'text/plain'
+                    else
+                      content_type
+                    end
                   end
 
         send_file(file_path, type: type)
       end
     end
+
     # -------------------------------------------------- #
 
     # @!group Sinatra things
@@ -506,8 +520,6 @@ module Epuber
         fix_links(html_doc, path, 'img', 'src') # images
         fix_links(html_doc, path, 'script', 'src') # javascript
         fix_links(html_doc, path, 'link', 'href') # css styles
-        add_file_to_head(:js, html_doc, 'support.coffee')
-        add_auto_refresh_script(html_doc)
 
         add_file_to_head(:js, html_doc, 'vendor/bower/jquery/jquery.min.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/spin/spin.js')
@@ -515,6 +527,10 @@ module Epuber
         add_file_to_head(:js, html_doc, 'vendor/bower/uri/URI.min.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/keymaster/keymaster.js')
         add_file_to_head(:style, html_doc, 'book_content.styl')
+
+        add_file_to_head(:js, html_doc, 'support.coffee')
+        add_auto_refresh_script(html_doc)
+
 
         current_index = spine.index { |file| file_resolver.relative_path_from_package_root(file) == path }
         previous_path = file_resolver.relative_path_from_package_root(spine_file_at(current_index - 1))

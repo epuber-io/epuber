@@ -159,9 +159,8 @@ module Epuber
       # @return [File]
       #
       def find_file_with_destination_path(destination_path)
-        file_paths = files_of.select do |file|
-          file.destination_path == destination_path
-        end
+        file = _destination_path_to_file_map[destination_path]
+        file_paths = [file].compact
 
         assert_one_file_path(file_paths, destination_path)
 
@@ -277,6 +276,10 @@ module Epuber
         @_source_path_to_file_map ||= {}
       end
 
+      def _destination_path_to_file_map
+        @_destination_path_to_file_map ||= {}
+      end
+
       # @param file [Epuber::Compiler::File]
       #
       # @return [nil]
@@ -301,6 +304,14 @@ module Epuber
 
           file.destination_path = ::File.join(destination_path, Compiler::EPUB_CONTENT_FOLDER, dest_path)
           file.source_path      = ::File.join(source_path, real_source_path)
+
+          # TODO: uncomment following lines and resolve duplicate items
+          #
+          # if _destination_path_to_file_map.key?(file.destination_path)
+          #   raise "Duplicate entry for result path #{file.destination_path}"
+          # end
+
+          _destination_path_to_file_map[file.destination_path] = file
         end
       end
 
