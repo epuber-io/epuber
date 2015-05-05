@@ -274,8 +274,8 @@ module Epuber
     # @param html_doc [Nokogiri::HTML::Document]
     #
     def add_auto_refresh_script(html_doc)
-      add_file_to_head(:js, html_doc, 'auto_refresh2.coffee')
-      add_script_file_to_head(html_doc, 'auto_refresh.js') do |script|
+      add_file_to_head(:js, html_doc, 'auto_refresh/reloader.coffee')
+      add_script_file_to_head(html_doc, 'auto_refresh/auto_refresh.js') do |script|
         bonjour_name = "#{`hostname`.chomp}.local"
 
         script.gsub!('GSUB_PORT', settings.port.to_s)
