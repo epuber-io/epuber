@@ -1,9 +1,10 @@
 
-class Timer
+class @Timer
     constructor: (@func) ->
         @running = no; @id = null
         @_handler = =>
-            @running = no; @id = null
+            @running = no
+            @id = null
             @func()
 
     start: (timeout) ->
@@ -48,6 +49,7 @@ class @ReloaderContext
 
     constructor: (@window, @console) ->
         @document = @window.document
+        @window.addEventListener('load', (=> @_restoreScrollPosition), false)
 
 
     _head: ->
@@ -199,7 +201,7 @@ class @ReloaderContext
             top: '50%' # Top position relative to parent
             left: '50%' # Left position relative to parent
 
-        @spinner = new Spinner(opts);
+        @spinner = new Spinner(opts)
 
     _displayCompilingOverlay: ->
         @_createCompilingOverlayIfNeeded()
@@ -212,6 +214,24 @@ class @ReloaderContext
 
 
 
+    _saveScrollPosition: ->
+        expires = new Date;
+        expires.setTime(expires.getTime() + 864e5)
+
+        o = window.pageXOffset + "_" + window.pageYOffset;
+        Cookies.set('epuber_scroll_offset', o, expires: expires)
+
+    _restoreScrollPosition: ->
+        offset = Cookies.get('epuber_scroll_offset')
+        if offset?
+            t = offset.split("_")
+
+            if t.length == 2
+                @window.scrollTo(parseInt(t[0]), parseInt(t[1]))
+
+        Cookies.set('epuber_scroll_offset', '0_0')
+
+
     perform: (type, changed_files_hrefs) ->
         switch type
             when ReloadType.style
@@ -222,6 +242,7 @@ class @ReloaderContext
 
             when ReloadType.reload
                 @console.log('ReloadType.reload')
+                @_saveScrollPosition()
 
                 uri = URI(@window.location)
                 uri.setQuery('cache_control', Math.round(+new Date / 1e3))
