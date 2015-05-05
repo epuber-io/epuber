@@ -275,6 +275,9 @@ module Epuber
     #
     def add_auto_refresh_script(html_doc)
       add_file_to_head(:js, html_doc, 'auto_refresh/reloader.coffee')
+      add_file_to_head(:js, html_doc, 'auto_refresh/connector.coffee')
+      add_file_to_head(:js, html_doc, 'auto_refresh/protocol.coffee')
+      add_file_to_head(:js, html_doc, 'auto_refresh/auto_refresh.coffee')
       add_script_file_to_head(html_doc, 'auto_refresh/auto_refresh.js') do |script|
         bonjour_name = "#{`hostname`.chomp}.local"
 
@@ -335,13 +338,14 @@ module Epuber
     end
 
     # @param type [Symbol]
-    def self.notify_clients(type, changed_files = [])
+    def self.notify_clients(type, data = nil)
       _log :info, "Notifying clients with type #{type.inspect}"
       raise "Not known type `#{type}`" unless [:styles, :reload, :compile_start, :compile_end].include?(type)
       message = {
-        message: type,
-        changed_files: changed_files,
+        name: type,
       }
+      message[:data] = data unless data.nil?
+
       send_to_clients(message.to_json)
     end
 
@@ -372,8 +376,6 @@ module Epuber
       compile_book
 
       _log :ui, 'Notifying clients'
-
-      notify_clients(:compile_end)
 
       changed.map! { |file| File.join('', 'raw', relative_path_to_book_file(file)) }
 
@@ -408,10 +410,12 @@ module Epuber
         ws.onopen do
           sockets << ws
 
+          ws.send({name: :hello}.to_json)
+
           thread = Thread.new do
             loop do
               sleep(10)
-              ws.send({message: :heartbeat}.to_json)
+              ws.send({name: :heartbeat}.to_json)
             end
           end
         end

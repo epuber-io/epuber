@@ -1,30 +1,45 @@
-{ Parser, PROTOCOL_6, PROTOCOL_7 } = require './protocol'
 
-Version = '2.2.2'
+# most of this code is based on https://github.com/livereload/livereload-js/blob/master/src/connector.coffee
+#
+class @Connector
+    MIN_DELAY = 1000
+    MAX_DELAY = 60 * 1000
+    HANDSHAKE_TIMEOUT = 5000
 
-exports.Connector = class Connector
+    constructor: (url, @WebSocket, @console, @Timer, @_handler) ->
+        uri = URI(url)
+        newScheme =
+            switch uri.protocol()
+                when 'http'
+                    'ws'
+                when 'https'
+                    'wss'
+        uri.protocol(newScheme)
+        @_uri = uri.toString()
 
-    constructor: (@options, @WebSocket, @Timer, @handlers) ->
-        @_uri = "ws#{if @options.https then "s" else ""}://#{@options.host}:#{@options.port}/livereload"
-
-        @_nextDelay = @options.mindelay
+        @_nextDelay = MIN_DELAY
         @_connectionDesired = no
-        @protocol = 0
 
-        @protocolParser = new Parser
-            connected: (@protocol) =>
+        @protocolParser = new ProtocolParser
+            connected: (hello_message) =>
                 @_handshakeTimeout.stop()
-                @_nextDelay = @options.mindelay
+                @_nextDelay = MIN_DELAY
                 @_disconnectionReason = 'broken'
-                @handlers.connected(protocol)
+                @_callHandler('connected', hello_message)
+
             error: (e) =>
-                @handlers.error(e)
+                @_callHandler('error', e)
                 @_closeOnError()
+
             message: (message) =>
-                @handlers.message(message)
+                if message.name == 'heartbeat'
+                    # TODO: reset timeout timer
+                else
+                    @_callHandler('message', message)
 
         @_handshakeTimeout = new Timer =>
             return unless @_isSocketConnected()
+            @console.error('Connector: Handshake timed out')
             @_disconnectionReason = 'handshake-timeout'
             @socket.close()
 
@@ -42,12 +57,13 @@ exports.Connector = class Connector
         @_connectionDesired = yes
         return if @_isSocketConnected()
 
+        @protocolParser.reset()
+
         # prepare for a new connection
         @_reconnectTimer.stop()
         @_disconnectionReason = 'cannot-connect'
-        @protocolParser.reset()
 
-        @handlers.connecting()
+        @_callHandler('connecting')
 
         @socket = new @WebSocket(@_uri)
         @socket.onopen    = (e) => @_onopen(e)
@@ -67,14 +83,22 @@ exports.Connector = class Connector
         return unless @_connectionDesired  # don't reconnect after manual disconnection
         unless @_reconnectTimer.running
             @_reconnectTimer.start(@_nextDelay)
-            @_nextDelay = Math.min(@options.maxdelay, @_nextDelay * 2)
+            @_nextDelay = Math.min(MAX_DELAY, @_nextDelay * 2)
 
-    sendCommand: (command) ->
-        return unless @protocol?
-        @_sendCommand command
+    _callHandler: (message, arg...) ->
+        func = @_handler[message]
+        if func?
+            func(arg...)
+        else
+            @console.error("Connector: error: handler doesn't know #{message}")
 
-    _sendCommand: (command) ->
-        @socket.send JSON.stringify(command)
+    sendMessage: (name, data) ->
+        message =
+            name: name
+
+        message.data = data if data?
+
+        @socket.send(JSON.stringify(message))
 
     _closeOnError: ->
         @_handshakeTimeout.stop()
@@ -82,24 +106,20 @@ exports.Connector = class Connector
         @socket.close()
 
     _onopen: (e) ->
-        @handlers.socketConnected()
+        @_callHandler('socketConnected')
         @_disconnectionReason = 'handshake-failed'
 
         # start handshake
-        hello = { command: 'hello', protocols: [PROTOCOL_6, PROTOCOL_7] }
-        hello.ver     = Version
-        hello.ext     = @options.ext     if @options.ext
-        hello.extver  = @options.extver  if @options.extver
-        hello.snipver = @options.snipver if @options.snipver
-        @_sendCommand hello
-        @_handshakeTimeout.start(@options.handshake_timeout)
+        @sendMessage('hello')
+        @_handshakeTimeout.start(HANDSHAKE_TIMEOUT)
 
     _onclose: (e) ->
-        @protocol = 0
-        @handlers.disconnected @_disconnectionReason, @_nextDelay
+        @_callHandler('disconnected', @_disconnectionReason, @_nextDelay)
         @_scheduleReconnection()
 
     _onerror: (e) ->
+        @_callHandler('error', e)
+        @console.error("Connector: #{e}")
 
     _onmessage: (e) ->
         @protocolParser.process(e.data)

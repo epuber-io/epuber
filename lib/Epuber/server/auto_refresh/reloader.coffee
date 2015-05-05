@@ -159,7 +159,7 @@ class @ReloaderContext
         # http://www.zachleat.com/web/load-css-dynamically/
         # http://pieisgood.org/test/script-link-events/
         clone.onload = =>
-            @console.log "LiveReload: the new stylesheet has finished loading"
+            @console.log "AutoRefresh: the new stylesheet has finished loading... for file #{clone.href}"
             @knownToSupportCssOnLoad = yes
             executeCallback()
 
@@ -167,7 +167,7 @@ class @ReloaderContext
             # polling
             do poll = =>
                 if clone.sheet
-                    @console.log "LiveReload is polling until the new CSS finishes loading..."
+                    @console.log "AutoRefresh: is polling until the new CSS finishes loading... for file #{clone.href}"
                     executeCallback()
                 else
                     Timer.start 50, poll
@@ -236,12 +236,14 @@ class @ReloaderContext
         switch type
             when ReloadType.style
                 @console.log('ReloadType.style')
+                @_hideCompilingOverlay()
+
                 @_startAnimatedStylesheetReload()
                 @_reattachAllStylesheetLinks(changed_files_hrefs)
                 after(TRANSITION.duration * 1000, => @_stopAnimatedStylesheetReload())
 
             when ReloadType.reload
-                @console.log('ReloadType.reload')
+                @console.log('AutoRefresh: reloading page')
                 @_saveScrollPosition()
 
                 uri = URI(@window.location)
