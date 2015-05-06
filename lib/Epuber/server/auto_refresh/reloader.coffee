@@ -49,7 +49,7 @@ class @ReloaderContext
 
     constructor: (@window, @console) ->
         @document = @window.document
-        @window.addEventListener('load', (=> @_restoreScrollPosition), false)
+        $(@window).load => @_restoreScrollPosition()
 
 
     _head: ->
