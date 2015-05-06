@@ -211,6 +211,7 @@ module Epuber
     #
     def self.relative_path_to_book_file(path)
       file = file_resolver.file_with_source_path(path)
+      return if file.nil?
       abs_path = File.join(build_path, '')
       file.destination_path.sub(abs_path, '')
     end
@@ -308,8 +309,16 @@ module Epuber
     end
 
     def self.reload_bookspec
+      last_target = target
       Config.instance.bookspec = nil
       self.book = Config.instance.bookspec
+
+      if (new_target = book.target_named(last_target.name))
+        self.target = new_target
+      else
+        self.target = book.targets.first
+        _log :ui, "[!] Not found previous target after reloading bookspec file, jumping to first #{self.target.name}"
+      end
     end
 
     def self.compile_book
@@ -357,21 +366,31 @@ module Epuber
     #
     def self.changes_detected(_modified, _added, _removed)
       all_changed = (_modified + _added).uniq
+
+      reload_bookspec if all_changed.any? { |file| file == book.file_path }
+
       changed = filter_not_project_files(all_changed) || []
       return if changed.count == 0
 
       notify_clients(:compile_start)
 
-      reload_bookspec if all_changed.any? { |file| file == book.file_path }
+
 
       _log :ui, 'Compiling'
       compile_book
 
       _log :ui, 'Notifying clients'
 
-      changed.map! { |file| File.join('', 'raw', relative_path_to_book_file(file)) }
+      # transform all paths to relatives to the server
+      changed.map! do |file|
+        relative = relative_path_to_book_file(file)
+        File.join('', 'raw', relative) unless relative.nil?
+      end
 
-      if changed.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
+      # remove nil paths (for example bookspec can't be found so the relative path is nil)
+      changed.compact!
+
+      if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
         notify_clients(:styles, changed)
       else
         notify_clients(:reload, changed)
