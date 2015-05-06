@@ -514,7 +514,7 @@ module Epuber
 
         fix_links(html_doc, path, 'img', 'src') # images
         fix_links(html_doc, path, 'script', 'src') # javascript
-        fix_links(html_doc, path, 'link', 'href') # css styles
+        fix_links(html_doc, path, 'link[rel=stylesheet]', 'href') # css styles
 
         add_file_to_head(:js, html_doc, 'vendor/bower/jquery/jquery.min.js')
         add_file_to_head(:js, html_doc, 'vendor/bower/spin/spin.js')
