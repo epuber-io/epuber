@@ -16,21 +16,24 @@ class @AutoRefresh
             @console.error("AutoRefresh disabled because the browser does not seem to support web sockets")
             return
 
+        @shouldDisplayConnectionStatus = no
         @document = @window.document
 
         @reloader = new ReloaderContext(@window, @console)
 
         @connector = new Connector window.location, @WebSocket, @console, Timer,
             connecting: =>
+                @console.info("AutoRefresh: started connecting")
                 @_displayConnectionStatus('Connecting')
 
             socketConnected: =>
+
             connected: =>
                 @console.info("AutoRefresh: connection to server established")
                 @_hideConnectionStatus()
 
             disconnected: (reason) =>
-                msg = "AutoRefresh: disconnected: #{reason}"
+                msg = "AutoRefresh: disconnected (reason: #{reason})"
                 @console.log(msg)
                 @_displayConnectionStatus(msg)
 
@@ -47,37 +50,46 @@ class @AutoRefresh
                 @reloader.perform(action, message.data)
 
 
-        @window.addEventListener 'beforeunload', =>
-            @connector.disconnect('beforeunload')
-            return null
+        $(@window).unload =>
+            @connector.disconnect('unload')
 
         @initialized = yes
 
     _displayConnectionStatus: (statusMessage) ->
+        @shouldDisplayConnectionStatus = yes
+
         unless @document.body?
-            @window.addEventListener 'load', =>
-                @_displayConnectionStatus(statusMessage)
+            $(@window).load =>
+                if @shouldDisplayConnectionStatus
+                    @_displayConnectionStatus(statusMessage)
             return
 
         container = @document.getElementById(CONNECTION_STATUS_ID)
-        if container?
-            container.parentNode.removeChild(container)
 
+        # remove if it is already there
+        $(container).remove() if container?
+
+        # create new container element
         container = @document.createElement('div')
         container.id = CONNECTION_STATUS_ID
+
+        # remove item after user clicks on the overlay
         container.onclick = ->
-            container.parentNode.removeChild(container)
+            $(container).remove()
 
         title = @document.createElement("p")
         title.innerHTML = statusMessage
         container.appendChild(title)
 
-        if @document.body.firstChild?
-            @document.body.insertBefore(container, @document.body.firstChild)
-        else
-            @document.body.appendChild(container)
+        $(container).prependTo(@document.body)
 
     _hideConnectionStatus: ->
-        container = @document.getElementById(CONNECTION_STATUS_ID)
-        if container?
-            container.parentNode.removeChild(container)
+        @shouldDisplayConnectionStatus = no
+
+        unless @document.body?
+            $(@window).load =>
+                unless @shouldDisplayConnectionStatus
+                    @_hideConnectionStatus()
+            return
+
+        $("\##{CONNECTION_STATUS_ID}").remove()
