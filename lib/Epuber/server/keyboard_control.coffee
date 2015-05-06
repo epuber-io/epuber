@@ -1,3 +1,6 @@
 
-key 'right', -> window.location.assign('/toc/' + $next_path)
-key 'left',  -> window.location.assign('/toc/' + $previous_path)
+goToPage = (path) ->
+    window.location.assign('/toc/' + path) if path?
+
+key 'right', -> goToPage($next_path)
+key 'left',  -> goToPage($previous_path)
