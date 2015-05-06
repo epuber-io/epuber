@@ -278,15 +278,7 @@ module Epuber
       add_file_to_head(:js, html_doc, 'auto_refresh/connector.coffee')
       add_file_to_head(:js, html_doc, 'auto_refresh/protocol.coffee')
       add_file_to_head(:js, html_doc, 'auto_refresh/auto_refresh.coffee')
-      add_script_file_to_head(html_doc, 'auto_refresh/auto_refresh.js') do |script|
-        bonjour_name = "#{`hostname`.chomp}.local"
-
-        script.gsub!('GSUB_PORT', settings.port.to_s)
-        script.gsub!('GSUB_IP_ADDRESS', request.ip)
-        script.gsub!('GSUB_BONJOUR_NAME', bonjour_name)
-
-        script
-      end
+      add_script_to_head(html_doc, 'var auto_refresh = new AutoRefresh(window, console);')
     end
 
     # @param html_doc [Nokogiri::HTML::Document]
