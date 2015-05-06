@@ -37,7 +37,7 @@ class @AutoRefresh
 
 
         @window.addEventListener 'beforeunload', =>
-            @connector.disconnect()
+            @connector.disconnect('beforeunload')
             return null
 
         @initialized = yes

@@ -71,11 +71,11 @@ class @Connector
         @socket.onmessage = (e) => @_onmessage(e)
         @socket.onerror   = (e) => @_onerror(e)
 
-    disconnect: ->
+    disconnect: (reason = 'manual')->
         @_connectionDesired = no
         @_reconnectTimer.stop()   # in case it was running
         return unless @_isSocketConnected()
-        @_disconnectionReason = 'manual'
+        @_disconnectionReason = reason
         @socket.close()
 
 
