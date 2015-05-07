@@ -10,8 +10,21 @@ module Epuber
   class Command
     class Init < Command
       self.summary = 'Initialize current folder to use it as Epuber project'
+      self.arguments = [
+        CLAide::Argument.new('PROJECT_NAME', false, true),
+      ]
+
+      # @param argv [CLAide::ARGV]
+      #
+      def initialize(argv)
+        @book_name = argv.arguments!.first
+
+        super(argv)
+      end
 
       def validate!
+        help! 'You must specify identifier-like name of the book as first argument' if @book_name.nil?
+
         existing = Dir.glob('*.bookspec')
         help! "Can't reinit this folder, #{existing.first} already exists." unless existing.empty?
       end
@@ -19,56 +32,38 @@ module Epuber
       def run
         super
 
-        print_welcome
-
-        book_title = ask('Book title: ')
-        book_id = ask('Book ID (basically simplified book title): ')
-
         write_gitignore
-        write_bookspec(book_title, book_id)
+        write_bookspec(@book_name)
 
         FileUtils.mkdir_p('images')
         FileUtils.mkdir_p('fonts')
         FileUtils.mkdir_p('styles')
-        write_default_style(book_id)
+        write_default_style(@book_name)
 
         FileUtils.mkdir_p('text')
 
-        print_good_bye(book_id)
+        print_good_bye(@book_name)
       end
 
 
       private
 
-      def print_welcome
-        puts <<-END.ansi.yellow
-Welcome to epuber init script. It will create basic structure for this project.
-There will be some questions about basic information, please fill them.
-END
-      end
-
       def print_good_bye(book_id)
         puts <<-END.ansi.green
-Success.
-Epuber now ends.
-
-Please review #{book_id}.bookspec file, remove comments, etc.
-
-Bye :)
+Project initialized, please review #{book_id}.bookspec file, remove comments.
 END
       end
 
       # Creates .bookspec file from template
       #
-      # @param book_title [String]
       # @param book_id [String]
       #
       # @return [void]
       #
-      def write_bookspec(book_title, book_id)
+      def write_bookspec(book_id)
         template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
         rendered = Epuber::RubyTemplater.from_file(template_path)
-                                        .with_locals(book_title: book_title, book_id: book_id)
+                                        .with_locals(book_id: book_id)
                                         .render
 
         write("#{book_id}.bookspec", rendered)

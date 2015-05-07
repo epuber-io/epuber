@@ -3,7 +3,8 @@
 Epuber::Book.new do |book|
 
   # Name of the book, REQUIRED
-  book.title = '#{book_title}'
+  #
+  book.title = ''
 
   # Subtitle of book, OPTIONAL
   #
