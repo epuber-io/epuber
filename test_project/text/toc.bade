@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?><!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+  <head>
+    <title>Práce na dálku</title>
+    <link href="../styles/prace_na_dalku.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div class="toc">
+      <h1 class="gray_pre">Obsah</h1>
+
+      - __target.root_toc.sub_items.each { |section|
+        - next if section.title.nil?
+        - next unless section.linear?
+
+        <p class="toc_section"><a href="#{section.file_request.source_pattern}">#{section.title}</a></p>
+
+        - section.sub_items.each { |chapter|
+          - next unless chapter.linear?
+          <p class="toc_item"><a href="#{chapter.file_request.source_pattern}">#{chapter.title}</a></p>
+        - }
+      - }
+
+    </div>
+  </body>
+</html>
