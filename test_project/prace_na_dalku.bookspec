@@ -16,23 +16,15 @@ Epuber::Book.new do |book|
   book.version = '1.0.1'
   book.build_version = '5'
 
-  book.custom_fonts = true
-  # book.fixed_layout = true
-  # book.default_viewport = Size.new(200, 300)
-
   book.cover_image = 'cover'
 
   book.target :ibooks do |t|
     t.add_const 'restart_store_url', 'https://itunes.apple.com/cz/book/restart/id490604028?mt=11'
-  end
-  book.target :play do |t|
-    t.add_const 'restart_store_url', 'https://play.google.com/store/books/details?id=AU5RAQAAQBAJ'
+    t.custom_fonts = true
   end
 
-  book.target :wooky do |t|
-    t.epub_version = 2.0
-    t.isbn = '978-80-87270-98-3'
-    t.add_const 'restart_store_url', 'http://melvil.cz/kniha-restart'
+  book.target :play do |t|
+    t.add_const 'restart_store_url', 'https://play.google.com/store/books/details?id=AU5RAQAAQBAJ'
   end
 
   book.target :palmknihy do |t|
@@ -45,8 +37,7 @@ Epuber::Book.new do |book|
   book.add_default_style 'prace_na_dalku.css'
   book.add_file 'prace_na_dalku-stylus.styl'
 
-  # not needed since it parse result xhtml and take all images and use them as dependency
-  # book.add_files '*.{png,jpg,jpeg}'
+  # add all fonts to result file
   book.add_files '*.{otf,ttf}'
 
   book.toc do |toc, target|
@@ -55,29 +46,33 @@ Epuber::Book.new do |book|
 
     toc.file 'copyright', :landmark_copyright
 
-    toc.file 'toc', :landmark_toc if target.name != :ibooks
+    if target.name != :ibooks
+      toc.file 'toc', :landmark_toc
+    end
+
+    toc.file 'intro', 'Úvod'
 
     toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do
-      toc.file 's01ch01'
-      toc.file 's01ch02'
-      toc.file 's01ch03'
+      toc.file 's01ch01', 'Proč se v práci nepracuje'
+      toc.file 's01ch02', 'Nenechte si ujet život dojížděním'
+      toc.file 's01ch03', 'Jde o technologii'
     end
 
     toc.file 's02', 'JAK NA VÝMLUVY' do
-      toc.file 's02ch01'
-      toc.file 's02ch02'
-      toc.file 's02ch03'
+      toc.file 's02ch01', 'Zázraky se dějí, jen když jsme všichni společně u toho'
+      toc.file 's02ch02', 'Když je nevidím, jak můžu vědět, jestli pracují?'
+      toc.file 's02ch03', 'Domácnosti jsou plné rozptylování'
     end
 
     toc.file 's03', 'JAK SPOLUPRACOVAT NA DÁLKU' do
-      toc.file 's03ch01'
-      toc.file 's03ch02'
-      toc.file 's03ch03'
+      toc.file 's03ch01', 'Bez překrývání to nejde'
+      toc.file 's03ch02', 'Vidět znamená věřit'
+      toc.file 's03ch03', 'Všechny informace na dosah'
     end
 
-    toc.file 'appendix'
+    toc.file 'conclusion', 'Závěr'
 
-    toc.file 'footnotes', linear: false
+    toc.file 'footnotes', 'Poznámky pod čarou', linear: false
   end
 
   # load file simple_checkers.rb
