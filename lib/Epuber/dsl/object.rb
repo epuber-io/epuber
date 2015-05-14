@@ -84,6 +84,17 @@ module Epuber
               end
         # rubocop:enable Lint/Eval
 
+        unless obj.is_a?(self)
+          msg = "Invalid object #{obj.class}, expected object of class #{self}"
+
+          if file_path
+            msg += ", loaded from file #{file_path}"
+
+          end
+
+          raise StandardError, msg
+        end
+
         obj.instance_eval { @file_path = file_path }
         obj
       end
