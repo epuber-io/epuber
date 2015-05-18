@@ -64,13 +64,11 @@ module Epuber
       #
       def should_not_contain(regexp, message)
         # find all matches
+        # taken from http://stackoverflow.com/questions/6804557/how-do-i-get-the-match-data-for-all-occurrences-of-a-ruby-regular-expression-in
         matches = text.to_enum(:scan, regexp).map { Regexp.last_match }
-
-        if matches.length > 0
-          matches.each do |match|
-            # @type match [MatchData]
-            puts MatchProblem.new(match, message, file_path)
-          end
+        matches.each do |match|
+          # @type match [MatchData]
+          puts MatchProblem.new(match, message, file_path)
         end
       end
     end
