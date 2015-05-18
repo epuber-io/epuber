@@ -203,7 +203,7 @@ module Epuber
                      end
 
           # filter out ibooks specific when the target is not ibooks
-          types.select! { |type| !type.to_s.start_with?('ibooks:') } unless @target.ibooks?
+          types.reject! { |type| type.to_s.start_with?('ibooks:') } unless @target.ibooks?
 
           result_file = @file_resolver.find_file_from_request(toc_item.file_request)
 
