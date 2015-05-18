@@ -5,4 +5,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in Epuber.gemspec
 gemspec
 
-gem 'bade', path: '../Bade'
+
+group :development, :test do
+  gem 'bade', path: '../Bade'
+end
