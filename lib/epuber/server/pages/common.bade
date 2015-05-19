@@ -27,6 +27,7 @@ mixin page(title: nil, header_id: nil)
     		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
     		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/jquery/jquery.min.js"></script>
     		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/spin/spin.js"></script>
+    		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 
     	body
