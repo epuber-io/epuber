@@ -2,7 +2,7 @@
 import "common"
 
 +page(title: 'Files', header_id: 'files')
-	#content
+	#content.toc_content
 		- file_resolver.files_of.each do |file|
 			p.file
 				- href = "/files/#{pretty_path(file)}"
