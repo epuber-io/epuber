@@ -108,7 +108,14 @@ module Epuber
     def initialize
       super
       _log :ui, 'Init compile'
-      self.class.compile_book
+
+      begin
+        self.class.compile_book
+      rescue => e
+        # print error, do not send error further, compilation or listener will die otherwise
+        $stderr.puts e
+        $stderr.puts e.backtrace
+      end
     end
 
     def self.start_listening_if_needed
