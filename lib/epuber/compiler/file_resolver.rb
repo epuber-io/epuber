@@ -33,13 +33,14 @@ module Epuber
       end
 
       GROUP_EXTENSIONS = {
-        text:  %w(.xhtml .html .bade .rxhtml),
-        image: %w(.png .jpg .jpeg),
-        font:  %w(.otf .ttf),
-        style: %w(.css .styl),
+        text:   %w(.xhtml .html .bade .rxhtml),
+        image:  %w(.png .jpg .jpeg),
+        font:   %w(.otf .ttf),
+        style:  %w(.css .styl),
+        script: %w(.js),
       }.freeze
 
-      STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css).freeze
+      STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css .js).freeze
 
       EXTENSIONS_RENAME = {
         '.styl'   => '.css',
