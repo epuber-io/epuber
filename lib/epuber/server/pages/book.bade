@@ -30,8 +30,11 @@ mixin iterate_spine(toc_item)
 					- item_href = "/toc/#{pretty_path(item.file_request)}"
 					a.href(href: item_href)= item.file_request.source_pattern
 					- unless item.title.nil?
-						= ' '
+						= ' &nbsp; '
 						span.title: a.title(href: item_href)= item.title
+					- end
+					- unless item.options.empty?
+						= ' &nbsp; '
 					- end
 					- item.options.each do |opt|
 						- next if opt.nil?
