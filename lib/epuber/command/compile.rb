@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'fileutils'
+require 'os'
 
 require_relative '../command'
 
@@ -111,13 +112,30 @@ module Epuber
         end
       end
 
-      def convert_epub_to_mobi(epub_path, mobi_path)
-        calibre_path = validate_dir('/Applications/calibre.app')
-        calibre_path = validate_dir(File.join(Dir.home, 'Applications/calibre.app')) if calibre_path.nil?
-        UI.error!("Can't find location of calibre.app, tried application folder /Applications and ~/Applications with application name calibre.app, please install calibre to one of those folders") if calibre_path.nil?
+      def find_calibre_app
+        locations = `mdfind "kMDItemCFBundleIdentifier == net.kovidgoyal.calibre"`.split("\n")
+        UI.error!("Can't find location of calibre.app to convert EPUB to MOBI.") if locations.empty?
 
-        # convert
-        system(::File.join(calibre_path, 'Contents/MacOS/ebook-convert'), epub_path, mobi_path)
+        selected = locations.first
+        UI.warn("Using calibre.app at location #{selected}") if locations.count > 1
+
+        selected
+      end
+
+      def find_calibre_convert_file
+        if OS.osx?
+          ::File.join(find_calibre_app, 'Contents/MacOS/ebook-convert')
+        elsif OS.linux?
+          script_path = '/usr/bin/ebook-convert'
+          UI.error!("Can't find ebook-convert in folder /usr/bin to convert EPUB to MOBI.") unless ::File.executable?(script_path)
+          script_path
+        else
+          UI.error!('Unsupported OS to convert EPUB to MOBI.')
+        end
+      end
+
+      def convert_epub_to_mobi(epub_path, mobi_path)
+        system(find_calibre_convert_file, epub_path, mobi_path)
       end
     end
   end
