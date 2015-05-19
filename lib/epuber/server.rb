@@ -486,6 +486,9 @@ module Epuber
 
     set :bind, '0.0.0.0'
 
+    # uncomment following line to enable accessing from remote devices
+    # set :port, '8080'
+
     error do
       ShowExceptions.new(self).call(env)
     end
