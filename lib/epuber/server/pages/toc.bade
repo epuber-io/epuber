@@ -11,8 +11,12 @@ mixin iterate_toc(toc_item)
 						- unless item.title.nil?
 							span.title: a.title(href: item_href)= item.title
 						- end
+						- unless item.options.empty?
+                        	= '&nbsp;'
+                        - end
 						- item.options.each do |opt|
 							- next if opt.nil?
+							= ' '
 							span.option= opt.inspect
 						- end
 						+iterate_toc(item)
@@ -21,5 +25,5 @@ mixin iterate_toc(toc_item)
 	- end
 
 +page(title: 'TOC', header_id: 'toc')
-	#content
+	#content.toc_content
 		+iterate_toc(target.root_toc)
