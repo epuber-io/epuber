@@ -23,3 +23,16 @@ desc 'Push to our geminabox server, !!! but overrides gems with same version !!!
 task 'push-force' => [:build] do
   sh "gem inabox #{gem_path} -o"
 end
+
+
+desc 'Shortcut for bower in correct location'
+task 'bower' do |_t, args|
+  Dir.chdir('lib/epuber/third_party/bower') do
+    sh 'bower', *args
+  end
+end
+
+desc 'Display lines of code'
+task 'sloc' do
+  sh 'cloc . --exclude-dir=iTunesProducer-dump,third_party,.idea,.epuber'
+end
