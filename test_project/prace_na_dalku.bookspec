@@ -52,7 +52,7 @@ Epuber::Book.new do |book|
       toc.file 'toc', :landmark_toc
     end
 
-    toc.file 'intro', 'Úvod'
+    toc.file 'intro', 'Úvod' # Example of Bade file containing only required data
 
     toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do
       toc.file 's01ch01', 'Proč se v práci nepracuje'
