@@ -54,7 +54,7 @@ Epuber::Book.new do |book|
 
     toc.file 'intro', 'Úvod' # Example of Bade file containing only required data
 
-    toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do
+    toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do # Example of full Bade file containing all required XHTML structures
       toc.file 's01ch01', 'Proč se v práci nepracuje'
       toc.file 's01ch02', 'Nenechte si ujet život dojížděním'
       toc.file 's01ch03', 'Jde o technologii'
