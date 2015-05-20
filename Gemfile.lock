@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    epuber (0.2.3.beta.1)
+    epuber (0.2.3)
       activesupport (~> 4.2)
       bade (= 0.1.1.beta.1)
       bundler (~> 1)
