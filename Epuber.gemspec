@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.homepage = 'http://epuber.io'
   spec.license  = 'Commercial'
 
-  spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec README.md)
+  spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec Gemfile Gemfile.lock LICENSE.txt README.md)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
