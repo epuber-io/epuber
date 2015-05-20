@@ -1,1 +1,5 @@
 
+mixin chapter(title)
+	h1= title
+
+	- default_block.call
