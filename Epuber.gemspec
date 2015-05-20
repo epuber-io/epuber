@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'epubcheck', '~> 3.0', '>= 3.0.1'
 
-  spec.add_runtime_dependency 'bade', '0.1.1.beta.1'
+  spec.add_runtime_dependency 'bade', '0.1.1'
 
   spec.add_runtime_dependency 'bundler', '~> 1'
 
