@@ -1,6 +1,6 @@
 # encoding utf-8
 
-check :result_text_xhtml_string, :run_only_before_release do |checker|
+check :result_text_xhtml_string do |checker|
   checker.should_not_contain(/(̌|́)/i, 'Contains strange diacritic characters')
 
   checker.should_not_contain(/[-–—][-–—]+/i, 'Contains redundant dashes')

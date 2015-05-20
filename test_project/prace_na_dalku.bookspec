@@ -5,7 +5,7 @@ Epuber::Book.new do |book|
   book.subtitle = 'Zn.: Kancelář zbytečná'
   book.authors = [
     'Jason Fried',
-    'David Heinemeier Hansson'
+    'David Heinemeier Hansson',
   ]
 
   book.language = 'cs'
