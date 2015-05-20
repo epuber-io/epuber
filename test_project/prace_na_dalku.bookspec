@@ -60,7 +60,7 @@ Epuber::Book.new do |book|
       toc.file 's01ch03', 'Jde o technologii'
     end
 
-    toc.file 's02', 'JAK NA VÝMLUVY' do
+    toc.file 's02', 'JAK NA VÝMLUVY' do # Example of full XHTML file containing all required XHTML structures
       toc.file 's02ch01', 'Zázraky se dějí, jen když jsme všichni společně u toho'
       toc.file 's02ch02', 'Když je nevidím, jak můžu vědět, jestli pracují?'
       toc.file 's02ch03', 'Domácnosti jsou plné rozptylování'
