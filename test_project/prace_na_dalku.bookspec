@@ -72,7 +72,7 @@ Epuber::Book.new do |book|
       toc.file 's03ch03', 'Všechny informace na dosah'
     end
 
-    toc.file 'conclusion', 'Závěr'
+    toc.file 'conclusion', 'Závěr' # Example of XHTML file containing only required data
 
     toc.file 'footnotes', 'Poznámky pod čarou', linear: false
   end
