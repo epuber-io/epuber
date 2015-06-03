@@ -83,7 +83,7 @@ module Epuber
       # @return [String]
       #
       def file_as
-        "#{@last_name.upcase}, #{@first_name}"
+        "#{@last_name.mb_chars.upcase}, #{@first_name}"
       end
     end
   end
