@@ -303,7 +303,7 @@ module Epuber
           next if path.nil?
 
           if path.empty?
-            UI.warning('Empty attribute `href` for tag `img`', location: node)
+            UI.warning('Empty attribute `href` for tag `img`', location: img)
             next
           end
 
