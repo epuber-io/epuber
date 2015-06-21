@@ -267,7 +267,7 @@ module Epuber
       # @return [File]
       #
       def file_with_source_path(source_path)
-        _source_path_to_file_map[source_path]
+        _source_path_to_file_map[source_path.unicode_normalize]
       end
 
       private
