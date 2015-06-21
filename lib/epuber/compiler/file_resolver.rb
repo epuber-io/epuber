@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+require 'unicode_normalize'
+
+
 module Epuber
   class Compiler
     class FileResolver
@@ -63,8 +66,8 @@ module Epuber
       # @param [String] destination_path
       #
       def initialize(source_path, destination_path)
-        @source_path      = source_path
-        @destination_path = destination_path
+        @source_path      = source_path.unicode_normalize
+        @destination_path = destination_path.unicode_normalize
         @files            = {
           spine:    [],
           manifest: [],
@@ -385,7 +388,7 @@ module Epuber
         end
 
         file_paths.map do |path|
-          path.sub(::File.join(context_path, ''), '')
+          path.unicode_normalize.sub(::File.join(context_path.unicode_normalize, ''), '')
         end
       end
 

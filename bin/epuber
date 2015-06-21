@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -Ku
 # encoding: utf-8
 
 lib = File.expand_path('../lib', File.dirname(__FILE__))
