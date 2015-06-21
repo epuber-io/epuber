@@ -219,7 +219,7 @@ module Epuber
     def self.relative_path_to_book_file(path)
       file = file_resolver.file_with_source_path(path)
       return if file.nil?
-      abs_path = File.join(build_path, '')
+      abs_path = File.join(build_path, '').unicode_normalize
       file.destination_path.sub(abs_path, '')
     end
 
