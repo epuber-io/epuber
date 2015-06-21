@@ -2,6 +2,10 @@
 
 # Most of this code is taken from github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/vendor/version.rb
 
+def is_number(other)
+  other.is_a?(Numeric) || other.is_a?(Fixnum) || other.is_a?(Float)
+end
+
 module Epuber
   class Version
     include Comparable
@@ -67,8 +71,8 @@ module Epuber
         i += 1
 
         next      if lhs == rhs
-        return -1 if String  == lhs && Numeric == rhs
-        return  1 if Numeric == lhs && String  == rhs
+        return -1 if lhs.is_a?(String) && is_number(rhs)
+        return  1 if is_number(lhs) && rhs.is_a?(String)
 
         return lhs <=> rhs
       end
