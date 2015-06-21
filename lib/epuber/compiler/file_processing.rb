@@ -126,7 +126,7 @@ module Epuber
         text_resolve_links(file, xhtml_doc)
         text_parse_images(file, xhtml_doc)
 
-        result_xhtml_s = xhtml_doc.to_s
+        result_xhtml_s = xhtml_doc.to_xml(indent: 0, encoding: 'UTF-8', save_with: 0)
 
         # perform transformations
         perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
