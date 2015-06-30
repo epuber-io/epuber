@@ -21,7 +21,9 @@ class @AutoRefresh
 
         @reloader = new ReloaderContext(@window, @console)
 
-        @connector = new Connector window.location, @WebSocket, @console, Timer,
+        url_without_fragment = new URI(window.location).fragment(null).toString()
+
+        @connector = new Connector url_without_fragment, @WebSocket, @console, Timer,
             connecting: =>
                 @console.info("AutoRefresh: started connecting")
                 @_displayConnectionStatus('Connecting')
