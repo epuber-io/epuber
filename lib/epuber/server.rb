@@ -10,6 +10,7 @@ require 'listen'
 require 'active_support'
 
 require_relative 'vendor/hash_binding'
+require_relative 'vendor/globals_context'
 
 require 'bade'
 require 'stylus'
@@ -88,6 +89,12 @@ module Epuber
 
     def self.sockets
       @sockets ||= []
+    end
+
+    # @return [Epuber::GlobalsContext]
+    #
+    def self.globals_context
+      @globals_context ||= GlobalsContext.new
     end
 
     # @return [Listener]
@@ -329,10 +336,14 @@ module Epuber
     end
 
     def self.compile_book
-      compiler = Epuber::Compiler.new(book, target)
-      compiler.compile(build_path)
-      self.spine = compiler.file_resolver.files_of(:spine)
-      self.file_resolver = compiler.file_resolver
+      globals_context.catch do
+        compiler = Epuber::Compiler.new(book, target)
+        compiler.compile(build_path)
+        self.spine = compiler.file_resolver.files_of(:spine)
+        self.file_resolver = compiler.file_resolver
+      end
+
+      globals_context.clear_all
     end
 
     # @param message [String]
