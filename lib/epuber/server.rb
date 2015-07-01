@@ -241,8 +241,8 @@ module Epuber
         src = node[attribute_name]
 
         unless src.nil?
-          abs_path      = File.expand_path(src, File.join(build_path, File.dirname(context_path)))
-          relative_path = abs_path.sub(File.expand_path(build_path), '')
+          abs_path      = File.expand_path(src, File.join(build_path, File.dirname(context_path))).unicode_normalize
+          relative_path = abs_path.sub(File.expand_path(build_path).unicode_normalize, '')
 
           node[attribute_name] = File.join('', 'raw', relative_path.to_s)
         end
