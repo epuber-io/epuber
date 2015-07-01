@@ -49,7 +49,8 @@ class @ReloaderContext
 
     constructor: (@window, @console) ->
         @document = @window.document
-        $(@window).load => @_restoreScrollPosition()
+        $(@window).load =>
+            @_restoreScrollPosition()
 
 
     _head: ->
@@ -229,7 +230,7 @@ class @ReloaderContext
             if t.length == 2
                 @window.scrollTo(parseInt(t[0]), parseInt(t[1]))
 
-        Cookies.set('epuber_scroll_offset', '0_0')
+        Cookies.expire('epuber_scroll_offset')
 
 
     perform: (type, changed_files_hrefs) ->
