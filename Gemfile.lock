@@ -58,7 +58,7 @@ GEM
     ffi (1.9.10)
     hitimes (1.2.2)
     i18n (0.7.0)
-    json (1.7.7)
+    json (1.8.3)
     listen (2.10.1)
       celluloid (~> 0.16.0)
       rb-fsevent (>= 0.9.3)
