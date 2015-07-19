@@ -22,6 +22,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
+  if spec.respond_to?(:metadata)
+    spec.metadata['allowed_push_host'] = "https://gem.epuber.io"
+  else
+    raise 'RubyGems 2.0 or newer is required to protect against public gem pushes.'
+  end
+
   spec.add_runtime_dependency 'activesupport', '~> 4.2'
   spec.add_runtime_dependency 'nokogiri', '~> 1.6'
   spec.add_runtime_dependency 'mime-types', '~> 2.4'
