@@ -116,13 +116,7 @@ module Epuber
       super
       _log :ui, 'Init compile'
 
-      begin
-        self.class.compile_book
-      rescue => e
-        # print error, do not send error further, compilation or listener will die otherwise
-        $stderr.puts e
-        $stderr.puts e.backtrace
-      end
+      self.class.compile_book
     end
 
     def self.start_listening_if_needed
@@ -336,14 +330,22 @@ module Epuber
     end
 
     def self.compile_book
-      globals_context.catch do
-        compiler = Epuber::Compiler.new(book, target)
-        compiler.compile(build_path)
-        self.spine = compiler.file_resolver.files_of(:spine)
-        self.file_resolver = compiler.file_resolver
-      end
+      begin
+        globals_context.catch do
+          compiler = Epuber::Compiler.new(book, target)
+          compiler.compile(build_path)
+          self.spine = compiler.file_resolver.files_of(:spine)
+          self.file_resolver = compiler.file_resolver
+        end
 
-      globals_context.clear_all
+        globals_context.clear_all
+
+        true
+      rescue => e
+        Epuber::UI.error("Compile error: #{e}")
+
+        false
+      end
     end
 
     # @param message [String]
@@ -393,9 +395,11 @@ module Epuber
       notify_clients(:compile_start)
 
 
-
       _log :ui, 'Compiling'
-      compile_book
+      unless compile_book
+        _log :ui, 'Skipping other steps'
+        return
+      end
 
       _log :ui, 'Notifying clients'
 
@@ -413,6 +417,13 @@ module Epuber
       else
         notify_clients(:reload, changed)
       end
+    end
+
+    def render_bade(name)
+      self.class.render_bade(name)
+    rescue => e
+      env['sinatra.error'] = e
+      ShowExceptions.new(self).call(env)
     end
 
     def self.render_bade(name)
@@ -521,7 +532,7 @@ module Epuber
     #
     namespace '' do
       get '/?' do
-        self.class.render_bade('book.bade')
+        render_bade('book.bade')
       end
 
       get '/change_target/:target_name' do |target_name|
@@ -540,7 +551,7 @@ module Epuber
     #
     namespace '/toc' do
       get '/?' do
-        self.class.render_bade('toc.bade')
+        render_bade('toc.bade')
       end
 
       get '/*' do
@@ -581,7 +592,7 @@ module Epuber
     #
     namespace '/files' do
       get '/?' do
-        self.class.render_bade('files.bade')
+        render_bade('files.bade')
       end
 
       get '/*' do
