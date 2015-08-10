@@ -10,9 +10,11 @@ module Epuber
     def catch
       before = global_variables
 
-      yield
-
-      @catch_variables += (global_variables - before)
+      begin
+        yield
+      ensure
+        @catch_variables += (global_variables - before)
+      end
     end
 
     def clear_all

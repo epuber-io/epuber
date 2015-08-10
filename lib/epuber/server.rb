@@ -342,6 +342,8 @@ module Epuber
 
         true
       rescue => e
+        globals_context.clear_all
+
         Epuber::UI.error("Compile error: #{e}")
 
         false
