@@ -19,9 +19,15 @@ module Epuber
         end
 
         def to_s
-          match_pre_line = @match.pre_match_lines.last
+          pre = match_pre_line = @match.pre_match_lines.last
+          if match_pre_line.length > 80
+            pre = "#{match_pre_line.first(10)} ... #{match_pre_line.last(10)}"
+          end
+
+          post = "#{@match.post_match_lines.first.first(10)} ..."
+
           match_length = @match.matched_string.length
-          start_sign = "#{' ' * match_pre_line.length}^"
+          start_sign = "#{' ' * pre.length}^"
           end_sign = if match_length > 1
                        "#{' ' * (match_length-2)}^"
                      else
@@ -29,7 +35,7 @@ module Epuber
                      end
 
           %{#{@file_path}:#{@match.line_number} column: #{match_pre_line.length} --- #{@message}
-  #{@match.matched_line}
+  #{pre + @match.matched_string.ansi.red + post}
   #{start_sign}#{end_sign}}
         end
       end
