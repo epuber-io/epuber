@@ -12,6 +12,7 @@ require 'zip'
 require 'RMagick'
 
 require_relative 'vendor/nokogiri_extensions'
+require_relative 'vendor/globals_context'
 
 require_relative 'plugin'
 
@@ -34,7 +35,7 @@ module Epuber
     # @return [Epuber::GlobalsContext]
     #
     def self.globals_catcher
-      @globals_catcher ||= GlobalsContext.new
+      @globals_catcher ||= Epuber::GlobalsContext.new
     end
 
     # @return [Epuber::Compiler::FileResolver]
