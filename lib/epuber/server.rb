@@ -95,12 +95,6 @@ module Epuber
       @sockets ||= []
     end
 
-    # @return [Epuber::GlobalsContext]
-    #
-    def self.globals_context
-      @globals_context ||= GlobalsContext.new
-    end
-
     # @return [Listener]
     #
     instance_class_accessor :listener
@@ -338,19 +332,13 @@ module Epuber
 
     def self.compile_book
       begin
-        globals_context.catch do
-          compiler = Epuber::Compiler.new(book, target)
-          compiler.compile(build_path)
-          self.spine = compiler.file_resolver.files_of(:spine)
-          self.file_resolver = compiler.file_resolver
-        end
-
-        globals_context.clear_all
+        compiler = Epuber::Compiler.new(book, target)
+        compiler.compile(build_path)
+        self.spine = compiler.file_resolver.files_of(:spine)
+        self.file_resolver = compiler.file_resolver
 
         true
       rescue => e
-        globals_context.clear_all
-
         Epuber::UI.error("Compile error: #{e}")
 
         false

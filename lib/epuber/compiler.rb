@@ -31,7 +31,11 @@ module Epuber
 
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
-
+    # @return [Epuber::GlobalsContext]
+    #
+    def self.globals_catcher
+      @globals_catcher ||= GlobalsContext.new
+    end
 
     # @return [Epuber::Compiler::FileResolver]
     #
@@ -59,28 +63,32 @@ module Epuber
     # @return [void]
     #
     def compile(build_folder, check: false, write: false, release: false)
-      @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
-      @should_check = check
-      @should_write = write
-      @release_build = release
-      @plugins = []
+      self.class.globals_catcher.catch do
+        @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
+        @should_check = check
+        @should_write = write
+        @release_build = release
+        @plugins = []
 
-      FileUtils.mkdir_p(build_folder)
+        FileUtils.mkdir_p(build_folder)
 
-      puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
+        puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
 
-      # parse plugins
-      parse_plugins
+        # parse plugins
+        parse_plugins
 
-      parse_toc_item(@target.root_toc)
-      parse_target_file_requests
+        parse_toc_item(@target.root_toc)
+        parse_target_file_requests
 
-      process_all_target_files
-      generate_other_files
+        process_all_target_files
+        generate_other_files
 
-      # build folder cleanup
-      remove_unnecessary_files
-      remove_empty_folders
+        # build folder cleanup
+        remove_unnecessary_files
+        remove_empty_folders
+      end
+    ensure
+      self.class.globals_catcher.clear_all
     end
 
     # Parse uses from current target
