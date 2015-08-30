@@ -340,6 +340,7 @@ module Epuber
         true
       rescue => e
         Epuber::UI.error("Compile error: #{e}")
+        Epuber::UI.error("Backtrace: #{e.backtrace}") if verbose
 
         false
       end
