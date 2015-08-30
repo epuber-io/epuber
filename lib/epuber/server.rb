@@ -75,6 +75,10 @@ module Epuber
     #
     instance_class_accessor :target
 
+    # @return [FalseClass, TrueClass]
+    #
+    instance_class_accessor :verbose
+
     # @return [Epuber::Compiler::FileResolver]
     #
     instance_class_accessor :file_resolver
@@ -103,9 +107,12 @@ module Epuber
 
     # @return nil
     #
-    def self.run!(book, target)
+    def self.run!(book, target, verbose: false)
       self.book = book
       self.target = target
+      self.verbose = verbose
+
+      self.enable :logging if verbose
 
       start_listening_if_needed
 
@@ -509,7 +516,6 @@ module Epuber
 
     register Sinatra::Namespace
 
-    enable :logging
     enable :sessions
     disable :show_exceptions
     disable :dump_errors

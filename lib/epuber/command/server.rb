@@ -36,7 +36,7 @@ module Epuber
 
         help!('Not existing target') if target.nil?
 
-        Epuber::Server.run!(book, target)
+        Epuber::Server.run!(book, target, verbose: self.verbose?)
       end
     end
   end
