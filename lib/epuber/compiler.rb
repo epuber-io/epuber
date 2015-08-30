@@ -65,6 +65,7 @@ module Epuber
     #
     def compile(build_folder, check: false, write: false, release: false)
       self.class.globals_catcher.catch do
+        @build_folder = build_folder
         @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
         @should_check = check
         @should_write = write
@@ -73,7 +74,7 @@ module Epuber
 
         FileUtils.mkdir_p(build_folder)
 
-        puts "  handling target #{@target.name.inspect} in build dir `#{build_folder}`"
+        puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_to_project(build_folder)}`"
 
         # parse plugins
         parse_plugins
@@ -167,7 +168,7 @@ module Epuber
           .select { |d| ::File.directory?(d) }
           .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
           .each do |d|
-          puts "removing empty folder `#{d}`"
+          puts "DEBUG: removing empty folder `#{d}`"
           Dir.rmdir(d)
         end
       end
@@ -203,7 +204,7 @@ module Epuber
       end
 
       unnecessary_paths.each do |path|
-        puts "DEBUG: removing unnecessary file: `#{path}`"
+        puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_to_project(path)}`"
         ::File.delete(path)
       end
     end

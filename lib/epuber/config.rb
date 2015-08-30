@@ -13,6 +13,10 @@ module Epuber
       @project_path ||= Dir.pwd
     end
 
+    def pretty_path_to_project(of_file)
+      Pathname.new(of_file).relative_path_from(Pathname.new(project_path))
+    end
+
     # @return [String]
     #
     def working_path
