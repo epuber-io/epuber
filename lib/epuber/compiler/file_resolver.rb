@@ -291,7 +291,7 @@ module Epuber
       def resolve_destination_path(file)
         if file.destination_path.nil?
           unless file.package_destination_path.nil?
-            file.destination_path = ::File.expand_path(file.package_destination_path, destination_path)
+            file.destination_path = ::File.join(destination_path, file.package_destination_path)
             return
           end
 

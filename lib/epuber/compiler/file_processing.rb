@@ -420,7 +420,7 @@ module Epuber
         return if FileUtils.uptodate?(dest_path, [source_path])
         return if ::File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
 
-        puts "DEBUG: copying file from #{Config.instance.pretty_path_to_project(source_path)} to #{Config.instance.pretty_path_to_project(dest_path)}"
+        puts "DEBUG: copying file from #{Config.instance.pretty_path_from_project(source_path)} to #{Config.instance.pretty_path_from_project(dest_path)}"
         FileUtils.cp(source_path, dest_path)
       end
 
@@ -444,7 +444,7 @@ module Epuber
 
         return unless should_write
 
-        puts "DEBUG: writing to file #{Config.instance.pretty_path_to_project(to_path)}"
+        puts "DEBUG: writing to file #{Config.instance.pretty_path_from_project(to_path)}"
 
         ::File.open(to_path, 'w') do |file_handle|
           file_handle.write(content)

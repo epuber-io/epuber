@@ -74,7 +74,7 @@ module Epuber
 
         FileUtils.mkdir_p(build_folder)
 
-        puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_to_project(build_folder)}`"
+        puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_from_project(build_folder)}`"
 
         # parse plugins
         parse_plugins
@@ -204,7 +204,7 @@ module Epuber
       end
 
       unnecessary_paths.each do |path|
-        puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_to_project(path)}`"
+        puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
         ::File.delete(path)
       end
     end

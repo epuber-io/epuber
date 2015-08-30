@@ -10,11 +10,15 @@ module Epuber
     # @return [String]
     #
     def project_path
-      @project_path ||= Dir.pwd
+      @project_path ||= Dir.pwd.unicode_normalize
     end
 
-    def pretty_path_to_project(of_file)
-      Pathname.new(of_file).relative_path_from(Pathname.new(project_path))
+    # @param of_file [String] absolute path to file
+    #
+    # @return [String] relative path to file from root of project
+    #
+    def pretty_path_from_project(of_file)
+      Pathname.new(of_file.unicode_normalize).relative_path_from(Pathname.new(project_path))
     end
 
     # @return [String]

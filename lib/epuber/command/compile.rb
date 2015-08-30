@@ -42,7 +42,7 @@ module Epuber
       def run
         super
 
-        puts "compiling book `#{book.file_path}`"
+        puts "compiling book `#{Config.instance.pretty_path_from_project(book.file_path)}`"
 
         if @release_version
           # Remove all previous versions of compiled files
