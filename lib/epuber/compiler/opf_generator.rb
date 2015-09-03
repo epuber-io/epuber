@@ -101,7 +101,8 @@ module Epuber
 
         @xml.metadata do
           # identifier
-          @xml['dc'].identifier("urn:isbn:#{@target.isbn}", id: OPF_UNIQUE_ID)
+          identifier = @target.identifier || "urn:isbn:#{@target.isbn}"
+          @xml['dc'].identifier(identifier, id: OPF_UNIQUE_ID)
 
           # title
           if @book.title

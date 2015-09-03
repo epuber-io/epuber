@@ -131,6 +131,11 @@ module Epuber
       attribute :isbn,
                 inherited: true
 
+      # @return [String] book identifier used in OPF file
+      #
+      attribute :identifier,
+                inherited: true
+
       # @return [String] target will use custom font (for iBooks only)
       #
       attribute :custom_fonts,
