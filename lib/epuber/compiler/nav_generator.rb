@@ -113,7 +113,7 @@ module Epuber
         @xml.ncx(nav_namespaces, version: '2005-1') do
           # head
           @xml.head do
-            @xml.meta(name: 'dtb:uid', content: "urn:isbn:#{@target.isbn}")
+            @xml.meta(name: 'dtb:uid', content: (@target.identifier || "urn:isbn:#{@target.isbn}"))
           end
 
           # title
