@@ -45,6 +45,10 @@ Epuber::Book.new do |book|
   #
   # book.published = '2014-06-10'
 
+  # Publisher name, OPTIONAL
+  #
+  # book.publisher = 'Epuber Inc.'
+
   # Version of book, REQUIRED for iBooks and epub 3.O
   #
   # This is used only for iBooks version
@@ -105,9 +109,6 @@ Epuber::Book.new do |book|
 
   # Add other files like images, fonts
   book.add_files '*.{otf,ttf}'
-
-  # Not needed for images since it parse result xhtml and take all images and use them as dependency
-  # book.add_files '*.{png,jpg,jpeg}'
 
 
   # Definition of TOC, with some informations like landmarks, linearity
