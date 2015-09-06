@@ -193,7 +193,7 @@ module Epuber
         landmarks.each do |landmark|
           dict = LANDMARKS_MAP[landmark]
 
-          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP}" if dict.nil?
+          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP.keys}" if dict.nil?
 
           map_type = dict[:type]
           types    = if map_type.is_a?(Array)

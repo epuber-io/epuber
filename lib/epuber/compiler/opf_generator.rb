@@ -240,7 +240,7 @@ module Epuber
         toc_item.landmarks.each do |landmark|
           type = LANDMARKS_MAP[landmark]
 
-          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP}" if type.nil?
+          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP.keys}" if type.nil?
 
           @xml.reference(type: type, href: pretty_path(result_file))
         end
