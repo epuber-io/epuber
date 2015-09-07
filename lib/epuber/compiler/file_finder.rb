@@ -80,21 +80,21 @@ module Epuber
         searching_path = context_path
 
         unless searching_path.nil?
-          context_path = ::File.expand_path(context_path, @source_path_abs)
+          searching_path = ::File.expand_path(context_path, @source_path_abs)
 
-          unless context_path.start_with?(@source_path_abs)
-            raise "You can't search from folder (#{context_path}) that is not sub folder of the source_path (#{source_path}) expanded to (#{@source_path_abs})."
+          unless searching_path.start_with?(@source_path_abs)
+            raise "You can't search from folder (#{searching_path}) that is not sub folder of the source_path (#{source_path}) expanded to (#{@source_path_abs})."
           end
 
-          files = __find_files(pattern, groups, searching_path)
+          files = self.class.__find_files(pattern, groups, searching_path)
         end
 
         if files.empty? && context_path != source_path
-          files = __find_files(pattern, groups, source_path)
+          files = self.class.__find_files(pattern, groups, @source_path_abs)
         end
 
         if files.empty? && search_everywhere && !pattern.start_with?('**')
-          files = __find_files('**/' + pattern, groups, source_path)
+          files = self.class.__find_files('**/' + pattern, groups, @source_path_abs)
         end
 
         files
@@ -106,8 +106,8 @@ module Epuber
       #
       # @return [Array<String>] list of founded files
       #
-      def find_all(pattern, groups: nil, context_path: source_path)
-        __find_files('**/' + pattern, groups, context_path)
+      def find_all(pattern, groups: nil, context_path: @source_path_abs)
+        self.class.__find_files('**/' + pattern, groups, context_path)
       end
 
       private
@@ -118,7 +118,7 @@ module Epuber
       #
       # @return [Array<String>] list of founded files
       #
-      def __find_files(pattern, groups, context_path)
+      def self.__find_files(pattern, groups, context_path)
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
@@ -134,8 +134,9 @@ module Epuber
           end
         end
 
+        context_pathname = Pathname.new(context_path)
         file_paths.map do |path|
-          Pathname(path.unicode_normalize).relative_path_from(@source_path_abs_pathname).to_s
+          Pathname(path.unicode_normalize).relative_path_from(context_pathname).to_s
         end
       end
     end

@@ -66,6 +66,7 @@ module Epuber
 
           files = @finder.find_files('*.xhtml', context_path: 'abc')
           expect(files.size).to eq 3
+          expect(files).to include 'file1.xhtml', 'file2.xhtml', 'file3.xhtml'
         end
 
         it 'can find files in nested folder' do
@@ -118,7 +119,6 @@ module Epuber
       end
     end
 
-    # TODO: returned paths have to be relative to context_path !!!
     # TODO: can find files without specified extension
     # TODO: can find files from super folder
 
