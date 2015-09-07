@@ -70,9 +70,9 @@ module Epuber
     #
     def self._location_from_obj(obj)
       case obj
-      when Thread::Backtrace::Location
+      when ::Thread::Backtrace::Location
         Location.new(obj.path, obj.lineno)
-      when Nokogiri::XML::Node
+      when ::Nokogiri::XML::Node
         Location.new(obj.document.file_path, obj.line)
       end
     end
