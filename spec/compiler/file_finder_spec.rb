@@ -57,6 +57,14 @@ module Epuber
             @finder.find_files('*', groups: :baf)
           }.to raise_error ::StandardError
         end
+
+        it 'finds file without specifying extension' do
+          FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
+
+          files = @finder.find_files('c')
+          expect(files).to include 'c.xhtml'
+          expect(files.size).to eq 1
+        end
       end
 
       context '#find_files cases with context_path' do
@@ -116,10 +124,25 @@ module Epuber
           files = @finder.find_all('*.stylus', groups: :style)
           expect(files.size).to eq 0
         end
+
+        it 'can find files without specifying extension' do
+          FileUtils.mkdir_p('dir_1/dir_11/dir_111')
+          FileUtils.mkdir_p('dir_2')
+          FileUtils.mkdir_p('dir_3')
+          FileUtils.mkdir_p('.git')
+
+          FileUtils.touch(['dir_1/one.xhtml', 'dir_1/two.xhtml', 'dir_1/three.css'])
+          FileUtils.touch(['dir_1/dir_11/dir_111/one.xhtml', 'dir_1/dir_11/dir_111/two.xhtml', 'dir_1/dir_11/dir_111/three.css'])
+          FileUtils.touch(['dir_2/fif.stylus', 'dir_2/baf.md', 'dir_2/hi.css', 'dir_2/one.bade'])
+          FileUtils.touch(['dir_3/abc.xhtml', 'dir_3/abc_md.md', 'dir_3/abc.txt'])
+          FileUtils.touch(['.gitignore', 'README.txt'])
+
+          files = @finder.find_all('one', groups: :text)
+          expect(files).to include 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml', 'dir_2/one.bade'
+        end
       end
     end
 
-    # TODO: can find files without specified extension
     # TODO: can find files from super folder
 
   end

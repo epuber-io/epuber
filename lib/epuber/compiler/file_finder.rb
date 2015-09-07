@@ -112,13 +112,22 @@ module Epuber
 
       private
 
+      def self.__find_files(pattern, groups, context_path)
+        files = __primitive_find_files(pattern, groups, context_path)
+
+        # try to find files with any extension
+        files = __primitive_find_files(pattern + '.*', groups, context_path) if files.empty?
+
+        files
+      end
+
       # @param [String] pattern  pattern of the desired files
       # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
       # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
       #
       # @return [Array<String>] list of founded files
       #
-      def self.__find_files(pattern, groups, context_path)
+      def self.__primitive_find_files(pattern, groups, context_path)
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
