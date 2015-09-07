@@ -70,8 +70,33 @@ module Epuber
       #
       # @return [Array<String>] list of founded files
       #
-      def find_files(pattern, groups = nil)
-        full_pattern = ::File.expand_path(pattern, source_path)
+      def find_files(pattern, groups: nil, context_path: nil, search_everywhere: true)
+        files = []
+
+        unless context_path.nil?
+          files = __find_files(pattern, groups, context_path)
+        end
+
+        if files.empty? && context_path != source_path
+          files = __find_files(pattern, groups, source_path)
+        end
+
+        if files.empty? && search_everywhere && !pattern.start_with?('**')
+          files = __find_files('**/' + pattern, groups, source_path)
+        end
+
+        files
+      end
+
+      private
+
+      # @param [String] pattern  pattern of the desired files
+      # @param [Symbol] groups list of group names, for valid values see GROUP_EXTENSIONS
+      #
+      # @return [Array<String>] list of founded files
+      #
+      def __find_files(pattern, groups, context_path)
+        full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
         # filter depend on group
@@ -82,8 +107,7 @@ module Epuber
           end.flatten
 
           file_paths.select! do |file_path|
-            extname     = ::File.extname(file_path)
-            valid_extensions.include?(extname)
+            valid_extensions.include?(::File.extname(file_path))
           end
         end
 
