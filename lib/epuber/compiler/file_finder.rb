@@ -40,17 +40,17 @@ module Epuber
       STATIC_EXTENSIONS = BINARY_EXTENSIONS + %w(.css .js)
 
       GROUP_EXTENSIONS = {
-          text:   %w(.xhtml .html .bade),
-          image:  %w(.png .jpg .jpeg),
-          font:   %w(.otf .ttf),
-          style:  %w(.css .styl),
-          script: %w(.js),
+        text:   %w(.xhtml .html .bade),
+        image:  %w(.png .jpg .jpeg),
+        font:   %w(.otf .ttf),
+        style:  %w(.css .styl),
+        script: %w(.js),
       }
 
       EXTENSIONS_RENAME = {
-          '.styl'   => '.css',
+        '.styl' => '.css',
 
-          '.bade'   => '.xhtml',
+        '.bade' => '.xhtml',
       }
 
       # @return [String] path where should look for source files
@@ -66,15 +66,29 @@ module Epuber
       end
 
       # @param [String] pattern  pattern of the desired files
+      # @param [Symbol] groups list of group names, for valid values see GROUP_EXTENSIONS
       #
       # @return [Array<String>] list of founded files
       #
-      def find_files(pattern)
+      def find_files(pattern, groups = nil)
         full_pattern = ::File.expand_path(pattern, source_path)
         file_paths = Dir.glob(full_pattern)
 
+        # filter depend on group
+        groups = Array(groups)
+        unless groups.empty?
+          valid_extensions = groups.map do |group|
+            GROUP_EXTENSIONS.fetch(group) { raise ::StandardError, "Unknown file group #{group.inspect}" }
+          end.flatten
+
+          file_paths.select! do |file_path|
+            extname     = ::File.extname(file_path)
+            valid_extensions.include?(extname)
+          end
+        end
+
         file_paths.map do |path|
-          Pathname(path.unicode_normalize).relative_path_from(@source_path_abs_pathname)
+          Pathname(path.unicode_normalize).relative_path_from(@source_path_abs_pathname).to_s
         end
       end
     end
