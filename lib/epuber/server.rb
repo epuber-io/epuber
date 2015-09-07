@@ -186,22 +186,8 @@ module Epuber
     # @return [String] path to file
     #
     def find_file(pattern = params[:splat].first, source_path: build_path)
-      paths = nil
-
-      exact_path = ::File.join(source_path, pattern)
-      if ::File.file?(exact_path)
-        return exact_path.sub(::File.join(source_path, ''), '')
-      end
-
-      Dir.chdir(source_path) do
-        paths = Dir.glob(pattern)
-        paths = Dir.glob("**/#{pattern}") if paths.empty?
-
-        paths = Dir.glob("**/#{pattern}*") if paths.empty?
-        paths = Dir.glob("**/#{pattern}.*") if paths.empty?
-      end
-
-      paths.first
+      finder = Compiler::FileFinder.new(source_path)
+      finder.find_files(pattern).first
     end
 
     # @param index [Fixnum]
