@@ -85,12 +85,23 @@ module Epuber
       #
       attr_reader :source_path
 
+      # @return [Array<String>]
+      #
+      attr_accessor :ignored_patterns
+
 
       # @param [String] source_path
       #
       def initialize(source_path)
         @source_path = source_path.unicode_normalize.freeze
         @source_path_abs = ::File.expand_path(@source_path).unicode_normalize.freeze
+        @ignored_patterns = []
+      end
+
+
+      def assert_one_file(files, pattern: nil, groups: nil, context_path: nil)
+        raise FileNotFoundError.new(pattern, context_path) if files.empty?
+        raise MultipleFilesFoundError.new(pattern, groups, context_path, files) if files.count >= 2
       end
 
       # Method for finding file from context_path, if there is not matching file, it will continue to search from
@@ -106,10 +117,7 @@ module Epuber
       #
       def find_file(pattern, groups: nil, context_path: nil, search_everywhere: true)
         files = find_files(pattern, groups: groups, context_path: context_path, search_everywhere: search_everywhere)
-
-        raise FileNotFoundError.new(pattern, context_path) if files.empty?
-        raise MultipleFilesFoundError.new(pattern, groups, context_path, files) if files.count >= 2
-
+        assert_one_file(files)
         files.first
       end
 
@@ -133,15 +141,15 @@ module Epuber
             raise "You can't search from folder (#{searching_path}) that is not sub folder of the source_path (#{source_path}) expanded to (#{@source_path_abs})."
           end
 
-          files = self.class.__find_files(pattern, groups, searching_path)
+          files = __find_files(pattern, groups, searching_path)
         end
 
         if files.empty? && context_path != source_path
-          files = self.class.__find_files(pattern, groups, @source_path_abs)
+          files = __find_files(pattern, groups, @source_path_abs)
         end
 
         if files.empty? && search_everywhere && !pattern.start_with?('**')
-          files = self.class.__find_files('**/' + pattern, groups, @source_path_abs)
+          files = __find_files('**/' + pattern, groups, @source_path_abs)
         end
 
         files
@@ -156,7 +164,7 @@ module Epuber
       # @return [Array<String>] list of founded files
       #
       def find_all(pattern, groups: nil, context_path: @source_path_abs)
-        self.class.__find_files('**/' + pattern, groups, context_path)
+        __find_files('**/' + pattern, groups, context_path)
       end
 
 
@@ -170,7 +178,7 @@ module Epuber
       #
       # @return [Array<String>] list of founded files
       #
-      def self.__find_files(pattern, groups, context_path)
+      def __find_files(pattern, groups, context_path)
         files = __core_find_files(pattern, groups, context_path)
 
         # try to find files with any extension
@@ -187,9 +195,14 @@ module Epuber
       #
       # @return [Array<String>] list of founded files
       #
-      def self.__core_find_files(pattern, groups, context_path)
+      def __core_find_files(pattern, groups, context_path)
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
+
+        # remove any files that should be ignored
+        file_paths.reject! do |path|
+          ignored_patterns.any? { |exclude_pattern| ::File.fnmatch(exclude_pattern, path) }
+        end
 
         # filter depend on group
         groups = Array(groups)
@@ -203,10 +216,13 @@ module Epuber
           end
         end
 
+        # create relative path to context path
         context_pathname = Pathname.new(context_path)
-        file_paths.map do |path|
+        file_paths.map! do |path|
           Pathname(path.unicode_normalize).relative_path_from(context_pathname).to_s
         end
+
+        file_paths
       end
     end
   end

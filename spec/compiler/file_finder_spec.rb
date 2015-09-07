@@ -166,6 +166,25 @@ module Epuber
           }.to raise_error FileFinder::MultipleFilesFoundError
         end
       end
+
+      context '#ignored_patterns' do
+        it 'support ignoring patterns' do
+          @finder.ignored_patterns << '/abc/**'
+
+          FileUtils.mkdir_p('/abc')
+          FileUtils.touch(['/abc/some_file.xhtml'])
+
+          files = @finder.find_all('*.xhtml')
+          expect(files.size).to eq 0
+
+          FileUtils.mkdir_p('/def')
+          FileUtils.touch(['/def/some_file.xhtml'])
+
+          files = @finder.find_all('*.xhtml')
+          expect(files.size).to eq 1
+          expect(files).to include 'def/some_file.xhtml'
+        end
+      end
     end
 
     # TODO: can find files from super folder
