@@ -141,9 +141,35 @@ module Epuber
           expect(files).to include 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml', 'dir_2/one.bade'
         end
       end
+
+      context '#find_file' do
+        it 'can find exactly one file' do
+          FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
+
+          file = @finder.find_file('c')
+          expect(file).to eq 'c.xhtml'
+        end
+
+        it "raises error when no file couldn't be found" do
+          FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
+
+          expect {
+            @finder.find_file('baf')
+          }.to raise_error FileFinder::FileNotFoundError
+        end
+
+        it "raises error when no file couldn't be found" do
+          FileUtils.touch(['a.xhtml', 'b.xhtml'])
+
+          expect {
+            @finder.find_file('*.xhtml')
+          }.to raise_error FileFinder::MultipleFilesFoundError
+        end
+      end
     end
 
     # TODO: can find files from super folder
+    # TODO: returned relative path must correspond to original input context path
 
   end
 end

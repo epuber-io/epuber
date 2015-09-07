@@ -11,10 +11,20 @@ module Epuber
         #
         attr_reader :pattern
 
-        # @param [String] pattern
+        # @return [String]
         #
-        def initialize(pattern)
+        attr_reader :context_path
+
+        # @param [String] pattern
+        # @param [String] context_path
+        #
+        def initialize(pattern, context_path)
           @pattern = pattern
+          @context_path = context_path
+        end
+
+        def to_s
+          "Not found file matching pattern `#{pattern}` from context path #{context_path}."
         end
       end
 
@@ -23,16 +33,34 @@ module Epuber
         #
         attr_reader :files_paths
 
+        # @return [Array<Symbol>]
+        #
+        attr_reader :groups
+
         # @return [String]
         #
         attr_reader :pattern
 
-        # @param [String] pattern
-        # @param [Array<String>] files_paths
+        # @return [String]
         #
-        def initialize(pattern, files_paths)
+        attr_reader :context_path
+
+        # @param [String] pattern  original pattern for searching
+        # @param [Symbol] groups  list of groups
+        # @param [String] context_path  context path of current searching
+        # @param [Array<String>] files_paths  list of founded files
+        #
+        def initialize(pattern, groups, context_path, files_paths)
           @pattern = pattern
+          @groups = groups
+          @context_path = context_path
           @files_paths = files_paths
+        end
+
+        def to_s
+          str = "Found too many files for pattern `#{pattern}` from context path #{context_path}"
+          str += ", file groups #{groups.map(:inspect)}" unless groups.nil?
+          str + ", founded files #{files_paths}"
         end
       end
 
@@ -63,14 +91,33 @@ module Epuber
       def initialize(source_path)
         @source_path = source_path.unicode_normalize.freeze
         @source_path_abs = ::File.expand_path(@source_path).unicode_normalize.freeze
-        @source_path_abs_pathname = Pathname.new(::File.expand_path(@source_path))
+      end
+
+      # Method for finding file from context_path, if there is not matching file, it will continue to search from
+      # #source_path and after that it tries to search recursively from #source_path.
+      #
+      # When it founds too many (more than two) it will raise MultipleFilesFoundError
+      #
+      # @param [String] pattern  pattern of the desired files
+      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
+      #
+      # @return [Array<String>] list of founded files
+      #
+      def find_file(pattern, groups: nil, context_path: nil, search_everywhere: true)
+        files = find_files(pattern, groups: groups, context_path: context_path, search_everywhere: search_everywhere)
+
+        raise FileNotFoundError.new(pattern, context_path) if files.empty?
+        raise MultipleFilesFoundError.new(pattern, groups, context_path, files) if files.count >= 2
+
+        files.first
       end
 
       # Method for finding files from context_path, if there is not matching file, it will continue to search from
       # #source_path and after that it tries to search recursively from #source_path.
       #
       # @param [String] pattern  pattern of the desired files
-      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
       # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
       #
       # @return [Array<String>] list of founded files
@@ -100,8 +147,10 @@ module Epuber
         files
       end
 
+      # Looks for all files from #source_path recursively
+      #
       # @param [String] pattern  pattern of the desired files
-      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
       # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
       #
       # @return [Array<String>] list of founded files
@@ -110,24 +159,35 @@ module Epuber
         self.class.__find_files('**/' + pattern, groups, context_path)
       end
 
+
       private
 
-      def self.__find_files(pattern, groups, context_path)
-        files = __primitive_find_files(pattern, groups, context_path)
-
-        # try to find files with any extension
-        files = __primitive_find_files(pattern + '.*', groups, context_path) if files.empty?
-
-        files
-      end
-
+      # Looks for files at given context path, if there is no file, it will try again with pattern for any extension
+      #
       # @param [String] pattern  pattern of the desired files
-      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
       # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
       #
       # @return [Array<String>] list of founded files
       #
-      def self.__primitive_find_files(pattern, groups, context_path)
+      def self.__find_files(pattern, groups, context_path)
+        files = __core_find_files(pattern, groups, context_path)
+
+        # try to find files with any extension
+        files = __core_find_files(pattern + '.*', groups, context_path) if files.empty?
+
+        files
+      end
+
+      # Core method for finding files, it only search for files, filter by input groups and map the final paths to pretty relative paths from context_path
+      #
+      # @param [String] pattern  pattern of the desired files
+      # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
+      #
+      # @return [Array<String>] list of founded files
+      #
+      def self.__core_find_files(pattern, groups, context_path)
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
