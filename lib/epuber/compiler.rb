@@ -25,6 +25,7 @@ module Epuber
 
     require_relative 'compiler/file'
     require_relative 'compiler/file_resolver'
+    require_relative 'compiler/file_finder'
 
     require_relative 'compiler/file_processing'
     include FileProcessing

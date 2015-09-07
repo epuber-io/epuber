@@ -53,6 +53,7 @@ GEM
     epubcheck (3.0.1)
     eventmachine (1.0.8)
     execjs (2.6.0)
+    fakefs (0.6.7)
     ffi (1.9.10)
     i18n (0.7.0)
     json (1.8.3)
@@ -135,6 +136,7 @@ PLATFORMS
 DEPENDENCIES
   bade!
   epuber!
+  fakefs
   rake (~> 10.4)
   rspec (~> 3.2)
   rubocop (~> 0.29)
