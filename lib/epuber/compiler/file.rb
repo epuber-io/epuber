@@ -37,7 +37,7 @@ module Epuber
 
 
       # @param file_request_or_path [String, Epuber::Book::FileRequest]
-      # @param [Symbol] group group of file, see Epuber::Compiler::FileResolver::GROUP_EXTENSIONS
+      # @param [Symbol] group group of file, see Epuber::Compiler::FileFinder::GROUP_EXTENSIONS
       # @param [Array<Symbol>, Set<Symbol>] properties list of properties, TODO add list of supported properties, and validate them
       #
       def initialize(file_request_or_path, group: nil, properties: [])

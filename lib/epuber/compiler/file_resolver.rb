@@ -1,57 +1,12 @@
 # encoding: utf-8
 
 require 'unicode_normalize'
+require_relative 'file_finder'
 
 
 module Epuber
   class Compiler
     class FileResolver
-      class FileNotFoundError < ::StandardError
-        # @return [String]
-        #
-        attr_reader :pattern
-
-        # @param [String] pattern
-        #
-        def initialize(pattern)
-          @pattern = pattern
-        end
-      end
-
-      class MultipleFilesFoundError < ::StandardError
-        # @return [Array<String>]
-        #
-        attr_reader :files_paths
-
-        # @return [String]
-        #
-        attr_reader :pattern
-
-        # @param [Array<String>] files_paths
-        #
-        def initialize(pattern, files_paths)
-          @pattern = pattern
-          @files_paths = files_paths
-        end
-      end
-
-      GROUP_EXTENSIONS = {
-        text:   %w(.xhtml .html .bade .rxhtml),
-        image:  %w(.png .jpg .jpeg),
-        font:   %w(.otf .ttf),
-        style:  %w(.css .styl),
-        script: %w(.js),
-      }.freeze
-
-      STATIC_EXTENSIONS = %w(.xhtml .html .png .jpg .jpeg .otf .ttf .css .js).freeze
-
-      EXTENSIONS_RENAME = {
-        '.styl'   => '.css',
-
-        '.bade'   => '.xhtml',
-        '.rxhtml' => '.xhtml',
-        '.md'     => '.xhtml',
-      }.freeze
 
       # @return [String] path where should look for source files
       #
@@ -66,9 +21,13 @@ module Epuber
       # @param [String] destination_path
       #
       def initialize(source_path, destination_path)
+        @finder = FileFinder.new(source_path)
+        @finder.ignored_patterns << ::File.join(Config::WORKING_PATH, '**')
+
         @source_path      = source_path.unicode_normalize
         @destination_path = destination_path.unicode_normalize
-        @files            = {
+
+        @files = {
           spine:    [],
           manifest: [],
           package:  [],
@@ -162,11 +121,11 @@ module Epuber
       #
       # @return [File]
       #
-      def find_file_with_destination_path(destination_path)
+      def find_file_with_destination_path(destination_path, groups, context_path)
         file = _destination_path_to_file_map[destination_path]
         file_paths = [file].compact
 
-        assert_one_file_path(file_paths, destination_path)
+        @finder.assert_one_file(file_paths, pattern: destination_path, groups: groups, context_path: context_path)
 
         file_paths.first
       end
@@ -182,14 +141,14 @@ module Epuber
           # don't even try, when there is star char
           begin
             # try to find file with exact path
-            return find_file_with_destination_path(::File.expand_path(pattern, context_path))
+            return find_file_with_destination_path(::File.expand_path(pattern, context_path), group, context_path)
 
-          rescue FileNotFoundError
+          rescue FileFinder::FileNotFoundError
             # not found, skip this and try to find with pattern
           end
         end
 
-        extensions = GROUP_EXTENSIONS[group]
+        extensions = FileFinder::GROUP_EXTENSIONS[group]
         raise "Unknown group #{group.inspect}" if extensions.nil?
 
         regexp_extensions = extensions.map { |ext| Regexp.escape(ext) }.join('|')
@@ -198,7 +157,7 @@ module Epuber
 
         regex = /^#{Regexp.escape(complete_path)}\/#{shorter_pattern}(?:#{regexp_extensions})$/
 
-        _find_file_obj(pattern) do |file|
+        _find_file_obj(pattern, group, context_path) do |file|
           regex =~ file.destination_path
         end
       end
@@ -255,11 +214,7 @@ module Epuber
       #
       def find_file(file_or_pattern, group = nil, context_path: source_path)
         pattern = pattern_from(file_or_pattern)
-        file_paths = find_files(file_or_pattern, group, context_path: context_path)
-
-        assert_one_file_path(file_paths, pattern)
-
-        file_paths.first
+        @finder.find_file(pattern, groups: group, context_path: context_path)
       end
 
       # @param [String] source_path
@@ -298,7 +253,7 @@ module Epuber
           real_source_path = find_file(file, file.group)
 
           extname     = ::File.extname(real_source_path)
-          new_extname = EXTENSIONS_RENAME[extname]
+          new_extname = FileFinder::EXTENSIONS_RENAME[extname]
 
           dest_path = if new_extname.nil?
                         real_source_path
@@ -319,18 +274,18 @@ module Epuber
         end
       end
 
-      # @param [String] failure_message
       #
       # @yieldparam [Epuber::Compiler::File]
       #
       # @return [Epuber::Compiler::File]
       #
-      def _find_file_obj(failure_message)
+      def _find_file_obj(pattern, group, context_path)
         file_objs = files_of.select do |file|
           yield file
         end
 
-        assert_one_file_path(file_objs, failure_message)
+        @finder.assert_one_file(file_objs, pattern: pattern, groups: group, context_path: context_path)
+
         file_objs.first
       end
 
@@ -341,55 +296,9 @@ module Epuber
       #
       def find_files(file_or_pattern, group = nil, context_path: source_path)
         pattern = pattern_from(file_or_pattern)
-
         group = file_or_pattern.group if group.nil? && file_or_pattern.is_a?(Epuber::Book::FileRequest)
 
-        file_paths = file_paths_with_pattern("**/#{pattern}", group, context_path: context_path)
-        file_paths = file_paths_with_pattern("**/#{pattern}.*", group, context_path: context_path) if file_paths.empty?
-
-        file_paths
-      end
-
-      # @param [Array<String>] file_paths list of founded paths to files
-      # @param [String] pattern pattern which will be included in raised error
-      #
-      # @raise FileNotFoundError
-      # @raise MultipleFilesFoundError
-      #
-      # @return nil
-      #
-      def assert_one_file_path(file_paths, pattern)
-        raise FileNotFoundError.new(pattern), "not found file matching pattern `#{pattern}`" if file_paths.empty?
-        raise MultipleFilesFoundError.new(pattern, file_paths), "found too many files for pattern `#{pattern}`, paths = #{file_paths}" if file_paths.count >= 2
-      end
-
-      # @param [String] pattern
-      # @param [Symbol] group
-      # @return [Array<String>]
-      #
-      def file_paths_with_pattern(pattern, group = nil, context_path: source_path)
-        full_pattern = ::File.expand_path(pattern, context_path)
-        file_paths = Dir.glob(full_pattern)
-
-        file_paths.reject! do |file_path|
-          file_path.include?(Config::WORKING_PATH)
-        end
-
-        # filter depend on group
-        unless group.nil?
-          file_paths.select! do |file_path|
-            extname     = ::File.extname(file_path)
-            group_array = GROUP_EXTENSIONS[group]
-
-            raise "Unknown file group #{group.inspect}" if group_array.nil?
-
-            group_array.include?(extname)
-          end
-        end
-
-        file_paths.map do |path|
-          path.unicode_normalize.sub(::File.join(context_path.unicode_normalize, ''), '')
-        end
+        @finder.find_files(pattern, groups: group, context_path: context_path)
       end
 
       # @param [String, File, FileRequest] file_or_pattern

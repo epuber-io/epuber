@@ -61,7 +61,7 @@ module Epuber
               b.subtitle = 'Abc'
             end
 
-            expect { book.validate }.to raise_error
+            expect { book.validate }.to raise_error ValidationError
           end
 
           it 'supports array' do
@@ -87,7 +87,7 @@ module Epuber
             }
           end
 
-          expect { book.validate }.to raise_error
+          expect { book.validate }.to raise_error ValidationError
         end
 
         context '#published' do

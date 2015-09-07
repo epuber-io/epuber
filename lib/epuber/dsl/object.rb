@@ -9,6 +9,8 @@ require 'active_support/core_ext/string/inflections'
 module Epuber
   module DSL
     class Object
+      class ValidationError < StandardError; end
+
       # @return [String, nil]
       #
       attr_reader :file_path
@@ -52,9 +54,9 @@ module Epuber
           next unless attr.required? && value.nil?
 
           if attr.singularize?
-            raise StandardError, "missing required attribute `#{key.to_s.singularize}|#{key}`"
+            raise ValidationError, "missing required attribute `#{key.to_s.singularize}|#{key}`"
           else
-            raise StandardError, "missing required attribute `#{key}`"
+            raise ValidationError, "missing required attribute `#{key}`"
           end
         end
       end

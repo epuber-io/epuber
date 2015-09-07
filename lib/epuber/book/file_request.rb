@@ -25,7 +25,7 @@ module Epuber
 
 
       # @param [String] source_pattern pattern describing path to file
-      # @param [Symbol] group group of file, see Epuber::Compiler::FileResolver::GROUP_EXTENSIONS
+      # @param [Symbol] group group of file, see Epuber::Compiler::FileFinder::GROUP_EXTENSIONS
       # @param [Array<Symbol>, Set<Symbol>] properties list of properties, TODO add list of supported properties, and validate them
       #
       def initialize(source_pattern, group: nil, properties: [])

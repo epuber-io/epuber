@@ -33,13 +33,13 @@ module Epuber
       it 'pretty_name is readonly' do
         expect do
           @contributor.pretty_name = ''
-        end.to raise_error
+        end.to raise_error NameError
       end
 
       it 'file_as is readonly' do
         expect do
           @contributor.file_as = ''
-        end.to raise_error
+        end.to raise_error NameError
       end
     end
 

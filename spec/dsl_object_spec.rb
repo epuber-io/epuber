@@ -51,7 +51,7 @@ module Epuber
         it 'should not validate without specified attribute' do
           expect do
             @example.validate
-          end.to raise_error
+          end.to raise_error Object::ValidationError
         end
 
         it 'should validate with specified attribute' do

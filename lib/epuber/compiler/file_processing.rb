@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require_relative 'file_resolver'
+require_relative 'file_finder'
 require_relative 'file'
 
 require_relative '../book/file_request'
@@ -33,11 +34,11 @@ module Epuber
           file_extname = ::File.extname(file_source_path)
 
           case file_extname
-          when *FileResolver::GROUP_EXTENSIONS[:text]
+          when *FileFinder::GROUP_EXTENSIONS[:text]
             process_text_file(file)
-          when *FileResolver::GROUP_EXTENSIONS[:image]
+          when *FileFinder::GROUP_EXTENSIONS[:image]
             process_image_file(file)
-          when *FileResolver::STATIC_EXTENSIONS
+          when *FileFinder::STATIC_EXTENSIONS
             file_copy(file)
           when '.styl'
             file.content = Stylus.compile(::File.new(file_source_path))
@@ -247,10 +248,10 @@ module Epuber
       #
       def _handle_file_resolver_error(error, location: nil)
         case error
-        when FileResolver::FileNotFoundError
+        when FileFinder::FileNotFoundError
           UI.warning("Can't find file with name #{error.pattern}", location: location)
 
-        when FileResolver::MultipleFilesFoundError
+        when FileFinder::MultipleFilesFoundError
           UI.warning("Too many files found for name #{error.pattern} and there should be only one, files: #{error.files_paths}", location: location)
         end
       end
@@ -263,11 +264,11 @@ module Epuber
         begin
           # try to find it in files folder
           @file_resolver.find_file_with_destination_pattern(pattern, context_path, group)
-        rescue FileResolver::FileNotFoundError
+        rescue FileFinder::FileNotFoundError
           # try to find it in all files
           @file_resolver.find_file_with_destination_pattern(".*/#{pattern}", @file_resolver.destination_path, group)
         end
-      rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError => e
+      rescue FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError => e
         _handle_file_resolver_error(e, location: location)
       end
 
@@ -310,14 +311,14 @@ module Epuber
           begin
             # try to find it in same folder
             package_path = @file_resolver.find_file(path, :image, context_path: ::File.dirname(file.source_path))
-          rescue FileResolver::FileNotFoundError
+          rescue FileFinder::FileNotFoundError
             # try to find in project folder
             begin
               package_path = @file_resolver.find_file(path, :image)
-            rescue FileResolver::FileNotFoundError, FileResolver::MultipleFilesFoundError => e
+            rescue FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError => e
               _handle_file_resolver_error(e, location: img)
             end
-          rescue FileResolver::MultipleFilesFoundError => e
+          rescue FileFinder::MultipleFilesFoundError => e
             _handle_file_resolver_error(e, location: img)
           end
 
