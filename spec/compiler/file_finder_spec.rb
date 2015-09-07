@@ -92,7 +92,35 @@ module Epuber
           expect(files.size).to eq 3
         end
       end
+
+      context '#find_all' do
+        it 'can find all files in project' do
+          FileUtils.mkdir_p('dir_1/dir_11/dir_111')
+          FileUtils.mkdir_p('dir_2')
+          FileUtils.mkdir_p('dir_3')
+          FileUtils.mkdir_p('.git')
+
+          FileUtils.touch(['dir_1/one.xhtml', 'dir_1/two.xhtml', 'dir_1/three.css'])
+          FileUtils.touch(['dir_1/dir_11/dir_111/one.xhtml', 'dir_1/dir_11/dir_111/two.xhtml', 'dir_1/dir_11/dir_111/three.css'])
+          FileUtils.touch(['dir_2/fif.stylus', 'dir_2/baf.md', 'dir_2/hi.css'])
+          FileUtils.touch(['dir_3/abc.xhtml', 'dir_3/abc_md.md', 'dir_3/abc.txt'])
+          FileUtils.touch(['.gitignore', 'README.txt'])
+
+          files = @finder.find_all('one.xhtml', groups: :text)
+          expect(files).to include 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml'
+
+          files = @finder.find_all('*.md')
+          expect(files).to include 'dir_2/baf.md', 'dir_3/abc_md.md'
+
+          files = @finder.find_all('*.stylus', groups: :style)
+          expect(files.size).to eq 0
+        end
+      end
     end
+
+    # TODO: returned paths have to be relative to context_path !!!
+    # TODO: can find files without specified extension
+    # TODO: can find files from super folder
 
   end
 end

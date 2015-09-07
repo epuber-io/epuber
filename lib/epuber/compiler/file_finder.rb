@@ -62,19 +62,31 @@ module Epuber
       #
       def initialize(source_path)
         @source_path = source_path.unicode_normalize.freeze
+        @source_path_abs = ::File.expand_path(@source_path).unicode_normalize.freeze
         @source_path_abs_pathname = Pathname.new(::File.expand_path(@source_path))
       end
 
+      # Method for finding files from context_path, if there is not matching file, it will continue to search from
+      # #source_path and after that it tries to search recursively from #source_path.
+      #
       # @param [String] pattern  pattern of the desired files
-      # @param [Symbol] groups list of group names, for valid values see GROUP_EXTENSIONS
+      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
       #
       # @return [Array<String>] list of founded files
       #
       def find_files(pattern, groups: nil, context_path: nil, search_everywhere: true)
         files = []
+        searching_path = context_path
 
-        unless context_path.nil?
-          files = __find_files(pattern, groups, context_path)
+        unless searching_path.nil?
+          context_path = ::File.expand_path(context_path, @source_path_abs)
+
+          unless context_path.start_with?(@source_path_abs)
+            raise "You can't search from folder (#{context_path}) that is not sub folder of the source_path (#{source_path}) expanded to (#{@source_path_abs})."
+          end
+
+          files = __find_files(pattern, groups, searching_path)
         end
 
         if files.empty? && context_path != source_path
@@ -88,10 +100,21 @@ module Epuber
         files
       end
 
+      # @param [String] pattern  pattern of the desired files
+      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
+      #
+      # @return [Array<String>] list of founded files
+      #
+      def find_all(pattern, groups: nil, context_path: source_path)
+        __find_files('**/' + pattern, groups, context_path)
+      end
+
       private
 
       # @param [String] pattern  pattern of the desired files
-      # @param [Symbol] groups list of group names, for valid values see GROUP_EXTENSIONS
+      # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+      # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
       #
       # @return [Array<String>] list of founded files
       #
