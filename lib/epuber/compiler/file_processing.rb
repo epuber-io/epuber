@@ -2,7 +2,6 @@
 
 require_relative 'file_resolver'
 require_relative 'file_finder'
-require_relative 'file'
 
 require_relative '../book/file_request'
 require_relative '../checker'

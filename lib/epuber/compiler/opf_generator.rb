@@ -11,8 +11,6 @@ require_relative '../book/toc_item'
 module Epuber
   class Compiler
     class OPFGenerator < Generator
-      require_relative 'file'
-
 
       EPUB2_NAMESPACES = {
         'xmlns'    => 'http://www.idpf.org/2007/opf',
