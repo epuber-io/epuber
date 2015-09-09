@@ -34,6 +34,35 @@ module Epuber
           expect(doc.root.children.count).to eq 2
         end
       end
+
+      context '.add_missing_root_elements' do
+        it 'adds all missing elements' do
+          input_str = '<p>abc</p><p>abcd</p>'
+          doc = XHTMLProcessor.xml_document_from_string(input_str)
+
+          expect(doc.at_css('p')).to_not be_nil
+
+          # all items are missing
+          expect(doc.at_css('html')).to be_nil
+          expect(doc.at_css('html head')).to be_nil
+          expect(doc.at_css('html head title')).to be_nil
+          expect(doc.at_css('html body')).to be_nil
+          expect(doc.at_css('html body p')).to be_nil
+
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          # and they are there
+          expect(doc.at_css('html')).to_not be_nil
+          expect(doc.at_css('html').namespaces).to include 'xmlns' => 'http://www.w3.org/1999/xhtml'
+          expect(doc.at_css('html').namespaces).to include 'xmlns:epub' => 'http://www.idpf.org/2007/ops'
+          expect(doc.at_css('html head')).to_not be_nil
+          expect(doc.at_css('html head title')).to_not be_nil
+          expect(doc.at_css('html head title').to_s).to eq '<title>Baf</title>'
+          expect(doc.at_css('html body')).to_not be_nil
+          expect(doc.at_css('html body p')).to_not be_nil
+          expect(doc.css('html body p').map(&:to_s).join).to eq input_str
+        end
+      end
     end
 
 
