@@ -75,6 +75,23 @@ module Epuber
         end
       end
 
+      # Method for adding style sheets with links, method will not add duplicate items
+      #
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @param [Array<String>] styles  links to files
+      #
+      # @return nil
+      #
+      def self.add_styles(xhtml_doc, styles)
+        head  = xhtml_doc.at_css('html > head')
+        old_links = head.css('link[rel="stylesheet"]').map { |node| node['href'] }
+
+        links_to_add = styles - old_links
+
+        links_to_add.each do |path|
+          head << xhtml_doc.create_element('link', href: path, rel: 'stylesheet', type: 'text/css')
+        end
+      end
     end
   end
 end

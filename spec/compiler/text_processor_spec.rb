@@ -63,6 +63,50 @@ module Epuber
           expect(doc.css('html body p').map(&:to_s).join).to eq input_str
         end
       end
+
+      context '.add_style_links' do
+        it 'adds missing links to empty head' do
+          doc = XHTMLProcessor.xml_document_from_string('')
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          expect(doc.css('link[rel="stylesheet"]').size).to eq 0
+
+          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+
+          expect(doc.css('link[rel="stylesheet"]').size).to eq 2
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def'
+        end
+
+        it 'adds missing links to styles' do
+          input_str = '<html>
+              <head>
+                <link rel="stylesheet" type="text/css" href="qwe" />
+              </head>
+            </html>'
+          doc = XHTMLProcessor.xml_document_from_string(input_str)
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          expect(doc.css('link[rel="stylesheet"]').size).to eq 1
+
+          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+
+          expect(doc.css('link[rel="stylesheet"]').size).to eq 3
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def', 'qwe'
+        end
+
+        it 'will not add duplicated items' do
+          doc = XHTMLProcessor.xml_document_from_string('')
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+
+          expect(doc.css('link[rel="stylesheet"]').size).to eq 2
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def'
+        end
+      end
     end
 
 
