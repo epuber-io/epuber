@@ -99,6 +99,15 @@ module Epuber
 
           files = @finder.find_files('*.xhtml', context_path: 'abc')
           expect(files.size).to eq 3
+          expect(files).to include '../file1.xhtml', '../file2.xhtml', '../file3.xhtml'
+        end
+
+        it 'returns relative path to context path' do
+          FileUtils.mkdir_p('abc/def/ghi')
+          FileUtils.touch(['file1.xhtml', 'file2.xhtml', 'file3.xhtml'])
+
+          files = @finder.find_files('*.xhtml', context_path: 'abc/def/ghi')
+          expect(files).to include '../../../file1.xhtml', '../../../file2.xhtml', '../../../file3.xhtml'
         end
       end
 
@@ -165,6 +174,14 @@ module Epuber
             @finder.find_file('*.xhtml')
           }.to raise_error FileFinder::MultipleFilesFoundError
         end
+
+        it 'returns relative path to context path' do
+          FileUtils.mkdir_p('abc/def/ghi')
+          FileUtils.touch(['file1.xhtml', 'file2.xhtml', 'file3.xhtml'])
+
+          files = @finder.find_file('file1', context_path: 'abc/def/ghi')
+          expect(files).to eq '../../../file1.xhtml'
+        end
       end
 
       context '#ignored_patterns' do
@@ -188,7 +205,6 @@ module Epuber
     end
 
     # TODO: can find files from super folder
-    # TODO: returned relative path must correspond to original input context path
 
   end
 end

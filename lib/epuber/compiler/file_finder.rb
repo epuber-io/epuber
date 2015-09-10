@@ -145,11 +145,11 @@ module Epuber
         end
 
         if files.empty? && context_path != source_path
-          files = __find_files(pattern, groups, @source_path_abs)
+          files = __find_files(pattern, groups, @source_path_abs, searching_path || @source_path_abs)
         end
 
         if files.empty? && search_everywhere && !pattern.start_with?('**')
-          files = __find_files('**/' + pattern, groups, @source_path_abs)
+          files = __find_files('**/' + pattern, groups, @source_path_abs, searching_path || @source_path_abs)
         end
 
         files
@@ -175,14 +175,15 @@ module Epuber
       # @param [String] pattern  pattern of the desired files
       # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
       # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
+      # @param [String] orig_context_path  original context path, wo it will work nicely with iterative searching
       #
       # @return [Array<String>] list of founded files
       #
-      def __find_files(pattern, groups, context_path)
-        files = __core_find_files(pattern, groups, context_path)
+      def __find_files(pattern, groups, context_path, orig_context_path = context_path)
+        files = __core_find_files(pattern, groups, context_path, orig_context_path)
 
         # try to find files with any extension
-        files = __core_find_files(pattern + '.*', groups, context_path) if files.empty?
+        files = __core_find_files(pattern + '.*', groups, context_path, orig_context_path) if files.empty?
 
         files
       end
@@ -192,10 +193,11 @@ module Epuber
       # @param [String] pattern  pattern of the desired files
       # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
       # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
+      # @param [String] orig_context_path  original context path, wo it will work nicely with iterative searching
       #
       # @return [Array<String>] list of founded files
       #
-      def __core_find_files(pattern, groups, context_path)
+      def __core_find_files(pattern, groups, context_path, orig_context_path = context_path)
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
@@ -217,7 +219,7 @@ module Epuber
         end
 
         # create relative path to context path
-        context_pathname = Pathname.new(context_path)
+        context_pathname = Pathname.new(orig_context_path)
         file_paths.map! do |path|
           Pathname(path.unicode_normalize).relative_path_from(context_pathname).to_s
         end
