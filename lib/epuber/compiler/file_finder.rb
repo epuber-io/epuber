@@ -117,7 +117,7 @@ module Epuber
       #
       def find_file(pattern, groups: nil, context_path: nil, search_everywhere: true)
         files = find_files(pattern, groups: groups, context_path: context_path, search_everywhere: search_everywhere)
-        assert_one_file(files)
+        assert_one_file(files, pattern: pattern, groups: groups, context_path: context_path)
         files.first
       end
 

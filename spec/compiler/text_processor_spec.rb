@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'claide/ansi'
+
 require_relative '../spec_helper'
 
 require 'epuber/book'
@@ -211,9 +213,37 @@ module Epuber
           expect(links).to include URI('ref1.xhtml'), URI('ref2.txt#abc'), URI('abc/ref10.xhtml')
         end
 
-        it 'prints warning when the attribute is empty'
-        it "prints warning when the desired file can't be found"
-        it 'silently skips tags without specified attributes'
+        it 'prints warning when the attribute is empty' do
+          FileUtils.touch('root.txt')
+          finder = FileFinder.new('/')
+          doc = XHTMLProcessor.xml_document_from_string('<a href=""/>')
+
+          expect {
+            XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
+          }.to output('Not found file matching pattern `` from context path root.txt.
+  (in file  line 1'.ansi.yellow + "\n").to_stdout
+        end
+
+        it "prints warning when the desired file can't be found" do
+          FileUtils.touch('root.txt')
+          finder = FileFinder.new('/')
+          doc = XHTMLProcessor.xml_document_from_string('<a href="blabla"/>')
+
+          expect {
+            XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
+          }.to output('Not found file matching pattern `blabla` from context path root.txt.
+  (in file  line 1'.ansi.yellow + "\n").to_stdout
+        end
+
+        it 'silently skips tags without specified attributes' do
+          FileUtils.touch('root.txt')
+          finder = FileFinder.new('/')
+          doc = XHTMLProcessor.xml_document_from_string('<a/>')
+
+          expect {
+            XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
+          }.to_not output.to_stdout
+        end
       end
     end
 
