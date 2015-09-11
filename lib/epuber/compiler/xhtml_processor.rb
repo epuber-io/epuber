@@ -3,9 +3,10 @@
 require 'nokogiri'
 
 
-
 module Epuber
   class Compiler
+    require_relative 'file_finder'
+
     class XHTMLProcessor
       class UnparseableLinkError < StandardError; end
 
@@ -98,15 +99,17 @@ module Epuber
       # Method which will resolve path to file from pattern
       #
       # @param [String] path  pattern or path of the file
-      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example image when searching for file from tag <img>
+      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching for file from tag <img>
       # @param [String] context_path  path to file from which is searching for other file
       # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
       #
-      # @raise UnparseableLinkError, Epuber::Compiler::FileFinder::FileNotFoundError, Epuber::Compiler::FileFinder::MultipleFilesFoundError
+      # @raise UnparseableLinkError, FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError
       #
       # @return [URI] resolved path to file or remote web page
       #
       def self.resolved_link_to_file(path, groups, context_path, file_finder)
+        raise FileFinder::FileNotFoundError.new(path, context_path) if path.empty?
+
         begin
           uri = URI(path)
         rescue
@@ -124,7 +127,8 @@ module Epuber
         # skip empty path
         return uri if uri.path.empty?
 
-        uri.path = file_finder.find_file(uri.path, groups: groups, context_path: File.dirname(context_path))
+        context_path = File.file?(context_path) ? File.dirname(context_path) : context_path
+        uri.path = file_finder.find_file(uri.path, groups: groups, context_path: context_path)
 
         uri
       end

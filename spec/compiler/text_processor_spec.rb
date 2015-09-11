@@ -184,6 +184,16 @@ module Epuber
             XHTMLProcessor.resolved_link_to_file('some_not_existing_file', nil, 'root.txt', finder)
           }.to raise_error FileFinder::FileNotFoundError
         end
+
+        it 'raise error when the path is empty' do
+          FileUtils.touch('root.txt')
+
+          finder = FileFinder.new('/')
+
+          expect {
+            XHTMLProcessor.resolved_link_to_file('', nil, 'root.txt', finder)
+          }.to raise_error FileFinder::FileNotFoundError
+        end
       end
     end
 
