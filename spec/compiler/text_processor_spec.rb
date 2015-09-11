@@ -216,23 +216,23 @@ module Epuber
         it 'prints warning when the attribute is empty' do
           FileUtils.touch('root.txt')
           finder = FileFinder.new('/')
-          doc = XHTMLProcessor.xml_document_from_string('<a href=""/>')
+          doc = XHTMLProcessor.xml_document_from_string('<a href=""/>', 'root.txt')
 
           expect {
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
           }.to output('Not found file matching pattern `` from context path root.txt.
-  (in file  line 1'.ansi.yellow + "\n").to_stdout
+  (in file root.txt line 1'.ansi.yellow + "\n").to_stdout
         end
 
         it "prints warning when the desired file can't be found" do
           FileUtils.touch('root.txt')
           finder = FileFinder.new('/')
-          doc = XHTMLProcessor.xml_document_from_string('<a href="blabla"/>')
+          doc = XHTMLProcessor.xml_document_from_string('<a href="blabla"/>', 'root.txt')
 
           expect {
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
           }.to output('Not found file matching pattern `blabla` from context path root.txt.
-  (in file  line 1'.ansi.yellow + "\n").to_stdout
+  (in file root.txt line 1'.ansi.yellow + "\n").to_stdout
         end
 
         it 'silently skips tags without specified attributes' do

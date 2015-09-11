@@ -18,7 +18,7 @@ module Epuber
       #
       # @return [Nokogiri::XML::Document] parsed document
       #
-      def self.xml_document_from_string(text)
+      def self.xml_document_from_string(text, file_path = nil)
         doc = Nokogiri::XML.parse(text)
         doc.encoding = 'UTF-8'
 
@@ -36,6 +36,8 @@ module Epuber
             doc.root.add_child(child)
           end
         end
+
+        doc.file_path = file_path
 
         doc
       end
