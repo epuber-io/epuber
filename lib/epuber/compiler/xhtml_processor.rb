@@ -127,7 +127,6 @@ module Epuber
         # skip empty path
         return uri if uri.path.empty? && !uri.fragment.nil? && !uri.fragment.empty?
 
-        context_path = File.file?(context_path) ? File.dirname(context_path) : context_path
         uri.path = file_finder.find_file(uri.path, groups: groups, context_path: context_path)
 
         uri

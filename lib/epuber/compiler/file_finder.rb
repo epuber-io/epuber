@@ -198,6 +198,9 @@ module Epuber
       # @return [Array<String>] list of founded files
       #
       def __core_find_files(pattern, groups, context_path, orig_context_path = context_path)
+        context_path = File.file?(context_path) ? File.dirname(context_path) : context_path
+        orig_context_path = File.file?(orig_context_path) ? File.dirname(orig_context_path) : orig_context_path
+
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
