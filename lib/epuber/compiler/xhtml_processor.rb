@@ -5,7 +5,7 @@ require 'nokogiri'
 
 module Epuber
   class Compiler
-    require_relative 'file_finder'
+    require_relative 'file_finders/normal'
 
     class XHTMLProcessor
       class UnparseableLinkError < StandardError; end
@@ -110,7 +110,7 @@ module Epuber
       # @return [URI] resolved path to file or remote web page
       #
       def self.resolved_link_to_file(path, groups, context_path, file_finder)
-        raise FileFinder::FileNotFoundError.new(path, context_path) if path.empty?
+        raise FileFinders::FileNotFoundError.new(path, context_path) if path.empty?
 
         begin
           uri = URI(path)
@@ -159,7 +159,7 @@ module Epuber
             founded_links << target_file
 
             node[attribute_name] = target_file.to_s
-          rescue UnparseableLinkError, FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError => e
+          rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
             UI.warning(e.to_s, location: node)
 
             # skip not found files

@@ -24,7 +24,7 @@ module Epuber
     require_relative 'compiler/meta_inf_generator'
 
     require_relative 'compiler/file_resolver'
-    require_relative 'compiler/file_finder'
+    require_relative 'compiler/file_finders/normal'
 
     require_relative 'compiler/file_processing'
     include FileProcessing

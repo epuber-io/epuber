@@ -2,7 +2,7 @@
 
 require 'fakefs/spec_helpers'
 
-require_relative '../spec_helper'
+require_relative '../../spec_helper'
 
 require 'epuber/book'
 require 'epuber/compiler'
@@ -13,16 +13,16 @@ require 'epuber/compiler'
 module Epuber
   class Compiler
 
-    describe FileFinder do
+    describe FileFinders::Normal do
       include FakeFS::SpecHelpers
 
       before do
-        @finder = FileFinder.new('.')
+        @finder = FileFinders::Normal.new('.')
       end
 
 
       it 'stores info from init' do
-        finder = FileFinder.new('dasdasas')
+        finder = FileFinders::Normal.new('dasdasas')
         expect(finder.source_path).to eq 'dasdasas'
       end
 
@@ -164,7 +164,7 @@ module Epuber
 
           expect {
             @finder.find_file('baf')
-          }.to raise_error FileFinder::FileNotFoundError
+          }.to raise_error FileFinders::FileNotFoundError
         end
 
         it "raises error when no file couldn't be found" do
@@ -172,7 +172,7 @@ module Epuber
 
           expect {
             @finder.find_file('*.xhtml')
-          }.to raise_error FileFinder::MultipleFilesFoundError
+          }.to raise_error FileFinders::MultipleFilesFoundError
         end
 
         it 'returns relative path to context path' do
@@ -206,19 +206,19 @@ module Epuber
       context '.group_filter_paths' do
         it 'returns the same array for nil groups' do
           input = %w(some/path/abc.txt some/path/abc2.txt a.txt)
-          output = FileFinder.group_filter_paths(input, nil)
+          output = FileFinders::Abstract.group_filter_paths(input, nil)
           expect(output).to be input
         end
 
         it 'returns filtered array for text groups' do
           input = %w(abc.xhtml a.png t.txt e.html)
-          output = FileFinder.group_filter_paths(input, :text)
+          output = FileFinders::Abstract.group_filter_paths(input, :text)
           expect(output).to eq %w(abc.xhtml e.html)
         end
 
         it 'returns filtered array for text and image groups' do
           input = %w(abc.xhtml a.png t.txt e.html font.otf)
-          output = FileFinder.group_filter_paths(input, [:text, :image])
+          output = FileFinders::Abstract.group_filter_paths(input, [:text, :image])
           expect(output).to eq %w(abc.xhtml a.png e.html)
         end
       end

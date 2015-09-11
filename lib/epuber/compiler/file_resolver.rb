@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'unicode_normalize'
-require_relative 'file_finder'
+require_relative 'file_finders/normal'
 
 
 module Epuber
@@ -21,7 +21,7 @@ module Epuber
       # @param [String] destination_path
       #
       def initialize(source_path, destination_path)
-        @finder = FileFinder.new(source_path)
+        @finder = FileFinders::Normal.new(source_path)
         @finder.ignored_patterns << ::File.join(Config::WORKING_PATH, '**')
 
         @source_path      = source_path.unicode_normalize
