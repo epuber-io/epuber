@@ -201,6 +201,10 @@ module Epuber
         full_pattern = ::File.expand_path(pattern, context_path)
         file_paths = Dir.glob(full_pattern)
 
+        file_paths.reject! do |path|
+          File.directory?(path)
+        end
+
         # remove any files that should be ignored
         file_paths.reject! do |path|
           ignored_patterns.any? { |exclude_pattern| ::File.fnmatch(exclude_pattern, path) }
