@@ -107,6 +107,84 @@ module Epuber
           expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def'
         end
       end
+
+      context '.resolved_link_to_file' do
+        it 'resolves links to other files in project' do
+          FileUtils.mkdir_p('some/path')
+          FileUtils.touch('some/path/origin.txt')
+          FileUtils.touch('some/path/near.txt')
+          FileUtils.touch('root.txt')
+
+          finder = FileFinder.new('/')
+
+          path = XHTMLProcessor.resolved_link_to_file('root', nil, 'some/path/origin.txt', finder)
+          expect(path).to eq URI('../../root.txt')
+          expect(path.to_s).to eq '../../root.txt'
+
+          path = XHTMLProcessor.resolved_link_to_file('root.txt', nil, 'some/path/origin.txt', finder)
+          expect(path).to eq URI('../../root.txt')
+          expect(path.to_s).to eq '../../root.txt'
+
+          path = XHTMLProcessor.resolved_link_to_file('../../root.txt', nil, 'some/path/origin.txt', finder)
+          expect(path).to eq URI('../../root.txt')
+          expect(path.to_s).to eq '../../root.txt'
+
+          path = XHTMLProcessor.resolved_link_to_file('near.txt', nil, 'some/path/origin.txt', finder)
+          expect(path).to eq URI('near.txt')
+          expect(path.to_s).to eq 'near.txt'
+
+          path = XHTMLProcessor.resolved_link_to_file('near', nil, 'some/path/origin.txt', finder)
+          expect(path).to eq URI('near.txt')
+          expect(path.to_s).to eq 'near.txt'
+        end
+
+        it 'is ok with remote urls, which have scheme' do
+          FileUtils.touch('root.txt')
+          finder = FileFinder.new('/')
+
+          url = XHTMLProcessor.resolved_link_to_file('http://www.google.com', nil, 'root.txt', finder)
+          expect(url).to eq URI('http://www.google.com')
+          expect(url.to_s).to eq 'http://www.google.com'
+
+          # https is ok
+          url = XHTMLProcessor.resolved_link_to_file('https://www.google.com', nil, 'root.txt', finder)
+          expect(url).to eq URI('https://www.google.com')
+          expect(url.to_s).to eq 'https://www.google.com'
+
+          url = XHTMLProcessor.resolved_link_to_file('https://google.com', nil, 'root.txt', finder)
+          expect(url).to eq URI('https://google.com')
+          expect(url.to_s).to eq 'https://google.com'
+        end
+
+        it 'is ok with relative id reference in file' do
+          FileUtils.touch('root.txt')
+          finder = FileFinder.new('/')
+
+          url = XHTMLProcessor.resolved_link_to_file('#some_id', nil, 'root.txt', finder)
+          expect(url).to eq URI('#some_id')
+          expect(url.to_s).to eq '#some_id'
+        end
+
+        it 'is ok with relative id reference to another file' do
+          FileUtils.touch('root.txt')
+          FileUtils.touch('ref.txt')
+          finder = FileFinder.new('/')
+
+          url = XHTMLProcessor.resolved_link_to_file('ref#some_id', nil, 'root.txt', finder)
+          expect(url).to eq URI('ref.txt#some_id')
+          expect(url.to_s).to eq 'ref.txt#some_id'
+        end
+
+        it 'raise error when the file could not be found' do
+          FileUtils.touch('root.txt')
+
+          finder = FileFinder.new('/')
+
+          expect {
+            XHTMLProcessor.resolved_link_to_file('some_not_existing_file', nil, 'root.txt', finder)
+          }.to raise_error FileFinder::FileNotFoundError
+        end
+      end
     end
 
 

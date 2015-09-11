@@ -7,6 +7,8 @@ require 'nokogiri'
 module Epuber
   class Compiler
     class XHTMLProcessor
+      class UnparseableLinkError < StandardError; end
+
       # Method for parsing incomplete XML, supports multiple root elements
       #
       # @warning Because of nature of XML, when input string don't contain root element, it will create own called `body`, since it will be used in next steps.
@@ -91,6 +93,40 @@ module Epuber
         links_to_add.each do |path|
           head << xhtml_doc.create_element('link', href: path, rel: 'stylesheet', type: 'text/css')
         end
+      end
+
+      # Method which will resolve path to file from pattern
+      #
+      # @param [String] path  pattern or path of the file
+      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example image when searching for file from tag <img>
+      # @param [String] context_path  path to file from which is searching for other file
+      # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
+      #
+      # @raise UnparseableLinkError, Epuber::Compiler::FileFinder::FileNotFoundError, Epuber::Compiler::FileFinder::MultipleFilesFoundError
+      #
+      # @return [URI] resolved path to file or remote web page
+      #
+      def self.resolved_link_to_file(path, groups, context_path, file_finder)
+        begin
+          uri = URI(path)
+        rescue
+          begin
+            uri = URI(URI::encode(path))
+          rescue
+            # skip not valid uri
+            raise UnparseableLinkError, "Unparseable link `#{path}`"
+          end
+        end
+
+        # skip uri with scheme (links to web pages)
+        return uri unless uri.scheme.nil?
+
+        # skip empty path
+        return uri if uri.path.empty?
+
+        uri.path = file_finder.find_file(uri.path, groups: groups, context_path: File.dirname(context_path))
+
+        uri
       end
     end
   end
