@@ -195,6 +195,26 @@ module Epuber
           }.to raise_error FileFinder::FileNotFoundError
         end
       end
+
+      context '.resolve_links_for' do
+        it 'resolves links to files from tags with specific arguments' do
+          FileUtils.mkdir_p('abc')
+          FileUtils.touch(['root.txt', 'ref1.xhtml', 'ref2.txt', 'abc/ref10.xhtml'])
+
+          finder = FileFinder.new('/')
+
+          doc = XHTMLProcessor.xml_document_from_string('<div><a href="ref1" /><a href="ref2.txt#abc"/><a href="ref10" /></div>')
+
+          links = XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
+
+          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.txt#abc"/><a href="abc/ref10.xhtml"/></div>'
+          expect(links).to include URI('ref1.xhtml'), URI('ref2.txt#abc'), URI('abc/ref10.xhtml')
+        end
+
+        it 'prints warning when the attribute is empty'
+        it "prints warning when the desired file can't be found"
+        it 'silently skips tags without specified attributes'
+      end
     end
 
 

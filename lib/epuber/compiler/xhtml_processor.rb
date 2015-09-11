@@ -132,6 +132,42 @@ module Epuber
 
         uri
       end
+
+      # Resolves all links to files in XHTML document and returns the resolved versions
+      #
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @param [String] tag_name  CSS selector for tag
+      # @param [String] attribute_name  name of attribute
+      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching for file from tag <img>
+      # @param [String] context_path  path to file from which is searching for other file
+      # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
+      #
+      # @return [Array<URI>] resolved links
+      #
+      def self.resolve_links_for(xhtml_doc, tag_name, attribute_name, groups, context_path, file_finder)
+        founded_links = []
+
+        xhtml_doc.css("#{tag_name}[#{attribute_name}]").each do |node|
+          begin
+            src = node[attribute_name]
+            # @type [String] src
+
+            next if src.nil?
+
+            target_file = resolved_link_to_file(src, groups, context_path, file_finder)
+            founded_links << target_file
+
+            node[attribute_name] = target_file.to_s
+          rescue UnparseableLinkError, FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError => e
+            UI.warning(e.to_s, location: node)
+
+            # skip not found files
+            next
+          end
+        end
+
+        founded_links
+      end
     end
   end
 end
