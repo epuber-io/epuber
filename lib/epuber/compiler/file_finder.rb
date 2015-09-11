@@ -168,7 +168,7 @@ module Epuber
       end
 
       # @param [Array<String>] paths  list of file paths
-      # @param [Array<Symbol] groups  list of groups to filter file paths
+      # @param [Array<Symbol>] groups  list of groups to filter file paths
       #
       # @return [Array<String>] filtered list of file paths
       #
@@ -186,6 +186,18 @@ module Epuber
           paths.select do |file_path|
             valid_extensions.include?(::File.extname(file_path))
           end
+        end
+      end
+
+      # @param [Array<String>] paths  list of file paths
+      # @param [String] context_path
+      #
+      # @return [Array<String>] mapped list of file paths
+      #
+      def self.relative_paths_from(paths, context_path)
+        context_pathname = Pathname.new(context_path)
+        paths.map do |path|
+          Pathname(path.unicode_normalize).relative_path_from(context_pathname).to_s
         end
       end
 
@@ -237,10 +249,7 @@ module Epuber
         file_paths = self.class.group_filter_paths(file_paths, groups)
 
         # create relative path to context path
-        context_pathname = Pathname.new(orig_context_path)
-        file_paths.map! do |path|
-          Pathname(path.unicode_normalize).relative_path_from(context_pathname).to_s
-        end
+        file_paths = self.class.relative_paths_from(file_paths, orig_context_path)
 
         file_paths
       end
