@@ -202,6 +202,26 @@ module Epuber
           expect(files).to include 'def/some_file.xhtml'
         end
       end
+
+      context '.group_filter_paths' do
+        it 'returns the same array for nil groups' do
+          input = %w(some/path/abc.txt some/path/abc2.txt a.txt)
+          output = FileFinder.group_filter_paths(input, nil)
+          expect(output).to be input
+        end
+
+        it 'returns filtered array for text groups' do
+          input = %w(abc.xhtml a.png t.txt e.html)
+          output = FileFinder.group_filter_paths(input, :text)
+          expect(output).to eq %w(abc.xhtml e.html)
+        end
+
+        it 'returns filtered array for text and image groups' do
+          input = %w(abc.xhtml a.png t.txt e.html font.otf)
+          output = FileFinder.group_filter_paths(input, [:text, :image])
+          expect(output).to eq %w(abc.xhtml a.png e.html)
+        end
+      end
     end
 
     # TODO: can find files from super folder

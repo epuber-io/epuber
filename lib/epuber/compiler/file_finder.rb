@@ -167,6 +167,27 @@ module Epuber
         __find_files('**/' + pattern, groups, context_path)
       end
 
+      # @param [Array<String>] paths  list of file paths
+      # @param [Array<Symbol] groups  list of groups to filter file paths
+      #
+      # @return [Array<String>] filtered list of file paths
+      #
+      def self.group_filter_paths(paths, groups)
+        # filter depend on group
+        groups = Array(groups)
+
+        if groups.empty?
+          paths
+        else
+          valid_extensions = groups.map do |group|
+            GROUP_EXTENSIONS.fetch(group) { raise ::StandardError, "Unknown file group #{group.inspect}" }
+          end.flatten
+
+          paths.select do |file_path|
+            valid_extensions.include?(::File.extname(file_path))
+          end
+        end
+      end
 
       private
 
@@ -213,17 +234,7 @@ module Epuber
           ignored_patterns.any? { |exclude_pattern| ::File.fnmatch(exclude_pattern, path) }
         end
 
-        # filter depend on group
-        groups = Array(groups)
-        unless groups.empty?
-          valid_extensions = groups.map do |group|
-            GROUP_EXTENSIONS.fetch(group) { raise ::StandardError, "Unknown file group #{group.inspect}" }
-          end.flatten
-
-          file_paths.select! do |file_path|
-            valid_extensions.include?(::File.extname(file_path))
-          end
-        end
+        file_paths = self.class.group_filter_paths(file_paths, groups)
 
         # create relative path to context path
         context_pathname = Pathname.new(orig_context_path)
