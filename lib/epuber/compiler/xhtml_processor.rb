@@ -125,7 +125,7 @@ module Epuber
         return uri unless uri.scheme.nil?
 
         # skip empty path
-        return uri if uri.path.empty?
+        return uri if uri.path.empty? && !uri.fragment.nil? && !uri.fragment.empty?
 
         context_path = File.file?(context_path) ? File.dirname(context_path) : context_path
         uri.path = file_finder.find_file(uri.path, groups: groups, context_path: context_path)
@@ -133,7 +133,7 @@ module Epuber
         uri
       end
 
-      # Resolves all links to files in XHTML document and returns the resolved versions
+      # Resolves all links to files in XHTML document and returns the valid and resolved versions
       #
       # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
       # @param [String] tag_name  CSS selector for tag
