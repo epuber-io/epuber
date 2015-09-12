@@ -76,7 +76,19 @@ module Epuber
 
       it 'can return file instance from destination path'
 
-      it 'can find unnecessary files in destination path'
+      it 'can find unnecessary files in destination path' do
+        FileUtils.mkdir_p(%w(/dest/valid /dest/not_valid))
+        FileUtils.touch(%w(/dest/valid/1.xhtml /dest/valid/2.xhtml /dest/not_valid/1.xhtml))
+
+        FileUtils.mkdir_p(%w(/source/valid /source/not_valid))
+        FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+
+        req = Book::FileRequest.new('valid/*.xhtml', false)
+        @sut.add_file_from_request(req)
+
+        unneeded = @sut.unneeded_files_in_destination
+        expect(unneeded).to contain_exactly 'not_valid/1.xhtml'
+      end
 
       it 'can find file instance from file request' do
         FileUtils.touch('/source/some_file.xhtml')

@@ -238,6 +238,26 @@ module Epuber
         _source_path_to_file_map[source_path.unicode_normalize]
       end
 
+      # Method to find all files that should be deleted, because they are not in files in receiver
+      #
+      # @return [Array<String>] list of files that should be deleted in destination directory
+      #
+      def unneeded_files_in_destination
+        requested_paths = files.map do |file|
+          file.destination_path
+        end
+
+        existing_paths = FileFinders::Normal.new(destination_path).find_all('*')
+
+        unnecessary_paths = existing_paths - requested_paths
+
+        unnecessary_paths.select! do |path|
+          !::File.directory?(File.join(destination_path, path))
+        end
+
+        unnecessary_paths
+      end
+
       private
 
       def _source_path_to_file_map
