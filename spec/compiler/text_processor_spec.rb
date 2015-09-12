@@ -117,7 +117,7 @@ module Epuber
           FileUtils.touch('some/path/near.txt')
           FileUtils.touch('root.txt')
 
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           path = XHTMLProcessor.resolved_link_to_file('root', nil, 'some/path/origin.txt', finder)
           expect(path).to eq URI('../../root.txt')
@@ -142,7 +142,7 @@ module Epuber
 
         it 'is ok with remote urls, which have scheme' do
           FileUtils.touch('root.txt')
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           url = XHTMLProcessor.resolved_link_to_file('http://www.google.com', nil, 'root.txt', finder)
           expect(url).to eq URI('http://www.google.com')
@@ -160,7 +160,7 @@ module Epuber
 
         it 'is ok with relative id reference in file' do
           FileUtils.touch('root.txt')
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           url = XHTMLProcessor.resolved_link_to_file('#some_id', nil, 'root.txt', finder)
           expect(url).to eq URI('#some_id')
@@ -170,7 +170,7 @@ module Epuber
         it 'is ok with relative id reference to another file' do
           FileUtils.touch('root.txt')
           FileUtils.touch('ref.txt')
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           url = XHTMLProcessor.resolved_link_to_file('ref#some_id', nil, 'root.txt', finder)
           expect(url).to eq URI('ref.txt#some_id')
@@ -180,21 +180,21 @@ module Epuber
         it 'raise error when the file could not be found' do
           FileUtils.touch('root.txt')
 
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           expect {
             XHTMLProcessor.resolved_link_to_file('some_not_existing_file', nil, 'root.txt', finder)
-          }.to raise_error FileFinder::FileNotFoundError
+          }.to raise_error FileFinders::FileNotFoundError
         end
 
         it 'raise error when the path is empty' do
           FileUtils.touch('root.txt')
 
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           expect {
             XHTMLProcessor.resolved_link_to_file('', nil, 'root.txt', finder)
-          }.to raise_error FileFinder::FileNotFoundError
+          }.to raise_error FileFinders::FileNotFoundError
         end
       end
 
@@ -203,7 +203,7 @@ module Epuber
           FileUtils.mkdir_p('abc')
           FileUtils.touch(['root.txt', 'ref1.xhtml', 'ref2.txt', 'abc/ref10.xhtml'])
 
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
 
           doc = XHTMLProcessor.xml_document_from_string('<div><a href="ref1" /><a href="ref2.txt#abc"/><a href="ref10" /></div>')
 
@@ -215,7 +215,7 @@ module Epuber
 
         it 'prints warning when the attribute is empty' do
           FileUtils.touch('root.txt')
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a href=""/>', 'root.txt')
 
           expect {
@@ -226,7 +226,7 @@ module Epuber
 
         it "prints warning when the desired file can't be found" do
           FileUtils.touch('root.txt')
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a href="blabla"/>', 'root.txt')
 
           expect {
@@ -237,7 +237,7 @@ module Epuber
 
         it 'silently skips tags without specified attributes' do
           FileUtils.touch('root.txt')
-          finder = FileFinder.new('/')
+          finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a/>')
 
           expect {
