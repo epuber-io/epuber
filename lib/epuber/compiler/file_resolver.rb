@@ -35,21 +35,26 @@ module Epuber
       #
       attr_reader :manifest_files
 
-      # @return [SortedSet<FileTypes::Abstract>] all files that will be copied to EPUB package
+      # @return [Array<FileTypes::Abstract>] all files that will be copied to EPUB package
       #
       attr_reader :package_files
 
-      # @return [SortedSet<FileTypes::Abstract>] totally all files
+      # @return [Array<FileTypes::Abstract>] totally all files
       #
       attr_reader :files
+
+
+      # @return [FileFinders::Normal]
+      #
+      attr_reader :source_finder
 
 
       # @param [String] source_path
       # @param [String] destination_path
       #
       def initialize(source_path, destination_path)
-        @finder = FileFinders::Normal.new(source_path)
-        @finder.ignored_patterns << ::File.join(Config::WORKING_PATH, '**')
+        @source_finder = FileFinders::Normal.new(source_path)
+        @source_finder.ignored_patterns << ::File.join(Config::WORKING_PATH, '**')
 
         @source_path      = source_path.unicode_normalize
         @destination_path = destination_path.unicode_normalize
@@ -58,13 +63,15 @@ module Epuber
         @manifest_files = []
         @package_files  = []
         @files          = []
+
+        @request_to_files = Hash.new { |hash, key| hash[key] = [] }
       end
 
       # @param [Epuber::Book::FileRequest] file_request
       #
       def add_file_from_request(file_request, path_type = :manifest)
         if file_request.only_one
-          file_path = @finder.find_file(file_request.source_pattern, groups: file_request.group)
+          file_path = @source_finder.find_file(file_request.source_pattern, groups: file_request.group)
           file_class = self.class.file_class_for(File.extname(file_path))
 
           file = file_class.new(file_path)
@@ -73,8 +80,8 @@ module Epuber
 
           add_file(file)
         else
-          file_paths = @finder.find_all(file_request.source_pattern, groups: file_request.group)
-          file_paths.each do |path|
+          file_paths = @source_finder.find_all(file_request.source_pattern, groups: file_request.group)
+          file_paths.map do |path|
             file_class = self.class.file_class_for(File.extname(path))
 
             file = file_class.new(path)
@@ -112,49 +119,24 @@ module Epuber
         @files << file unless @files.include?(file)
 
         unless file.file_request.nil?
-          _request_to_file_map_cache[file.file_request] = file
+          @request_to_files[file.file_request] << file
         end
         if file.respond_to?(:source_path) && !file.source_path.nil?
           _source_path_to_file_map[file.source_path] = file
         end
       end
 
-      # @param [FileRequest] file_request
+      # @param [Book::FileRequest] file_request
       #
-      # @return [File, nil]
+      # @return [File, Array<FileTypes::AbstractFile>]
       #
       def find_file_from_request(file_request)
-        return if file_request.nil?
+        files = @request_to_files[file_request]
 
-        cached = _request_to_file_map_cache[file_request]
-        return cached unless cached.nil?
-
-        founded = @manifest_files.find do |file|
-          if file.file_request == file_request
-            true
-          elsif !file.source_path.nil?
-            file.source_path == find_file(file_request, file_request.group)
-          end
-        end
-
-        _request_to_file_map_cache[file_request] = founded
-
-        founded
-      end
-
-      # @param [FileRequest] file_request
-      #
-      # @return [Array<File>]
-      #
-      def find_files_from_request(file_request)
-        return if file_request.nil?
-
-        @manifest_files.select do |file|
-          if file.file_request == file_request
-            true
-          elsif !file.source_path.nil?
-            file.source_path == find_file(file_request, file_request.group)
-          end
+        if file_request.only_one
+          files.first
+        else
+          files
         end
       end
 
@@ -166,7 +148,7 @@ module Epuber
         file = _destination_path_to_file_map[destination_path]
         file_paths = [file].compact
 
-        @finder.assert_one_file(file_paths, pattern: destination_path, groups: groups, context_path: context_path)
+        @source_finder.assert_one_file(file_paths, pattern: destination_path, groups: groups, context_path: context_path)
 
         file_paths.first
       end
@@ -236,7 +218,7 @@ module Epuber
       #
       def relative_path_from_source_root(file)
         return if file.nil?
-        relative_path(self.source_path, file)
+        relative_path(source_path, file)
       end
 
       # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] file
@@ -245,16 +227,7 @@ module Epuber
       #
       def relative_path_from_package_root(file)
         return if file.nil?
-        relative_path(self.destination_path, file)
-      end
-
-      # @param [String] pattern
-      # @param [Symbol] group
-      #
-      # @return [String] relative path from source path to founded file
-      #
-      def find_file(pattern, group = nil, context_path: source_path)
-        @finder.find_file(pattern, groups: group, context_path: context_path)
+        relative_path(destination_path, file)
       end
 
       # @param [String] source_path
@@ -266,10 +239,6 @@ module Epuber
       end
 
       private
-
-      def _request_to_file_map_cache
-        @_request_to_file_map_cache ||= {}
-      end
 
       def _source_path_to_file_map
         @_source_path_to_file_map ||= {}
@@ -323,7 +292,7 @@ module Epuber
           yield file
         end
 
-        @finder.assert_one_file(file_objs, pattern: pattern, groups: group, context_path: context_path)
+        @source_finder.assert_one_file(file_objs, pattern: pattern, groups: group, context_path: context_path)
 
         file_objs.first
       end

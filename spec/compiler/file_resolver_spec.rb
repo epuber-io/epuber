@@ -30,7 +30,8 @@ module Epuber
       it 'supports adding files from request' do
         FileUtils.touch('/source/file.txt')
 
-        @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
+        ret_file = @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
+        expect(ret_file).to_not be_nil
 
         expect(@sut.files.count).to eq 1
         expect(@sut.manifest_files.count).to eq 1
@@ -45,6 +46,8 @@ module Epuber
         expect(file).to be_a FileTypes::StaticFile
       end
 
+      it 'handles multiple addition of the same file'
+
       it 'supports adding files with generated content'
 
       it 'supports adding multiple files' do
@@ -52,7 +55,6 @@ module Epuber
 
         @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
 
-        expect(@sut.files.count).to eq 4
         expect(@sut.files.map(&:source_path)).to contain_exactly 'file1.xhtml', 'file2.xhtml', 'file3.xhtml', 'file4.xhtml'
       end
 
@@ -62,11 +64,43 @@ module Epuber
         expect(FileResolver.path_for('/root', :package)).to eq '/root'
       end
 
-      it 'supports searching files in source folder'
+      it 'supports searching files in source folder' do
+        FileUtils.touch('/source/1.xhtml')
+
+        expect(@sut.source_finder.find_file('1.xhtml')).to eq '1.xhtml'
+      end
+
       it 'support searching files in destination folder'
+
       it 'can return file instance from source path'
+
       it 'can return file instance from destination path'
+
       it 'can find unnecessary files in destination path'
+
+      it 'can find file instance from file request' do
+        FileUtils.touch('/source/some_file.xhtml')
+
+        req = Book::FileRequest.new('/source/some_file.xhtml')
+        file = @sut.add_file_from_request(req)
+
+        same_req = Book::FileRequest.new('/source/some_file.xhtml')
+        founded_file = @sut.find_file_from_request(same_req)
+
+        expect(founded_file).to be file
+      end
+
+      it 'can find file instances from multi file request' do
+        FileUtils.touch(%w(/source/some_file.xhtml /source/some_file2.xhtml))
+
+        req = Book::FileRequest.new('*.xhtml', false)
+        files = @sut.add_file_from_request(req)
+
+        same_req = Book::FileRequest.new('*.xhtml', false)
+        founded_files = @sut.find_file_from_request(same_req)
+
+        expect(founded_files).to eq files
+      end
 
       context '.file_class_for' do
         it 'selects correct file type from file extension' do
