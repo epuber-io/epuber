@@ -20,7 +20,8 @@ module Epuber
         it 'writes content into file' do
           expect(File.exist?('b.txt')).to be_falsey
 
-          file = GeneratedFile.new('b.txt')
+          file = GeneratedFile.new
+          file.destination_path = 'b.txt'
           file.content = 'some content'
           file.process
 

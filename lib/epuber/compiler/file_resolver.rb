@@ -1,11 +1,20 @@
 # encoding: utf-8
 
 require 'unicode_normalize'
-require_relative 'file_finders/normal'
+
 
 
 module Epuber
   class Compiler
+    require_relative 'file_finders/normal'
+    require_relative 'file_finders/imaginary'
+
+    require_relative 'file_types/abstract_file'
+    require_relative 'file_types/static_file'
+    require_relative 'file_types/stylus_file'
+    require_relative 'file_types/xhtml_file'
+    require_relative 'file_types/bade_file'
+
     class FileResolver
 
       # @return [String] path where should look for source files
@@ -15,6 +24,23 @@ module Epuber
       # @return [String] path where will be stored result files
       #
       attr_reader :destination_path
+
+
+      # @return [Array<FileTypes::Abstract>] all files that will be in spine
+      #
+      attr_reader :spine_files
+
+      # @return [Array<FileTypes::Abstract>] all files that has to be in manifest file (OPF)
+      #
+      attr_reader :manifest_files
+
+      # @return [SortedSet<FileTypes::Abstract>] all files that will be copied to EPUB package
+      #
+      attr_reader :package_files
+
+      # @return [SortedSet<FileTypes::Abstract>] totally all files
+      #
+      attr_reader :files
 
 
       # @param [String] source_path
@@ -27,36 +53,54 @@ module Epuber
         @source_path      = source_path.unicode_normalize
         @destination_path = destination_path.unicode_normalize
 
-        @files = {
-          spine:    [],
-          manifest: [],
-          package:  [],
-        }.freeze
+        @spine_files = SortedSet.new
+        @manifest_files = SortedSet.new
+        @package_files = SortedSet.new
+        @files = SortedSet.new
       end
 
-      # @param [Epuber::Compiler::File, FileRequest] file
-      # @param [Symbol] type
-      #      one of: :spine, :manifest or :package
+      # @param [Epuber::Book::FileRequest] file_request
       #
-      def add_file(file, type: :manifest)
+      def add_file_from_request(file_request, path_type = :manifest)
+        file_path = @finder.find_file(file_request.source_pattern, groups: file_request.group)
+        file_class = self.class.file_class_for(File.extname(file_path))
+
+        file = file_class.new(file_path)
+        file.file_request = file_request
+        file.path_type = path_type
+
+        add_file(file)
+      end
+
+      # @param [Epuber::Compiler::FileTypes::AbstractFile] file
+      #
+      def add_file(file)
+        type = file.path_type
+
+        unless [:spine, :manifest, :package, nil].include?(type)
+          raise "Unknown file.path_type #{type.inspect}, expected are :spine, :manifest, :package or nil"
+        end
+
         resolve_destination_path(file)
 
-        if type == :spine
-          @files[:spine] << file unless @files[:spine].include?(file)
+        if [:spine].include?(type)
+          @spine_files << file
         end
 
-        if type == :spine || type == :manifest
-          @files[:manifest] << file unless @files[:manifest].include?(file)
+        if [:spine, :manifest].include?(type)
+          @manifest_files << file
         end
 
-        if type == :spine || type == :manifest || type == :package
-          @files[:package] << file unless @files[:package].include?(file)
+        if [:spine, :manifest, :package].include?(type)
+          @package_files << file
         end
+
+        @files << file
 
         unless file.file_request.nil?
           _request_to_file_map_cache[file.file_request] = file
         end
-        unless file.source_path.nil?
+        if file.respond_to?(:source_path) && !file.source_path.nil?
           _source_path_to_file_map[file.source_path] = file
         end
       end
@@ -69,15 +113,6 @@ module Epuber
         end
       end
 
-      # @param [Symbol] type
-      #      one of: :spine, :manifest or :package
-      #
-      # @return [Array<File>, nil]
-      #
-      def files_of(type = :package)
-        @files[type] if @files.include?(type)
-      end
-
       # @param [FileRequest] file_request
       #
       # @return [File, nil]
@@ -88,7 +123,7 @@ module Epuber
         cached = _request_to_file_map_cache[file_request]
         return cached unless cached.nil?
 
-        founded = files_of.find do |file|
+        founded = @manifest_files.find do |file|
           if file.file_request == file_request
             true
           elsif !file.source_path.nil?
@@ -108,7 +143,7 @@ module Epuber
       def find_files_from_request(file_request)
         return if file_request.nil?
 
-        files_of.select do |file|
+        @manifest_files.select do |file|
           if file.file_request == file_request
             true
           elsif !file.source_path.nil?
@@ -143,12 +178,12 @@ module Epuber
             # try to find file with exact path
             return find_file_with_destination_path(::File.expand_path(pattern, context_path), group, context_path)
 
-          rescue FileFinder::FileNotFoundError
+          rescue FileFinders::FileNotFoundError
             # not found, skip this and try to find with pattern
           end
         end
 
-        extensions = FileFinder::GROUP_EXTENSIONS[group]
+        extensions = FileFinders::GROUP_EXTENSIONS[group]
         raise "Unknown group #{group.inspect}" if extensions.nil?
 
         regexp_extensions = extensions.map { |ext| Regexp.escape(ext) }.join('|')
@@ -207,13 +242,12 @@ module Epuber
         relative_path(self.destination_path, file)
       end
 
-      # @param file_or_pattern [String, Epuber::Compiler::File]
-      # @param group [Symbol]
+      # @param [String] pattern
+      # @param [Symbol] group
       #
       # @return [String] relative path from source path to founded file
       #
-      def find_file(file_or_pattern, group = nil, context_path: source_path)
-        pattern = pattern_from(file_or_pattern)
+      def find_file(pattern, group = nil, context_path: source_path)
         @finder.find_file(pattern, groups: group, context_path: context_path)
       end
 
@@ -239,21 +273,20 @@ module Epuber
         @_destination_path_to_file_map ||= {}
       end
 
-      # @param file [Epuber::Compiler::File]
+      # @param file [Epuber::Compiler::AbstractFile]
       #
       # @return [nil]
       #
       def resolve_destination_path(file)
-        if file.destination_path.nil?
-          unless file.package_destination_path.nil?
-            file.destination_path = ::File.join(destination_path, file.package_destination_path)
-            return
-          end
-
-          real_source_path = find_file(file, file.group)
+        if file.final_destination_path.nil?
+          real_source_path = if file.respond_to?(:source_path) && !file.source_path.nil?
+                               file.source_path
+                             else
+                               find_file(file, file.group)
+                             end
 
           extname     = ::File.extname(real_source_path)
-          new_extname = FileFinder::EXTENSIONS_RENAME[extname]
+          new_extname = FileFinders::EXTENSIONS_RENAME[extname]
 
           dest_path = if new_extname.nil?
                         real_source_path
@@ -261,8 +294,8 @@ module Epuber
                         real_source_path.sub(/#{extname}$/, new_extname)
                       end
 
-          file.destination_path = ::File.join(destination_path, Compiler::EPUB_CONTENT_FOLDER, dest_path)
-          file.source_path      = ::File.join(source_path, real_source_path)
+          file.destination_path = dest_path
+          file.final_destination_path = ::File.join(destination_path, Compiler::EPUB_CONTENT_FOLDER, dest_path)
 
           # TODO: uncomment following lines and resolve duplicate items
           #
@@ -301,19 +334,25 @@ module Epuber
         @finder.find_files(pattern, groups: group, context_path: context_path)
       end
 
-      # @param [String, File, FileRequest] file_or_pattern
-      # @return [String] only pattern
+
+
+      ##################################################################################################################
+
+      private
+
+      # @param [String] extname  extension of file
       #
-      def pattern_from(file_or_pattern)
-        if file_or_pattern.is_a?(File)
-          file_or_pattern.file_request.source_pattern
-        elsif file_or_pattern.is_a?(Epuber::Book::FileRequest)
-          file_or_pattern.source_pattern
-        elsif file_or_pattern.is_a?(String)
-          file_or_pattern
-        else
-          raise "Unknown class #{file_or_pattern.class}"
-        end
+      # @return [Class]
+      #
+      def self.file_class_for(extname)
+        mapping = {
+          '.styl'  => FileTypes::StylusFile,
+          '.bade'  => FileTypes::BadeFile,
+          '.xhtml' => FileTypes::XHTMLFile,
+          '.html'  => FileTypes::XHTMLFile,
+        }
+
+        mapping[extname] || FileTypes::StaticFile
       end
     end
   end

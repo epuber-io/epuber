@@ -14,10 +14,27 @@ module Epuber
         #
         attr_accessor :group
 
-        # @return [Set<String>] list of properties
+        # @return [Set<Symbol>] list of properties
         #
         attr_accessor :properties
 
+        # @return [Set<Symbol>] list of properties
+        #
+        def properties
+          @properties ||= Set.new
+        end
+
+
+        # @return [String] final absolute destination path calculated by FileResolver
+        #
+        attr_accessor :final_destination_path
+
+        # @return [Symbol] type of path, one of :spine, :manifest, :package
+        #
+        attr_accessor :path_type
+
+
+        ################################################################################################################
 
         # @param [String] source_path
         # @param [String] dest_path

@@ -6,9 +6,9 @@ module Epuber
     module FileTypes
       require_relative 'source_file'
 
-      class StaticFile < SourceFile
+      class StylusFile < SourceFile
         def process(opts = {})
-          self.class.file_copy(source_path, destination_path)
+          raise 'Implement'
         end
       end
     end

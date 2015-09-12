@@ -1,14 +1,16 @@
 # encoding: utf-8
 
+require 'nokogiri'
+
 
 module Epuber
   class Compiler
     module FileTypes
       require_relative 'source_file'
 
-      class StaticFile < SourceFile
+      class XHTMLFile < SourceFile
         def process(opts = {})
-          self.class.file_copy(source_path, destination_path)
+          raise 'To implement'
         end
       end
     end

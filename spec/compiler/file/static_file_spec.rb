@@ -21,7 +21,8 @@ module Epuber
 
           expect(File.exist?('b.txt')).to be_falsey
 
-          file = StaticFile.new('a.txt', 'b.txt')
+          file = StaticFile.new('a.txt')
+          file.destination_path = 'b.txt'
           file.process
 
           expect(File.exist?('b.txt')).to be_truthy
