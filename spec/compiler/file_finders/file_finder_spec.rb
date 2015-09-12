@@ -62,8 +62,7 @@ module Epuber
           FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
 
           files = @finder.find_files('c')
-          expect(files).to include 'c.xhtml'
-          expect(files.size).to eq 1
+          expect(files).to contain_exactly 'c.xhtml'
         end
       end
 
@@ -73,8 +72,7 @@ module Epuber
           FileUtils.touch(['abc/file1.xhtml', 'abc/file2.xhtml', 'abc/file3.xhtml'])
 
           files = @finder.find_files('*.xhtml', context_path: 'abc')
-          expect(files.size).to eq 3
-          expect(files).to include 'file1.xhtml', 'file2.xhtml', 'file3.xhtml'
+          expect(files).to contain_exactly 'file1.xhtml', 'file2.xhtml', 'file3.xhtml'
         end
 
         it 'can find files in nested folder' do
@@ -98,8 +96,7 @@ module Epuber
           FileUtils.touch(['file1.xhtml', 'file2.xhtml', 'file3.xhtml'])
 
           files = @finder.find_files('*.xhtml', context_path: 'abc')
-          expect(files.size).to eq 3
-          expect(files).to include '../file1.xhtml', '../file2.xhtml', '../file3.xhtml'
+          expect(files).to contain_exactly '../file1.xhtml', '../file2.xhtml', '../file3.xhtml'
         end
 
         it 'returns relative path to context path' do
@@ -107,7 +104,7 @@ module Epuber
           FileUtils.touch(['file1.xhtml', 'file2.xhtml', 'file3.xhtml'])
 
           files = @finder.find_files('*.xhtml', context_path: 'abc/def/ghi')
-          expect(files).to include '../../../file1.xhtml', '../../../file2.xhtml', '../../../file3.xhtml'
+          expect(files).to contain_exactly '../../../file1.xhtml', '../../../file2.xhtml', '../../../file3.xhtml'
         end
       end
 
@@ -125,10 +122,10 @@ module Epuber
           FileUtils.touch(['.gitignore', 'README.txt'])
 
           files = @finder.find_all('one.xhtml', groups: :text)
-          expect(files).to include 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml'
+          expect(files).to contain_exactly 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml'
 
           files = @finder.find_all('*.md')
-          expect(files).to include 'dir_2/baf.md', 'dir_3/abc_md.md'
+          expect(files).to contain_exactly 'dir_2/baf.md', 'dir_3/abc_md.md'
 
           files = @finder.find_all('*.stylus', groups: :style)
           expect(files.size).to eq 0
@@ -147,7 +144,7 @@ module Epuber
           FileUtils.touch(['.gitignore', 'README.txt'])
 
           files = @finder.find_all('one', groups: :text)
-          expect(files).to include 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml', 'dir_2/one.bade'
+          expect(files).to contain_exactly 'dir_1/one.xhtml', 'dir_1/dir_11/dir_111/one.xhtml', 'dir_2/one.bade'
         end
       end
 
@@ -198,8 +195,7 @@ module Epuber
           FileUtils.touch(['/def/some_file.xhtml'])
 
           files = @finder.find_all('*.xhtml')
-          expect(files.size).to eq 1
-          expect(files).to include 'def/some_file.xhtml'
+          expect(files).to contain_exactly 'def/some_file.xhtml'
         end
       end
 

@@ -75,8 +75,7 @@ module Epuber
 
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
-          expect(doc.css('link[rel="stylesheet"]').size).to eq 2
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def'
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def'
         end
 
         it 'adds missing links to styles' do
@@ -92,8 +91,7 @@ module Epuber
 
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
-          expect(doc.css('link[rel="stylesheet"]').size).to eq 3
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def', 'qwe'
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def', 'qwe'
         end
 
         it 'will not add duplicated items' do
@@ -105,8 +103,7 @@ module Epuber
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
-          expect(doc.css('link[rel="stylesheet"]').size).to eq 2
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to include 'abc', 'def'
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def'
         end
       end
 
@@ -210,7 +207,7 @@ module Epuber
           links = XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
 
           expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.txt#abc"/><a href="abc/ref10.xhtml"/></div>'
-          expect(links).to include URI('ref1.xhtml'), URI('ref2.txt#abc'), URI('abc/ref10.xhtml')
+          expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.txt#abc'), URI('abc/ref10.xhtml')
         end
 
         it 'prints warning when the attribute is empty' do
