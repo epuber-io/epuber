@@ -72,9 +72,31 @@ module Epuber
 
       it 'support searching files in destination folder'
 
-      it 'can return file instance from source path'
+      it 'can return file instance from source path' do
+        FileUtils.mkdir_p(%w(/source/valid))
+        FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
 
-      it 'can return file instance from destination path'
+        req = Book::FileRequest.new('valid/*.xhtml', false)
+        @sut.add_file_from_request(req)
+
+        file = @sut.file_with_source_path('valid/2.xhtml')
+
+        expect(file).to_not be_nil
+        expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
+        expect(file.source_path).to eq 'valid/2.xhtml'
+      end
+
+      it 'can return file instance from destination path' do
+        FileUtils.mkdir_p(%w(/source/valid))
+        FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+
+        req = Book::FileRequest.new('valid/*.xhtml', false)
+        @sut.add_file_from_request(req)
+
+        file = @sut.file_with_destination_path('valid/2.xhtml')
+        expect(file).to_not be_nil
+        expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
+      end
 
       it 'can find unnecessary files in destination path' do
         FileUtils.mkdir_p(%w(/dest/valid /dest/not_valid))

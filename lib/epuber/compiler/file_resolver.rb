@@ -65,6 +65,8 @@ module Epuber
         @files          = []
 
         @request_to_files = Hash.new { |hash, key| hash[key] = [] }
+        @final_destination_path_to_file = {}
+        @source_path_to_file = {}
       end
 
       # @param [Epuber::Book::FileRequest] file_request
@@ -118,17 +120,21 @@ module Epuber
 
         @files << file unless @files.include?(file)
 
+
         unless file.file_request.nil?
           @request_to_files[file.file_request] << file
         end
+
         if file.respond_to?(:source_path) && !file.source_path.nil?
-          _source_path_to_file_map[file.source_path] = file
+          @source_path_to_file[file.source_path] = file
         end
       end
 
+      # Get instance of file from request instance
+      #
       # @param [Book::FileRequest] file_request
       #
-      # @return [File, Array<FileTypes::AbstractFile>]
+      # @return [FileTypes::AbstractFile, Array<FileTypes::AbstractFile>]
       #
       def file_from_request(file_request)
         files = @request_to_files[file_request]
@@ -140,6 +146,29 @@ module Epuber
         end
       end
 
+      # Get instance of file from source path
+      #
+      # @param [String] source_path
+      #
+      # @return [FileTypes::AbstractFile]
+      #
+      def file_with_source_path(source_path)
+        @source_path_to_file[source_path.unicode_normalize]
+      end
+
+      # Method to get instance of file on specific path
+      #
+      # @param [String] path  path to file from destination folder
+      # @param [String] path_type  path type of path (:spine, :manifest or :package)
+      #
+      # @return [FileTypes::AbstractFile]
+      #
+      def file_with_destination_path(path, path_type = :manifest)
+        final_path = File.join(self.class.path_for(destination_path, path_type), path.unicode_normalize)
+        @final_destination_path_to_file[final_path]
+      end
+
+      
       # @param [String] destination_path
       #
       # @return [File]
@@ -230,13 +259,7 @@ module Epuber
         relative_path(destination_path, file)
       end
 
-      # @param [String] source_path
-      #
-      # @return [File]
-      #
-      def file_with_source_path(source_path)
-        _source_path_to_file_map[source_path.unicode_normalize]
-      end
+
 
       # Method to find all files that should be deleted, because they are not in files in receiver
       #
@@ -259,14 +282,6 @@ module Epuber
       end
 
       private
-
-      def _source_path_to_file_map
-        @_source_path_to_file_map ||= {}
-      end
-
-      def _destination_path_to_file_map
-        @_destination_path_to_file_map ||= {}
-      end
 
       # @param file [Epuber::Compiler::AbstractFile]
       #
@@ -298,7 +313,7 @@ module Epuber
           #   raise "Duplicate entry for result path #{file.destination_path}"
           # end
 
-          _destination_path_to_file_map[file.destination_path] = file
+          @final_destination_path_to_file[file.final_destination_path] = file
         end
       end
 
