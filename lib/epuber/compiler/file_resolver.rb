@@ -16,6 +16,7 @@ module Epuber
     require_relative 'file_types/bade_file'
 
     class FileResolver
+      PATH_TYPES = [:spine, :manifest, :package, nil]
 
       # @return [String] path where should look for source files
       #
@@ -77,7 +78,7 @@ module Epuber
       def add_file(file)
         type = file.path_type
 
-        unless [:spine, :manifest, :package, nil].include?(type)
+        unless PATH_TYPES.include?(type)
           raise "Unknown file.path_type #{type.inspect}, expected are :spine, :manifest, :package or nil"
         end
 
@@ -285,17 +286,17 @@ module Epuber
                                find_file(file, file.group)
                              end
 
-          extname     = ::File.extname(real_source_path)
+          extname     = File.extname(real_source_path)
           new_extname = FileFinders::EXTENSIONS_RENAME[extname]
 
           dest_path = if new_extname.nil?
                         real_source_path
                       else
-                        real_source_path.sub(/#{extname}$/, new_extname)
+                        real_source_path.sub(/#{Regexp.escape(extname)}$/, new_extname)
                       end
 
           file.destination_path = dest_path
-          file.final_destination_path = ::File.join(destination_path, Compiler::EPUB_CONTENT_FOLDER, dest_path)
+          file.final_destination_path = File.join(self.class.path_for(destination_path, file.path_type), dest_path)
 
           # TODO: uncomment following lines and resolve duplicate items
           #
@@ -353,6 +354,20 @@ module Epuber
         }
 
         mapping[extname] || FileTypes::StaticFile
+      end
+
+      # @param [String] root_path  path to root of the package
+      # @param [Symbol] path_type  path type of file
+      #
+      def self.path_for(root_path, path_type)
+        case path_type
+          when :spine, :manifest
+            File.join(root_path, Compiler::EPUB_CONTENT_FOLDER)
+          when :package
+            root_path
+          else
+            nil
+        end
       end
     end
   end

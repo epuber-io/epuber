@@ -17,7 +17,7 @@ module Epuber
     describe FileResolver do
       include FakeFS::SpecHelpers
 
-      it 'supports adding files' do
+      it 'supports adding files from request' do
         FileUtils.mkdir_p(%w(source dest))
         FileUtils.touch('/source/file.txt')
 
@@ -41,6 +41,21 @@ module Epuber
         expect(file.final_destination_path).to eq '/dest/OEBPS/file.txt'
         expect(file).to be_a FileTypes::StaticFile
       end
+
+      it 'supports adding files with generated content'
+      it 'supports adding multiple files'
+
+      it 'can calculate path depend on path type' do
+        expect(FileResolver.path_for('/root', :manifest)).to eq '/root/OEBPS'
+        expect(FileResolver.path_for('/root', :spine)).to eq '/root/OEBPS'
+        expect(FileResolver.path_for('/root', :package)).to eq '/root'
+      end
+
+      it 'supports searching files in source folder'
+      it 'support searching files in destination folder'
+      it 'can return file instance from source path'
+      it 'can return file instance from destination path'
+      it 'can find unnecessary files in destination path'
 
       context '.file_class_for' do
         it 'selects correct file type from file extension' do
