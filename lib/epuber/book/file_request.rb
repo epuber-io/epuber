@@ -25,12 +25,13 @@ module Epuber
 
 
       # @param [String] source_pattern pattern describing path to file
+      # @param [Bool] only_one find only one file, otherwise look for all files matching pattern in project
       # @param [Symbol] group group of file, see Epuber::Compiler::FileFinder::GROUP_EXTENSIONS
-      # @param [Array<Symbol>, Set<Symbol>] properties list of properties, TODO add list of supported properties, and validate them
+      # @param [Array<Symbol>, Set<Symbol>] properties list of properties
       #
-      def initialize(source_pattern, group: nil, properties: [])
+      def initialize(source_pattern, only_one = true, group: nil, properties: [])
         @source_pattern = source_pattern
-        @only_one       = true
+        @only_one       = only_one
         @group          = group
         @properties     = properties.to_set
       end

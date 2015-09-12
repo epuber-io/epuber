@@ -54,23 +54,36 @@ module Epuber
         @source_path      = source_path.unicode_normalize
         @destination_path = destination_path.unicode_normalize
 
-        @spine_files = SortedSet.new
-        @manifest_files = SortedSet.new
-        @package_files = SortedSet.new
-        @files = SortedSet.new
+        @spine_files    = []
+        @manifest_files = []
+        @package_files  = []
+        @files          = []
       end
 
       # @param [Epuber::Book::FileRequest] file_request
       #
       def add_file_from_request(file_request, path_type = :manifest)
-        file_path = @finder.find_file(file_request.source_pattern, groups: file_request.group)
-        file_class = self.class.file_class_for(File.extname(file_path))
+        if file_request.only_one
+          file_path = @finder.find_file(file_request.source_pattern, groups: file_request.group)
+          file_class = self.class.file_class_for(File.extname(file_path))
 
-        file = file_class.new(file_path)
-        file.file_request = file_request
-        file.path_type = path_type
+          file = file_class.new(file_path)
+          file.file_request = file_request
+          file.path_type = path_type
 
-        add_file(file)
+          add_file(file)
+        else
+          file_paths = @finder.find_all(file_request.source_pattern, groups: file_request.group)
+          file_paths.each do |path|
+            file_class = self.class.file_class_for(File.extname(path))
+
+            file = file_class.new(path)
+            file.file_request = file_request
+            file.path_type = path_type
+
+            add_file(file)
+          end
+        end
       end
 
       # @param [Epuber::Compiler::FileTypes::AbstractFile] file
@@ -85,32 +98,24 @@ module Epuber
         resolve_destination_path(file)
 
         if [:spine].include?(type)
-          @spine_files << file
+          @spine_files << file unless @spine_files.include?(file)
         end
 
         if [:spine, :manifest].include?(type)
-          @manifest_files << file
+          @manifest_files << file unless @manifest_files.include?(file)
         end
 
         if [:spine, :manifest, :package].include?(type)
-          @package_files << file
+          @package_files << file unless @package_files.include?(file)
         end
 
-        @files << file
+        @files << file unless @files.include?(file)
 
         unless file.file_request.nil?
           _request_to_file_map_cache[file.file_request] = file
         end
         if file.respond_to?(:source_path) && !file.source_path.nil?
           _source_path_to_file_map[file.source_path] = file
-        end
-      end
-
-      # @param [FileRequest] file_request
-      #
-      def add_files(file_request)
-        find_files(file_request).each do |path|
-          add_file(File.new(Epuber::Book::FileRequest.new(path)))
         end
       end
 
@@ -321,18 +326,6 @@ module Epuber
         @finder.assert_one_file(file_objs, pattern: pattern, groups: group, context_path: context_path)
 
         file_objs.first
-      end
-
-      # @param file_or_pattern [String, Epuber::Book::FileRequest]
-      # @param group [Symbol]
-      #
-      # @return [Array<String>]
-      #
-      def find_files(file_or_pattern, group = nil, context_path: source_path)
-        pattern = pattern_from(file_or_pattern)
-        group = file_or_pattern.group if group.nil? && file_or_pattern.is_a?(Epuber::Book::FileRequest)
-
-        @finder.find_files(pattern, groups: group, context_path: context_path)
       end
 
 

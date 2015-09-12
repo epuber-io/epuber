@@ -17,23 +17,26 @@ module Epuber
     describe FileResolver do
       include FakeFS::SpecHelpers
 
-      it 'supports adding files from request' do
+      before do
         FileUtils.mkdir_p(%w(source dest))
+        @sut = FileResolver.new('/source', '/dest')
+      end
+
+      it 'is empty after initialization' do
+        expect(@sut.files.count).to eq 0
+        expect(@sut.manifest_files.count).to eq 0
+      end
+
+      it 'supports adding files from request' do
         FileUtils.touch('/source/file.txt')
 
-        resolver = FileResolver.new('/source', '/dest')
+        @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
 
-        expect(resolver.files.count).to eq 0
-        expect(resolver.manifest_files.count).to eq 0
+        expect(@sut.files.count).to eq 1
+        expect(@sut.manifest_files.count).to eq 1
+        expect(@sut.spine_files.count).to eq 0
 
-
-        resolver.add_file_from_request(Book::FileRequest.new('file.txt'))
-
-
-        expect(resolver.files.count).to eq 1
-        expect(resolver.manifest_files.count).to eq 1
-
-        file = resolver.files.first
+        file = @sut.files.first
         expect(file).to_not be_nil
         expect(file.path_type).to eq :manifest
         expect(file.source_path).to eq 'file.txt'
@@ -43,7 +46,15 @@ module Epuber
       end
 
       it 'supports adding files with generated content'
-      it 'supports adding multiple files'
+
+      it 'supports adding multiple files' do
+        FileUtils.touch(%w(/source/file1.xhtml /source/file2.xhtml /source/file3.xhtml /source/file4.xhtml))
+
+        @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
+
+        expect(@sut.files.count).to eq 4
+        expect(@sut.files.map(&:source_path)).to contain_exactly 'file1.xhtml', 'file2.xhtml', 'file3.xhtml', 'file4.xhtml'
+      end
 
       it 'can calculate path depend on path type' do
         expect(FileResolver.path_for('/root', :manifest)).to eq '/root/OEBPS'
