@@ -130,11 +130,11 @@ module Epuber
       #
       # @return [File, Array<FileTypes::AbstractFile>]
       #
-      def find_file_from_request(file_request)
+      def file_from_request(file_request)
         files = @request_to_files[file_request]
 
         if file_request.only_one
-          files.first
+          files.first  # @request_to_files always returns array, see #initialize method
         else
           files
         end

@@ -97,7 +97,7 @@ module Epuber
         file = @sut.add_file_from_request(req)
 
         same_req = Book::FileRequest.new('/source/some_file.xhtml')
-        founded_file = @sut.find_file_from_request(same_req)
+        founded_file = @sut.file_from_request(same_req)
 
         expect(founded_file).to be file
       end
@@ -109,7 +109,7 @@ module Epuber
         files = @sut.add_file_from_request(req)
 
         same_req = Book::FileRequest.new('*.xhtml', false)
-        founded_files = @sut.find_file_from_request(same_req)
+        founded_files = @sut.file_from_request(same_req)
 
         expect(founded_files).to eq files
       end
