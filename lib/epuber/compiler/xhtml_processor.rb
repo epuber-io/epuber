@@ -192,6 +192,41 @@ module Epuber
       def self.using_javascript?(xhtml_doc)
         !xhtml_doc.at_css('script').nil?
       end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      # @param [String] file_path path of referring file
+      # @param [FileResolver] file_resolver
+      #
+      # @return nil
+      #
+      def self.resolve_images(xhtml_doc, file_path, file_resolver)
+        xhtml_doc.css('img').each do |img|
+          path = img['src']
+          next if path.nil?
+
+          dirname = File.dirname(file_path)
+
+          begin
+            new_path = file_resolver.dest_finder.find_file(path, groups: :image, context_path: dirname)
+
+          rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
+            begin
+              new_path = resolved_link_to_file(path, :image, dirname, file_resolver.source_finder).to_s
+              pkg_new_path = File.expand_path(new_path, dirname)
+
+              file = FileTypes::ImageFile.new(pkg_new_path)
+              file_resolver.add_file(file)
+
+            rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
+              UI.warning(e.to_s, location: node)
+
+              next
+            end
+          end
+
+          img['src'] = new_path
+        end
+      end
     end
   end
 end

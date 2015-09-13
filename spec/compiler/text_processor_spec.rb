@@ -257,6 +257,44 @@ module Epuber
         doc = XHTMLProcessor.xml_document_from_string('<script src="baf.js" />')
         expect(XHTMLProcessor.using_javascript?(doc)).to be_truthy
       end
+
+      context '.resolve_images' do
+        it 'resolves not existing file in destination' do
+          FileUtils.mkdir_p('/images')
+          FileUtils.touch(%w(/images/image1.png /images/image2.jpg /file.xhtml))
+
+          xml = '<div><img src="image1" /></div>'
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+          resolver = FileResolver.new('/', '/.build')
+
+          expect(resolver.files.count).to eq 0
+
+          XHTMLProcessor.resolve_images(doc, 'file.xhtml', resolver)
+
+          expect(doc.at_css('img')['src']).to eq 'images/image1.png'
+          expect(resolver.files.count).to eq 1
+        end
+
+        it 'resolves existing file in destination' do
+          FileUtils.mkdir_p('/images')
+          FileUtils.touch(%w(/images/image1.png /images/image2.jpg /file.xhtml))
+
+          resolver = FileResolver.new('/', '/.build')
+          resolver.add_file_from_request(Book::FileRequest.new('image1.png', false))
+
+          expect(resolver.files.count).to eq 1
+
+
+          xml = '<div><img src="image1" /></div>'
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+
+
+          XHTMLProcessor.resolve_images(doc, 'file.xhtml', resolver)
+
+          expect(doc.at_css('img')['src']).to eq 'images/image1.png'
+          expect(resolver.files.count).to eq 1
+        end
+      end
     end
 
 
