@@ -242,6 +242,21 @@ module Epuber
           }.to_not output.to_stdout
         end
       end
+
+      context '.resolve_links' do
+        it 'resolves links in <a>'
+        it 'resolves links in <map>'
+        it 'resolves links in <img>'
+        it 'resolves links in <script>'
+      end
+
+      it 'detects whether xhtml document is using some scripts' do
+        doc = XHTMLProcessor.xml_document_from_string('<script>var baf = document.shit();</script>')
+        expect(XHTMLProcessor.using_javascript?(doc)).to be_truthy
+
+        doc = XHTMLProcessor.xml_document_from_string('<script src="baf.js" />')
+        expect(XHTMLProcessor.using_javascript?(doc)).to be_truthy
+      end
     end
 
 

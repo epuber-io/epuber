@@ -169,6 +169,29 @@ module Epuber
 
         founded_links
       end
+
+      # Resolves all links to files in XHTML document and returns the valid and resolved versions
+      #
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @param [String] context_path  path to file from which is searching for other file
+      # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
+      #
+      # @return [Array<URI>] resolved links
+      #
+      def self.resolve_links(xhtml_doc, context_path, file_finder)
+        [
+          resolve_links_for(xhtml_doc, 'a', 'href', :text, context_path, file_finder),
+          resolve_links_for(xhtml_doc, 'map > area', 'href', :text, context_path, file_finder),
+        ].flatten
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      #
+      # @return [Bool]
+      #
+      def self.using_javascript?(xhtml_doc)
+        !xhtml_doc.at_css('script').nil?
+      end
     end
   end
 end
