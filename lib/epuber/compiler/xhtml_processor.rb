@@ -98,6 +98,19 @@ module Epuber
         end
       end
 
+      # Adds viewport meta tag to head of some document, but only if there is not some existing tag
+      #
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      # @param [Epuber::Size] viewport_size
+      #
+      def self.add_viewport(xhtml_doc, viewport_size)
+        head = xhtml_doc.at_css('html > head')
+        return unless head.at_css("meta[name='viewport']").nil?
+
+        s = viewport_size
+        head << xhtml_doc.create_element('meta', name: 'viewport', content: "width=#{s.width},height=#{s.height}")
+      end
+
       # Method which will resolve path to file from pattern
       #
       # @param [String] path  pattern or path of the file

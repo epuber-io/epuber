@@ -107,6 +107,39 @@ module Epuber
         end
       end
 
+      context '.add_viewport' do
+        it 'adds viewport when there is no other' do
+          xml = '<p>aaa</p>'
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+          XHTMLProcessor.add_missing_root_elements(doc, 'Bla', Epuber::Version.new(2.0))
+
+          XHTMLProcessor.add_viewport(doc, Epuber::Size.new(100, 200))
+
+          meta = doc.at_css('html > head > meta[name="viewport"]')
+          expect(meta['content']).to eq 'width=100,height=200'
+        end
+
+        it "doesn't viewport when there is some already existing" do
+          xml = '
+          <html>
+            <head>
+              <meta name="viewport" content="width=50,height=300" />
+            </head>
+            <body>
+              <p>aaa</p>
+            </body>
+          </html>'
+
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+          XHTMLProcessor.add_missing_root_elements(doc, 'Bla', Epuber::Version.new(2.0))
+
+          XHTMLProcessor.add_viewport(doc, Epuber::Size.new(100, 200))
+
+          meta = doc.at_css('html > head > meta[name="viewport"]')
+          expect(meta['content']).to eq 'width=50,height=300'
+        end
+      end
+
       context '.resolved_link_to_file' do
         it 'resolves links to other files in project' do
           FileUtils.mkdir_p('some/path')
