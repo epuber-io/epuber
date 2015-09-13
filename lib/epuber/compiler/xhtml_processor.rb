@@ -115,15 +115,15 @@ module Epuber
       #
       # @param [String] path  pattern or path of the file
       # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching for file from tag <img>
-      # @param [String] context_path  path to file from which is searching for other file
+      # @param [String] file_path  path to file from which is searching for other file
       # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
       #
       # @raise UnparseableLinkError, FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError
       #
       # @return [URI] resolved path to file or remote web page
       #
-      def self.resolved_link_to_file(path, groups, context_path, file_finder)
-        raise FileFinders::FileNotFoundError.new(path, context_path) if path.empty?
+      def self.resolved_link_to_file(path, groups, file_path, file_finder)
+        raise FileFinders::FileNotFoundError.new(path, file_path) if path.empty?
 
         begin
           uri = URI(path)
@@ -142,7 +142,7 @@ module Epuber
         # skip empty path
         return uri if uri.path.empty? && !uri.fragment.nil? && !uri.fragment.empty?
 
-        uri.path = file_finder.find_file(uri.path, groups: groups, context_path: context_path)
+        uri.path = file_finder.find_file(uri.path, groups: groups, context_path: file_path)
 
         uri
       end
@@ -153,12 +153,12 @@ module Epuber
       # @param [String] tag_name  CSS selector for tag
       # @param [String] attribute_name  name of attribute
       # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching for file from tag <img>
-      # @param [String] context_path  path to file from which is searching for other file
+      # @param [String] file_path  path to file from which is searching for other file
       # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
       #
       # @return [Array<URI>] resolved links
       #
-      def self.resolve_links_for(xhtml_doc, tag_name, attribute_name, groups, context_path, file_finder)
+      def self.resolve_links_for(xhtml_doc, tag_name, attribute_name, groups, file_path, file_finder)
         founded_links = []
 
         xhtml_doc.css("#{tag_name}[#{attribute_name}]").each do |node|
@@ -168,7 +168,7 @@ module Epuber
 
             next if src.nil?
 
-            target_file = resolved_link_to_file(src, groups, context_path, file_finder)
+            target_file = resolved_link_to_file(src, groups, file_path, file_finder)
             founded_links << target_file
 
             node[attribute_name] = target_file.to_s
@@ -186,15 +186,15 @@ module Epuber
       # Resolves all links to files in XHTML document and returns the valid and resolved versions
       #
       # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
-      # @param [String] context_path  path to file from which is searching for other file
+      # @param [String] file_path  path to file from which is searching for other file
       # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
       #
       # @return [Array<URI>] resolved links
       #
-      def self.resolve_links(xhtml_doc, context_path, file_finder)
+      def self.resolve_links(xhtml_doc, file_path, file_finder)
         [
-          resolve_links_for(xhtml_doc, 'a', 'href', :text, context_path, file_finder),
-          resolve_links_for(xhtml_doc, 'map > area', 'href', :text, context_path, file_finder),
+          resolve_links_for(xhtml_doc, 'a', 'href', :text, file_path, file_finder),
+          resolve_links_for(xhtml_doc, 'map > area', 'href', :text, file_path, file_finder),
         ].flatten
       end
 
@@ -225,13 +225,15 @@ module Epuber
           rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
             begin
               new_path = resolved_link_to_file(path, :image, dirname, file_resolver.source_finder).to_s
-              pkg_new_path = File.expand_path(new_path, dirname)
+              pkg_abs_path = File.expand_path(new_path, dirname)
+              pkg_new_path = Pathname.new(pkg_abs_path).relative_path_from(Pathname.new(file_resolver.source_path)).to_s
 
               file = FileTypes::ImageFile.new(pkg_new_path)
+              file.path_type = :manifest
               file_resolver.add_file(file)
 
             rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
-              UI.warning(e.to_s, location: node)
+              UI.warning(e.to_s, location: img)
 
               next
             end

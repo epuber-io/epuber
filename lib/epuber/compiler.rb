@@ -5,11 +5,7 @@ require 'English'
 require 'pathname'
 require 'fileutils'
 
-require 'stylus'
-require 'bade'
 require 'zip'
-
-require 'RMagick'
 
 require_relative 'vendor/nokogiri_extensions'
 require_relative 'vendor/globals_context'

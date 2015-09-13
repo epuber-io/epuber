@@ -192,7 +192,7 @@ module Epuber
       #
       def unneeded_files_in_destination
         requested_paths = files.map do |file|
-          file.destination_path
+          file.pkg_destination_path
         end
 
         existing_paths = FileFinders::Normal.new(destination_path).find_all('*')

@@ -134,7 +134,7 @@ module Epuber
 
           cover_image = @target.cover_image
           unless cover_image.nil?
-            cover_image_result = @file_resolver.find_file_from_request(cover_image)
+            cover_image_result = @file_resolver.file_from_request(cover_image)
             @xml.meta(name: 'cover', content: create_id_from_path(pretty_path(cover_image_result)))
           end
 
@@ -164,7 +164,7 @@ module Epuber
       #
       def generate_manifest
         @xml.manifest do
-          @file_resolver.files_of(:manifest).each do |file|
+          @file_resolver.manifest_files.each do |file|
             pretty_path         = pretty_path(file)
             attrs               = {}
             attrs['id']         = create_id_from_path(pretty_path)
@@ -190,7 +190,7 @@ module Epuber
         args = if @target.epub_version >= 3
                  {}
                else
-                 nav_file = @file_resolver.files_of(:manifest).find { |file| file.destination_path.end_with?('.ncx') }
+                 nav_file = @file_resolver.manifest_files.find { |file| file.destination_path.end_with?('.ncx') }
                  raise 'not found nav file' if nav_file.nil?
 
                  { toc: create_id_from_path(pretty_path(nav_file)) }
@@ -198,7 +198,7 @@ module Epuber
 
         @xml.spine(args) do
           @target.root_toc.flat_sub_items.each do |toc_item|
-            result_file = @file_resolver.find_file_from_request(toc_item.file_request)
+            result_file = @file_resolver.file_from_request(toc_item.file_request)
 
             attrs = {}
             attrs['idref'] = create_id_from_path(pretty_path(result_file))
@@ -234,14 +234,16 @@ module Epuber
       # @return nil
       #
       def guide_visit_toc_item(toc_item)
-        result_file = @file_resolver.find_file_from_request(toc_item.file_request)
+        unless toc_item.file_request.nil?
+          result_file = @file_resolver.file_from_request(toc_item.file_request)
 
-        toc_item.landmarks.each do |landmark|
-          type = LANDMARKS_MAP[landmark]
+          toc_item.landmarks.each do |landmark|
+            type = LANDMARKS_MAP[landmark]
 
-          raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP.keys}" if type.nil?
+            raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP.keys}" if type.nil?
 
-          @xml.reference(type: type, href: pretty_path(result_file))
+            @xml.reference(type: type, href: pretty_path(result_file))
+          end
         end
 
         guide_visit_toc_items(toc_item.sub_items)
