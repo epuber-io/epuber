@@ -50,18 +50,15 @@ module Epuber
       # @return [Epuber::Book::File]
       #
       def generate_nav_file
-        nav_file = Epuber::Compiler::File.new(nil)
-
-        name = if @target.epub_version >= 3
-                 'nav.xhtml'
-               else
-                 'nav.ncx'
-               end
-
-        nav_file.package_destination_path = ::File.join(Epuber::Compiler::EPUB_CONTENT_FOLDER, name)
-
+        nav_file = Epuber::Compiler::FileTypes::GeneratedFile.new
+        nav_file.destination_path = if @target.epub_version >= 3
+                                      'nav.xhtml'
+                                    else
+                                      'nav.ncx'
+                                    end
         nav_file.content = generate_nav
-        nav_file.add_property(:navigation)
+        nav_file.path_type = :manifest
+        nav_file.properties << :navigation
         nav_file
       end
 

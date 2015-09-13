@@ -78,11 +78,12 @@ module Epuber
         end
       end
 
-      # @return [Epuber::Compiler::File]
+      # @return [Epuber::Compiler::FileTypes::GeneratedFile]
       #
       def generate_opf_file
-        opf_file = Epuber::Compiler::File.new(nil)
-        opf_file.package_destination_path = ::File.join(Epuber::Compiler::EPUB_CONTENT_FOLDER, 'content.opf')
+        opf_file = Epuber::Compiler::FileTypes::GeneratedFile.new
+        opf_file.destination_path = File.join(Epuber::Compiler::EPUB_CONTENT_FOLDER, 'content.opf')
+        opf_file.path_type = :package
         opf_file.content = generate_opf
         opf_file
       end

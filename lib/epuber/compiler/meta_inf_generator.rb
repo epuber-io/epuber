@@ -49,15 +49,18 @@ module Epuber
       #
       def generate_all_files
         all = []
-        container_xml                          = File.new(nil)
-        container_xml.package_destination_path = 'META-INF/container.xml'
-        container_xml.content                  = generate_container_xml
+
+        container_xml                  = FileTypes::GeneratedFile.new
+        container_xml.path_type        = :package
+        container_xml.destination_path = 'META-INF/container.xml'
+        container_xml.content          = generate_container_xml
         all << container_xml
 
         if @target.ibooks?
-          display_options                          = File.new(nil)
-          display_options.package_destination_path = 'META-INF/com.apple.ibooks.display-options.xml'
-          display_options.content                  = generate_ibooks_display_options_xml
+          display_options                  = FileTypes::GeneratedFile.new
+          display_options.path_type        = :package
+          display_options.destination_path = 'META-INF/com.apple.ibooks.display-options.xml'
+          display_options.content          = generate_ibooks_display_options_xml
           all << display_options
         end
 

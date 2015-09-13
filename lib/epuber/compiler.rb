@@ -99,7 +99,7 @@ module Epuber
     #
     def parse_plugins
       @plugins += @target.plugins.map do |path|
-        Plugin.new(::File.expand_path(path, Config.instance.project_path))
+        Plugin.new(File.expand_path(path, Config.instance.project_path))
       end
     end
 
@@ -112,13 +112,10 @@ module Epuber
     def archive(path = nil, configuration_suffix: nil)
       path ||= epub_name(configuration_suffix)
 
-      epub_path = ::File.expand_path(path)
-      base_path = ::File.join(@file_resolver.destination_path, '')
+      epub_path = File.expand_path(path)
 
       Dir.chdir(@file_resolver.destination_path) do
-        new_paths = @file_resolver.files_of(:package).map(&:destination_path).map do |file_path|
-          file_path.sub(base_path, '')
-        end
+        new_paths = @file_resolver.package_files.map(&:pgk_destination_path)
 
         if ::File.exists?(epub_path)
           Zip::File.open(epub_path, true) do |zip_file|
@@ -165,7 +162,7 @@ module Epuber
     def remove_empty_folders
       Dir.chdir(@file_resolver.destination_path) do
         Dir.glob('**/*')
-          .select { |d| ::File.directory?(d) }
+          .select { |d| File.directory?(d) }
           .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
           .each do |d|
           puts "DEBUG: removing empty folder `#{d}`"
@@ -177,35 +174,11 @@ module Epuber
     # @return nil
     #
     def remove_unnecessary_files
-      output_dir = @file_resolver.destination_path
-
-      requested_paths = @file_resolver.files_of(:package).map do |file|
-        # files have paths from EPUB_CONTENT_FOLDER
-        abs_path = ::File.expand_path(file.destination_path, ::File.join(output_dir, EPUB_CONTENT_FOLDER))
-        abs_path.sub(::File.join(output_dir, ''), '')
-      end
-
-      existing_paths = nil
-
-      Dir.chdir(output_dir) do
-        existing_paths = Dir.glob('**/*')
-      end
-
-      unnecessary_paths = existing_paths - requested_paths
-
-      # absolute path
-      unnecessary_paths.map! do |path|
-        ::File.join(output_dir, path)
-      end
-
-      # remove directories
-      unnecessary_paths.select! do |path|
-        !::File.directory?(path)
-      end
-
+      unnecessary_paths = @file_resolver.unneeded_files_in_destination.map { |path| File.join(@file_resolver.destination_path, path) }
       unnecessary_paths.each do |path|
         puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
-        ::File.delete(path)
+
+        File.delete(path)
       end
     end
 
@@ -214,26 +187,27 @@ module Epuber
     def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
       nav_file = NavGenerator.new(@book, @target, @file_resolver).generate_nav_file
-      @file_resolver.add_file(nav_file, type: :manifest)
+      @file_resolver.add_file(nav_file)
       process_file(nav_file)
 
       # generate .opf file
       opf_file = OPFGenerator.new(@book, @target, @file_resolver).generate_opf_file
-      @file_resolver.add_file(opf_file, type: :package)
+      @file_resolver.add_file(opf_file)
       process_file(opf_file)
 
       # generate mimetype file
-      mimetype_file = Epuber::Compiler::File.new(nil)
-      mimetype_file.package_destination_path = 'mimetype'
-      mimetype_file.content                  = 'application/epub+zip'
-      @file_resolver.add_file(mimetype_file, type: :package)
+      mimetype_file                  = Epuber::Compiler::FileTypes::GeneratedFile.new
+      mimetype_file.path_type        = :package
+      mimetype_file.destination_path = 'mimetype'
+      mimetype_file.content          = 'application/epub+zip'
+      @file_resolver.add_file(mimetype_file)
       process_file(mimetype_file)
 
       # generate META-INF files
-      opf_path = opf_file.package_destination_path
+      opf_path = opf_file.pkg_destination_path
       meta_inf_files = MetaInfGenerator.new(@book, @target, opf_path).generate_all_files
       meta_inf_files.each do |meta_file|
-        @file_resolver.add_file(meta_file, type: :package)
+        @file_resolver.add_file(meta_file)
         process_file(meta_file)
       end
     end
@@ -242,18 +216,14 @@ module Epuber
     #
     def parse_target_file_requests
       @target.files.each do |file_request|
-        if file_request.only_one
-          @file_resolver.add_file(File.new(file_request))
-        else
-          @file_resolver.add_files(file_request)
-        end
+        @file_resolver.add_file_from_request(file_request)
       end
     end
 
     # @return nil
     #
     def process_all_target_files
-      @file_resolver.files_of(:manifest).each do |file|
+      @file_resolver.manifest_files.each do |file|
         process_file(file)
       end
     end
@@ -263,7 +233,7 @@ module Epuber
     def parse_toc_item(toc_item)
       unless toc_item.file_request.nil?
         file_request = toc_item.file_request
-        @file_resolver.add_file(File.new(file_request), type: :spine)
+        @file_resolver.add_file_from_request(file_request, :spine)
       end
 
       # process recursively other files
