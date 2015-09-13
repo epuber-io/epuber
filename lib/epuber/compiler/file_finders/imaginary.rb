@@ -94,6 +94,17 @@ module Epuber
           end
         end
 
+        def __core_file?(path)
+          components = self.class.path_parts(path)
+
+          current = root
+          components.each do |dir|
+            current = current.respond_to?(:[]) ? current[dir] : nil
+          end
+
+          current.is_a?(FileEntry)
+        end
+
         private
 
         def self.path_parts(path)

@@ -233,10 +233,10 @@ module Epuber
         # @return [Array<String>] list of founded files
         #
         def __core_find_files(pattern, groups, context_path, orig_context_path = context_path)
-          context_path = File.file?(context_path) ? File.dirname(context_path) : context_path
-          orig_context_path = File.file?(orig_context_path) ? File.dirname(orig_context_path) : orig_context_path
+          context_path = __core_file?(context_path) ? File.dirname(context_path) : context_path
+          orig_context_path = __core_file?(orig_context_path) ? File.dirname(orig_context_path) : orig_context_path
 
-          full_pattern = ::File.expand_path(pattern, context_path)
+          full_pattern = File.expand_path(pattern, context_path)
           file_paths = __core_find_files_from_pattern(full_pattern)
 
           file_paths.reject! do |path|
@@ -245,18 +245,20 @@ module Epuber
 
           # remove any files that should be ignored
           file_paths.reject! do |path|
-            ignored_patterns.any? { |exclude_pattern| ::File.fnmatch(exclude_pattern, path) }
+            ignored_patterns.any? { |exclude_pattern| File.fnmatch(exclude_pattern, path) }
           end
 
           file_paths = self.class.group_filter_paths(file_paths, groups)
 
           # create relative path to context path
-          file_paths = self.class.relative_paths_from(file_paths, orig_context_path)
-
-          file_paths
+          self.class.relative_paths_from(file_paths, orig_context_path)
         end
 
         def __core_find_files_from_pattern(pattern)
+          raise 'Implement this in subclass'
+        end
+
+        def __core_file?(path)
           raise 'Implement this in subclass'
         end
       end
