@@ -114,6 +114,9 @@ module Epuber
 
         resolve_destination_path(file)
 
+        return unless @final_destination_path_to_file[file.final_destination_path].nil?
+
+
         if [:spine].include?(type)
           @spine_files << file unless @spine_files.include?(file)
         end
@@ -128,7 +131,11 @@ module Epuber
 
         @files << file unless @files.include?(file)
 
+
         dest_finder.add_file(file.destination_path)
+
+        @final_destination_path_to_file[file.final_destination_path] = file
+
 
         if file.respond_to?(:file_request) && !file.file_request.nil?
           @request_to_files[file.file_request] << file
@@ -177,34 +184,6 @@ module Epuber
         @final_destination_path_to_file[final_path]
       end
 
-      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] from
-      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] to
-      #
-      # @return [String]
-      #
-      def relative_path(from, to)
-        from_path = if from.is_a?(String)
-                      from
-                    elsif from.is_a?(Epuber::Compiler::File)
-                      from.destination_path
-                    elsif from.is_a?(Epuber::Book::FileRequest)
-                      find_file_from_request(from).destination_path
-                    end
-
-        from_path = ::File.dirname(from_path) unless ::File.directory?(from_path)
-
-        to_path = if to.is_a?(String)
-                    to
-                  elsif to.is_a?(Epuber::Compiler::File)
-                    to.destination_path
-                  elsif to.is_a?(Epuber::Book::FileRequest)
-                    find_file_from_request(to).destination_path
-                  end
-
-        Pathname.new(to_path).relative_path_from(Pathname.new(from_path)).to_s
-      end
-
-
       # Method to find all files that should be deleted, because they are not in files in receiver
       #
       # @return [Array<String>] list of files that should be deleted in destination directory
@@ -224,6 +203,9 @@ module Epuber
 
         unnecessary_paths
       end
+
+
+      ##################################################################################################################
 
       private
 
@@ -259,16 +241,8 @@ module Epuber
           file.destination_path = dest_path
           file.pkg_destination_path = File.join(*self.class.path_comps_for(file.path_type), dest_path)
           file.final_destination_path = File.join(destination_path, file.pkg_destination_path)
-
-          @final_destination_path_to_file[file.final_destination_path] = file
         end
       end
-
-
-
-      ##################################################################################################################
-
-      private
 
       # @param [String] extname  extension of file
       #

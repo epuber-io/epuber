@@ -46,7 +46,30 @@ module Epuber
         expect(file).to be_a FileTypes::StaticFile
       end
 
-      it 'handles multiple addition of the same file'
+      it 'handles multiple addition of the same file' do
+        FileUtils.touch(%w(/source/file.txt /source/image.png))
+
+        @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
+
+        expect(@sut.files.count).to eq 1
+
+        @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
+
+        expect(@sut.files.count).to eq 1
+      end
+
+      it 'handles multiple addition of same files' do
+        FileUtils.touch(%w(/source/file.txt /source/image.png))
+
+        @sut.add_file_from_request(Book::FileRequest.new('*.txt', false))
+        expect(@sut.files.count).to eq 1
+
+
+        FileUtils.touch(%w(/source/file1.txt))
+
+        @sut.add_file_from_request(Book::FileRequest.new('*.txt', false))
+        expect(@sut.files.count).to eq 2
+      end
 
       it 'supports adding files with generated content' do
         file = FileTypes::GeneratedFile.new
