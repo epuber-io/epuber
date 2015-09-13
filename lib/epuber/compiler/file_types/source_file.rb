@@ -12,6 +12,10 @@ module Epuber
         #
         attr_reader :source_path
 
+        # @return [String] absolute source path
+        #
+        attr_accessor :abs_source_path
+
         # @return [Epuber::Book::FileRequest]
         #
         attr_accessor :file_request

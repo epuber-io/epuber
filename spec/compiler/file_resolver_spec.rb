@@ -40,6 +40,7 @@ module Epuber
         expect(file).to_not be_nil
         expect(file.path_type).to eq :manifest
         expect(file.source_path).to eq 'file.txt'
+        expect(file.abs_source_path).to eq '/source/file.txt'
         expect(file.destination_path).to eq 'file.txt'
         expect(file.pkg_destination_path).to eq 'OEBPS/file.txt'
         expect(file.final_destination_path).to eq '/dest/OEBPS/file.txt'
