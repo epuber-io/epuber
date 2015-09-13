@@ -14,6 +14,8 @@ module Epuber
     require_relative 'file_types/stylus_file'
     require_relative 'file_types/xhtml_file'
     require_relative 'file_types/bade_file'
+    require_relative 'file_types/image_file'
+
 
     class FileResolver
       class ResolveError < StandardError; end
@@ -252,9 +254,14 @@ module Epuber
       def self.file_class_for(extname)
         mapping = {
           '.styl'  => FileTypes::StylusFile,
+
           '.bade'  => FileTypes::BadeFile,
           '.xhtml' => FileTypes::XHTMLFile,
           '.html'  => FileTypes::XHTMLFile,
+
+          '.jpg'   => FileTypes::ImageFile,
+          '.jpeg'  => FileTypes::ImageFile,
+          '.png'   => FileTypes::ImageFile,
         }
 
         mapping[extname] || FileTypes::StaticFile

@@ -201,9 +201,9 @@ module Epuber
           expect(FileResolver.file_class_for('.xhtml')).to be FileTypes::XHTMLFile
           expect(FileResolver.file_class_for('.html')).to be FileTypes::XHTMLFile
 
-          expect(FileResolver.file_class_for('.png')).to be FileTypes::StaticFile
-          expect(FileResolver.file_class_for('.jpeg')).to be FileTypes::StaticFile
-          expect(FileResolver.file_class_for('.jpg')).to be FileTypes::StaticFile
+          expect(FileResolver.file_class_for('.png')).to be FileTypes::ImageFile
+          expect(FileResolver.file_class_for('.jpeg')).to be FileTypes::ImageFile
+          expect(FileResolver.file_class_for('.jpg')).to be FileTypes::ImageFile
 
           expect(FileResolver.file_class_for('.otf')).to be FileTypes::StaticFile
           expect(FileResolver.file_class_for('.ttf')).to be FileTypes::StaticFile
