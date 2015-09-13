@@ -160,7 +160,7 @@ module Epuber
         FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
 
         req = Book::FileRequest.new('valid/*.xhtml', false)
-        @sut.add_file_from_request(req)
+        @sut.add_file_from_request(req, :package)
 
         unneeded = @sut.unneeded_files_in_destination
         expect(unneeded).to contain_exactly 'not_valid/1.xhtml'

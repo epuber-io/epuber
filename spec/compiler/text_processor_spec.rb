@@ -256,6 +256,7 @@ module Epuber
 
         it "prints warning when the desired file can't be found" do
           FileUtils.touch('root.txt')
+
           finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a href="blabla"/>', 'root.txt')
 

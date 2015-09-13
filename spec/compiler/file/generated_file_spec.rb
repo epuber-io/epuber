@@ -22,6 +22,7 @@ module Epuber
 
           file = GeneratedFile.new
           file.destination_path = 'b.txt'
+          file.final_destination_path = '/b.txt'
           file.content = 'some content'
           file.process
 
