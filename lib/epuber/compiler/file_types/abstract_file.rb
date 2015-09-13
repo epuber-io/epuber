@@ -25,6 +25,10 @@ module Epuber
         end
 
 
+        # @return [String] final relative destination path from root of the package calculated by FileResolver
+        #
+        attr_accessor :pkg_destination_path
+
         # @return [String] final absolute destination path calculated by FileResolver
         #
         attr_accessor :final_destination_path

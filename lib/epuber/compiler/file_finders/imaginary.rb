@@ -140,6 +140,15 @@ module Epuber
             matches.map { |entry| find_recurser(entry, parts) }
           end
         end
+
+        # @param [DirEntry] dir
+        #
+        # @return [Hash<String, DirEntry>]
+        #
+        def directories_under(dir)
+          children = dir.entries.values.select { |f| f.is_a?(DirEntry) }
+          (Array(dir) + children + children.map { |c| directories_under(c) }).flatten.uniq
+        end
       end
     end
   end

@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require 'fakefs/spec_helpers'
-
 require_relative '../spec_helper'
 
 require 'epuber/book'
@@ -42,6 +40,7 @@ module Epuber
         expect(file.path_type).to eq :manifest
         expect(file.source_path).to eq 'file.txt'
         expect(file.destination_path).to eq 'file.txt'
+        expect(file.pkg_destination_path).to eq 'OEBPS/file.txt'
         expect(file.final_destination_path).to eq '/dest/OEBPS/file.txt'
         expect(file).to be_a FileTypes::StaticFile
       end
@@ -70,7 +69,20 @@ module Epuber
         expect(@sut.source_finder.find_file('1.xhtml')).to eq '1.xhtml'
       end
 
-      it 'support searching files in destination folder'
+      it 'support searching files in destination folder' do
+        FileUtils.mkdir_p('/source/folder')
+        FileUtils.touch(%w(/source/folder/file1.xhtml /source/folder/file2.xhtml /source/folder/file3.xhtml /source/folder/file4.xhtml))
+        FileUtils.touch(%w(/source/image1.png /source/image2.jpg /source/image3.jpg /source/image4.jpg))
+
+        @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
+        @sut.add_file_from_request(Book::FileRequest.new('*.{png,jpg}', false))
+
+        file = @sut.dest_finder.find_file('file1', context_path: 'folder')
+        expect(file).to eq 'file1.xhtml'
+
+        file = @sut.dest_finder.find_file('image2', context_path: 'folder')
+        expect(file).to eq '../image2.jpg'
+      end
 
       it 'can return file instance from source path' do
         FileUtils.mkdir_p(%w(/source/valid))

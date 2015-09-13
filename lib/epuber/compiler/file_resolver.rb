@@ -48,13 +48,19 @@ module Epuber
       #
       attr_reader :source_finder
 
+      # @return [FileFinders::Imaginary]
+      #
+      attr_reader :dest_finder
+
 
       # @param [String] source_path
       # @param [String] destination_path
       #
       def initialize(source_path, destination_path)
-        @source_finder = FileFinders::Normal.new(source_path)
+        @source_finder = FileFinders::Normal.new(source_path.unicode_normalize)
         @source_finder.ignored_patterns << ::File.join(Config::WORKING_PATH, '**')
+
+        @dest_finder = FileFinders::Imaginary.new(destination_path.unicode_normalize)
 
         @source_path      = source_path.unicode_normalize
         @destination_path = destination_path.unicode_normalize
@@ -120,6 +126,7 @@ module Epuber
 
         @files << file unless @files.include?(file)
 
+        dest_finder.add_file(file.destination_path)
 
         unless file.file_request.nil?
           @request_to_files[file.file_request] << file
@@ -166,52 +173,6 @@ module Epuber
       def file_with_destination_path(path, path_type = :manifest)
         final_path = File.join(self.class.path_for(destination_path, path_type), path.unicode_normalize)
         @final_destination_path_to_file[final_path]
-      end
-
-      
-      # @param [String] destination_path
-      #
-      # @return [File]
-      #
-      def find_file_with_destination_path(destination_path, groups, context_path)
-        file = _destination_path_to_file_map[destination_path]
-        file_paths = [file].compact
-
-        @source_finder.assert_one_file(file_paths, pattern: destination_path, groups: groups, context_path: context_path)
-
-        file_paths.first
-      end
-
-      # @param [String] pattern
-      # @param [String] context_path
-      # @param [Symbol] group
-      #
-      # @return [File]
-      #
-      def find_file_with_destination_pattern(pattern, context_path, group)
-        unless pattern.include?('*')
-          # don't even try, when there is star char
-          begin
-            # try to find file with exact path
-            return find_file_with_destination_path(::File.expand_path(pattern, context_path), group, context_path)
-
-          rescue FileFinders::FileNotFoundError
-            # not found, skip this and try to find with pattern
-          end
-        end
-
-        extensions = FileFinders::GROUP_EXTENSIONS[group]
-        raise "Unknown group #{group.inspect}" if extensions.nil?
-
-        regexp_extensions = extensions.map { |ext| Regexp.escape(ext) }.join('|')
-        complete_path = ::File.expand_path(::File.dirname(pattern), context_path)
-        shorter_pattern = ::File.basename(pattern)
-
-        regex = /^#{Regexp.escape(complete_path)}\/#{shorter_pattern}(?:#{regexp_extensions})$/
-
-        _find_file_obj(pattern, group, context_path) do |file|
-          regex =~ file.destination_path
-        end
       end
 
       # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] from
@@ -305,31 +266,11 @@ module Epuber
                       end
 
           file.destination_path = dest_path
-          file.final_destination_path = File.join(self.class.path_for(destination_path, file.path_type), dest_path)
-
-          # TODO: uncomment following lines and resolve duplicate items
-          #
-          # if _destination_path_to_file_map.key?(file.destination_path)
-          #   raise "Duplicate entry for result path #{file.destination_path}"
-          # end
+          file.pkg_destination_path = File.join(self.class.path_for(file.path_type), dest_path)
+          file.final_destination_path = File.join(destination_path, file.pkg_destination_path)
 
           @final_destination_path_to_file[file.final_destination_path] = file
         end
-      end
-
-      #
-      # @yieldparam [Epuber::Compiler::File]
-      #
-      # @return [Epuber::Compiler::File]
-      #
-      def _find_file_obj(pattern, group, context_path)
-        file_objs = files_of.select do |file|
-          yield file
-        end
-
-        @source_finder.assert_one_file(file_objs, pattern: pattern, groups: group, context_path: context_path)
-
-        file_objs.first
       end
 
 
@@ -356,12 +297,16 @@ module Epuber
       # @param [String] root_path  path to root of the package
       # @param [Symbol] path_type  path type of file
       #
-      def self.path_for(root_path, path_type)
+      def self.path_for(root_path = nil, path_type)
         case path_type
           when :spine, :manifest
-            File.join(root_path, Compiler::EPUB_CONTENT_FOLDER)
+            if root_path.nil?
+              Compiler::EPUB_CONTENT_FOLDER
+            else
+              File.join(root_path, Compiler::EPUB_CONTENT_FOLDER)
+            end
           when :package
-            root_path
+            root_path || '.'
           else
             nil
         end
