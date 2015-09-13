@@ -115,7 +115,7 @@ module Epuber
       epub_path = File.expand_path(path)
 
       Dir.chdir(@file_resolver.destination_path) do
-        new_paths = @file_resolver.package_files.map(&:pgk_destination_path)
+        new_paths = @file_resolver.package_files.map(&:pkg_destination_path)
 
         if ::File.exists?(epub_path)
           Zip::File.open(epub_path, true) do |zip_file|
