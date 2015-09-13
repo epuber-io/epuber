@@ -5,6 +5,7 @@ require_relative '../spec_helper'
 require 'epuber/book'
 require 'epuber/compiler'
 
+require 'epuber/compiler/file_types/generated_file'
 require 'epuber/compiler/file_types/static_file'
 require 'epuber/compiler/file_types/stylus_file'
 
@@ -47,7 +48,24 @@ module Epuber
 
       it 'handles multiple addition of the same file'
 
-      it 'supports adding files with generated content'
+      it 'supports adding files with generated content' do
+        file = FileTypes::GeneratedFile.new
+        file.destination_path = 'some_file.xhtml'
+        file.path_type = :package
+
+        @sut.add_file(file)
+
+        exp_file = @sut.files.first
+        expect(exp_file).to be file
+        expect(exp_file.destination_path).to eq 'some_file.xhtml'
+        expect(exp_file.pkg_destination_path).to eq 'some_file.xhtml'
+        expect(exp_file.final_destination_path).to eq '/dest/some_file.xhtml'
+      end
+
+      it 'changes extensions of specific files' do
+        expect(@sut.send(:renamed_file_with_path, 'file.bade')).to eq 'file.xhtml'
+        expect(@sut.send(:renamed_file_with_path, 'file.styl')).to eq 'file.css'
+      end
 
       it 'supports adding multiple files' do
         FileUtils.touch(%w(/source/file1.xhtml /source/file2.xhtml /source/file3.xhtml /source/file4.xhtml))
@@ -58,15 +76,15 @@ module Epuber
       end
 
       it 'can calculate path depend on path type' do
-        expect(FileResolver.path_for('/root', :manifest)).to eq '/root/OEBPS'
-        expect(FileResolver.path_for('/root', :spine)).to eq '/root/OEBPS'
-        expect(FileResolver.path_for('/root', :package)).to eq '/root'
+        expect(FileResolver.path_comps_for('/root', :manifest)).to eq %w(/root OEBPS)
+        expect(FileResolver.path_comps_for('/root', :spine)).to eq %w(/root OEBPS)
+        expect(FileResolver.path_comps_for('/root', :package)).to eq %w(/root)
       end
 
       it 'supports searching files in source folder' do
         FileUtils.touch('/source/1.xhtml')
 
-        expect(@sut.source_finder.find_file('1.xhtml')).to eq '1.xhtml'
+        expect(@sut.source_finder.find_file('1')).to eq '1.xhtml'
       end
 
       it 'support searching files in destination folder' do

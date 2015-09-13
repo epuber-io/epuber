@@ -16,6 +16,8 @@ module Epuber
     require_relative 'file_types/bade_file'
 
     class FileResolver
+      class ResolveError < StandardError; end
+
       PATH_TYPES = [:spine, :manifest, :package, nil]
 
       # @return [String] path where should look for source files
@@ -128,7 +130,7 @@ module Epuber
 
         dest_finder.add_file(file.destination_path)
 
-        unless file.file_request.nil?
+        if file.respond_to?(:file_request) && !file.file_request.nil?
           @request_to_files[file.file_request] << file
         end
 
@@ -171,7 +173,7 @@ module Epuber
       # @return [FileTypes::AbstractFile]
       #
       def file_with_destination_path(path, path_type = :manifest)
-        final_path = File.join(self.class.path_for(destination_path, path_type), path.unicode_normalize)
+        final_path = File.join(*self.class.path_comps_for(destination_path, path_type), path.unicode_normalize)
         @final_destination_path_to_file[final_path]
       end
 
@@ -202,25 +204,6 @@ module Epuber
         Pathname.new(to_path).relative_path_from(Pathname.new(from_path)).to_s
       end
 
-      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] file
-      #
-      # @return [String]
-      #
-      def relative_path_from_source_root(file)
-        return if file.nil?
-        relative_path(source_path, file)
-      end
-
-      # @param [Epuber::Compiler::File, Epuber::Book::FileRequest, String] file
-      #
-      # @return [String]
-      #
-      def relative_path_from_package_root(file)
-        return if file.nil?
-        relative_path(destination_path, file)
-      end
-
-
 
       # Method to find all files that should be deleted, because they are not in files in receiver
       #
@@ -244,29 +227,37 @@ module Epuber
 
       private
 
+      # @param [String] path  path to some file
+      #
+      # @return [String] path with changed extension
+      #
+      def renamed_file_with_path(path)
+        extname     = File.extname(path)
+        new_extname = FileFinders::EXTENSIONS_RENAME[extname]
+
+        if new_extname.nil?
+          path
+        else
+          path.sub(/#{Regexp.escape(extname)}$/, new_extname)
+        end
+      end
+
       # @param file [Epuber::Compiler::AbstractFile]
       #
       # @return [nil]
       #
       def resolve_destination_path(file)
         if file.final_destination_path.nil?
-          real_source_path = if file.respond_to?(:source_path) && !file.source_path.nil?
-                               file.source_path
-                             else
-                               find_file(file, file.group)
-                             end
-
-          extname     = File.extname(real_source_path)
-          new_extname = FileFinders::EXTENSIONS_RENAME[extname]
-
-          dest_path = if new_extname.nil?
-                        real_source_path
+          dest_path = if file.respond_to?(:source_path) && !file.source_path.nil?
+                        renamed_file_with_path(file.source_path)
+                      elsif !file.destination_path.nil?
+                        file.destination_path
                       else
-                        real_source_path.sub(/#{Regexp.escape(extname)}$/, new_extname)
+                        raise ResolveError, "What should I do with file that doesn't have source path or destination path? file: #{file.inspect}"
                       end
 
           file.destination_path = dest_path
-          file.pkg_destination_path = File.join(self.class.path_for(file.path_type), dest_path)
+          file.pkg_destination_path = File.join(*self.class.path_comps_for(file.path_type), dest_path)
           file.final_destination_path = File.join(destination_path, file.pkg_destination_path)
 
           @final_destination_path_to_file[file.final_destination_path] = file
@@ -297,16 +288,14 @@ module Epuber
       # @param [String] root_path  path to root of the package
       # @param [Symbol] path_type  path type of file
       #
-      def self.path_for(root_path = nil, path_type)
+      # @return [Array<String>] path components
+      #
+      def self.path_comps_for(root_path = nil, path_type)
         case path_type
           when :spine, :manifest
-            if root_path.nil?
-              Compiler::EPUB_CONTENT_FOLDER
-            else
-              File.join(root_path, Compiler::EPUB_CONTENT_FOLDER)
-            end
+            Array(root_path) + [Compiler::EPUB_CONTENT_FOLDER]
           when :package
-            root_path || '.'
+            Array(root_path)
           else
             nil
         end
