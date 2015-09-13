@@ -216,6 +216,12 @@ module Epuber
       end
     end
 
+    # @param [FileTypes::AbstractFile] file
+    #
+    def process_file(file)
+      file.process(book: @book, target: @target, file_resolver: @file_resolver)
+    end
+
     # @return nil
     #
     def process_all_target_files
