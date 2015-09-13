@@ -47,7 +47,7 @@ module Epuber
         #
         def self.file_copy(source_path, dest_path)
           return if FileUtils.uptodate?(dest_path, [source_path])
-          return if ::File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
+          return if File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
 
           file_copy!(source_path, dest_path)
         end
@@ -58,6 +58,8 @@ module Epuber
         # @return nil
         #
         def self.file_copy!(source_path, dest_path)
+          FileUtils.mkdir_p(File.dirname(dest_path))
+
           FileUtils.cp(source_path, dest_path)
         end
 
@@ -67,8 +69,8 @@ module Epuber
         # @return nil
         #
         def self.write_to_file(content, to_path)
-          original_content = if ::File.exists?(to_path)
-                               ::File.read(to_path)
+          original_content = if File.exists?(to_path)
+                               File.read(to_path)
                              end
 
           should_write = if original_content.nil?
@@ -90,7 +92,9 @@ module Epuber
         # @return nil
         #
         def self.write_to_file!(content, to_path)
-          ::File.open(to_path, 'w') do |file_handle|
+          FileUtils.mkdir_p(File.dirname(to_path))
+
+          File.open(to_path, 'w') do |file_handle|
             file_handle.write(content)
           end
         end

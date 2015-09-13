@@ -12,7 +12,7 @@ module Epuber
         attr_accessor :content
 
         def process(opts = {})
-          self.class.write_to_file(content.to_s, destination_path)
+          self.class.write_to_file(content.to_s, final_destination_path)
         end
       end
     end

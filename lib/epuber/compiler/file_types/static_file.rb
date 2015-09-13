@@ -8,7 +8,7 @@ module Epuber
 
       class StaticFile < SourceFile
         def process(opts = {})
-          self.class.file_copy(source_path, destination_path)
+          self.class.file_copy(abs_source_path, final_destination_path)
         end
       end
     end
