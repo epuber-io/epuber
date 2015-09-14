@@ -24,13 +24,15 @@ module Epuber
         end
 
         # @param [String] content xhtml in string
-        # @param [Book] book
-        # @param [Book::Target] target
-        # @param [FileResolver] file_resolver
+        # @param [Compiler::CompilationContext] compilation_context
         #
         # @return [String] new xhtml string
         #
-        def common_process(content, book: nil, target: nil, file_resolver: nil)
+        def common_process(content, compilation_context)
+          target = compilation_context.target
+          book = compilation_context.book
+          file_resolver = compilation_context.file_resolver
+
           xhtml_doc = XHTMLProcessor.xml_document_from_string(content, source_path)
           XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
 
@@ -45,10 +47,12 @@ module Epuber
           xhtml_doc.to_xml(indent: 0, encoding: 'UTF-8', save_with: 0)
         end
 
-        def process(opts = {})
+        # @param [Compiler::CompilationContext]
+        #
+        def process(compilation_context)
           xhtml_content = File.read(abs_source_path)
 
-          xhtml_content = common_process(xhtml_content, opts)
+          xhtml_content = common_process(xhtml_content, compilation_context)
 
           self.class.write_to_file(xhtml_content, final_destination_path)
         end

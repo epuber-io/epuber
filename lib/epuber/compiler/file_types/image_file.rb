@@ -9,7 +9,9 @@ module Epuber
       require_relative 'source_file'
 
       class ImageFile < SourceFile
-        def process(opts = {})
+        # @param [Compiler::CompilationContext] compilation_context
+        #
+        def process(compilation_context)
           dest = final_destination_path
           source = abs_source_path
 

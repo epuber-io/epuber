@@ -15,6 +15,8 @@ require_relative 'plugin'
 
 module Epuber
   class Compiler
+    require_relative 'compiler/compilation_context'
+
     require_relative 'compiler/opf_generator'
     require_relative 'compiler/nav_generator'
     require_relative 'compiler/meta_inf_generator'
@@ -38,9 +40,9 @@ module Epuber
     #
     attr_reader :file_resolver
 
-    # @return [Array<Epuber::Plugin>]
+    # @return [CompilationContext]
     #
-    attr_reader :plugins
+    attr_reader :compilation_context
 
     # @param book [Epuber::Book::Book]
     # @param target [Epuber::Book::Target]
@@ -48,6 +50,7 @@ module Epuber
     def initialize(book, target)
       @book = book
       @target = target
+      @compilation_context = CompilationContext.new(book, target)
     end
 
     # Compile target to build folder
@@ -60,20 +63,18 @@ module Epuber
     # @return [void]
     #
     def compile(build_folder, check: false, write: false, release: false)
+      @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
+      compilation_context.file_resolver = @file_resolver
+      compilation_context.should_check = check
+      compilation_context.should_write = write
+      compilation_context.release_build = release
+
       self.class.globals_catcher.catch do
         @build_folder = build_folder
-        @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
-        @should_check = check
-        @should_write = write
-        @release_build = release
-        @plugins = []
 
         FileUtils.mkdir_p(build_folder)
 
         puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_from_project(build_folder)}`"
-
-        # parse plugins
-        parse_plugins
 
         parse_toc_item(@target.root_toc)
         parse_target_file_requests
@@ -87,16 +88,6 @@ module Epuber
       end
     ensure
       self.class.globals_catcher.clear_all
-    end
-
-    # Parse uses from current target
-    #
-    # @return nil
-    #
-    def parse_plugins
-      @plugins += @target.plugins.map do |path|
-        Plugin.new(File.expand_path(path, Config.instance.project_path))
-      end
     end
 
     # Archives current target files to epub
@@ -219,7 +210,7 @@ module Epuber
     # @param [FileTypes::AbstractFile] file
     #
     def process_file(file)
-      file.process(book: @book, target: @target, file_resolver: @file_resolver)
+      file.process(compilation_context)
     end
 
     # @return nil

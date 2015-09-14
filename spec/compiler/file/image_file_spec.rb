@@ -33,7 +33,7 @@ module Epuber
           file.pkg_destination_path = file.destination_path
           file.final_destination_path = file.destination_path
 
-          file.process
+          file.process(nil)
 
           expect(File.exist?(img_dest)).to be_truthy
           expect(FileUtils.compare_file(img_source, img_dest)).to eq true

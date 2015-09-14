@@ -81,7 +81,7 @@ module Epuber
                    PluginFile.new(file_path)
                  end
                else
-                 raise "Can't find anything for #{path}"
+                 raise LoadError, "#{self}: Can't find anything for #{path}"
                end
     end
 

@@ -9,11 +9,13 @@ module Epuber
       require_relative 'xhtml_file'
 
       class BadeFile < XHTMLFile
-        # @param [Book] book
-        # @param [Book::Target] target
-        # @param [FileResolver] file_resolver
+        # @param [Compiler::CompilationContext] compilation_context
         #
-        def process(book: nil, target: nil, file_resolver: nil)
+        def process(compilation_context)
+          target = compilation_context.target
+          book = compilation_context.book
+          file_resolver = compilation_context.file_resolver
+
           bade_content = File.read(abs_source_path)
 
           variables = {
@@ -28,7 +30,7 @@ module Epuber
                                         .with_locals(variables)
                                         .render(new_line: '', indent: '')
 
-          xhtml_content = common_process(xhtml_content, book: book, target: target, file_resolver: file_resolver)
+          xhtml_content = common_process(xhtml_content, compilation_context)
 
           self.class.write_to_file(xhtml_content, final_destination_path)
         end

@@ -24,7 +24,7 @@ module Epuber
           file.destination_path = 'b.txt'
           file.final_destination_path = '/b.txt'
           file.content = 'some content'
-          file.process
+          file.process(nil)
 
           expect(File.exist?('b.txt')).to be_truthy
           expect(File.read('b.txt')).to eq 'some content'

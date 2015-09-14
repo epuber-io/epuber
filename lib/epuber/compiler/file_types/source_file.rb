@@ -25,10 +25,6 @@ module Epuber
         def initialize(source_path)
           @source_path = source_path
         end
-
-        def process(opts = {})
-          raise 'Abstract method, implement in subclass!'
-        end
       end
     end
   end
