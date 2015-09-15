@@ -7,8 +7,11 @@ module Epuber
   class Book
     describe Target do
       before do
+        @book = Book.new
         @root = Target.new('root')
         @root.isbn = '123-145'
+        @root.book = @book
+
         @child = Target.new(@root, 'child')
       end
 
@@ -38,6 +41,16 @@ module Epuber
       it 'inherited values specified in callee target are not ignored' do
         @child.isbn = '123'
         expect(@child.isbn).to eq '123'
+      end
+
+      context '#book' do
+        it 'keep reference to book' do
+          expect(@root.book).to eq @book
+        end
+
+        it 'traverse searching for book to parent' do
+          expect(@child.book).to eq @book
+        end
       end
 
       context '#add_const' do

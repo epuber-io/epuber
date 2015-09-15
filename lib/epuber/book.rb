@@ -100,6 +100,7 @@ module Epuber
     #
     def target(name)
       @default_target.sub_target(name) do |target|
+        target.book = self
         yield target if block_given?
       end
     end

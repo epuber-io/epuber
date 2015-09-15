@@ -10,14 +10,15 @@ require_relative '../dsl/tree_object'
 module Epuber
   class Book
     class Target < DSL::TreeObject
-      # @param [Target] parent
-      # @param [String] name
+      # @param [Target] parent  reference to parent target
+      # @param [String] name  name of this target
       #
       def initialize(parent = nil, name)
         super(parent)
 
         @name      = name
         @is_ibooks = nil
+        @book      = nil
         @files     = []
         @constants = {}
         @root_toc  = TocItem.new
@@ -41,7 +42,7 @@ module Epuber
         @constants.freeze
       end
 
-      # @return [String] target name
+      # @return [String, Symbol] target name
       #
       attr_reader :name
 
@@ -52,6 +53,16 @@ module Epuber
       # @return [Epuber::Book::TocItem]
       #
       attr_reader :root_toc
+
+      # @return [Epuber::Book] reference to book
+      #
+      attr_accessor :book
+
+      # @return [Epuber::Book] reference to book
+      #
+      def book
+        @book || (parent && parent.book)
+      end
 
 
       # Create new sub_target with name

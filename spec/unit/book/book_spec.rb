@@ -159,7 +159,7 @@ module Epuber
           expect(ibooks_target.isbn).to eq 'abcd-1234'
         end
 
-        it 'can suppports nested targets' do
+        it 'supports nested targets' do
           @book.isbn = 'abcd-1234'
 
           ibooks_target_sub = nil
@@ -176,6 +176,11 @@ module Epuber
 
           expect(ibooks_target_sub.isbn).to eq 'abcd-1234'
           expect(ibooks_target_sub.epub_version).to eq '2.0'
+        end
+
+        it 'there is reference to book from created target' do
+          target = @book.target :some_target
+          expect(target.book).to eq @book
         end
       end
 
