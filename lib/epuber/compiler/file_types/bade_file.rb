@@ -16,7 +16,7 @@ module Epuber
           book = compilation_context.book
           file_resolver = compilation_context.file_resolver
 
-          bade_content = File.read(abs_source_path)
+          bade_content = load_source(compilation_context)
 
           variables = {
             __book: book,

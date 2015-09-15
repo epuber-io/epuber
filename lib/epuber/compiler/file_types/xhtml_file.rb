@@ -23,6 +23,22 @@ module Epuber
           end
         end
 
+        # @param [Compiler::CompilationContext] compilation_context
+        #
+        def load_source(compilation_context)
+          xhtml_content = File.read(abs_source_path)
+
+          if compilation_context.should_write
+            perform_plugin_things(Transformer, :source_text_file) do |transformer|
+              xhtml_content = transformer.call(file.destination_path, xhtml_content)
+            end
+
+            self.class.write_to_file(xhtml_content, abs_source_path)
+          end
+
+          xhtml_content
+        end
+
         # @param [String] content xhtml in string
         # @param [Compiler::CompilationContext] compilation_context
         #
@@ -50,9 +66,7 @@ module Epuber
         # @param [Compiler::CompilationContext]
         #
         def process(compilation_context)
-          xhtml_content = File.read(abs_source_path)
-
-          xhtml_content = common_process(xhtml_content, compilation_context)
+          xhtml_content = common_process(load_source, compilation_context)
 
           self.class.write_to_file(xhtml_content, final_destination_path)
         end
