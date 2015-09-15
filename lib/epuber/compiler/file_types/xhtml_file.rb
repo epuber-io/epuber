@@ -29,8 +29,8 @@ module Epuber
           xhtml_content = File.read(abs_source_path)
 
           if compilation_context.should_write
-            perform_plugin_things(Transformer, :source_text_file) do |transformer|
-              xhtml_content = transformer.call(file.destination_path, xhtml_content)
+            compilation_context.perform_plugin_things(Transformer, :source_text_file) do |transformer|
+              xhtml_content = transformer.call(final_destination_path, xhtml_content)
             end
 
             self.class.write_to_file(xhtml_content, abs_source_path)
@@ -60,13 +60,27 @@ module Epuber
           XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
           XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)
 
-          xhtml_doc.to_xml(indent: 0, encoding: 'UTF-8', save_with: 0)
+          xhtml_string = xhtml_doc.to_xml(indent: 0, encoding: 'UTF-8', save_with: 0)
+
+          # perform transformations
+          compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
+            xhtml_string = transformer.call(final_destination_path, xhtml_string)
+          end
+
+          # perform custom validation
+          if compilation_context.should_check
+            compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
+              checker.call(final_destination_path, xhtml_string)
+            end
+          end
+
+          xhtml_string
         end
 
         # @param [Compiler::CompilationContext]
         #
         def process(compilation_context)
-          xhtml_content = common_process(load_source, compilation_context)
+          xhtml_content = common_process(load_source(compilation_context), compilation_context)
 
           self.class.write_to_file(xhtml_content, final_destination_path)
         end
