@@ -186,6 +186,10 @@ module Epuber
           url = XHTMLProcessor.resolved_link_to_file('https://google.com', nil, 'root.txt', finder)
           expect(url).to eq URI('https://google.com')
           expect(url.to_s).to eq 'https://google.com'
+
+          url = XHTMLProcessor.resolved_link_to_file('http://www.gutenberg.org', nil, 'root.txt', finder)
+          expect(url).to eq URI('http://www.gutenberg.org')
+          expect(url.to_s).to eq 'http://www.gutenberg.org'
         end
 
         it 'is ok with relative id reference in file' do
@@ -195,6 +199,10 @@ module Epuber
           url = XHTMLProcessor.resolved_link_to_file('#some_id', nil, 'root.txt', finder)
           expect(url).to eq URI('#some_id')
           expect(url.to_s).to eq '#some_id'
+
+          url = XHTMLProcessor.resolved_link_to_file('#toc', nil, 'root.txt', finder)
+          expect(url).to eq URI('#toc')
+          expect(url.to_s).to eq '#toc'
         end
 
         it 'is ok with relative id reference to another file' do
