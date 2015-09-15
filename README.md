@@ -1,5 +1,7 @@
 # Epuber
 
+[![Build Status](https://semaphoreci.com/api/v1/projects/a719f33d-45b6-4cc4-8923-fd8672ea9ddd/418813/badge.svg)](https://semaphoreci.com/samnung/epuber)
+
 
 ## Installation
 
