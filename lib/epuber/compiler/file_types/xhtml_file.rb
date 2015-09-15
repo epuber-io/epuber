@@ -8,6 +8,10 @@ module Epuber
 
       class XHTMLFile < SourceFile
 
+        # @return [Epuber::Book::TocItem]
+        #
+        attr_accessor :toc_item
+
         # @param [Book::Target] target
         # @param [FileResolver] file_resolver
         #

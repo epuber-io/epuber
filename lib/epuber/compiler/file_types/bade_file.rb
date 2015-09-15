@@ -9,7 +9,7 @@ module Epuber
       require_relative 'xhtml_file'
 
       class BadeFile < XHTMLFile
-        # @param [Compiler::CompilationContext] compilation_context
+        # @param [Epuber::Compiler::CompilationContext] compilation_context
         #
         def process(compilation_context)
           target = compilation_context.target
@@ -23,6 +23,7 @@ module Epuber
             __target: target,
             __file_resolver: file_resolver,
             __file: self,
+            __toc_item: toc_item,
             __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(target.constants),
           }
 
