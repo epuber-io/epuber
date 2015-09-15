@@ -2,7 +2,7 @@
 
 require 'claide/ansi'
 
-require_relative '../spec_helper'
+require_relative '../../spec_helper'
 
 require 'epuber/book'
 require 'epuber/compiler'

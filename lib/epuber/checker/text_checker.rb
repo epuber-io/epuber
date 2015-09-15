@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'active_support/core_ext/string/access'
+
 require_relative '../ruby_extensions/match_data'
 require_relative '../checker'
 

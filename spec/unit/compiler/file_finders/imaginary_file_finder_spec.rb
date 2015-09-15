@@ -1,8 +1,6 @@
 # encoding: utf-8
 
-require 'fakefs/spec_helpers'
-
-require_relative '../../spec_helper'
+require_relative '../../../spec_helper'
 
 require 'epuber/book'
 require 'epuber/compiler'
