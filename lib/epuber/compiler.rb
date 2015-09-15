@@ -24,9 +24,6 @@ module Epuber
     require_relative 'compiler/file_resolver'
     require_relative 'compiler/file_finders/normal'
 
-    require_relative 'compiler/file_processing'
-    include FileProcessing
-
 
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
