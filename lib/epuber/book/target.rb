@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require_relative 'file_request'
-
 require_relative '../vendor/version'
 require_relative '../vendor/size'
 require_relative '../dsl/tree_object'
@@ -9,6 +7,8 @@ require_relative '../dsl/tree_object'
 
 module Epuber
   class Book
+    require_relative 'file_request'
+
     class Target < DSL::TreeObject
       # @param [Target] parent  reference to parent target
       # @param [String] name  name of this target

@@ -1,13 +1,14 @@
 # encoding: utf-8
 
-require_relative 'generator'
 require_relative '../book/toc_item'
 
 
 module Epuber
   class Compiler
+    require_relative 'file_resolver'
+    require_relative 'generator'
+
     class NavGenerator < Generator
-      require_relative 'file_resolver'
 
       NCX_NAMESPACES = {
         'xmlns' => 'http://www.daisy.org/z3986/2005/ncx/',
@@ -50,7 +51,7 @@ module Epuber
       # @return [Epuber::Book::File]
       #
       def generate_nav_file
-        nav_file = Epuber::Compiler::FileTypes::GeneratedFile.new
+        nav_file = FileTypes::GeneratedFile.new
         nav_file.destination_path = if @target.epub_version >= 3
                                       'nav.xhtml'
                                     else
