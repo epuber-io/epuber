@@ -234,6 +234,20 @@ module Epuber
             XHTMLProcessor.resolved_link_to_file('', nil, 'root.txt', finder)
           }.to raise_error FileFinders::FileNotFoundError
         end
+
+        it 'will not raise for valid path' do
+          FileUtils.mkdir_p('image')
+          FileUtils.touch('image/stan_mindsetbw.png')
+
+          FileUtils.mkdir_p('text')
+          FileUtils.touch('text/root.txt')
+
+          finder = FileFinders::Normal.new('/')
+
+          expect {
+            XHTMLProcessor.resolved_link_to_file('image/stan_mindsetbw.png', nil, 'text/root.txt', finder)
+          }.to_not raise_error
+        end
       end
 
       context '.resolve_links_for' do
