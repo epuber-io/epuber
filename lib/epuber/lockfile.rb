@@ -30,6 +30,8 @@ module Epuber
     # @return nil
     #
     def write_to_file
+      return if defined_from_file.nil?
+
       File.open(defined_from_file, 'w') do |f|
         f.write(YAML.dump(@internal_data))
       end
