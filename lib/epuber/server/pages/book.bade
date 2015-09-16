@@ -27,7 +27,8 @@ mixin iterate_spine(toc_item)
 		ul.spine
 			- toc_item.sub_items.each do |item|
 				li
-					- item_href = "/toc/#{pretty_path(item.file_request)}"
+					- file = file_resolver.file_from_request(item.file_request)
+					- item_href = "/toc/#{file.pkg_destination_path}"
 					a.href(href: item_href)= item.file_request.source_pattern
 					- unless item.title.nil?
 						= ' &nbsp; '
@@ -51,7 +52,8 @@ mixin iterate_spine(toc_item)
 			- if book.cover_image.nil?
 				img(src: '/server/raw/default_cover.png')
 			- else
-				img(src: "/raw/#{pretty_path(book.cover_image)}")
+				- file = file_resolver.file_from_request(book.cover_image)
+				img(src: "/raw/#{file.pkg_destination_path}")
 			- end
 	#content
 		+section('Metadata')

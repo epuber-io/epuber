@@ -186,7 +186,7 @@ module Epuber
     # @return [String] path to file
     #
     def find_file(pattern = params[:splat].first, source_path: build_path)
-      finder = Compiler::FileFinder.new(source_path)
+      finder = Compiler::FileFinders::Normal.new(source_path)
       finder.find_files(pattern).first
     end
 
@@ -319,7 +319,7 @@ module Epuber
       begin
         compiler = Epuber::Compiler.new(book, target)
         compiler.compile(build_path)
-        self.spine = compiler.file_resolver.files_of(:spine)
+        self.spine = compiler.file_resolver.spine_files
         self.file_resolver = compiler.file_resolver
 
         true
@@ -560,9 +560,9 @@ module Epuber
         add_auto_refresh_script(html_doc)
 
 
-        current_index = spine.index { |file| file_resolver.relative_path_from_package_root(file) == path }
-        previous_path = file_resolver.relative_path_from_package_root(spine_file_at(current_index - 1))
-        next_path     = file_resolver.relative_path_from_package_root(spine_file_at(current_index + 1))
+        current_index = spine.index { |file| file.pkg_destination_path == path }
+        previous_path = spine_file_at(current_index - 1).try(:pkg_destination_path)
+        next_path     = spine_file_at(current_index + 1).try(:pkg_destination_path)
         add_keyboard_control_script(html_doc, previous_path, next_path)
 
         [200, html_doc.to_html]

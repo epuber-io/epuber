@@ -3,15 +3,15 @@ import "common"
 
 +page(title: 'Files', header_id: 'files')
 	#content.toc_content
-		- file_resolver.files_of.each do |file|
+		- file_resolver.manifest_files.each do |file|
 			p.file
-				- href = "/files/#{pretty_path(file)}"
-				- unless file.file_request.nil?
+				- href = "/files/file.pkg_destination_path}"
+				- unless file.try(:file_request).nil?
 					a.source_pattern(href: href)= file.file_request.source_pattern
 					= ' '
 					span.arrow =>
 					= '  '
 				- end
 
-				a.source_path(href: href)= pretty_path(file)
+				a.source_path(href: href)= file.pkg_destination_path
 		- end

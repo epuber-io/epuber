@@ -3,6 +3,8 @@
 
 module Epuber
   class Compiler
+    require_relative '../xhtml_processor'
+
     module FileTypes
       require_relative 'source_file'
 

@@ -10,6 +10,7 @@ module Epuber
     require_relative 'file_finders/imaginary'
 
     require_relative 'file_types/abstract_file'
+    require_relative 'file_types/generated_file'
     require_relative 'file_types/static_file'
     require_relative 'file_types/stylus_file'
     require_relative 'file_types/xhtml_file'

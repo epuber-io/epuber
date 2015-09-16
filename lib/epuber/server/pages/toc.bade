@@ -7,7 +7,8 @@ mixin iterate_toc(toc_item)
 			- toc_item.sub_items.each do |item|
 				- unless item.title.nil?
 					li
-						- item_href = "/toc/#{pretty_path(item.file_request)}"
+						- file = file_resolver.file_from_request(item.file_request)
+						- item_href = "/toc/#{file.pkg_destination_path}"
 						- unless item.title.nil?
 							span.title: a.title(href: item_href)= item.title
 						- end
