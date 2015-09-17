@@ -126,18 +126,36 @@ module Epuber
         expect(file).to eq '../image2.jpg'
       end
 
-      it 'can return file instance from source path' do
-        FileUtils.mkdir_p(%w(/source/valid))
-        FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+      context '#file_with_source_path' do
+        it 'can return file instance from source path' do
+          FileUtils.mkdir_p(%w(/source/valid))
+          FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
 
-        req = Book::FileRequest.new('valid/*.xhtml', false)
-        @sut.add_file_from_request(req)
+          req = Book::FileRequest.new('valid/*.xhtml', false)
+          @sut.add_file_from_request(req)
 
-        file = @sut.file_with_source_path('valid/2.xhtml')
+          file = @sut.file_with_source_path('valid/2.xhtml')
 
-        expect(file).to_not be_nil
-        expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
-        expect(file.source_path).to eq 'valid/2.xhtml'
+          expect(file).to_not be_nil
+          expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
+          expect(file.source_path).to eq 'valid/2.xhtml'
+          expect(file.abs_source_path).to eq '/source/valid/2.xhtml'
+        end
+
+        it 'can return file instance from absolute source path' do
+          FileUtils.mkdir_p(%w(/source/valid))
+          FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+
+          req = Book::FileRequest.new('valid/*.xhtml', false)
+          @sut.add_file_from_request(req)
+
+          file = @sut.file_with_source_path('/source/valid/2.xhtml')
+
+          expect(file).to_not be_nil
+          expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
+          expect(file.source_path).to eq 'valid/2.xhtml'
+          expect(file.abs_source_path).to eq '/source/valid/2.xhtml'
+        end
       end
 
       it 'can return file instance from destination path' do

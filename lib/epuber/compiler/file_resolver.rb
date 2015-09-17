@@ -78,6 +78,7 @@ module Epuber
         @request_to_files = Hash.new { |hash, key| hash[key] = [] }
         @final_destination_path_to_file = {}
         @source_path_to_file = {}
+        @abs_source_path_to_file = {}
       end
 
       # @param [Epuber::Book::FileRequest] file_request
@@ -147,6 +148,10 @@ module Epuber
         if file.respond_to?(:source_path) && !file.source_path.nil?
           @source_path_to_file[file.source_path] = file
         end
+
+        if file.respond_to?(:abs_source_path) && !file.abs_source_path.nil?
+          @abs_source_path_to_file[file.abs_source_path] = file
+        end
       end
 
       # Get instance of file from request instance
@@ -165,14 +170,16 @@ module Epuber
         end
       end
 
-      # Get instance of file from source path
+      # Get instance of file from source path, but this is relative path from project root, if you want to find
+      # file with absolute source path see #file_with_abs_source_path
       #
       # @param [String] source_path
       #
       # @return [FileTypes::AbstractFile]
       #
       def file_with_source_path(source_path)
-        @source_path_to_file[source_path.unicode_normalize]
+        source_path = source_path.unicode_normalize
+        @source_path_to_file[source_path] || @abs_source_path_to_file[source_path]
       end
 
       # Method to get instance of file on specific path
