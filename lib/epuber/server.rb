@@ -46,8 +46,6 @@ module Epuber
       end
     end
 
-    BINARY_FILES_EXTNAMES = %w(.png .jpeg .jpg .otf .ttf)
-
     def self.instance_class_accessor(name)
       instance_name = "@#{name}"
 
@@ -395,7 +393,7 @@ module Epuber
       # remove nil paths (for example bookspec can't be found so the relative path is nil)
       changed.compact!
 
-      if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileResolver::GROUP_EXTENSIONS[:style]) }
+      if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
         notify_clients(:styles, changed)
       else
         notify_clients(:reload, changed)
@@ -471,7 +469,7 @@ module Epuber
         body(CoffeeScript.compile(::File.read(file_path)))
       else
         extname = File.extname(file_path)
-        type    = unless BINARY_FILES_EXTNAMES.include?(extname)
+        type    = unless Compiler::FileFinders::BINARY_EXTENSIONS.include?(extname)
                     mime_type = MIME::Types.of(file_path).first
                     if mime_type.nil?
                       'text/plain'
