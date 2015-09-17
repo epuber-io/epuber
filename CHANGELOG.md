@@ -1,6 +1,22 @@
 
 # CHANGELOG
 
+## v0.3.1.beta.1
+
+- [FileResolver] #file_with_source_path now can find file with absolute source path
+
+## v0.3
+
+After a lot changes in core, bumping to 0.3.
+
+- [bower] update cookies-js to 1.2.2 and uri.js to 1.15.2
+- Rewritten file type system, now every type has separate class, should be easier to add new file types and add functionality in future
+- Compiling now should be a little bit faster because of new searching files
+- [Book::Target] now has link to book
+- [FileTypes::XHTMLFile] now has link to TocItem
+- [FileResolver] added tests
+- [XHTMLProcessor] new module for dealing with XHTML
+
 ## v0.2.4.beta.4
 
 - [Gemfile.lock] Update rb-fsevent to 0.9.6
