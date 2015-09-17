@@ -28,6 +28,8 @@ module Epuber
               b_img.resize!(width, height)
             end
 
+            FileUtils.mkdir_p(File.dirname(dest))
+
             img.write(dest)
           else
             # file is already old
