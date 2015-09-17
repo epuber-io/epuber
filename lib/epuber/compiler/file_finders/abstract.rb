@@ -237,7 +237,7 @@ module Epuber
           orig_context_path = __core_file?(orig_context_path) ? File.dirname(orig_context_path) : orig_context_path
 
           full_pattern = File.expand_path(pattern, context_path)
-          file_paths = __core_find_files_from_pattern(full_pattern)
+          file_paths = __core_find_files_from_pattern(full_pattern).map(&:unicode_normalize)
 
           file_paths.reject! do |path|
             File.directory?(path)

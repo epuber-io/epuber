@@ -226,7 +226,7 @@ module Epuber
           rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
             begin
               new_path = resolved_link_to_file(path, :image, dirname, file_resolver.source_finder).to_s
-              pkg_abs_path = File.expand_path(new_path, dirname)
+              pkg_abs_path = File.expand_path(new_path, dirname).unicode_normalize
               pkg_new_path = Pathname.new(pkg_abs_path).relative_path_from(Pathname.new(file_resolver.source_path)).to_s
 
               file = FileTypes::ImageFile.new(pkg_new_path)
