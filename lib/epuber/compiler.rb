@@ -214,6 +214,7 @@ module Epuber
     #
     def process_all_target_files
       @file_resolver.manifest_files.each do |file|
+        puts "    processing file #{file.source_path}"
         process_file(file)
       end
     end
