@@ -54,14 +54,15 @@ module Epuber
 
       # @param file_path [String]
       # @param text [String]
+      # @param [CompilationContext] compilation_context
       #
       # @return nil
       #
-      def call(file_path, text)
+      def call(file_path, text, compilation_context)
         @file_path = file_path
         @text = text
 
-        @block.call(self, text)
+        @block.call(self, text, compilation_context)
 
         @text = nil
         @file_path = nil

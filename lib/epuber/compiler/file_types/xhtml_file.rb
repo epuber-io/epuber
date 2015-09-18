@@ -36,7 +36,7 @@ module Epuber
 
           if compilation_context.should_write
             compilation_context.perform_plugin_things(Transformer, :source_text_file) do |transformer|
-              xhtml_content = transformer.call(final_destination_path, xhtml_content)
+              xhtml_content = transformer.call(final_destination_path, xhtml_content, compilation_context)
             end
 
             self.class.write_to_file(xhtml_content, abs_source_path)
@@ -70,13 +70,13 @@ module Epuber
 
           # perform transformations
           compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
-            xhtml_string = transformer.call(final_destination_path, xhtml_string)
+            xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
           end
 
           # perform custom validation
           if compilation_context.should_check
             compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
-              checker.call(final_destination_path, xhtml_string)
+              checker.call(final_destination_path, xhtml_string, compilation_context)
             end
           end
 

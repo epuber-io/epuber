@@ -18,14 +18,15 @@ module Epuber
 
       # @param [String] file_path  path to transforming file
       # @param [String] text  text file content
+      # @param [CompilationContext] compilation_context
       #
       # @return [String] new transformed text
       #
-      def call(file_path, text)
+      def call(file_path, text, compilation_context)
         @file_path = file_path
         @text = text.dup
 
-        @block.call(self, @text)
+        @block.call(self, @text, compilation_context)
 
         new_text = @text
 
