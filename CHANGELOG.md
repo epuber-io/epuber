@@ -4,6 +4,13 @@
 ## v0.3.1.beta.1
 
 - [FileResolver] #file_with_source_path now can find file with absolute source path
+- [Server] fix several crashes because of not existing constants, etc
+- [Server] fix calculation of relative path to destination path (causing to break style auto refreshes)
+- [XHTMLProcessor] fix resolving images with unicode path
+- [FileTypes::ImageFile] create folder if doesn't exists (causing to crash the compilation)
+- [Compiler] now prints current file, helps with debugging and general using
+- [Server] fix urls on page /files
+- [Checker & Transformer] add third parameter CompilationContext
 
 ## v0.3
 
