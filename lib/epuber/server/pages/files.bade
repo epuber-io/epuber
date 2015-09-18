@@ -5,7 +5,7 @@ import "common"
 	#content.toc_content
 		- file_resolver.manifest_files.each do |file|
 			p.file
-				- href = "/files/file.pkg_destination_path}"
+				- href = "/files/#{file.pkg_destination_path}"
 				- unless file.try(:file_request).nil?
 					a.source_pattern(href: href)= file.file_request.source_pattern
 					= ' '
