@@ -192,8 +192,8 @@ module Epuber
     # @return [Epuber::Book::File, nil]
     #
     def spine_file_at(index)
-      if index >= 0 && index < spine.count
-        spine[index]
+      if !file_resolver.nil? && index >= 0 && index < file_resolver.spine_files.count
+        file_resolver.spine_files[index]
       end
     end
 
@@ -316,15 +316,14 @@ module Epuber
       begin
         compiler = Epuber::Compiler.new(book, target)
         compiler.compile(build_path)
-        self.spine = compiler.file_resolver.spine_files
-        self.file_resolver = compiler.file_resolver
-
         true
       rescue => e
         Epuber::UI.error("Compile error: #{e}")
         Epuber::UI.error("Backtrace: #{e.backtrace}") if verbose
 
         false
+      ensure
+        self.file_resolver = compiler.try(:file_resolver)
       end
     end
 
@@ -556,11 +555,15 @@ module Epuber
         add_file_to_head(:js, html_doc, 'support.coffee')
         add_auto_refresh_script(html_doc)
 
+        unless file_resolver.nil?
+          current_index = file_resolver.spine_files.index { |file| file.pkg_destination_path == path }
 
-        current_index = spine.index { |file| file.pkg_destination_path == path }
-        previous_path = spine_file_at(current_index - 1).try(:pkg_destination_path)
-        next_path     = spine_file_at(current_index + 1).try(:pkg_destination_path)
-        add_keyboard_control_script(html_doc, previous_path, next_path)
+          unless current_index.nil?
+            previous_path = spine_file_at(current_index - 1).try(:pkg_destination_path)
+            next_path     = spine_file_at(current_index + 1).try(:pkg_destination_path)
+            add_keyboard_control_script(html_doc, previous_path, next_path)
+          end
+        end
 
         [200, html_doc.to_html]
       end
