@@ -35,13 +35,13 @@ module Epuber
           xhtml_content = File.read(abs_source_path)
 
           compilation_context.perform_plugin_things(Transformer, :source_text_file) do |transformer|
-            xhtml_content = transformer.call(final_destination_path, xhtml_content, compilation_context)
+            xhtml_content = transformer.call(abs_source_path, xhtml_content, compilation_context)
           end
           
           # perform custom validation
           if compilation_context.should_check
             compilation_context.perform_plugin_things(Checker, :source_text_file) do |checker|
-              checker.call(final_destination_path, xhtml_content, compilation_context)
+              checker.call(abs_source_path, xhtml_content, compilation_context)
             end
           end
 
