@@ -165,6 +165,20 @@ module Epuber
       def file_from_request(file_request)
         files = @request_to_files[file_request]
 
+        if files.empty? && file_request.only_one
+          begin
+            path  = @source_finder.find_file(file_request.source_pattern, groups: file_request.group)
+            file  = file_with_source_path(path)
+
+            unless file.nil?
+              @request_to_files[file_request] = file
+              files = [file]
+            end
+          rescue FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
+            # noop
+          end
+        end
+
         if file_request.only_one
           files.first  # @request_to_files always returns array, see #initialize method
         else

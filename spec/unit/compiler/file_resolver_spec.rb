@@ -224,6 +224,19 @@ module Epuber
         expect(founded_file).to be files.first
         expect(founded_file).to be new_file
       end
+
+      it 'can find/search file instance with different file request' do
+        FileUtils.touch(%w(/source/some_file.xhtml /source/some_file2.xhtml))
+
+        req = Book::FileRequest.new('*.xhtml', false)
+        files = @sut.add_file_from_request(req)
+
+        req_with_fragment = Book::FileRequest.new('some_file#fragment')
+        founded_file = @sut.file_from_request(req_with_fragment)
+        expect(founded_file).to_not be_nil
+        expect(founded_file).to be files.first
+      end
+
       context '.file_class_for' do
         it 'selects correct file type from file extension' do
           expect(FileResolver.file_class_for('.styl')).to be FileTypes::StylusFile
