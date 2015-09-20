@@ -121,7 +121,7 @@ module Epuber
         existing_file = @final_destination_path_to_file[file.final_destination_path]
 
         # save mapping from file_request to file, file_request can be different, but result file could be the same ...
-        if file.respond_to?(:file_request) && !file.file_request.nil?
+        unless file.try(:file_request).nil?
           @request_to_files[file.file_request] << (existing_file || file)
         end
 
@@ -129,18 +129,18 @@ module Epuber
         return existing_file unless existing_file.nil?
 
         if [:spine].include?(type)
-          @spine_files << file unless @spine_files.include?(file)
+          @spine_files << file
         end
 
         if [:spine, :manifest].include?(type)
-          @manifest_files << file unless @manifest_files.include?(file)
+          @manifest_files << file
         end
 
         if [:spine, :manifest, :package].include?(type)
-          @package_files << file unless @package_files.include?(file)
+          @package_files << file
         end
 
-        @files << file unless @files.include?(file)
+        @files << file
 
 
         dest_finder.add_file(file.destination_path)
