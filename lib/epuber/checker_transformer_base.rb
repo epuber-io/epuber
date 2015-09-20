@@ -37,7 +37,7 @@ module Epuber
     # @return [Array<Symbol>]
     #
     def valid_options
-      [:run_only_before_release, :interactive]
+      [:run_only_before_release]
     end
 
 
