@@ -60,6 +60,7 @@ module Epuber
           expect(doc.at_css('html head')).to_not be_nil
           expect(doc.at_css('html head title')).to_not be_nil
           expect(doc.at_css('html head title').to_s).to eq '<title>Baf</title>'
+          expect(doc.at_css('html head meta[@charset="utf-8"]')).to_not be_nil
           expect(doc.at_css('html body')).to_not be_nil
           expect(doc.at_css('html body p')).to_not be_nil
           expect(doc.css('html body p').map(&:to_s).join).to eq input_str

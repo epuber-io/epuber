@@ -76,6 +76,7 @@ module Epuber
           html = xhtml_doc.css('html').first
           head = xhtml_doc.create_element('head')
           head << xhtml_doc.create_element('title', title)
+          head << xhtml_doc.create_element('meta', charset: 'utf-8')
 
           html.children.first.before(head)
         end
