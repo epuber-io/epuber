@@ -121,9 +121,9 @@ GEM
       execjs
       stylus-source
     stylus-source (0.49.3)
-    thin (1.6.3)
+    thin (1.6.4)
       daemons (~> 1.0, >= 1.0.9)
-      eventmachine (~> 1.0)
+      eventmachine (~> 1.0, >= 1.0.4)
       rack (~> 1.0)
     thread_safe (0.3.5)
     tilt (2.0.1)
