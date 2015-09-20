@@ -111,11 +111,23 @@ module Epuber
     def self.instance
       @instance ||= new
     end
+
+    class << self
+      attr_accessor :test
+
+      def test?
+        test
+      end
+    end
+
+    self.test = false
   end
 end
 
 # HACK: this should be done with nicer way
 #
 at_exit do
-  Epuber::Config.instance.save_lockfile
+  unless Epuber::Config.test?
+    Epuber::Config.instance.save_lockfile
+  end
 end

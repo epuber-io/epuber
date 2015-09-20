@@ -7,6 +7,7 @@ require 'epuber'
 
 require_relative 'matchers/xml'
 
+Epuber::Config.test = true
 
 module FakeFS
   module FileUtils
