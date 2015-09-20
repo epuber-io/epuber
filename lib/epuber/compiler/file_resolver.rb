@@ -118,8 +118,15 @@ module Epuber
 
         resolve_destination_path(file)
 
-        return unless @final_destination_path_to_file[file.final_destination_path].nil?
+        existing_file = @final_destination_path_to_file[file.final_destination_path]
 
+        # save mapping from file_request to file, file_request can be different, but result file could be the same ...
+        if file.respond_to?(:file_request) && !file.file_request.nil?
+          @request_to_files[file.file_request] << (existing_file || file)
+        end
+
+        # return existing file if already exists, new file will be thrown away
+        return existing_file unless existing_file.nil?
 
         if [:spine].include?(type)
           @spine_files << file unless @spine_files.include?(file)
@@ -139,11 +146,6 @@ module Epuber
         dest_finder.add_file(file.destination_path)
 
         @final_destination_path_to_file[file.final_destination_path] = file
-
-
-        if file.respond_to?(:file_request) && !file.file_request.nil?
-          @request_to_files[file.file_request] << file
-        end
 
         if file.respond_to?(:source_path) && !file.source_path.nil?
           @source_path_to_file[file.source_path] = file

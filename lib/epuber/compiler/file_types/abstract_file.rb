@@ -38,6 +38,11 @@ module Epuber
         attr_accessor :path_type
 
 
+        def ==(other)
+          self.class == other.class && final_destination_path == other.final_destination_path
+        end
+
+
         ################################################################################################################
 
         # @param [String] source_path
