@@ -34,6 +34,7 @@ module Epuber
 
         write_gitignore
         write_bookspec(@book_name)
+        write_sublime_project(@book_name)
 
         FileUtils.mkdir_p('images')
         FileUtils.mkdir_p('fonts')
@@ -54,7 +55,7 @@ Project initialized, please review #{book_id}.bookspec file, remove comments.
 END
       end
 
-      # Creates .bookspec file from template
+      # Creates <book-id>.bookspec file from template
       #
       # @param book_id [String]
       #
@@ -67,6 +68,27 @@ END
                                         .render
 
         write("#{book_id}.bookspec", rendered)
+      end
+
+      # Creates <book-id>.sublime-project
+      #
+      # @param book_id [String]
+      #
+      # @return [void]
+      #
+      def write_sublime_project(book_id)
+        text = '{
+  "folders": [
+    {
+      "follow_symlinks": true,
+      "path": ".",
+      "folder_exclude_patterns": [".epuber"],
+      "file_exclude_patterns": ["*.epub"]
+    }
+  ]
+}'
+
+        write("#{book_id}.sublime-project", text)
       end
 
       # Creates .gitignore file
