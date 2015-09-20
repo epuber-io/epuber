@@ -177,6 +177,13 @@ module Epuber
           files = @finder.find_file('file1', context_path: 'abc/def/ghi')
           expect(files).to eq '../../../file1.xhtml'
         end
+
+        it 'can find file even the path contains fragment' do
+          FileUtils.touch(['a.xhtml', 'b.xhtml'])
+
+          file = @finder.find_file('a#baf')
+          expect(file).to eq 'a.xhtml'
+        end
       end
 
       context '#ignored_patterns' do

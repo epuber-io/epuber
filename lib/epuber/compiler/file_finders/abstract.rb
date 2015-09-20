@@ -215,6 +215,9 @@ module Epuber
         # @return [Array<String>] list of founded files
         #
         def __find_files(pattern, groups, context_path, orig_context_path = context_path)
+          # remove fragment from pattern
+          pattern = pattern.sub(/#.*$/, '') if pattern.include?('#')
+
           files = __core_find_files(pattern, groups, context_path, orig_context_path)
 
           # try to find files with any extension
