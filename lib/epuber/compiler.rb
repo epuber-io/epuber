@@ -223,9 +223,8 @@ module Epuber
     #
     def parse_toc_item(toc_item)
       unless toc_item.file_request.nil?
-        file_request = toc_item.file_request
-        file = @file_resolver.add_file_from_request(file_request, :spine)
-        file.toc_item = toc_item
+        file = @file_resolver.add_file_from_request(toc_item.file_request, :spine)
+        file.toc_item = toc_item if file.toc_item.nil?
       end
 
       # process recursively other files
