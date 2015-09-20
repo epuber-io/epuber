@@ -34,11 +34,19 @@ module Epuber
         def load_source(compilation_context)
           xhtml_content = File.read(abs_source_path)
 
-          if compilation_context.should_write
-            compilation_context.perform_plugin_things(Transformer, :source_text_file) do |transformer|
-              xhtml_content = transformer.call(final_destination_path, xhtml_content, compilation_context)
+          compilation_context.perform_plugin_things(Transformer, :source_text_file) do |transformer|
+            xhtml_content = transformer.call(final_destination_path, xhtml_content, compilation_context)
+          end
+          
+          # perform custom validation
+          if compilation_context.should_check
+            compilation_context.perform_plugin_things(Checker, :source_text_file) do |checker|
+              checker.call(final_destination_path, xhtml_content, compilation_context)
             end
+          end
 
+
+          if compilation_context.should_write
             self.class.write_to_file(xhtml_content, abs_source_path)
           end
 

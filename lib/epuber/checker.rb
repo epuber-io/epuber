@@ -11,7 +11,8 @@ module Epuber
     #
     def self.map_source_type__class
       {
-        :result_text_xhtml_string => TextChecker
+        :result_text_xhtml_string => TextChecker,
+        :source_text_file         => TextChecker,
       }.merge(super)
     end
   end

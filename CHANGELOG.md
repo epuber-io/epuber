@@ -11,6 +11,7 @@
 - [Compiler] now prints current file, helps with debugging and general using
 - [Server] fix urls on page /files
 - [Checker & Transformer] add third parameter CompilationContext
+- [Checker] add new checker type :source_text_file, 
 
 ## v0.3
 
