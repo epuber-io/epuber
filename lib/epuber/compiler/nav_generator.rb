@@ -203,7 +203,7 @@ module Epuber
           # filter out ibooks specific when the target is not ibooks
           types.reject! { |type| type.to_s.start_with?('ibooks:') } unless @target.ibooks?
 
-          result_file_path = pretty_path_for_request(file_request)
+          result_file_path = pretty_path_for_request(toc_item.file_request)
 
           types.each do |type|
             @xml.li do
