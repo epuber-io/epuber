@@ -17,13 +17,31 @@ module Epuber
 
       protected
 
-      # @param file [Epuber::Compiler::File]
+      # @param [Epuber::Book::FileRequest] file_request
+      #
+      # @return [String]
+      #
+      def pretty_path_for_request(file_request, fragment: true)
+        file = @file_resolver.file_from_request(file_request)
+        path = file.destination_path
+
+        if fragment
+          pattern = file_request.source_pattern
+          fragment_index = pattern.index('#')
+          unless fragment_index.nil?
+            path += pattern[fragment_index..-1]
+          end
+        end
+
+        path
+      end
+
+      # @param [Epuber::Compiler::FileTypes::AbstractFile] file
       #
       # @return [String]
       #
       def pretty_path(file)
-        base_path = ::File.join(@file_resolver.destination_path, Epuber::Compiler::EPUB_CONTENT_FOLDER, '')
-        file.destination_path.sub(base_path, '')
+        file.destination_path
       end
 
       # Helper function for generating XML

@@ -149,13 +149,13 @@ module Epuber
       # @param toc_item [Epuber::Book::TocItem]
       #
       def visit_toc_item(toc_item)
-        result_file = @file_resolver.file_from_request(toc_item.file_request)
+        result_file_path = pretty_path_for_request(toc_item.file_request)
 
         if toc_item.title.nil?
           visit_toc_items(toc_item.sub_items)
         elsif @target.epub_version >= 3
           @xml.li do
-            @xml.a(toc_item.title, href: pretty_path(result_file))
+            @xml.a(toc_item.title, href: result_file_path)
 
             visit_toc_items(toc_item.sub_items)
           end
@@ -164,7 +164,7 @@ module Epuber
             @xml.navLabel do
               @xml.text_(toc_item.title)
             end
-            @xml.content(src: pretty_path(result_file))
+            @xml.content(src: result_file_path)
 
             @nav_nav_point_id += 1
 
@@ -203,11 +203,11 @@ module Epuber
           # filter out ibooks specific when the target is not ibooks
           types.reject! { |type| type.to_s.start_with?('ibooks:') } unless @target.ibooks?
 
-          result_file = @file_resolver.file_from_request(toc_item.file_request)
+          result_file_path = pretty_path_for_request(file_request)
 
           types.each do |type|
             @xml.li do
-              @xml.a(dict[:text], 'epub:type' => type, 'href' => pretty_path(result_file))
+              @xml.a(dict[:text], 'epub:type' => type, 'href' => result_file_path)
             end
           end
         end
