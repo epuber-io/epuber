@@ -1,6 +1,14 @@
 
 # CHANGELOG
 
+## v0.3.2
+
+- [Command::Init] create sublime project
+- [XHTMLProcessor] add `<meta charset="utf-8"/>` to default head (only for epub3.0+) 
+- [OPFGenerator] fix duplicated items in spine
+- [UserInterface] rewrite some logs and make big improvements, overwriting processing lines, so result output is much shorter  
+
+
 ## v0.3.1
 
 - [FileResolver] #file_with_source_path now can find file with absolute source path
