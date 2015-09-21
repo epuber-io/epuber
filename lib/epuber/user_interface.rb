@@ -43,8 +43,41 @@ module Epuber
       puts(_format_message(:warning, message, location: location))
     end
 
-    def self.puts(*args)
-      $stdout.puts(*args)
+    def self.remove_last_line
+      $stdout.print("\b" * (@last_line.length))
+    end
+
+    def self.print(message)
+      @last_line = message
+      $stdout.print(message)
+    end
+
+    def self.puts(message)
+      $stdout.puts(message)
+    end
+
+
+    # @param [Compiler::FileTypes::AbstractFile] file
+    #
+    # @return nil
+    #
+    def self.print_processing_file(file, index, count)
+      remove_processing_file_line
+
+      @last_processing_file_line = "▸ Processing #{file.source_path} (#{index + 1} of #{count})"
+      $stdout.print(@last_processing_file_line)
+    end
+
+    def self.remove_processing_file_line
+      unless @last_processing_file_line.nil?
+        $stdout.print("\033[2K") # remove line, but without moving cursor
+        $stdout.print("\r") # go to beginning of line
+        @last_processing_file_line = nil
+      end
+    end
+
+    def self.processing_files_done
+      remove_processing_file_line
     end
 
     private

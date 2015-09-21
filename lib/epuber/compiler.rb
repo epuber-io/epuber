@@ -213,10 +213,12 @@ module Epuber
     # @return nil
     #
     def process_all_target_files
-      @file_resolver.manifest_files.each do |file|
-        puts "    processing file #{file.source_path}"
+      @file_resolver.manifest_files.each_with_index do |file, idx|
+        UI.print_processing_file(file, idx, @file_resolver.manifest_files.count)
         process_file(file)
       end
+
+      UI.processing_files_done
     end
 
     # @param toc_item [Epuber::Book::TocItem]
