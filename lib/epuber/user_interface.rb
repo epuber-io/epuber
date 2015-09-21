@@ -57,6 +57,17 @@ module Epuber
     end
 
 
+
+    # @param [#to_s] problem some problem, object just have to know to convert self into string with method #to_s
+    #
+    def self.print_processing_problem(problem)
+      last_line = @last_processing_file_line
+      remove_processing_file_line
+
+      $stdout.puts(problem.to_s.ansi.send(_color_from_level(:warning)))
+      $stdout.print(last_line)
+    end
+
     # @param [Compiler::FileTypes::AbstractFile] file
     #
     # @return nil
