@@ -85,19 +85,9 @@ module Epuber
         # @return nil
         #
         def self.write_to_file?(content, to_path)
-          original_content = if File.exists?(to_path)
-                               File.read(to_path)
-                             end
+          return true unless File.exists?(to_path)
 
-          should_write = if original_content.nil?
-                           true
-                         elsif content.is_a?(String)
-                           original_content != content
-                         else
-                           original_content != content.to_s
-                         end
-
-          should_write
+          File.read(to_path) != content.to_s
         end
 
         # @param [String | #to_s] content anything, that can be converted to string and should be written to file
