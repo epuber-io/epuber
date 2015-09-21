@@ -10,7 +10,7 @@ module Epuber
         # @param [Compiler::CompilationContext] compilation_context
         #
         def process(compilation_context)
-          self.class.file_copy(abs_source_path, final_destination_path)
+          default_file_copy
         end
       end
     end

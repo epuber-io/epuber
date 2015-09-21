@@ -43,29 +43,36 @@ module Epuber
       puts(_format_message(:warning, message, location: location))
     end
 
-    def self.remove_last_line
-      $stdout.print("\b" * (@last_line.length))
-    end
 
-    def self.print(message)
-      @last_line = message
-      $stdout.print(message)
-    end
-
-    def self.puts(message)
-      $stdout.puts(message)
-    end
 
 
 
     # @param [#to_s] problem some problem, object just have to know to convert self into string with method #to_s
     #
     def self.print_processing_problem(problem)
-      last_line = @last_processing_file_line
-      remove_processing_file_line
+      last_line = remove_processing_file_line
 
       $stdout.puts(problem.to_s.ansi.send(_color_from_level(:warning)))
       $stdout.print(last_line)
+    end
+
+    # @param [String] info_text
+    #
+    def self.print_processing_debug_info(info_text)
+      if current_command && current_command.verbose?
+        last_line = remove_processing_file_line
+
+        message = if @current_file.nil?
+                    "▸ #{info_text}"
+                  else
+                    "▸ #{@current_file.source_path}: #{info_text}"
+                  end
+
+        $stdout.puts(message.ansi.send(_color_from_level(:debug)))
+
+        @last_processing_file_line = last_line
+        $stdout.print(last_line)
+      end
     end
 
     # @param [Compiler::FileTypes::AbstractFile] file
@@ -75,20 +82,28 @@ module Epuber
     def self.print_processing_file(file, index, count)
       remove_processing_file_line
 
+      @current_file = file
+
       @last_processing_file_line = "▸ Processing #{file.source_path} (#{index + 1} of #{count})"
       $stdout.print(@last_processing_file_line)
     end
 
     def self.remove_processing_file_line
+      last_line = @last_processing_file_line
+
       unless @last_processing_file_line.nil?
         $stdout.print("\033[2K") # remove line, but without moving cursor
         $stdout.print("\r") # go to beginning of line
         @last_processing_file_line = nil
       end
+
+      last_line
     end
 
     def self.processing_files_done
       remove_processing_file_line
+
+      @current_file = nil
     end
 
     private
@@ -101,8 +116,8 @@ module Epuber
       case level
         when :error;   :red
         when :warning; :yellow
-        when :normal;  :normal
-        when :debug;   :gray
+        when :normal;  :white
+        when :debug;   :blue
         else
           raise "Unknown output level #{level}"
       end

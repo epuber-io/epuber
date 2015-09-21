@@ -31,9 +31,7 @@ module Epuber
                                         .with_locals(variables)
                                         .render(new_line: '', indent: '')
 
-          xhtml_content = common_process(xhtml_content, compilation_context)
-
-          self.class.write_to_file(xhtml_content, final_destination_path)
+          write_compiled(common_process(xhtml_content, compilation_context))
         end
       end
     end

@@ -94,9 +94,7 @@ module Epuber
         # @param [Compiler::CompilationContext]
         #
         def process(compilation_context)
-          xhtml_content = common_process(load_source(compilation_context), compilation_context)
-
-          self.class.write_to_file(xhtml_content, final_destination_path)
+          write_processed(common_process(load_source(compilation_context), compilation_context))
         end
       end
     end

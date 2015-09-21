@@ -24,7 +24,7 @@ module Epuber
 
           if resolution > max_resolution
             img = img.change_geometry("#{max_resolution}@>") do |width, height, b_img|
-              puts "DEBUG: downscaling image #{source_path} from resolution #{b_img.columns}x#{b_img.rows} to #{width}x#{height}"
+              UI.print_processing_debug_info("downscaling from resolution #{b_img.columns}x#{b_img.rows} to #{width}x#{height}")
               b_img.resize!(width, height)
             end
 
