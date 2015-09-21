@@ -1,7 +1,7 @@
 
 # CHANGELOG
 
-## v0.3.1.beta.1
+## v0.3.1
 
 - [FileResolver] #file_with_source_path now can find file with absolute source path
 - [Server] fix several crashes because of not existing constants, etc
@@ -11,7 +11,16 @@
 - [Compiler] now prints current file, helps with debugging and general using
 - [Server] fix urls on page /files
 - [Checker & Transformer] add third parameter CompilationContext
-- [Checker] add new checker type :source_text_file, 
+- [Checker] add new checker type :source_text_file
+- [Server] fix crashes after compilation error/crash
+- [FileFinder] add support for paths containing fragment part
+- [FileResolver] made some optimizations about adding files
+- [FileResolver] #file_from_request now support searching from added files without matching exact file request instance
+- [NavGenerator] fix generating paths with fragment part
+- [Compiler] add support for nested toc items
+- [Plugins] :source_text_file now receives source file instead of destination path
+- [Gemfile.lock] update thin to 1.6.4
+
 
 ## v0.3
 
