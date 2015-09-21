@@ -59,12 +59,13 @@ module Epuber
     #
     # @return [void]
     #
-    def compile(build_folder, check: false, write: false, release: false)
+    def compile(build_folder, check: false, write: false, release: false, verbose: false)
       @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       compilation_context.file_resolver = @file_resolver
       compilation_context.should_check = check
       compilation_context.should_write = write
       compilation_context.release_build = release
+      compilation_context.verbose = verbose
 
       self.class.globals_catcher.catch do
         @build_folder = build_folder
@@ -106,7 +107,7 @@ module Epuber
             old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
             diff = old_paths - new_paths
             diff.each do |file_to_remove|
-              puts "DEBUG: removing file from result EPUB: #{file_to_remove}"
+              puts "DEBUG: removing file from result EPUB: #{file_to_remove}" if compilation_context.verbose?
               zip_file.remove(file_to_remove)
             end
           end
@@ -149,7 +150,7 @@ module Epuber
           .select { |d| File.directory?(d) }
           .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
           .each do |d|
-          puts "DEBUG: removing empty folder `#{d}`"
+          puts "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
           Dir.rmdir(d)
         end
       end
@@ -160,7 +161,7 @@ module Epuber
     def remove_unnecessary_files
       unnecessary_paths = @file_resolver.unneeded_files_in_destination.map { |path| File.join(@file_resolver.destination_path, path) }
       unnecessary_paths.each do |path|
-        puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
+        puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`" if compilation_context.verbose?
 
         File.delete(path)
       end
@@ -213,10 +214,12 @@ module Epuber
     # @return nil
     #
     def process_all_target_files
-      @file_resolver.manifest_files.each do |file|
-        puts "    processing file #{file.source_path}"
+      @file_resolver.manifest_files.each_with_index do |file, idx|
+        UI.print_processing_file(file, idx, @file_resolver.manifest_files.count)
         process_file(file)
       end
+
+      UI.processing_files_done
     end
 
     # @param toc_item [Epuber::Book::TocItem]

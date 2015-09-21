@@ -60,6 +60,14 @@ module Epuber
       #
       attr_accessor :release_build
 
+      # @return [Bool]
+      #
+      attr_accessor :verbose
+
+      def verbose?
+        verbose
+      end
+
 
       def initialize(book, target)
         @book = book

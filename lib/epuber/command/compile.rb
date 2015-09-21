@@ -57,7 +57,7 @@ module Epuber
           # Build all targets to always clean directory
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
-            compiler.compile(Epuber::Config.instance.release_build_path(target), check: true, write: @should_write, release: true)
+            compiler.compile(Epuber::Config.instance.release_build_path(target), check: true, write: @should_write, release: true, verbose: verbose?)
 
             archive_name = compiler.epub_name
 
@@ -74,7 +74,7 @@ module Epuber
         else
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
-            compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check, write: @should_write)
+            compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check, write: @should_write, verbose: verbose?)
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
             system(%(epubcheck "#{archive_path}")) if @should_check
