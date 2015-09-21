@@ -160,11 +160,11 @@ module Epuber
       when :ui
         puts message
       when :info
-        puts "INFO: #{message}"
+        puts "INFO: #{message}" if verbose
       when :get
-        puts " GET: #{message}"
+        puts " GET: #{message}" if verbose
       when :ws
-        puts "  WS: #{message}"
+        puts "  WS: #{message}" if verbose
       else
         raise "Unknown log level #{level}"
       end
