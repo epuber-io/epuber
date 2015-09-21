@@ -196,14 +196,21 @@ module Epuber
                  { toc: create_id_from_path(pretty_path(nav_file)) }
                end
 
+        all_items = @target.root_toc.flat_sub_items.map do |toc_item|
+          result_file = @file_resolver.file_from_request(toc_item.file_request)
+
+          attrs = {}
+          attrs['idref'] = create_id_from_path(pretty_path(result_file))
+          attrs['linear'] = 'no' unless toc_item.linear?
+
+          attrs
+        end
+
+        # uniq, but without any other attributes
+        all_items.uniq! { |i| i['idref'] }
+
         @xml.spine(args) do
-          @target.root_toc.flat_sub_items.each do |toc_item|
-            result_file = @file_resolver.file_from_request(toc_item.file_request)
-
-            attrs = {}
-            attrs['idref'] = create_id_from_path(pretty_path(result_file))
-            attrs['linear'] = 'no' unless toc_item.linear?
-
+          all_items.each do |attrs|
             @xml.itemref(attrs)
           end
         end
