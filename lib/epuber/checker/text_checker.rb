@@ -15,30 +15,56 @@ module Epuber
         # @param match [MatchData]
         #
         def initialize(match, message, file_path)
+          @match = match
           @message = message
           @file_path = file_path
-          @match = match
         end
 
-        def to_s
-          pre = match_pre_line = @match.pre_match_lines.last
-          if match_pre_line.length > 80
-            pre = "#{match_pre_line.first(10)} ... #{match_pre_line.last(10)}"
-          end
+        # Formats caret symbol with space indent
+        #
+        # @param [Fixnum] indent
+        #
+        # @return [String]
+        #
+        def caret_symbol(indent)
+          ' ' * indent + '^'
+        end
 
-          post = "#{@match.post_match_lines.first.first(10)} ..."
-
-          match_length = @match.matched_string.length
-          start_sign = "#{' ' * pre.length}^"
-          end_sign = if match_length > 1
-                       "#{' ' * (match_length-2)}^"
+        # Formats caret symbols for indent and length
+        #
+        # @param [Fixnum] length
+        # @param [Fixnum] indent
+        #
+        # @return [String]
+        #
+        def caret_symbols(indent, length)
+          start_sign = caret_symbol(indent)
+          end_sign = if length > 1
+                       caret_symbol(length-2)
                      else
                        ''
                      end
 
+          "#{start_sign}#{end_sign}"
+        end
+
+        def to_s
+          match_line = @match.matched_string
+          post_line = @match.post_match_lines.first
+          pre_line = @match.pre_match_lines.last
+
+          pre = match_pre_line = pre_line
+          if match_pre_line.length > 100
+            pre = "#{match_pre_line.first(20)} ... #{match_pre_line.last(30)}"
+          end
+
+          post = "#{post_line.first(20)} ..."
+
+          pointers = caret_symbols(pre.length, match_line.length)
+
           %{#{@file_path}:#{@match.line_number} column: #{match_pre_line.length} --- #{@message}
-  #{pre + @match.matched_string.ansi.red + post}
-  #{start_sign}#{end_sign}}
+  #{pre + match_line.ansi.red + post}
+  #{pointers}}
         end
       end
 
