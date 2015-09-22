@@ -57,7 +57,9 @@ Epuber::Book.new do |book|
     toc.file 's01', 'NADEŠEL ČAS PRO PRÁCI NA DÁLKU' do # Example of full Bade file containing all required XHTML structures
       toc.file 's01ch01', 'Proč se v práci nepracuje'
       toc.file 's01ch02', 'Nenechte si ujet život dojížděním'
-      toc.file 's01ch03', 'Jde o technologii'
+      toc.file 's01ch03', 'Jde o technologii' do
+        toc.file '#baf', 'Jde více než o technologie'
+      end
     end
 
     toc.file 's02', 'JAK NA VÝMLUVY' do # Example of full XHTML file containing all required XHTML structures

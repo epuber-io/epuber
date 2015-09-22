@@ -27,7 +27,7 @@ mixin iterate_spine(toc_item)
 		ul.spine
 			- toc_item.sub_items.each do |item|
 				li
-					- item_href = "/toc/#{pretty_path(item.file_request)}"
+					- item_href = "/toc/#{pretty_path_toc_item(item)}"
 					a.href(href: item_href)= item.file_request.source_pattern
 					- unless item.title.nil?
 						= ' &nbsp; '

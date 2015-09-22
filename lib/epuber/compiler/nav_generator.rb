@@ -149,7 +149,7 @@ module Epuber
       # @param toc_item [Epuber::Book::TocItem]
       #
       def visit_toc_item(toc_item)
-        result_file_path = pretty_path_for_request(toc_item.file_request)
+        result_file_path = pretty_path_for_request(toc_item.full_file_request)
 
         if toc_item.title.nil?
           visit_toc_items(toc_item.sub_items)

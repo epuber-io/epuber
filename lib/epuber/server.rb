@@ -10,6 +10,7 @@ require 'listen'
 require 'active_support'
 
 require_relative 'vendor/hash_binding'
+require_relative 'helper'
 
 require 'bade'
 require 'stylus'

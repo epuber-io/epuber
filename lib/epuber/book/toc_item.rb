@@ -75,7 +75,7 @@ module Epuber
       # @return [Book::FileRequest]
       #
       def full_file_request
-        FileRequest.new(full_source_pattern)
+        FileRequest.new(full_source_pattern, group: file_request.group, properties: file_request.properties)
       end
 
 

@@ -197,7 +197,7 @@ module Epuber
                end
 
         all_items = @target.root_toc.flat_sub_items.map do |toc_item|
-          result_file = @file_resolver.file_from_request(toc_item.file_request)
+          result_file = @file_resolver.file_from_request(toc_item.full_file_request)
 
           attrs = {}
           attrs['idref'] = create_id_from_path(pretty_path(result_file))
