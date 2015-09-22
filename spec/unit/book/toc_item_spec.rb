@@ -69,11 +69,13 @@ module Epuber
         context '#full_source_pattern' do
           it 'returns the same pattern when pattern includes path' do
             expect(@root.full_source_pattern).to eq 's01'
+            expect(@root.local_source_pattern).to eq 's01'
           end
 
           it 'returns composed pattern when child item have only fragment' do
             subitem = @root.file '#fragment'
             expect(subitem.full_source_pattern).to eq 's01#fragment'
+            expect(subitem.local_source_pattern).to eq '#fragment'
           end
 
           it 'returns composed pattern when multiple children items have only fragment' do
@@ -95,6 +97,7 @@ module Epuber
             end
 
             expect(subitem.full_source_pattern).to eq 's01#fragment6'
+            expect(subitem.local_source_pattern).to eq '#fragment6'
           end
         end
       end

@@ -58,7 +58,8 @@ Epuber::Book.new do |book|
       toc.file 's01ch01', 'Proč se v práci nepracuje'
       toc.file 's01ch02', 'Nenechte si ujet život dojížděním'
       toc.file 's01ch03', 'Jde o technologii' do
-        toc.file '#baf', 'Jde více než o technologie'
+        toc.file 's01ch03#baf', 'Jde více než o technologie'
+        toc.file '#baf2', 'Jde více než o technologie 2'
       end
     end
 

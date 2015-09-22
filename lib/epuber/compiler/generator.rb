@@ -17,23 +17,9 @@ module Epuber
 
       protected
 
-      # @param [Epuber::Book::FileRequest] file_request
-      #
-      # @return [String]
-      #
-      def pretty_path_for_request(file_request, fragment: true)
-        file = @file_resolver.file_from_request(file_request)
-        path = file.destination_path
-
-        if fragment
-          pattern = file_request.source_pattern
-          fragment_index = pattern.index('#')
-          unless fragment_index.nil?
-            path += pattern[fragment_index..-1]
-          end
-        end
-
-        path
+      def pretty_path_for_toc_item(toc_item, fragment: true)
+        file = @file_resolver.file_from_request(toc_item.file_request)
+        [file.destination_path, fragment ? toc_item.file_fragment : nil].compact.join('#')
       end
 
       # @param [Epuber::Compiler::FileTypes::AbstractFile] file

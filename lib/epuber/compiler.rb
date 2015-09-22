@@ -226,7 +226,7 @@ module Epuber
     #
     def parse_toc_item(toc_item)
       unless toc_item.file_request.nil?
-        file = @file_resolver.add_file_from_request(toc_item.full_file_request, :spine)
+        file = @file_resolver.add_file_from_request(toc_item.file_request, :spine)
         file.toc_item = toc_item if file.toc_item.nil?
       end
 

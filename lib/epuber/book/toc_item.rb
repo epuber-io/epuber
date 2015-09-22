@@ -24,6 +24,9 @@ module Epuber
       attribute :options,
                 default_value: []
 
+      # @return [String]
+      #
+      attr_accessor :file_fragment
 
 
       # --------------
@@ -53,29 +56,17 @@ module Epuber
       # @return [String]
       #
       def full_source_pattern
-        valuable_parent = self
-
-        while !valuable_parent.nil? && valuable_parent.file_request.source_pattern.start_with?('#')
-          valuable_parent = valuable_parent.parent
-        end
-
-        return file_request.source_pattern if valuable_parent == self || valuable_parent.nil?
-
-        parent_pattern = valuable_parent.file_request.source_pattern
-        parent_pattern = parent_pattern.sub(/#.*$/, '')
-
-        self_pattern   = file_request.source_pattern
-
-        fragment_index = self_pattern.index('#')
-        parent_pattern += self_pattern[fragment_index..-1] unless fragment_index.nil?
-
-        parent_pattern
+        [file_request.source_pattern, file_fragment].compact.join('#')
       end
 
-      # @return [Book::FileRequest]
+      # @return [String]
       #
-      def full_file_request
-        FileRequest.new(full_source_pattern, group: file_request.group, properties: file_request.properties)
+      def local_source_pattern
+        file_request = attributes_values[:file_request]
+
+        return "##{file_fragment}" if file_request.nil?
+
+        [file_request.source_pattern, file_fragment].compact.join('#')
       end
 
 
@@ -95,8 +86,16 @@ module Epuber
       def file(file_path, title = nil, *opts)
         create_child_item do |item|
           unless file_path.nil?
-            file_obj = FileRequest.new(file_path, group: :text)
-            item.file_request = file_obj
+            file_pattern, file_fragment = file_path.split('#')
+
+            unless file_pattern.nil? || file_pattern.empty?
+              file_obj = FileRequest.new(file_pattern, group: :text)
+              item.file_request = file_obj
+            end
+
+            unless file_fragment.nil? || file_fragment.empty?
+              item.file_fragment = file_fragment
+            end
           end
 
           if title.is_a?(String)

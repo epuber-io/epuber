@@ -10,12 +10,8 @@ module Epuber
     # @return [String]
     #
     def self.destination_path_for_toc_item(toc_item, file_resolver, context_path)
-      file = file_resolver.file_from_request(toc_item.full_file_request)
-      path = file.final_destination_path
-
-      pattern        = toc_item.file_request.source_pattern
-      fragment_index = pattern.index('#')
-      path           += pattern[fragment_index..-1] unless fragment_index.nil?
+      file = file_resolver.file_from_request(toc_item.file_request)
+      path = [file.final_destination_path, toc_item.file_fragment].compact.join('#')
 
       Pathname.new(path).relative_path_from(Pathname.new(context_path)).to_s
     end
