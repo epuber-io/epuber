@@ -50,6 +50,29 @@ module Epuber
         end
       end
 
+      # @return [String]
+      #
+      def full_source_pattern
+        valuable_parent = self
+
+        while !valuable_parent.nil? && valuable_parent.file_request.source_pattern.start_with?('#')
+          valuable_parent = valuable_parent.parent
+        end
+
+        return if valuable_parent.nil?
+        return file_request.source_pattern if valuable_parent == self
+
+        parent_pattern = valuable_parent.file_request.source_pattern
+        parent_pattern = parent_pattern.sub(/#.*$/, '')
+
+        self_pattern   = file_request.source_pattern
+
+        fragment_index = self_pattern.index('#')
+        parent_pattern += self_pattern[fragment_index..-1] unless fragment_index.nil?
+
+        parent_pattern
+      end
+
 
       # -------------- creating sub items -----------------
 

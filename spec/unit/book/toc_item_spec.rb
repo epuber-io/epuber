@@ -65,6 +65,38 @@ module Epuber
             expect(sub_item.options).to eq [:landmark, :landmark_2, { key: 1 }, { key_2: 2 }]
           end
         end
+
+        context '#full_source_pattern' do
+          it 'returns the same pattern when pattern includes path' do
+            expect(@root.full_source_pattern).to eq 's01'
+          end
+
+          it 'returns composed pattern when child item have only fragment' do
+            subitem = @root.file '#fragment'
+            expect(subitem.full_source_pattern).to eq 's01#fragment'
+          end
+
+          it 'returns composed pattern when multiple children items have only fragment' do
+            subitem = nil
+            @root.file '#fragment' do
+              @root.file '#fragment1' do
+                @root.file '#fragment2' do
+                  @root.file '#fragment3' do
+                    @root.file '#fragment4' do
+                      @root.file '#fragment5' do
+                        @root.file '#fragment6' do |current_item|
+                          subitem = current_item
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+
+            expect(subitem.full_source_pattern).to eq 's01#fragment6'
+          end
+        end
       end
 
       # TODO: nested creating
