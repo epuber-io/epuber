@@ -59,8 +59,7 @@ module Epuber
           valuable_parent = valuable_parent.parent
         end
 
-        return if valuable_parent.nil?
-        return file_request.source_pattern if valuable_parent == self
+        return file_request.source_pattern if valuable_parent == self || valuable_parent.nil?
 
         parent_pattern = valuable_parent.file_request.source_pattern
         parent_pattern = parent_pattern.sub(/#.*$/, '')
@@ -71,6 +70,12 @@ module Epuber
         parent_pattern += self_pattern[fragment_index..-1] unless fragment_index.nil?
 
         parent_pattern
+      end
+
+      # @return [Book::FileRequest]
+      #
+      def full_file_request
+        FileRequest.new(full_source_pattern)
       end
 
 
