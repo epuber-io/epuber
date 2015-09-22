@@ -1,6 +1,13 @@
 
 - def pretty_path(file_request)
--     file_resolver.relative_path_from_package_root(file_request)
+-   file = file_resolver.file_from_request(file_request)
+-   path = file.destination_path
+
+-   pattern = file_request.source_pattern
+-   fragment_index = pattern.index('#')
+-   path += pattern[fragment_index..-1] unless fragment_index.nil?
+
+-   path
 - end
 
 
