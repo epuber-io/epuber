@@ -215,11 +215,11 @@ module Epuber
       # @return nil
       #
       def self.resolve_images(xhtml_doc, file_path, file_resolver)
+        dirname = File.dirname(file_path)
+
         xhtml_doc.css('img').each do |img|
           path = img['src']
           next if path.nil?
-
-          dirname = File.dirname(file_path)
 
           begin
             new_path = file_resolver.dest_finder.find_file(path, groups: :image, context_path: dirname)
