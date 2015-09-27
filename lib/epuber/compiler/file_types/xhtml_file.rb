@@ -74,7 +74,7 @@ module Epuber
           XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
           XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)
 
-          xhtml_string = xhtml_doc.to_xml(indent: 0, encoding: 'UTF-8', save_with: 0)
+          xhtml_string = xhtml_doc.to_s
 
           # perform transformations
           compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
