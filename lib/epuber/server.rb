@@ -313,18 +313,35 @@ module Epuber
       end
     end
 
-    def self.compile_book
+    def self._compile_book
       begin
         compiler = Epuber::Compiler.new(book, target)
         compiler.compile(build_path)
+        self.file_resolver = compiler.file_resolver
+
         true
       rescue => e
+        self.file_resolver = compiler.file_resolver
+
         Epuber::UI.error("Compile error: #{e}")
         Epuber::UI.error("Backtrace: #{e.backtrace}") if verbose
 
         false
-      ensure
-        self.file_resolver = compiler.try(:file_resolver)
+      end
+    end
+
+    def self.compile_book(&completion)
+      if !@compilation_thread.nil? && @compilation_thread.status != false
+        @compilation_thread.kill
+        @compilation_thread = nil
+      end
+
+      if completion.nil?
+        _compile_book
+      else
+        @compilation_thread = Thread.new do
+          completion.call(_compile_book)
+        end
       end
     end
 
@@ -375,28 +392,30 @@ module Epuber
       notify_clients(:compile_start)
 
 
-      _log :ui, 'Compiling'
-      unless compile_book
-        _log :ui, 'Skipping other steps'
-        notify_clients(:compile_end)
-        return
-      end
+      _log :ui, "#{Time.now}  Compiling"
+      compile_book do |success|
+        unless success
+          _log :ui, 'Skipping other steps'
+          notify_clients(:compile_end)
+          next
+        end
 
-      _log :ui, 'Notifying clients'
+        _log :ui, 'Notifying clients'
 
-      # transform all paths to relatives to the server
-      changed.map! do |file|
-        relative = relative_path_to_book_file(file)
-        File.join('', 'raw', relative) unless relative.nil?
-      end
+        # transform all paths to relatives to the server
+        changed.map! do |file|
+          relative = relative_path_to_book_file(file)
+          File.join('', 'raw', relative) unless relative.nil?
+        end
 
-      # remove nil paths (for example bookspec can't be found so the relative path is nil)
-      changed.compact!
+        # remove nil paths (for example bookspec can't be found so the relative path is nil)
+        changed.compact!
 
-      if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
-        notify_clients(:styles, changed)
-      else
-        notify_clients(:reload, changed)
+        if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
+          notify_clients(:styles, changed)
+        else
+          notify_clients(:reload, changed)
+        end
       end
     end
 
