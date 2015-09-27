@@ -48,15 +48,21 @@ module Epuber
           "#{start_sign}#{end_sign}"
         end
 
+        def remove_tabs(text)
+          text.gsub("\t", ' ' * 4)
+        end
+
         def to_s
           match_line = @match.matched_string
           post_line = @match.post_match_lines.first
           pre_line = @match.pre_match_lines.last
 
           pre = match_pre_line = pre_line
-          if match_pre_line.length > 100
+          if remove_tabs(match_pre_line).length > 100
             pre = "#{match_pre_line.first(20)} ... #{match_pre_line.last(30)}"
           end
+
+          pre = remove_tabs(pre)
 
           post = "#{post_line.first(20)} ..."
 
