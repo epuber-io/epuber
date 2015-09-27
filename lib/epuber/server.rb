@@ -365,7 +365,7 @@ module Epuber
     # @param _removed [Array<String>]
     #
     def self.changes_detected(_modified, _added, _removed)
-      all_changed = (_modified + _added).uniq
+      all_changed = (_modified + _added + _removed).uniq
 
       reload_bookspec if all_changed.any? { |file| file == book.file_path }
 
@@ -378,6 +378,7 @@ module Epuber
       _log :ui, 'Compiling'
       unless compile_book
         _log :ui, 'Skipping other steps'
+        notify_clients(:compile_end)
         return
       end
 
