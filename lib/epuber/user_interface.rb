@@ -32,15 +32,19 @@ module Epuber
     # @param [Thread::Backtrace::Location] location location of the error
     #
     def self.error(message, location: nil)
-      puts(_format_message(:error, message, location: location))
-      _print_backtrace(message.try(:backtrace_locations) || caller_locations, location: location)
+      _clear_processing_line_for_new_output do
+        puts(_format_message(:error, message, location: location))
+        _print_backtrace(message.try(:backtrace_locations) || caller_locations, location: location)
+      end
     end
 
     # @param [String] message message of the error
     # @param [Thread::Backtrace::Location] location location of the error
     #
     def self.warning(message, location: nil)
-      puts(_format_message(:warning, message, location: location))
+      _clear_processing_line_for_new_output do
+        puts(_format_message(:warning, message, location: location))
+      end
     end
 
 
@@ -50,28 +54,24 @@ module Epuber
     # @param [#to_s] problem some problem, object just have to know to convert self into string with method #to_s
     #
     def self.print_processing_problem(problem)
-      last_line = remove_processing_file_line
-
-      $stdout.puts(problem.to_s.ansi.send(_color_from_level(:warning)))
-      $stdout.print(last_line)
+      _clear_processing_line_for_new_output do
+        $stdout.puts(problem.to_s.ansi.send(_color_from_level(:warning)))
+      end
     end
 
     # @param [String] info_text
     #
     def self.print_processing_debug_info(info_text)
       if current_command && current_command.verbose?
-        last_line = remove_processing_file_line
+        _clear_processing_line_for_new_output do
+          message = if @current_file.nil?
+                      "▸ #{info_text}"
+                    else
+                      "▸ #{@current_file.source_path}: #{info_text}"
+                    end
 
-        message = if @current_file.nil?
-                    "▸ #{info_text}"
-                  else
-                    "▸ #{@current_file.source_path}: #{info_text}"
-                  end
-
-        $stdout.puts(message.ansi.send(_color_from_level(:debug)))
-
-        @last_processing_file_line = last_line
-        $stdout.print(last_line)
+          $stdout.puts(message.ansi.send(_color_from_level(:debug)))
+        end
       end
     end
 
@@ -107,6 +107,15 @@ module Epuber
     end
 
     private
+
+    def self._clear_processing_line_for_new_output
+      last_line = remove_processing_file_line
+
+      yield
+
+      @last_processing_file_line = last_line
+      $stdout.print(last_line)
+    end
 
     # @param [Symbol] level color of the output
     #
