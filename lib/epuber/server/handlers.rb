@@ -4,6 +4,10 @@ require 'nokogiri'
 
 module Epuber
   class Server
+    # @param [String] file_path  absolute path to xhtml file
+    #
+    # @return [(Fixnum, String)]
+    #
     def handle_xhtml_file(file_path)
       html_doc = Nokogiri::XML(File.open(file_path))
 
@@ -28,6 +32,36 @@ module Epuber
       end
 
       [200, html_doc.to_html]
+    end
+
+    # @param [String] file_name  name of the file located in ./pages/
+    #
+    # @return [(Fixnum, String)]
+    #
+    def handle_server_bade(file_name)
+      handle_bade(File.expand_path("pages/#{file_name}", File.dirname(__FILE__)))
+    end
+
+    # @param [String] file_path  path to bade file to render
+    #
+    # @return [(Fixnum, String)]
+    #
+    def handle_bade(file_path)
+      [200, self.class.render_bade(file_path)]
+    rescue => e
+      env['sinatra.error'] = e
+      ShowExceptions.new(self).call(env)
+    end
+
+    # @param [String] file_path  path to bade file to render
+    #
+    # @return [String]
+    #
+    def self.render_bade(file_path)
+      renderer = Bade::Renderer.from_file(file_path)
+                               .with_locals(book: book, target: target, file_resolver: file_resolver)
+
+      renderer.render(new_line: '', indent: '')
     end
   end
 end

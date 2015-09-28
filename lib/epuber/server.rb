@@ -402,25 +402,6 @@ module Epuber
       end
     end
 
-    def render_bade(name)
-      self.class.render_bade(name)
-    rescue => e
-      env['sinatra.error'] = e
-      ShowExceptions.new(self).call(env)
-    end
-
-    def self.render_bade(name)
-      source_path = File.expand_path("server/pages/#{name}", File.dirname(__FILE__))
-
-      renderer = Bade::Renderer.from_file(source_path)
-                               .with_locals(book: book, target: target, file_resolver: file_resolver)
-
-      result = renderer.render(new_line: '', indent: '')
-
-      [200, result]
-    end
-
-
     # -------------------------------------------------- #
 
     # @param [String] path
@@ -514,7 +495,7 @@ module Epuber
     #
     namespace '' do
       get '/?' do
-        render_bade('book.bade')
+        handle_server_bade('book.bade')
       end
 
       get '/change_target/:target_name' do |target_name|
@@ -550,7 +531,7 @@ module Epuber
     # @group TOC
     #
     get '/toc/?' do
-      render_bade('toc.bade')
+      handle_server_bade('toc.bade')
     end
 
     # ----------------------------------
@@ -558,7 +539,7 @@ module Epuber
     #
     namespace '/files' do
       get '/?' do
-        render_bade('files.bade')
+        handle_server_bade('files.bade')
       end
 
       get '/*' do
