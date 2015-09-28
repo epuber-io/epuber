@@ -59,5 +59,43 @@ module Epuber
         ### expect(manifest).to have_xpath("/item[@properties='cover-image']")
       end
     end
+
+    it 'creates full metadata structure for default epub 2.0' do
+      book = Book.new do |b|
+        b.title        = 'Práce na dálku'
+        b.author       = 'Jared Diamond'
+        b.published    = '10. 12. 2014'
+        b.publisher    = 'Jan Melvil Publishing'
+        b.language     = 'cs'
+        b.version      = 1.0
+        b.is_ibooks    = true
+        b.custom_fonts = true
+        b.epub_version = 2.0
+        ### b.cover_image = 'cover.jpg'
+      end
+
+
+
+      ncx_file = Compiler::FileTypes::GeneratedFile.new
+      ncx_file.destination_path = 'nav.ncx'
+      ncx_file.path_type = :manifest
+      resolver = Compiler::FileResolver.new('/source', '/dest')
+      resolver.add_file(ncx_file)
+
+      @sut = Compiler::OPFGenerator.new(book, book.targets.first, resolver)
+
+      opf_xml = @sut.generate_opf
+      with_xpath(opf_xml, '/package/metadata') do |metadata|
+        expect(metadata).to have_xpath('/dc:title', 'Práce na dálku')
+
+        expect(metadata).to have_xpath('/dc:creator', 'Jared Diamond')
+        expect(metadata).to have_xpath('/dc:creator/@opf:file-as', 'DIAMOND, Jared')
+        expect(metadata).to have_xpath('/dc:creator/@opf:role', 'aut')
+
+        expect(metadata).to have_xpath('/dc:publisher', 'Jan Melvil Publishing')
+        expect(metadata).to have_xpath('/dc:language', 'cs')
+        expect(metadata).to have_xpath('/dc:date', '2014-12-10')
+      end
+    end
   end
 end

@@ -13,8 +13,9 @@ module Epuber
     class OPFGenerator < Generator
 
       EPUB2_NAMESPACES = {
-        'xmlns'    => 'http://www.idpf.org/2007/opf',
-        'xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
+        'xmlns'     => 'http://www.idpf.org/2007/opf',
+        'xmlns:dc'  => 'http://purl.org/dc/elements/1.1/',
+        'xmlns:opf' => 'http://www.idpf.org/2007/opf',
       }.freeze
 
       EPUB3_NAMESPACES = {
@@ -124,7 +125,7 @@ module Epuber
               @xml.meta(author.file_as, property: 'file-as', refines: author_id_ref)
               @xml.meta(author.role, property: 'role', refines: author_id_ref, scheme: 'marc:relators')
             else
-              @xml['dc'].creator(author.pretty_name)
+              @xml['dc'].creator(author.pretty_name, 'opf:file-as' => author.file_as, 'opf:role' => author.role)
             end
           end
 
