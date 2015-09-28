@@ -25,6 +25,8 @@ module Epuber
   # [LATER]   /file/<path-or-pattern> -- displays pretty file (image, text file) (for example: /file/text/s01.xhtml or /file/text/s01.bade)
   #
   class Server < Sinatra::Base
+    require_relative 'server/handlers'
+
     class ShowExceptions < Sinatra::ShowExceptions
       def call(env)
         e = env['sinatra.error']
@@ -206,25 +208,6 @@ module Epuber
       file = file_resolver.file_with_source_path(path)
       return if file.nil?
       file.pkg_destination_path
-    end
-
-    # @param html_doc [Nokogiri::HTML::Document]
-    # @param context_path [String]
-    # @param css_selector [String]
-    # @param attribute_name [String]
-    #
-    def fix_links(html_doc, context_path, css_selector, attribute_name)
-      img_nodes = html_doc.css(css_selector)
-      img_nodes.each do |node|
-        src = node[attribute_name]
-
-        unless src.nil?
-          abs_path      = File.expand_path(src, File.join(build_path, File.dirname(context_path))).unicode_normalize
-          relative_path = abs_path.sub(File.expand_path(build_path).unicode_normalize, '')
-
-          node[attribute_name] = File.join('', 'raw', relative_path.to_s)
-        end
-      end
     end
 
     def add_script_file_to_head(html_doc, file_name, *args)
@@ -545,49 +528,29 @@ module Epuber
       end
     end
 
-    # ------------------------------------------
-    # @group TOC
-    #
-    namespace '/toc' do
-      get '/?' do
-        render_bade('toc.bade')
-      end
-
+    namespace '/book' do
       get '/*' do
-        next handle_websocket("/toc/#{params[:splat].first}") if request.websocket?
+        next handle_websocket("/book/#{params[:splat].first}") if request.websocket?
 
         path = find_file
         next not_found if path.nil?
 
-        _log :get, "/toc/#{params[:splat].first}: founded file #{path}"
-        html_doc = Nokogiri::HTML(File.open(File.join(build_path, path)))
+        full_path = File.expand_path(path, build_path)
 
-        fix_links(html_doc, path, 'img', 'src') # images
-        fix_links(html_doc, path, 'script', 'src') # javascript
-        fix_links(html_doc, path, 'link[rel=stylesheet]', 'href') # css styles
-
-        add_file_to_head(:js, html_doc, 'vendor/bower/jquery/jquery.min.js')
-        add_file_to_head(:js, html_doc, 'vendor/bower/spin/spin.js')
-        add_file_to_head(:js, html_doc, 'vendor/bower/cookies/cookies.min.js')
-        add_file_to_head(:js, html_doc, 'vendor/bower/uri/URI.min.js')
-        add_file_to_head(:js, html_doc, 'vendor/bower/keymaster/keymaster.js')
-        add_file_to_head(:style, html_doc, 'book_content.styl')
-
-        add_file_to_head(:js, html_doc, 'support.coffee')
-        add_auto_refresh_script(html_doc)
-
-        unless file_resolver.nil?
-          current_index = file_resolver.spine_files.index { |file| file.pkg_destination_path == path }
-
-          unless current_index.nil?
-            previous_path = spine_file_at(current_index - 1).try(:pkg_destination_path)
-            next_path     = spine_file_at(current_index + 1).try(:pkg_destination_path)
-            add_keyboard_control_script(html_doc, previous_path, next_path)
-          end
+        case File.extname(full_path)
+          when '.xhtml'
+            handle_xhtml_file(full_path)
+          else
+            handle_file(full_path)
         end
-
-        [200, html_doc.to_html]
       end
+    end
+
+    # ------------------------------------------
+    # @group TOC
+    #
+    get '/toc/?' do
+      render_bade('toc.bade')
     end
 
     # ----------------------------------
