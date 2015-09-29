@@ -190,10 +190,10 @@ module Epuber
       @file_resolver.add_file(container_xml)
       process_file(container_xml)
 
-      meta_inf_files = MetaInfGenerator.new(compilation_context).generate_all_files
-      meta_inf_files.each do |meta_file|
-        @file_resolver.add_file(meta_file)
-        process_file(meta_file)
+      if @target.epub_version >= 2.0 && @target.epub_version < 3.0
+        ibooks_options = FileTypes::IBooksDisplayOptionsFile.new
+        @file_resolver.add_file(ibooks_options)
+        process_file(ibooks_options)
       end
     end
 

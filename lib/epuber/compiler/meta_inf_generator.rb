@@ -36,22 +36,6 @@ module Epuber
           end
         end
       end
-
-      # @return [Array<Epuber::Compiler::File>]
-      #
-      def generate_all_files
-        all = []
-
-        if @target.ibooks?
-          display_options                  = FileTypes::GeneratedFile.new
-          display_options.path_type        = :package
-          display_options.destination_path = 'META-INF/com.apple.ibooks.display-options.xml'
-          display_options.content          = generate_ibooks_display_options_xml
-          all << display_options
-        end
-
-        all
-      end
     end
   end
 end
