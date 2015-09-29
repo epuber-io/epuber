@@ -23,3 +23,27 @@ module FakeFS
     end
   end
 end
+
+
+RSpec.configure do |c|
+  if ENV['SKIP_EXPENSIVE_TESTS'] == 'true'
+    c.filter_run_excluding expensive: true
+  end
+end
+
+
+
+
+def spec_root
+  File.dirname(__FILE__)
+end
+
+def resolve_file_paths(file)
+  # hack lines, because this normally does FileResolver
+  if file.respond_to?(:source_path)
+    file.abs_source_path = file.source_path
+  end
+
+  file.pkg_destination_path = file.destination_path
+  file.final_destination_path = file.destination_path
+end
