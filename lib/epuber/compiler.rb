@@ -181,10 +181,7 @@ module Epuber
       process_file(opf_file)
 
       # generate mimetype file
-      mimetype_file                  = Epuber::Compiler::FileTypes::GeneratedFile.new
-      mimetype_file.path_type        = :package
-      mimetype_file.destination_path = 'mimetype'
-      mimetype_file.content          = 'application/epub+zip'
+      mimetype_file = FileTypes::MimeTypeFile.new
       @file_resolver.add_file(mimetype_file)
       process_file(mimetype_file)
 
