@@ -186,8 +186,11 @@ module Epuber
       process_file(mimetype_file)
 
       # generate META-INF files
-      opf_path = opf_file.pkg_destination_path
-      meta_inf_files = MetaInfGenerator.new(@book, @target, opf_path).generate_all_files
+      container_xml = FileTypes::ContainerXMLFile.new
+      @file_resolver.add_file(container_xml)
+      process_file(container_xml)
+
+      meta_inf_files = MetaInfGenerator.new(compilation_context).generate_all_files
       meta_inf_files.each do |meta_file|
         @file_resolver.add_file(meta_file)
         process_file(meta_file)

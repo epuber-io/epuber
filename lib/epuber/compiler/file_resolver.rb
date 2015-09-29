@@ -19,6 +19,7 @@ module Epuber
     require_relative 'file_types/nav_file'
     require_relative 'file_types/opf_file'
     require_relative 'file_types/mime_type_file'
+    require_relative 'file_types/container_xml_file'
 
 
     class FileResolver
