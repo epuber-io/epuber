@@ -7,7 +7,9 @@ module Epuber
   describe Compiler::OPFGenerator do
     before do
       book = Book.new
-      @sut = Compiler::OPFGenerator.new(book, book.targets.first, Compiler::FileResolver.new('', ''))
+      ctx = Compiler::CompilationContext.new(book, book.targets.first)
+      ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
+      @sut = Compiler::OPFGenerator.new(ctx)
     end
 
     it 'creates minimal xml structure for empty book' do
@@ -32,7 +34,9 @@ module Epuber
         ### b.cover_image = 'cover.jpg'
       end
 
-      @sut = Compiler::OPFGenerator.new(book, book.targets.first, Compiler::FileResolver.new('', ''))
+      ctx = Compiler::CompilationContext.new(book, book.targets.first)
+      ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
+      @sut = Compiler::OPFGenerator.new(ctx)
 
       opf_xml = @sut.generate_opf
       with_xpath(opf_xml, '/package/metadata') do |metadata|
@@ -82,7 +86,9 @@ module Epuber
       resolver = Compiler::FileResolver.new('/source', '/dest')
       resolver.add_file(ncx_file)
 
-      @sut = Compiler::OPFGenerator.new(book, book.targets.first, resolver)
+      ctx = Compiler::CompilationContext.new(book, book.targets.first)
+      ctx.file_resolver = resolver
+      @sut = Compiler::OPFGenerator.new(ctx)
 
       opf_xml = @sut.generate_opf
       with_xpath(opf_xml, '/package/metadata') do |metadata|

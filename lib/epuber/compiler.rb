@@ -176,7 +176,7 @@ module Epuber
       process_file(nav_file)
 
       # generate .opf file
-      opf_file = OPFGenerator.new(@book, @target, @file_resolver).generate_opf_file
+      opf_file = FileTypes::OPFFile.new
       @file_resolver.add_file(opf_file)
       process_file(opf_file)
 
