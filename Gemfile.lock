@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    epuber (0.3.3.beta)
+    epuber (0.3.3)
       activesupport (~> 4.2)
-      bade (= 0.1.1)
+      bade (>= 0.1.2, < 1.0.0)
       bundler (~> 1)
       claide (~> 0.8)
       coffee-script
@@ -23,7 +23,7 @@ PATH
 PATH
   remote: ../Bade
   specs:
-    bade (0.1.1)
+    bade (0.1.2)
       bundler (~> 1)
 
 GEM
