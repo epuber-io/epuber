@@ -1,4 +1,4 @@
 
 module Epuber
-  VERSION = '0.3.3.beta'
+  VERSION = '0.3.3'
 end
