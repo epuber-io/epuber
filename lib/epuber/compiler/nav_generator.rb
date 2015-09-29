@@ -32,6 +32,12 @@ module Epuber
         landmark_toc:        { type: 'toc', text: 'Table of contents' },
       }.freeze
 
+      # @param [CompilationContext]
+      #
+      def initialize(compilation_context)
+        super(compilation_context.book, compilation_context.target, compilation_context.file_resolver)
+      end
+
       # Generates XML for toc document, the structure differs depend on epub_version
       #
       # Use method #to_s to generate nice string from XML document
@@ -47,22 +53,6 @@ module Epuber
           end
         end
       end
-
-      # @return [Epuber::Book::File]
-      #
-      def generate_nav_file
-        nav_file = FileTypes::GeneratedFile.new
-        nav_file.destination_path = if @target.epub_version >= 3
-                                      'nav.xhtml'
-                                    else
-                                      'nav.ncx'
-                                    end
-        nav_file.content = generate_nav
-        nav_file.path_type = :manifest
-        nav_file.properties << :navigation
-        nav_file
-      end
-
 
 
       private

@@ -171,7 +171,7 @@ module Epuber
     #
     def generate_other_files
       # generate nav file (nav.xhtml or nav.ncx)
-      nav_file = NavGenerator.new(@book, @target, @file_resolver).generate_nav_file
+      nav_file = FileTypes::NavFile.new(@target.epub_version)
       @file_resolver.add_file(nav_file)
       process_file(nav_file)
 

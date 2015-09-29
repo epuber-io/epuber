@@ -16,6 +16,7 @@ module Epuber
     require_relative 'file_types/xhtml_file'
     require_relative 'file_types/bade_file'
     require_relative 'file_types/image_file'
+    require_relative 'file_types/nav_file'
 
 
     class FileResolver
