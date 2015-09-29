@@ -20,8 +20,12 @@ module Epuber
       #
       def plugins
         @plugins ||= @target.plugins.map do |path|
-          Plugin.new(File.expand_path(path, Config.instance.project_path))
-        end
+          begin
+            Plugin.new(File.expand_path(path, Config.instance.project_path))
+          rescue LoadError
+            UI.error "Can't find plugin at path #{path}"
+          end
+        end.compact
       end
 
       # @param [Class] klass class of thing you want to perform (Checker or Transformer)
