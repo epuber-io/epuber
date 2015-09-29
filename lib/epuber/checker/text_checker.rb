@@ -48,28 +48,40 @@ module Epuber
           "#{start_sign}#{end_sign}"
         end
 
+        def formatted_match_line
+          match_line = @match.matched_string
+          pre_line = @match.pre_match_lines.last || ''
+
+          pre = match_pre_line = pre_line
+          if remove_tabs(match_pre_line).length > 100
+            pre = "#{match_pre_line.first(20)}...#{match_pre_line.last(30)}"
+          end
+
+          pre = remove_tabs(pre)
+
+          post_line = @match.post_match_lines.first || ''
+
+          post = if post_line.length > 50
+                   "#{post_line.first(50)}..."
+                 else
+                   post_line
+                 end
+
+          [pre, match_line, post]
+        end
+
         def remove_tabs(text)
           text.gsub("\t", ' ' * 4)
         end
 
         def to_s
-          match_line = @match.matched_string
-          post_line = @match.post_match_lines.first
-          pre_line = @match.pre_match_lines.last
+          pre_original = @match.pre_match_lines.last || ''
+          pre, match_text, post = formatted_match_line
 
-          pre = match_pre_line = pre_line
-          if remove_tabs(match_pre_line).length > 100
-            pre = "#{match_pre_line.first(20)} ... #{match_pre_line.last(30)}"
-          end
+          pointers = caret_symbols(pre.length, match_text.length)
 
-          pre = remove_tabs(pre)
-
-          post = "#{post_line.first(20)} ..."
-
-          pointers = caret_symbols(pre.length, match_line.length)
-
-          %{#{@file_path}:#{@match.line_number} column: #{match_pre_line.length} --- #{@message}
-  #{pre + match_line.ansi.red + post}
+          %{#{@file_path}:#{@match.line_number} column: #{pre_original.length} --- #{@message}
+  #{pre + match_text.ansi.red + post}
   #{pointers}}
         end
       end
