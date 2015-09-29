@@ -5,14 +5,17 @@ require 'nokogiri'
 module Epuber
   class Compiler
     class Generator
-      # @param [Epuber::Book::Target] target
-      # @param [Epuber::Book::Book] book
-      # @param [FileResolver] file_resolver
+      # @return [Epuber::Compiler::CompilationContext]
       #
-      def initialize(book, target, file_resolver)
-        @book = book
-        @target = target
-        @file_resolver = file_resolver
+      attr_reader :compilation_context
+
+      # @param [Epuber::Compiler::CompilationContext] compilation_context
+      #
+      def initialize(compilation_context)
+        @compilation_context = compilation_context
+        @book = compilation_context.book
+        @target = compilation_context.target
+        @file_resolver = compilation_context.file_resolver
       end
 
       protected

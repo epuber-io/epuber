@@ -62,12 +62,6 @@ module Epuber
 
       OPF_UNIQUE_ID = 'bookid'
 
-      # @param [CompilationContext]
-      #
-      def initialize(compilation_context)
-        super(compilation_context.book, compilation_context.target, compilation_context.file_resolver)
-      end
-
       # Generates XML for opf document
       #
       # Use method #to_s to generate nice string from XML document

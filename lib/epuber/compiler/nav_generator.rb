@@ -32,12 +32,6 @@ module Epuber
         landmark_toc:        { type: 'toc', text: 'Table of contents' },
       }.freeze
 
-      # @param [CompilationContext]
-      #
-      def initialize(compilation_context)
-        super(compilation_context.book, compilation_context.target, compilation_context.file_resolver)
-      end
-
       # Generates XML for toc document, the structure differs depend on epub_version
       #
       # Use method #to_s to generate nice string from XML document
