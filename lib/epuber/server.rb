@@ -388,7 +388,7 @@ module Epuber
         # transform all paths to relatives to the server
         changed.map! do |file|
           relative = relative_path_to_book_file(file)
-          File.join('', 'raw', relative) unless relative.nil?
+          File.join('', 'book', relative) unless relative.nil?
         end
 
         # remove nil paths (for example bookspec can't be found so the relative path is nil)
