@@ -224,8 +224,5 @@ module Epuber
         end
       end
     end
-
-    # TODO: can find files from super folder
-
   end
 end

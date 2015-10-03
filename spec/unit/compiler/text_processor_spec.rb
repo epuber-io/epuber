@@ -301,10 +301,32 @@ module Epuber
       end
 
       context '.resolve_links' do
-        it 'resolves links in <a>'
-        it 'resolves links in <map>'
-        it 'resolves links in <img>'
-        it 'resolves links in <script>'
+        before do
+          FileUtils.mkdir_p('folder')
+          FileUtils.touch(%w(root.xhtml ref1.xhtml ref2.xhtml folder/ref10.xhtml))
+          FileUtils.touch(%w(image1.jpeg image2.jpg folder/image3.png))
+
+          @finder = FileFinders::Normal.new('/')
+        end
+
+        it 'resolves links in <a>' do
+          doc = XHTMLProcessor.xml_document_from_string('<div><a href="ref1" /><a href="ref2.xhtml#abc"/><a href="ref10" /></div>')
+
+          links = XHTMLProcessor.resolve_links(doc, 'root.xhtml', @finder)
+
+          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.xhtml#abc"/><a href="folder/ref10.xhtml"/></div>'
+          expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.xhtml#abc'), URI('folder/ref10.xhtml')
+        end
+
+        it 'resolves links in <map>' do
+          source = '<map><area href="ref1" /><area href="ref2.xhtml#abc"/><area href="ref10" /></map>'
+          doc = XHTMLProcessor.xml_document_from_string(source)
+
+          links = XHTMLProcessor.resolve_links(doc, 'root.xhtml', @finder)
+
+          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<map><area href="ref1.xhtml"/><area href="ref2.xhtml#abc"/><area href="folder/ref10.xhtml"/></map>'
+          expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.xhtml#abc'), URI('folder/ref10.xhtml')
+        end
       end
 
       it 'detects whether xhtml document is using some scripts' do
