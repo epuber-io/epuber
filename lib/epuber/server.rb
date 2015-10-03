@@ -495,7 +495,11 @@ module Epuber
     #
     namespace '' do
       get '/?' do
-        handle_server_bade('book.bade')
+        if request.websocket?
+          handle_websocket('/')
+        else
+          handle_server_bade('book.bade')
+        end
       end
 
       get '/change_target/:target_name' do |target_name|
@@ -531,7 +535,11 @@ module Epuber
     # @group TOC
     #
     get '/toc/?' do
-      handle_server_bade('toc.bade')
+      if request.websocket?
+        handle_websocket('/toc')
+      else
+        handle_server_bade('toc.bade')
+      end
     end
 
     # ----------------------------------
@@ -539,7 +547,11 @@ module Epuber
     #
     namespace '/files' do
       get '/?' do
-        handle_server_bade('files.bade')
+        if request.websocket?
+          handle_websocket('/files')
+        else
+          handle_server_bade('files.bade')
+        end
       end
 
       get '/*' do

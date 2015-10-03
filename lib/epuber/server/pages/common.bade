@@ -38,6 +38,15 @@ mixin page(title: nil, header_id: nil)
     		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
     		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/jquery/jquery.min.js"></script>
     		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/spin/spin.js"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/uri/URI.min.js"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/cookies/cookies.min.js"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/auto_refresh/reloader.coffee"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/auto_refresh/connector.coffee"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/auto_refresh/protocol.coffee"></script>
+    		<script type="text/javascript" charset="utf-8" src="/server/raw/auto_refresh/auto_refresh.coffee"></script>
+    		<script type="text/javascript">
+    			| var auto_refresh = new AutoRefresh(window, console);
+    		</script>
     		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 
