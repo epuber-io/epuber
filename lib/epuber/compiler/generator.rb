@@ -2,6 +2,17 @@
 
 require 'nokogiri'
 
+module Nokogiri
+  module XML
+    class Builder
+      class NodeBuilder
+        attr_reader :node
+      end
+    end
+  end
+end
+
+
 module Epuber
   class Compiler
     class Generator

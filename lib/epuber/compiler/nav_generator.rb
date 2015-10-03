@@ -139,14 +139,16 @@ module Epuber
           visit_toc_items(toc_item.sub_items)
         elsif @target.epub_version >= 3
           @xml.li do
-            @xml.a(toc_item.title, href: result_file_path)
+            node_builder = @xml.a(href: result_file_path)
+            node_builder.node.inner_html = toc_item.title
 
             visit_toc_items(toc_item.sub_items)
           end
         else
           @xml.navPoint(id: "navPoint_#{@nav_nav_point_id}") do
             @xml.navLabel do
-              @xml.text_(toc_item.title)
+              node_builder = @xml.text_
+              node_builder.node.inner_html = toc_item.title
             end
             @xml.content(src: result_file_path)
 
