@@ -177,15 +177,11 @@ module Epuber
 
           raise "Unknown landmark `#{landmark.inspect}`, supported are #{LANDMARKS_MAP.keys}" if dict.nil?
 
-          map_type = dict[:type]
-          types    = if map_type.is_a?(Array)
-                       map_type
-                     else
-                       [map_type]
-                     end
+          types = Array(dict[:type])
+
 
           # filter out ibooks specific when the target is not ibooks
-          types.reject! { |type| type.to_s.start_with?('ibooks:') } unless @target.ibooks?
+          types = types.reject { |type| type.to_s.start_with?('ibooks:') } unless @target.ibooks?
 
           result_file_path = pretty_path_for_toc_item(toc_item, fragment: false)
 
