@@ -21,7 +21,11 @@ module Epuber
       def plugins
         @plugins ||= @target.plugins.map do |path|
           begin
-            Plugin.new(File.expand_path(path, Config.instance.project_path))
+            plugin = Plugin.new(File.expand_path(path, Config.instance.project_path))
+            plugin.files.each do |file|
+              file_resolver.add_file(file)
+            end
+            plugin
           rescue LoadError
             UI.error "Can't find plugin at path #{path}"
           end

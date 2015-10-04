@@ -2,15 +2,12 @@
 
 require_relative 'checker'
 require_relative 'transformer'
+require_relative 'compiler/file_types/source_file'
 
 
 module Epuber
   class Plugin
-    class PluginFile
-      # @return [String]
-      #
-      attr_reader :file_path
-
+    class PluginFile < Compiler::FileTypes::SourceFile
       # @return [Array]
       #
       attr_reader :instances
@@ -18,7 +15,7 @@ module Epuber
       # @param [String] file_path path to plugin file
       #
       def initialize(file_path)
-        @file_path = file_path
+        super(file_path)
         @instances = []
 
         eval(::File.read(file_path), binding, file_path)
