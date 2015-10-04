@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require_relative '../command'
+require 'os'
 
 
 module Epuber
@@ -11,11 +12,18 @@ module Epuber
         CLAide::Argument.new('TARGET', false, false),
       ]
 
+      def self.options
+        [
+          ['--open',   'Opens the web page in default web browser, working only on OS X'],
+        ].concat(super)
+      end
+
       # @param args [CLAide::ARGV]
       #
       def initialize(args)
         super
         @selected_target_name = args.shift_argument
+        @open_web_browser = args.flag?('open', false)
       end
 
       def validate!
@@ -36,7 +44,15 @@ module Epuber
 
         help!('Not existing target') if target.nil?
 
-        Epuber::Server.run!(book, target, verbose: self.verbose?)
+        Epuber::Server.run!(book, target, verbose: verbose?) do |uri|
+          if OS.osx?
+            if @open_web_browser
+              system "open #{uri}"
+            else
+              puts 'Web browser can be automatically opened by adding --open flag, see --help'
+            end
+          end
+        end
       end
     end
   end
