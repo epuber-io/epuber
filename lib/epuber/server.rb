@@ -122,6 +122,7 @@ module Epuber
     end
 
     def self.verbose=(verbose)
+      @verbose = verbose
       @default_thin_logger ||= Thin::Logging.logger
 
       unless verbose
@@ -327,8 +328,7 @@ module Epuber
       rescue => e
         self.file_resolver = compiler.file_resolver
 
-        Epuber::UI.error("Compile error: #{e}")
-        Epuber::UI.error("Backtrace: #{e.backtrace}") if verbose
+        Epuber::UI.error("Compile error: #{e}", location: e)
 
         false
       end
