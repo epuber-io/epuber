@@ -48,11 +48,10 @@ mixin iterate_spine(toc_item)
 +page(header_id: 'home')
 	.cover_image
 		div
-			- if book.cover_image.nil?
-				img(src: '/server/raw/default_cover.png')
-			- else
-				- file = file_resolver.file_from_request(book.cover_image)
+			- unless (file = file_resolver.file_from_request(book.cover_image)).nil?
 				img(src: "/raw/#{file.pkg_destination_path}")
+			- else
+				img(src: '/server/raw/default_cover.png')
 			- end
 	#content
 		+section('Metadata')
