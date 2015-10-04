@@ -20,8 +20,15 @@ module Epuber
       # @return [Nokogiri::XML::Document] parsed document
       #
       def self.xml_document_from_string(text, file_path = nil)
-        doc = Nokogiri::XML.parse(text)
+        if /\A[\n\r ]+(<\?xml)/ =~ text
+          UI.warning('XML header must be at the beginning of document', location: UI::Location.new(file_path, 1))
+
+          text = text.lstrip
+        end
+
+        doc = Nokogiri::XML(text)
         doc.encoding = 'UTF-8'
+        doc.file_path = file_path
 
         fragment = Nokogiri::XML.fragment(text)
         root_elements = fragment.children.select { |el| el.element? }
@@ -37,8 +44,6 @@ module Epuber
             doc.root.add_child(child)
           end
         end
-
-        doc.file_path = file_path
 
         doc
       end

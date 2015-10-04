@@ -143,6 +143,8 @@ module Epuber
         Location.new(obj.path, obj.lineno)
       when ::Nokogiri::XML::Node
         Location.new(obj.document.file_path, obj.line)
+      when Location
+        obj
       end
     end
 
