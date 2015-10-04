@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'stringio'
+
 require 'sinatra/base'
 require 'sinatra/namespace'
 require 'sinatra-websocket'
@@ -106,11 +108,30 @@ module Epuber
       self.target = target
       self.verbose = verbose
 
-      self.enable :logging if verbose
-
       start_listening_if_needed
 
-      super()
+      old_stderr = $stderr
+      $stderr = StringIO.new unless verbose
+
+      super() do |server|
+        $stderr = old_stderr
+        puts "Started development server on #{server.host}:#{server.port}"
+
+        yield URI("http://#{server.host}:#{server.port}") if block_given?
+      end
+    end
+
+    def self.verbose=(verbose)
+      @default_thin_logger ||= Thin::Logging.logger
+
+      unless verbose
+        Thin::Logging.logger = Logger.new(nil)
+        Thin::Logging.logger.level = nil
+      else
+        Thin::Logging.logger = @default_thin_logger
+      end
+
+      set :logging, verbose
     end
 
     def initialize
