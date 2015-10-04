@@ -24,9 +24,14 @@ module Epuber
 
     def self.run(argv = [])
       begin
+        UI.current_command = self
         super
+        UI.current_command = nil
+
       rescue => e
-        Epuber::UI.error!(e)
+        UI.error!(e)
+
+        UI.current_command = nil
       end
     end
 
