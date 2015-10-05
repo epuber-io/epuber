@@ -11,10 +11,8 @@ Gem::Specification.new do |spec|
   spec.version  = Epuber::VERSION
   spec.authors  = ['Roman Kříž']
   spec.email    = ['samnung@gmail.com']
-  spec.summary  = 'Command line tool for easy creating and maintaining ebooks.'
-  spec.description = "Command line tool for easy creating and maintaining ebooks.\n"
-                     'With support Stylus.'
-  spec.homepage = 'http://epuber.io'
+  spec.summary  = 'Epuber is simple tool to compile and pack source files into EPUB format.'
+  spec.homepage = 'https://github.com/epuber-io/epuber'
   spec.license  = 'MIT'
 
   spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec Gemfile LICENSE.txt README.md)
@@ -30,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'os', '~> 0.9'
 
   spec.add_runtime_dependency 'stylus', '~> 1.0'
-  spec.add_runtime_dependency 'coffee-script'
+  spec.add_runtime_dependency 'coffee-script', '~> 2.4'
 
   spec.add_runtime_dependency 'sinatra', '~> 1.4'
   spec.add_runtime_dependency 'sinatra-websocket', '~> 0.3'
