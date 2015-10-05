@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.description = "Command line tool for easy creating and maintaining ebooks.\n"
                      'With support Stylus.'
   spec.homepage = 'http://epuber.io'
-  spec.license  = 'Commercial'
+  spec.license  = 'MIT'
 
   spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec Gemfile LICENSE.txt README.md)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
