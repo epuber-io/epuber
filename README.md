@@ -9,7 +9,7 @@ Epuber is simple tool to compile and pack source files into EPUB format. Offers 
 
 - creating multiple versions of book with requirement to maintain only one source (e.g. for iBooks, Google Play, ...)
     - defined constants are usable in almost all source files
-- using template engines (currenlty only [Bade](https://github.com/epuber-io/bade)), css preprocessors (currently only Stylus) and standard EPUB formats at the same time
+- using template engines (currently only [Bade](https://github.com/epuber-io/bade)), css preprocessors (currently only Stylus) and standard EPUB formats at the same time
 - have local development server which
     - automatically refresh web browser when some source file changes
     - quick jumping to next page with arrow keys on keyboard
