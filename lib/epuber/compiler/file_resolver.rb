@@ -1,8 +1,6 @@
 # encoding: utf-8
 
-require 'unicode_normalize'
-
-
+require_relative '../ruby_extensions/string'
 
 module Epuber
   class Compiler
