@@ -1,6 +1,33 @@
 
 # CHANGELOG
 
+## v0.3.6
+
+- add support for older versions of Ruby (2.1.X and 2.0.X) which doesn't support string unicode normalization
+
+
+## v0.3.5
+
+- [Server] fix AutoRefresh for style changes
+- [Server] add AutoRefresh for home pages (`/`, `/toc`, `/files`)
+- [Server] add `--open` CLI flag to open automatically web browser after server starts
+
+
+## v0.3.4
+
+- upgrade Bade to 0.1.3
+
+
+## v0.3.3
+
+- [FileTypes] add new classes for generated files (`META-INF/*`, `nav.xhtml`, `content.opf`, ...)
+- [TextChecker] fix formatting when indent contains tab characters
+- [TextChecker] fix crasheshes for cases when problem is at beginning or end of line
+- [Server] fix several crashes when compilation fails
+- [Server] move `/toc/*` requests to `/book/*` so it supports loading images from css
+- [OPFGenerator] add `opf:file-as` to author element for EPUB 2
+
+
 ## v0.3.2
 
 - [Command::Init] create sublime project
