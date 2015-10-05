@@ -1,38 +1,16 @@
 
-require 'rubygems'
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new(:spec)
 
-Rake::Task[:release].clear
-Rake::Task['install:local'].clear
+task :default => :spec
 
-
-helper = Bundler::GemHelper.instance
-gemspec = helper.gemspec
-gem_path = File.expand_path("pkg/#{gemspec.name}-#{gemspec.version}.gem", helper.base)
-
-
-desc 'Push to our geminabox server'
-task :push => [:build] do
-  sh "gem inabox #{gem_path}"
-end
-
-desc 'Push to our geminabox server, !!! but overrides gems with same version !!!'
-task 'push-force' => [:build] do
-  sh "gem inabox #{gem_path} -o"
-end
 
 
 desc 'Shortcut for bower in correct location'
-task 'bower' do |_t, args|
+task 'bower_update' do
   Dir.chdir('lib/epuber/third_party/bower') do
-    sh 'bower', *args
+    sh 'bower update'
   end
-end
-
-desc 'Display lines of code'
-task 'sloc' do
-  sh 'cloc . --exclude-dir=iTunesProducer-dump,third_party,.idea,.epuber'
 end
