@@ -1,6 +1,6 @@
 # Epuber
 
-[![Build Status](https://travis-ci.org/epuber-io/epuber.svg?branch=master)](https://travis-ci.org/epuber-io/epuber)
+[![Gem Version](https://badge.fury.io/rb/epuber.svg)](http://badge.fury.io/rb/epuber) [![Build Status](https://travis-ci.org/epuber-io/epuber.svg?branch=master)](https://travis-ci.org/epuber-io/epuber) [![Coverage Status](https://coveralls.io/repos/epuber-io/epuber/badge.svg?branch=master&service=github)](https://coveralls.io/github/epuber-io/epuber?branch=master)
 
 Epuber is simple tool to compile and pack source files into EPUB format. Offers to define multiple "targets" which allows to create multiple versions of the book by running only one command. Eliminates copying code and information, eliminates needs to use _git_ branches to differ ebook content.
 
