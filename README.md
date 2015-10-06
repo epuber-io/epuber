@@ -18,9 +18,29 @@ Epuber is simple tool to compile and pack source files into EPUB format. Offers 
 
 ## Installation
 
-Installation is easy, just type following line to terminal:
+Epuber has several prerequisites, first of all it uses [RMagick](https://github.com/rmagick/rmagick) which has several external dependencies:
 
-    $ gem install epuber
+- ImageMagick
+- pkg-config
+
+On OS X the easiest way to install prerequisites is to use [brew](http://brew.sh):
+
+    $ brew install imagemagick pkg-config
+
+On Ubuntu, you can run:
+
+    $ sudo apt-get install libmagickwand-dev
+
+
+### Finish
+
+Then just type following line to terminal:
+
+    $ sudo gem install epuber
+
+If everything goes well, try running following line in terminal:
+
+    $ epuber --help
 
 
 ## Development
