@@ -48,7 +48,7 @@ mixin iterate_spine(toc_item)
 +page(header_id: 'home')
 	.cover_image
 		div
-			- unless (file = file_resolver.file_from_request(book.cover_image)).nil?
+			- if !book.cover_image.nil? && !(file = file_resolver.file_from_request(book.cover_image)).nil?
 				img(src: "/raw/#{file.pkg_destination_path}")
 			- else
 				img(src: '/server/raw/default_cover.png')
