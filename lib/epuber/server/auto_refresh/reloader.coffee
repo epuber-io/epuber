@@ -247,9 +247,7 @@ class @ReloaderContext
                 @console.log('AutoRefresh: reloading page')
                 @_saveScrollPosition()
 
-                uri = URI(@window.location)
-                uri.setQuery('cache_control', Math.round(+new Date / 1e3))
-                @window.location.assign(uri.toString())
+                window.location.reload(true)
 
             when ReloadType.compilation_begin
                 @_displayCompilingOverlay()
