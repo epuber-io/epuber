@@ -31,18 +31,22 @@ selected_color = #6D3102
 left_align = 40px
 header_underline_height = 6px
 
-#header_bg
-  height 70px
-  width 100%
-  background-color #C5946C
-  float left
+header_height = 60px
 
 #header
-  height 70px
+  height header_height
   width 100%
+  position fixed
+  top 0px
+  z-index 10000
+
+  background-color #C5946C
+  box-shadow 1px 1px 10px rgba(0, 0, 0, 0.4)
+
+#header_content
+  height 100%
   max-width 1200px
   margin 0 auto
-  background-color #C5946C
   position relative
 
   ul
@@ -56,7 +60,7 @@ header_underline_height = 6px
       list-style none
       padding 0
       margin 0 10px
-      font-size 36px
+      font-size (header_height / 1.8px)
       color normal_color
       border-bottom solid header_underline_height transparent
 
@@ -85,7 +89,7 @@ header_underline_height = 6px
   max-width 1200px
 
   margin 0 auto
-  margin-top 20px
+  margin-top header_height + 20px
 
 #content
   flex 5

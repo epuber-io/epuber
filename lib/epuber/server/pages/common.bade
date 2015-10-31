@@ -16,12 +16,12 @@
 
 
 mixin body_header(current)
-	#header_bg
-	#header
-		ul
-			li(class: 'selected' if current == 'home' || current.nil?): a(href: '/')= book.title
-			li(class: 'selected' if current == 'toc'): a(href: '/toc/') Toc
-			li(class: 'selected' if current == 'files'): a(href: '/files/') Files
+    #header
+        #header_content
+            ul
+                li(class: 'selected' if current == 'home' || current.nil?): a(href: '/')= book.title
+                li(class: 'selected' if current == 'toc'): a(href: '/toc/') Toc
+                li(class: 'selected' if current == 'files'): a(href: '/files/') Files
 
 mixin body_footer
 	#footer
