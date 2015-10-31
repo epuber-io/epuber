@@ -45,16 +45,30 @@ module Epuber
 
         ################################################################################################################
 
+        # @param [String] source_path  path to source file
+        # @param [String] dest_path  path to destination file
+        # @param [Bool] identical whether the content of existing files should be compared or not (expensive operation)
+        #
+        # @return [Bool]
+        #
+        def self.file_uptodate?(source_path, dest_path, identical: true)
+          return false unless File.exist?(dest_path)
+          return false unless FileUtils.uptodate?(dest_path, [source_path])
+
+          if identical
+            return false unless FileUtils.identical?(dest_path, source_path)
+          end
+
+          true
+        end
+
         # @param [String] source_path
         # @param [String] dest_path
         #
         # @return [Bool]
         #
         def self.file_copy?(source_path, dest_path)
-          return false if FileUtils.uptodate?(dest_path, [source_path])
-          return false if File.exists?(dest_path) && FileUtils.compare_file(dest_path, source_path)
-
-          true
+          !file_uptodate?(source_path, dest_path)
         end
 
         # @param [String] source_path

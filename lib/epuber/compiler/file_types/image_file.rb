@@ -15,7 +15,7 @@ module Epuber
           dest = final_destination_path
           source = abs_source_path
 
-          return if FileUtils.uptodate?(dest, [source])
+          return if self.class.file_uptodate?(source, dest)
 
           img = Magick::Image::read(source).first
 

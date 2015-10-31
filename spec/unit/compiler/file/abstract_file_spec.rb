@@ -31,22 +31,13 @@ module Epuber
         end
 
         context 'copy_file?' do
-          it 'do not need to copy when the source file is older' do
-            File.write('source.txt', 'some content, so we can compare it')
-            File.write('dest.txt', 'some different content') # we don't care about content now
+          it 'does not need to copy when the source file is older' do
+            content = 'some content, so we can compare it'
+            File.write('source.txt', content)
+            File.write('dest.txt', content)
 
             # source file is older then dest file
             expect(File.mtime('source.txt') < File.mtime('dest.txt')).to be_truthy
-
-            expect(AbstractFile.file_copy?('source.txt', 'dest.txt')).to be_falsey
-          end
-
-          it 'do not need to copy when files has same content' do
-            File.write('dest.txt', 'some content, so we can compare it')
-            File.write('source.txt', 'some content, so we can compare it')
-
-            # source file is newer
-            expect(File.mtime('source.txt') > File.mtime('dest.txt')).to be_truthy
 
             expect(AbstractFile.file_copy?('source.txt', 'dest.txt')).to be_falsey
           end
