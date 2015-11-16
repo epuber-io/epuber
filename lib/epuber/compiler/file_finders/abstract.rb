@@ -43,20 +43,20 @@ module Epuber
         attr_reader :context_path
 
         # @param [String] pattern  original pattern for searching
-        # @param [Symbol] groups  list of groups
+        # @param [Array<Symbol> | Symbol] groups  list of groups
         # @param [String] context_path  context path of current searching
         # @param [Array<String>] files_paths  list of founded files
         #
         def initialize(pattern, groups, context_path, files_paths)
           @pattern = pattern
-          @groups = groups
+          @groups = Array(groups)
           @context_path = context_path
           @files_paths = files_paths
         end
 
         def to_s
           str = "Found too many files for pattern `#{pattern}` from context path #{context_path}"
-          str += ", file groups #{groups.map(:inspect)}" unless groups.nil?
+          str += ", file groups #{groups.map(&:inspect)}" if !groups.nil? && !groups.empty?
           str + ", founded files #{files_paths}"
         end
       end
@@ -98,6 +98,8 @@ module Epuber
         end
 
 
+        # @param [Array<Symbol> | Symbol] groups
+        #
         def assert_one_file(files, pattern: nil, groups: nil, context_path: nil)
           raise FileNotFoundError.new(pattern, context_path) if files.empty?
           raise MultipleFilesFoundError.new(pattern, groups, context_path, files) if files.count >= 2
@@ -109,7 +111,7 @@ module Epuber
         # When it founds too many (more than two) it will raise MultipleFilesFoundError
         #
         # @param [String] pattern  pattern of the desired files
-        # @param [Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+        # @param [Array<Symbol> | Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
         # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
         #
         # @return [Array<String>] list of founded files
