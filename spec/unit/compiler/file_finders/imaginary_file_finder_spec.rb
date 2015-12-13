@@ -57,6 +57,27 @@ module Epuber
           expect(path).to eq ['abc.txt']
         end
 
+
+        context 'crashes' do
+          it "doesn't crash when searched path is empty, only raises valid error" do
+            finder = Imaginary.new('/')
+            finder.add_file('/abc/def')
+
+            expect do
+              finder.find_file('')
+            end.to raise_error(FileNotFoundError)
+          end
+
+          it "doesn't crash when searched path is empty (specified context path), only raises valid error" do
+            finder = Imaginary.new('/')
+            finder.add_file('/abc/def')
+
+            expect do
+              finder.find_file('', groups: :image, context_path: '/abc')
+            end.to raise_error(FileNotFoundError)
+          end
+        end
+
       end
     end
   end

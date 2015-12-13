@@ -86,7 +86,9 @@ module Epuber
 
         def __core_find_files_from_pattern(pattern)
           parts = self.class.path_parts(pattern)
-          find_recurser(root, parts).flatten.map do |item|
+          found_entries = find_recurser(root, parts).flatten
+          file_entries = found_entries.reject { |entry| entry.is_a?(DirEntry) }
+          file_entries.map do |item|
             item.absolute_path
           end
         end
@@ -112,6 +114,8 @@ module Epuber
           return [] unless dir.respond_to? :[]
 
           pattern, *parts = parts
+          return [] if pattern.nil?
+
           matches         = case pattern
                               when '**'
                                 case parts
@@ -125,20 +129,12 @@ module Epuber
                                     end.flatten.uniq
                                   when []
                                     parts = [] # end recursion
-                                    dir.entries.flatten.uniq
+                                    dir.entries.values.flatten.uniq
                                   else
                                     directories_under(dir)
                                 end
                               else
-                                regex_body = pattern.gsub('.', '\.')
-                                               .gsub('?', '.')
-                                               .gsub('*', '.*')
-                                               .gsub('(', '\(')
-                                               .gsub(')', '\)')
-                                               .gsub(/\{(.*?)\}/) do
-                                  "(#{Regexp.last_match[1].gsub(',', '|')})"
-                                end
-                                               .gsub(/\A\./, '(?!\.).')
+                                regex_body = pattern_to_regex(pattern)
                                 dir.entries.reject { |k, _v| /\A#{regex_body}\Z/ !~ k }.values
                             end
 
@@ -151,11 +147,23 @@ module Epuber
 
         # @param [DirEntry] dir
         #
-        # @return [Hash<String, DirEntry>]
+        # @return [Array<DirEntry>]
         #
         def directories_under(dir)
           children = dir.entries.values.select { |f| f.is_a?(DirEntry) }
           (Array(dir) + children + children.map { |c| directories_under(c) }).flatten.uniq
+        end
+
+        def pattern_to_regex(pattern)
+          pattern.gsub('.', '\.')
+            .gsub('?', '.')
+            .gsub('*', '.*')
+            .gsub('(', '\(')
+            .gsub(')', '\)')
+            .gsub(/\{(.*?)\}/) do
+              "(#{Regexp.last_match[1].gsub(',', '|')})"
+            end
+            .gsub(/\A\./, '(?!\.).')
         end
       end
     end
