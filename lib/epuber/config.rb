@@ -124,11 +124,3 @@ module Epuber
     self.test = false
   end
 end
-
-# HACK: this should be done with nicer way
-#
-at_exit do
-  unless Epuber::Config.test?
-    Epuber::Config.instance.save_lockfile
-  end
-end

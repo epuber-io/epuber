@@ -63,5 +63,11 @@ module Epuber
       raise PlainInformative, "No `.bookspec' found in the project directory." if bookspec_files.empty?
       raise PlainInformative, "Multiple `.bookspec' found in current directory" if bookspec_files.count > 1
     end
+
+    def write_lockfile
+      unless Epuber::Config.test?
+        Epuber::Config.instance.save_lockfile
+      end
+    end
   end
 end

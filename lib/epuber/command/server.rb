@@ -44,14 +44,19 @@ module Epuber
 
         help!('Not existing target') if target.nil?
 
-        Epuber::Server.run!(book, target, verbose: verbose?) do |uri|
-          if OS.osx?
-            if @open_web_browser
-              system "open #{uri}"
-            else
-              puts 'Web browser can be automatically opened by adding --open flag, see --help'
+        begin
+          Epuber::Server.run!(book, target, verbose: verbose?) do |uri|
+            if OS.osx?
+              if @open_web_browser
+                system "open #{uri}"
+              else
+                puts 'Web browser can be automatically opened by adding --open flag, see --help'
+              end
             end
           end
+        rescue Interrupt
+          write_lockfile
+          raise
         end
       end
     end

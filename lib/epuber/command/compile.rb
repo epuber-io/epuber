@@ -82,6 +82,8 @@ module Epuber
             convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
           end
         end
+
+        write_lockfile
       end
 
       private
