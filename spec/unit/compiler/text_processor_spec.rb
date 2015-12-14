@@ -335,6 +335,9 @@ module Epuber
 
         doc = XHTMLProcessor.xml_document_from_string('<script src="baf.js" />')
         expect(XHTMLProcessor.using_javascript?(doc)).to be_truthy
+
+        doc = XHTMLProcessor.xml_document_from_string('<p>some text</p>')
+        expect(XHTMLProcessor.using_javascript?(doc)).to be_falsey
       end
 
       context '.resolve_images' do
@@ -372,6 +375,38 @@ module Epuber
 
           expect(doc.at_css('img')['src']).to eq 'images/image1.png'
           expect(resolver.files.count).to eq 1
+        end
+      end
+
+      context 'using_remote_resources?' do
+        it 'detects using remote images' do
+          doc = XHTMLProcessor.xml_document_from_string('<img src="http://lorempixel.com/400/200" />')
+          expect(XHTMLProcessor.using_remote_resources?(doc)).to be_truthy
+        end
+
+        it "not detects remote resources when there aren't any remote images" do
+          doc = XHTMLProcessor.xml_document_from_string('<img src="images/cover_image.jpg" />')
+          expect(XHTMLProcessor.using_remote_resources?(doc)).to be_falsey
+        end
+
+        it 'detects using remote styles' do
+          doc = XHTMLProcessor.xml_document_from_string('<link rel="stylesheet" type="text/css" href="http://httpbin.org/style.css">')
+          expect(XHTMLProcessor.using_remote_resources?(doc)).to be_truthy
+        end
+
+        it "not detects remote resources when there aren't any remote styles" do
+          doc = XHTMLProcessor.xml_document_from_string('<link rel="stylesheet" type="text/css" href="style.css">')
+          expect(XHTMLProcessor.using_remote_resources?(doc)).to be_falsey
+        end
+
+        it 'detects using remote scripts' do
+          doc = XHTMLProcessor.xml_document_from_string('<script src="http://httpbin.orgtutorial/browser/script/rabbits.js"></script>')
+          expect(XHTMLProcessor.using_remote_resources?(doc)).to be_truthy
+        end
+
+        it "not detects remote resources when there aren't any remote scripts" do
+          doc = XHTMLProcessor.xml_document_from_string('<script src="../browser/script/rabbits.js"></script>')
+          expect(XHTMLProcessor.using_remote_resources?(doc)).to be_falsey
         end
       end
     end

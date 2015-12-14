@@ -213,6 +213,15 @@ module Epuber
         !xhtml_doc.at_css('script').nil?
       end
 
+      def self.using_remote_resources?(xhtml_doc)
+        regexp = %r{^[^:/?#]+://.*}
+
+        result = false
+        result ||= xhtml_doc.css('[src]').any? { |node| node['src'] =~ regexp }
+        result ||= xhtml_doc.css('link[href]').any? { |node| node['href'] =~ regexp }
+        result
+      end
+
       # @param [Nokogiri::XML::Document] xhtml_doc
       # @param [String] file_path path of referring file
       # @param [FileResolver] file_resolver

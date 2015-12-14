@@ -70,6 +70,7 @@ module Epuber
 
           XHTMLProcessor.add_viewport(xhtml_doc, target.default_viewport) unless target.default_viewport.nil?
           self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
+          self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
 
           XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
           XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)

@@ -58,6 +58,7 @@ module Epuber
         cover_image: 'cover-image',
         navigation:  'nav',
         scripted:    'scripted',
+        remote_resources: 'remote-resources',
       }.freeze
 
       OPF_UNIQUE_ID = 'bookid'
