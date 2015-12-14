@@ -28,6 +28,8 @@ module Epuber
         super
         UI.current_command = nil
 
+      rescue Interrupt
+        UI.error('[!] Cancelled')
       rescue => e
         UI.error!(e)
 
