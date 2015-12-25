@@ -3,7 +3,7 @@ rvm:
   - 2.0.0-p647
   - 2.1.7
   - 2.2.4
-  - head
+  - ruby-head
 
 before_install:
   - wget -nv -O- https://raw.githubusercontent.com/kovidgoyal/calibre/master/setup/linux-installer.py | sudo python -c "import sys; main=lambda:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
