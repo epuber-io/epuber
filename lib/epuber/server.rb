@@ -128,7 +128,7 @@ module Epuber
 
       unless verbose
         Thin::Logging.logger = Logger.new(nil)
-        Thin::Logging.logger.level = nil
+        Thin::Logging.logger.level = :fatal
       else
         Thin::Logging.logger = @default_thin_logger
       end
