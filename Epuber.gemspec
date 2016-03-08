@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'listen', '~> 3.0'
   spec.add_runtime_dependency 'os', '~> 0.9'
 
-  spec.add_runtime_dependency 'stylus', '~> 1.0'
+  spec.add_runtime_dependency 'epuber-stylus', '~> 1.0'
   spec.add_runtime_dependency 'coffee-script', '~> 2.4'
 
   spec.add_runtime_dependency 'sinatra', '~> 1.4'
