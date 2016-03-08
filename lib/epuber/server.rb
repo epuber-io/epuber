@@ -16,7 +16,7 @@ require_relative 'vendor/hash_binding'
 require_relative 'helper'
 
 require 'bade'
-require 'stylus'
+require 'epuber-stylus'
 require 'coffee-script'
 
 require_relative 'third_party/bower'
