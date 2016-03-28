@@ -47,6 +47,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rspec', '~> 3.2'
   spec.add_development_dependency 'rubocop', '~> 0.29'
-  spec.add_development_dependency 'rake', '~> 10.4'
+  spec.add_development_dependency 'rake', '~> 11'
   spec.add_development_dependency 'fakefs', '~> 0.6'
 end
