@@ -175,6 +175,10 @@ module Epuber
     #
     default_target_attribute :create_mobi
 
+    # @return [String] book identifier used in OPF file
+    #
+    default_target_attribute :identifier
+
 
     # @return [String] isbn of printed book
     #
