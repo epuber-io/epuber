@@ -12,6 +12,7 @@ module Epuber
   end
 
   class Command < CLAide::Command
+    require_relative 'command/build'
     require_relative 'command/compile'
     require_relative 'command/init'
     require_relative 'command/server'
