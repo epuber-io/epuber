@@ -5,11 +5,15 @@ mixin book_meta(key, format: nil)
 	tr
 		- value = book.send(key.to_sym)
 		- if value.is_a?(Array)
-			- value = value.map(&format).join(', ')
+			- value = value.compact.map(&format).join(', ')
 		- end
 
 		- unless value.nil?
 			td.book_meta_key= key.gsub('_', ' ')
+			- if value.to_s.empty?
+				- value = '&nbsp;'
+			- end
+
 			td.book_meta_value= value
 		- end
 
