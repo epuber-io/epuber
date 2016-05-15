@@ -19,7 +19,7 @@ mixin body_header(current)
     #header
         #header_content
             ul
-                li(class: 'selected' if current == 'home' || current.nil?): a(href: '/')= book.title
+                li(class: 'selected' if current == 'home' || current.nil?): a(href: '/') Home
                 li(class: 'selected' if current == 'toc'): a(href: '/toc/') Toc
                 li(class: 'selected' if current == 'files'): a(href: '/files/') Files
 
@@ -30,11 +30,7 @@ mixin body_footer
 mixin page(title: nil, header_id: nil)
 	html
     	head
-    		- if title.nil?
-    			title #{book.title} | Epuber
-    		- else
-    			title #{title} | #{book.title} | Epuber
-    		- end
+    		title= [title, book.title, 'Epuber'].compact.reject(&:empty?).join(' | ')
     		link(rel: "stylesheet", type: "text/css", href: "/server/raw/basic.styl")
     		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/jquery/jquery.min.js"></script>
     		<script type="text/javascript" charset="utf-8" src="/server/raw/vendor/bower/spin/spin.js"></script>
