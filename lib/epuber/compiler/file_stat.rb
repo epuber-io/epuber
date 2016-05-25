@@ -20,6 +20,10 @@ module Epuber
       #
       attr_reader :file_path
 
+      # @return [String]
+      #
+      attr_reader :dependency_paths
+
       # @param [String] path
       # @param [File::Stat] stat
       #
@@ -30,6 +34,21 @@ module Epuber
         @mtime = stat.mtime
         @ctime = stat.ctime
         @size = stat.size
+
+        @dependency_paths = []
+      end
+
+      # @param [String] path
+      #
+      def add_dependency!(path)
+        @dependency_paths << path
+      end
+
+      # @param [Array<String>] paths
+      #
+      def keep_dependencies!(paths)
+        to_delete = (dependency_paths - paths)
+        @dependency_paths -= to_delete
       end
 
       # @param [FileStat] other
