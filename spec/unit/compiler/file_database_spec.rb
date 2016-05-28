@@ -95,10 +95,21 @@ module Epuber
           sut.update_metadata('/file')
           sut.add_dependency('/file_dep', to: '/file')
 
+          expect(sut.up_to_date?('/file')).to be_truthy
+
           # make the dependency file newer
           File.write('/file_dep', 'abc def')
 
           expect(sut.up_to_date?('/file')).to be_falsey
+        end
+
+        it 'handle not-existing files correctly' do
+          File.write('/file', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency('/file_dep', to: '/file')
+
+          expect(sut.up_to_date?('/file')).to be_truthy
         end
 
         it 'resolve transitive dependency' do

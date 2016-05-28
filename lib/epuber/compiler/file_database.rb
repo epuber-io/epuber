@@ -31,7 +31,7 @@ module Epuber
       #
       def changed?(file_path)
         stat = @all_files[file_path]
-        return true if stat.nil?
+        return false if stat.nil?
 
         result = (stat != FileStat.new(file_path))
         result || stat.dependency_paths.any? { |path| changed?(path) }
@@ -60,7 +60,11 @@ module Epuber
 
         to_stat.add_dependency!(file_path)
 
-        update_metadata(file_path) if @all_files[file_path].nil?
+        begin
+          update_metadata(file_path) if @all_files[file_path].nil?
+        rescue Errno::ENOENT
+          # no action, valid case where dependant file does not exist
+        end
       end
 
       # @param [Array<String>] file_paths
