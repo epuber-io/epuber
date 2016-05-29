@@ -9,6 +9,8 @@ module Epuber
       require_relative 'xhtml_file'
 
       class BadeFile < XHTMLFile
+        PRECOMPILED_CACHE_NAME = 'bade_precompiled'
+
         # @param [Epuber::Compiler::CompilationContext] compilation_context
         #
         def process(compilation_context)
@@ -16,7 +18,8 @@ module Epuber
           book = compilation_context.book
           file_resolver = compilation_context.file_resolver
 
-          bade_content = load_source(compilation_context)
+          up_to_date = source_file_up_to_date?
+          precompiled_exists = File.exist?(precompiled_path)
 
           variables = {
             __book: book,
@@ -27,11 +30,35 @@ module Epuber
             __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(target.constants),
           }
 
-          xhtml_content = Bade::Renderer.from_source(bade_content, source_path)
-                                        .with_locals(variables)
-                                        .render(new_line: '', indent: '')
+          if up_to_date && precompiled_exists && compilation_context.debug?
+            precompiled = Bade::Precompiled.from_yaml_file(precompiled_path)
+
+            renderer = Bade::Renderer.from_precompiled(precompiled)
+                                     .with_locals(variables)
+
+            xhtml_content = renderer.render(new_line: '', indent: '')
+
+          else
+            compilation_context.source_file_database.update_metadata(source_path) if compilation_context.debug?
+
+            bade_content = load_source(compilation_context)
+
+            renderer = Bade::Renderer.from_source(bade_content, source_path)
+                                     .with_locals(variables)
+
+            FileUtils.mkdir_p(File.dirname(precompiled_path))
+            renderer.precompiled.write_yaml_to_file(precompiled_path)
+
+            xhtml_content = renderer.render(new_line: '', indent: '')
+          end
 
           write_compiled(common_process(xhtml_content, compilation_context))
+        end
+
+        # @return [String]
+        #
+        def precompiled_path
+          File.join(Config.instance.build_cache_path(PRECOMPILED_CACHE_NAME), source_path + '.precompiled.yml')
         end
       end
     end

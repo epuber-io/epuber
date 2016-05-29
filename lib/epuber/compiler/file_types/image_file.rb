@@ -9,13 +9,13 @@ module Epuber
       require_relative 'source_file'
 
       class ImageFile < SourceFile
-        # @param [Compiler::CompilationContext] compilation_context
+        # @param [Compiler::CompilationContext] _compilation_context
         #
-        def process(compilation_context)
+        def process(_compilation_context)
+          return if destination_file_up_to_date?
+
           dest = final_destination_path
           source = abs_source_path
-
-          return if self.class.file_uptodate?(source, dest)
 
           img = Magick::Image::read(source).first
 
@@ -35,6 +35,8 @@ module Epuber
             # file is already old
             self.class.file_copy!(source, dest)
           end
+
+          update_metadata!
         end
       end
     end

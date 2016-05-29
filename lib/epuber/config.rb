@@ -103,6 +103,28 @@ module Epuber
       File.join(working_path, 'release_build', target.name.to_s)
     end
 
+    # @param [String] cache_name
+    #
+    # @return [String]
+    #
+    def build_cache_path(cache_name)
+      File.join(working_path, 'build_cache', cache_name)
+    end
+
+    # @return [String]
+    #
+    def file_stat_database_path
+      File.join(working_path, 'metadata', 'source_file_stats.yml')
+    end
+
+    # @param [Epuber::Book::Target] target
+    #
+    # @return [String]
+    #
+    def target_file_stat_database_path(target)
+      File.join(working_path, 'metadata', 'target_stats', target.name.to_s, 'file_stats.yml')
+    end
+
     # ---------------------------------------------------------------------------------------------------------------- #
 
     # Singleton

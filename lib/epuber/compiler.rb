@@ -85,9 +85,16 @@ module Epuber
         # build folder cleanup
         remove_unnecessary_files
         remove_empty_folders
+
+        source_paths = file_resolver.files.select { |a| a.is_a?(FileTypes::SourceFile) }.map { |a| a.source_path }
+        compilation_context.source_file_database.cleanup(source_paths)
+        compilation_context.target_file_database.cleanup(source_paths)
       end
     ensure
       self.class.globals_catcher.clear_all
+
+      compilation_context.source_file_database.save_to_file
+      compilation_context.target_file_database.save_to_file
     end
 
     # Archives current target files to epub
@@ -207,10 +214,12 @@ module Epuber
       end
     end
 
-    # @param [FileTypes::AbstractFile] file
+    # @param [Epuber::Compiler::FileTypes::AbstractFile] file
     #
     def process_file(file)
+      file.compilation_context = compilation_context
       file.process(compilation_context)
+      file.compilation_context = nil
     end
 
     # @return nil

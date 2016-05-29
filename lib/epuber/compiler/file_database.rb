@@ -29,24 +29,42 @@ module Epuber
 
       # @param [String] file_path
       #
-      def changed?(file_path)
+      def changed?(file_path, transitive: true, default_value: true)
         stat = @all_files[file_path]
-        return false if stat.nil?
+        return default_value if stat.nil?
 
         result = (stat != FileStat.new(file_path))
-        result || stat.dependency_paths.any? { |path| changed?(path) }
+
+        if transitive
+          result ||= stat.dependency_paths.any? do |path|
+            changed?(path, transitive: transitive, default_value: false)
+          end
+        end
+
+        result
       end
 
       # @param [String] file_path
       #
-      def up_to_date?(file_path)
-        !changed?(file_path)
+      # @return [FileStat]
+      #
+      def file_stat_for(file_path)
+        @all_files[file_path]
+      end
+
+      # @param [String] file_path
+      #
+      def up_to_date?(file_path, transitive: true)
+        !changed?(file_path, transitive: transitive)
       end
 
       # @param [String] file_path
       #
       def update_metadata(file_path)
-        @all_files[file_path] = FileStat.new(file_path)
+        old_stat = @all_files[file_path]
+        old_dependencies = old_stat ? old_stat.dependency_paths : []
+
+        @all_files[file_path] = FileStat.new(file_path, dependency_paths: old_dependencies)
       end
 
       # @param [String] file_path  path to file that will be dependent on
@@ -81,6 +99,8 @@ module Epuber
       # @param [String] path
       #
       def save_to_file(path = store_file_path)
+        FileUtils.mkdir_p(File.dirname(path))
+
         File.write(path, @all_files.to_yaml)
       end
 

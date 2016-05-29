@@ -37,6 +37,9 @@ module Epuber
         #
         attr_accessor :path_type
 
+        # @return [Epuber::Compiler::CompilationContext] non-nil value only during #process() method
+        #
+        attr_accessor :compilation_context
 
         def ==(other)
           self.class == other.class && final_destination_path == other.final_destination_path

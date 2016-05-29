@@ -49,6 +49,7 @@ mixin bla()
           ctx = CompilationContext.new(book, book.default_target)
           ctx.file_resolver = FileResolver.new('/', '/.build')
 
+          file.compilation_context = ctx
           file.process(ctx)
 
           expect(File.read('some_file.xhtml')).to eq '<?xml version="1.0" encoding="UTF-8" standalone="no"?>

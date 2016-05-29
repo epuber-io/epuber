@@ -27,7 +27,7 @@ module Epuber
       # @param [String] path
       # @param [File::Stat] stat
       #
-      def initialize(path, stat = nil)
+      def initialize(path, stat = nil, dependency_paths: [])
         @file_path = path
 
         stat ||= File.stat(path)
@@ -35,7 +35,7 @@ module Epuber
         @ctime = stat.ctime
         @size = stat.size
 
-        @dependency_paths = []
+        @dependency_paths = dependency_paths
       end
 
       # @param [String] path
