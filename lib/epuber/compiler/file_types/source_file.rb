@@ -42,6 +42,8 @@ module Epuber
         # @return [Bool]
         #
         def source_file_up_to_date?
+          return false if compilation_context.no_cache
+
           source_db = compilation_context.source_file_database
           source_db.up_to_date?(source_path)
         end
@@ -51,6 +53,8 @@ module Epuber
         # @return [Bool]
         #
         def destination_file_up_to_date?
+          return false if compilation_context.no_cache
+
           source_db = compilation_context.source_file_database
           target_db = compilation_context.target_file_database
 

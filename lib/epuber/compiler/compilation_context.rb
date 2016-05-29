@@ -82,6 +82,10 @@ module Epuber
 
       # @return [Bool]
       #
+      attr_accessor :no_cache
+
+      # @return [Bool]
+      #
       attr_accessor :verbose
 
       def verbose?
@@ -90,6 +94,10 @@ module Epuber
 
       def debug?
         !release_build
+      end
+
+      def incremental_build?
+        !no_cache
       end
 
       def initialize(book, target)

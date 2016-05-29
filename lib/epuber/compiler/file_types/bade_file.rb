@@ -30,7 +30,7 @@ module Epuber
             __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(target.constants),
           }
 
-          if up_to_date && precompiled_exists && compilation_context.debug?
+          if up_to_date && precompiled_exists && compilation_context.incremental_build?
             precompiled = Bade::Precompiled.from_yaml_file(precompiled_path)
 
             renderer = Bade::Renderer.from_precompiled(precompiled)

@@ -18,9 +18,10 @@ module Epuber
 
       def self.options
         [
-          ['--check',   'Performs additional validation on sources + checks result epub with epubcheck.'],
-          ['--write',   'Performs additional transformations which writes to source files.'],
-          ['--release', 'Create release version of the book, no caching, everything creates from scratch.'],
+          ['--check',    'Performs additional validation on sources + checks result epub with epubcheck.'],
+          ['--write',    'Performs additional transformations which writes to source files.'],
+          ['--release',  'Create release version of the book, no caching, everything creates from scratch.'],
+          ['--no-cache', 'Turns off incremental build, can resolve some bugs but build takes much longer.']
         ].concat(super)
       end
 
@@ -31,6 +32,7 @@ module Epuber
         @should_check = argv.flag?('check', false)
         @should_write = argv.flag?('write', false)
         @release_version = argv.flag?('release', false)
+        @no_cache = argv.flag?('no-cache', false)
 
         super(argv)
       end
@@ -59,7 +61,10 @@ module Epuber
           # Build all targets to always clean directory
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
-            compiler.compile(Epuber::Config.instance.release_build_path(target), check: true, write: @should_write, release: true, verbose: verbose?)
+            build_path = Epuber::Config.instance.release_build_path(target)
+            compiler.compile(build_path, check: true, write: @should_write,
+                                       release: true, verbose: verbose?,
+                                      no_cache: true)
 
             archive_name = compiler.epub_name
 
@@ -76,7 +81,8 @@ module Epuber
         else
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
-            compiler.compile(Epuber::Config.instance.build_path(target), check: @should_check, write: @should_write, verbose: verbose?)
+            build_path = Epuber::Config.instance.build_path(target)
+            compiler.compile(build_path, check: @should_check, write: @should_write, verbose: verbose?, no_cache: @no_cache)
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
             system(%(epubcheck "#{archive_path}")) if @should_check
