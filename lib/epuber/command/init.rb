@@ -101,8 +101,10 @@ END
 *.epub
 *.mobi
 !.epuber/
-.epuber/build
-.epuber/release_build
+.epuber/build/
+.epuber/release_build/
+.epuber/build_cache/
+.epuber/metadata/
 
         END
         )

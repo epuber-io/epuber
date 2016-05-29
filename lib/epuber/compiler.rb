@@ -61,13 +61,14 @@ module Epuber
     #
     # @return [void]
     #
-    def compile(build_folder, check: false, write: false, release: false, verbose: false)
+    def compile(build_folder, check: false, write: false, release: false, verbose: false, use_cache: true)
       @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       compilation_context.file_resolver = @file_resolver
       compilation_context.should_check = check
       compilation_context.should_write = write
       compilation_context.release_build = release
       compilation_context.verbose = verbose
+      compilation_context.use_cache = use_cache
 
       self.class.globals_catcher.catch do
         @build_folder = build_folder
@@ -75,6 +76,9 @@ module Epuber
         FileUtils.mkdir_p(build_folder)
 
         puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_from_project(build_folder)}`"
+
+        file_resolver.add_file(FileTypes::SourceFile.new(Config.instance.pretty_path_from_project(@book.file_path).to_s))
+        compilation_context.plugins
 
         parse_toc_item(@target.root_toc)
         parse_target_file_requests
@@ -85,9 +89,16 @@ module Epuber
         # build folder cleanup
         remove_unnecessary_files
         remove_empty_folders
+
+        source_paths = file_resolver.files.select { |a| a.is_a?(FileTypes::SourceFile) }.map { |a| a.source_path }
+        compilation_context.source_file_database.cleanup(source_paths)
+        compilation_context.target_file_database.cleanup(source_paths)
       end
     ensure
       self.class.globals_catcher.clear_all
+
+      compilation_context.source_file_database.save_to_file
+      compilation_context.target_file_database.save_to_file
     end
 
     # Archives current target files to epub
@@ -207,10 +218,49 @@ module Epuber
       end
     end
 
-    # @param [FileTypes::AbstractFile] file
+    # @param [Epuber::Compiler::FileTypes::AbstractFile] file
     #
     def process_file(file)
+      file.compilation_context = compilation_context
+
+      resolve_dependencies(file) if file.is_a?(FileTypes::SourceFile)
       file.process(compilation_context)
+
+      file.compilation_context = nil
+    end
+
+    # @param [FileTypes::SourceFile] file
+    #
+    def resolve_dependencies(file)
+      deps = file.find_dependencies
+
+      # compute better paths for FileDatabase
+      dirname = File.dirname(file.source_path)
+      paths = deps.map { |relative| Config.instance.pretty_path_from_project(File.expand_path(relative, dirname)).to_s }.uniq
+
+      # add missing files to file_resolver
+      paths.each do |path|
+        next if file_resolver.file_with_source_path(path)
+        file_resolver.add_file(FileTypes::SourceFile.new(path))
+      end
+
+      # add .bookspec file
+      paths += [Config.instance.pretty_path_from_project(@book.file_path).to_s]
+
+      # add all activated plugin files
+      paths += compilation_context.plugins.map do |plugin|
+        plugin.files.map { |p_file| p_file.source_path }
+      end.flatten
+
+      # add dependencies to databases
+      source_db = compilation_context.source_file_database
+      source_db.update_metadata(file.source_path) unless source_db.file_stat_for(file.source_path)
+      source_db.add_dependency(paths, to: file.source_path)
+
+      # add dependencies to databases
+      target_db = compilation_context.target_file_database
+      target_db.update_metadata(file.source_path) unless target_db.file_stat_for(file.source_path)
+      target_db.add_dependency(paths, to: file.source_path)
     end
 
     # @return nil

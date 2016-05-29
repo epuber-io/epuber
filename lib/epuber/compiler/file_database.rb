@@ -29,23 +29,64 @@ module Epuber
 
       # @param [String] file_path
       #
-      def changed?(file_path)
+      def changed?(file_path, transitive: true, default_value: true)
         stat = @all_files[file_path]
-        return true if stat.nil?
+        return default_value if stat.nil?
 
-        stat != FileStat.new(file_path)
+        result = (stat != FileStat.new(file_path))
+
+        if transitive
+          result ||= stat.dependency_paths.any? do |path|
+            changed?(path, transitive: transitive, default_value: false)
+          end
+        end
+
+        result
       end
 
       # @param [String] file_path
       #
-      def up_to_date?(file_path)
-        !changed?(file_path)
+      # @return [FileStat]
+      #
+      def file_stat_for(file_path)
+        @all_files[file_path]
+      end
+
+      # @param [String] file_path
+      #
+      def up_to_date?(file_path, transitive: true)
+        !changed?(file_path, transitive: transitive)
       end
 
       # @param [String] file_path
       #
       def update_metadata(file_path)
-        @all_files[file_path] = FileStat.new(file_path)
+        old_stat = @all_files[file_path]
+        old_dependencies = old_stat ? old_stat.dependency_paths : []
+
+        @all_files[file_path] = FileStat.new(file_path, dependency_paths: old_dependencies)
+      end
+
+      # @param [Array<String>, String] file_path  path to file that will be dependent on
+      # @param [String] to  path to original file, that will has new dependency
+      #
+      def add_dependency(file_path, to: nil)
+        raise ArgumentError, ':to is required' if to.nil?
+
+        file_paths = Array(file_path)
+
+        to_stat = @all_files[to]
+        raise ArgumentError, ":to (#{to}) file is not in database" if to_stat.nil?
+
+        to_stat.add_dependency!(file_paths)
+
+        begin
+          file_paths.each do |path|
+            update_metadata(path) if @all_files[path].nil?
+          end
+        rescue Errno::ENOENT
+          # no action, valid case where dependant file does not exist
+        end
       end
 
       # @param [Array<String>] file_paths
@@ -53,10 +94,34 @@ module Epuber
       def cleanup(file_paths)
         to_remove = @all_files.keys - file_paths
         to_remove.each { |key| @all_files.delete(key) }
+
+        @all_files.each do |_, stat|
+          _cleanup_stat_dependency_list(file_paths, stat)
+        end
       end
 
+      # @param [String] path
+      #
       def save_to_file(path = store_file_path)
+        FileUtils.mkdir_p(File.dirname(path))
+
         File.write(path, @all_files.to_yaml)
+      end
+
+
+      # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+      private
+
+      # @param [Array<String>] file_paths
+      # @param [FileStat] stat
+      #
+      def _cleanup_stat_dependency_list(file_paths, stat)
+        stat.keep_dependencies!(file_paths)
+
+        stat.dependency_paths.each do |path|
+          _cleanup_stat_dependency_list(file_paths, @all_files[path])
+        end
       end
 
     end

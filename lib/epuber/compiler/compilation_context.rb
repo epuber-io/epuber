@@ -16,12 +16,24 @@ module Epuber
       #
       attr_accessor :file_resolver
 
+      # This will track source files regardless of current target
+      #
+      # @return [Epuber::Compiler::FileDatabase]
+      #
+      attr_reader :source_file_database
+
+      # This will track source files depend on current target
+      #
+      # @return [Epuber::Compiler::FileDatabase]
+      #
+      attr_reader :target_file_database
+
       # @return [Array<Epuber::Plugin>]
       #
       def plugins
         @plugins ||= @target.plugins.map do |path|
           begin
-            plugin = Plugin.new(File.expand_path(path, Config.instance.project_path))
+            plugin = Plugin.new(path)
             plugin.files.each do |file|
               file_resolver.add_file(file)
             end
@@ -70,16 +82,30 @@ module Epuber
 
       # @return [Bool]
       #
+      attr_accessor :use_cache
+
+      # @return [Bool]
+      #
       attr_accessor :verbose
 
       def verbose?
         verbose
       end
 
+      def debug?
+        !release_build
+      end
+
+      def incremental_build?
+        use_cache
+      end
 
       def initialize(book, target)
         @book = book
         @target = target
+
+        @source_file_database = FileDatabase.new(Config.instance.file_stat_database_path)
+        @target_file_database = FileDatabase.new(Config.instance.target_file_stat_database_path(target))
       end
     end
   end

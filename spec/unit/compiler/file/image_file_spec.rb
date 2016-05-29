@@ -18,6 +18,15 @@ module Epuber
           @tmp_dir = Dir.mktmpdir
         end
 
+        let (:ctx) do
+          book = Book.new
+
+          ctx = CompilationContext.new(book, book.default_target)
+          ctx.file_resolver = FileResolver.new(@tmp_dir, File.join(@tmp_dir, '/.build'))
+
+          ctx
+        end
+
         it "copy file's content to destination" do
           img_source = File.join(spec_root, '../test_project/images/001_Frie_9780804137508_art_r1_fmt.png')
           img_dest = File.join(@tmp_dir, 'dest_image.png')
@@ -29,6 +38,7 @@ module Epuber
           file.destination_path = img_dest
           resolve_file_paths(file)
 
+          file.compilation_context = ctx
           file.process(nil)
 
           expect(File.exist?(img_dest)).to be_truthy
@@ -47,6 +57,7 @@ module Epuber
           file.destination_path = dest
           resolve_file_paths(file)
 
+          file.compilation_context = ctx
           file.process(nil)
 
 

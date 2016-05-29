@@ -19,8 +19,10 @@ module Epuber
 
         def write_generate(content)
           if self.class.write_to_file?(content, final_destination_path)
-            UI.print_processing_debug_info("Writing generated content to #{pkg_destination_path}")
+            UI.print_processing_debug_info("#{pkg_destination_path}: Writing generated content")
             self.class.write_to_file!(content, final_destination_path)
+          else
+            UI.print_processing_debug_info("#{pkg_destination_path}: Not writing to disk ... generated content is same")
           end
         end
       end
