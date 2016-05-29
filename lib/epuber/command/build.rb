@@ -127,7 +127,7 @@ module Epuber
         UI.error!("Can't find location of calibre.app to convert EPUB to MOBI.") if locations.empty?
 
         selected = locations.first
-        UI.warn("Using calibre.app at location #{selected}") if locations.count > 1
+        UI.warning("Found multiple calibre.app, using at location #{selected}") if locations.count > 1
 
         selected
       end

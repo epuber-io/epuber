@@ -77,6 +77,9 @@ module Epuber
 
         puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_from_project(build_folder)}`"
 
+        file_resolver.add_file(FileTypes::SourceFile.new(Config.instance.pretty_path_from_project(@book.file_path).to_s))
+        compilation_context.plugins
+
         parse_toc_item(@target.root_toc)
         parse_target_file_requests
 
@@ -240,6 +243,14 @@ module Epuber
         next if file_resolver.file_with_source_path(path)
         file_resolver.add_file(FileTypes::SourceFile.new(path))
       end
+
+      # add .bookspec file
+      paths += [Config.instance.pretty_path_from_project(@book.file_path).to_s]
+
+      # add all activated plugin files
+      paths += compilation_context.plugins.map do |plugin|
+        plugin.files.map { |p_file| p_file.source_path }
+      end.flatten
 
       # add dependencies to databases
       source_db = compilation_context.source_file_database

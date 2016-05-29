@@ -33,7 +33,7 @@ module Epuber
       def plugins
         @plugins ||= @target.plugins.map do |path|
           begin
-            plugin = Plugin.new(File.expand_path(path, Config.instance.project_path))
+            plugin = Plugin.new(path)
             plugin.files.each do |file|
               file_resolver.add_file(file)
             end
