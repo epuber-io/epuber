@@ -32,7 +32,7 @@ module Epuber
         @should_check = argv.flag?('check', false)
         @should_write = argv.flag?('write', false)
         @release_version = argv.flag?('release', false)
-        @no_cache = argv.flag?('no-cache', false)
+        @use_cache = argv.flag?('cache', true)
 
         super(argv)
       end
@@ -82,7 +82,7 @@ module Epuber
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
             build_path = Epuber::Config.instance.build_path(target)
-            compiler.compile(build_path, check: @should_check, write: @should_write, verbose: verbose?, no_cache: @no_cache)
+            compiler.compile(build_path, check: @should_check, write: @should_write, verbose: verbose?, use_cache: @use_cache)
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
             system(%(epubcheck "#{archive_path}")) if @should_check

@@ -82,7 +82,7 @@ module Epuber
 
       # @return [Bool]
       #
-      attr_accessor :no_cache
+      attr_accessor :use_cache
 
       # @return [Bool]
       #
@@ -97,7 +97,7 @@ module Epuber
       end
 
       def incremental_build?
-        !no_cache
+        use_cache
       end
 
       def initialize(book, target)

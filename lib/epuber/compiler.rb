@@ -61,14 +61,14 @@ module Epuber
     #
     # @return [void]
     #
-    def compile(build_folder, check: false, write: false, release: false, verbose: false, no_cache: false)
+    def compile(build_folder, check: false, write: false, release: false, verbose: false, use_cache: true)
       @file_resolver = FileResolver.new(Config.instance.project_path, build_folder)
       compilation_context.file_resolver = @file_resolver
       compilation_context.should_check = check
       compilation_context.should_write = write
       compilation_context.release_build = release
       compilation_context.verbose = verbose
-      compilation_context.no_cache = no_cache
+      compilation_context.use_cache = use_cache
 
       self.class.globals_catcher.catch do
         @build_folder = build_folder

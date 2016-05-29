@@ -42,7 +42,7 @@ module Epuber
         # @return [Bool]
         #
         def source_file_up_to_date?
-          return false if compilation_context.no_cache
+          return false unless compilation_context.incremental_build?
 
           source_db = compilation_context.source_file_database
           source_db.up_to_date?(source_path)
@@ -53,7 +53,7 @@ module Epuber
         # @return [Bool]
         #
         def destination_file_up_to_date?
-          return false if compilation_context.no_cache
+          return false unless compilation_context.incremental_build?
 
           source_db = compilation_context.source_file_database
           target_db = compilation_context.target_file_database
@@ -81,9 +81,9 @@ module Epuber
         end
 
         def default_file_copy
-          ok = destination_file_up_to_date? && destination_file_exist?
-
-          unless ok
+          if destination_file_up_to_date?
+            UI.print_processing_debug_info("Destination path #{pkg_destination_path} is up-to-date")
+          else
             UI.print_processing_debug_info("Copying to #{pkg_destination_path}")
             self.class.file_copy!(abs_source_path, final_destination_path)
           end
@@ -95,6 +95,8 @@ module Epuber
           if self.class.write_to_file?(content, final_destination_path)
             UI.print_processing_debug_info("Writing compiled version to #{pkg_destination_path}")
             self.class.write_to_file!(content, final_destination_path)
+          else
+            UI.print_processing_debug_info("Not writing to disk ... compiled version at #{pkg_destination_path} is same")
           end
         end
 
@@ -102,6 +104,8 @@ module Epuber
           if self.class.write_to_file?(content, final_destination_path)
             UI.print_processing_debug_info("Writing processed version to #{pkg_destination_path}")
             self.class.write_to_file!(content, final_destination_path)
+          else
+            UI.print_processing_debug_info("Not writing to disk ... processed version at #{pkg_destination_path} is same")
           end
         end
       end
