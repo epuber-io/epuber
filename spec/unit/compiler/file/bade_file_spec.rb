@@ -16,6 +16,15 @@ module Epuber
       describe BadeFile do
         include FakeFS::SpecHelpers
 
+        let (:ctx) do
+          book = Book.new
+
+          ctx = CompilationContext.new(book, book.default_target)
+          ctx.file_resolver = FileResolver.new('/', '/.build')
+
+          ctx
+        end
+
         it 'handles ugly file with all xml bullshit lines' do
           source = 'import "dep.bade"
 
@@ -68,6 +77,36 @@ mixin bla()
 </html>
 '
         end
+
+        it 'finds imports' do
+          source = %q(
+import "abc.bade"
+import 'def.bade'
+)
+
+          imports = BadeFile.find_imports(source)
+
+          expect(imports).to contain_exactly 'abc.bade', 'def.bade'
+        end
+
+        it 'finds dependency files' do
+          source = %q(
+import "abc.bade"
+import 'def.bade'
+)
+          FileUtils.mkdir_p('/abc')
+          File.write('/abc/some_file.bade', source)
+          FileUtils.touch('/abc/abc.bade')
+          FileUtils.touch('/abc/def.bade')
+
+          file = BadeFile.new('/abc/some_file.bade')
+          file.destination_path = 'abc/some_file.xhtml'
+          file.compilation_context = ctx
+          resolve_file_paths(file)
+
+          expect(file.find_dependencies).to contain_exactly 'abc.bade', 'def.bade'
+        end
+
 
       end
 

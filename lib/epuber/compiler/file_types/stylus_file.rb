@@ -23,6 +23,16 @@ module Epuber
 
           update_metadata!
         end
+
+        def find_dependencies
+          self.class.find_imports(File.read(abs_source_path))
+        end
+
+        # @return [Array<String>]
+        #
+        def self.find_imports(content)
+          content.to_enum(:scan, /^\s*@import ("|')([^'"]*)("|')/).map { Regexp.last_match[2] }
+        end
       end
     end
   end

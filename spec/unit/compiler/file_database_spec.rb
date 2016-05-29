@@ -25,9 +25,9 @@ module Epuber
         sut.save_to_file
 
         inst2 = FileDatabase.new('/db')
-        expect(sut.all_files).to eq inst2.all_files
-        expect(sut.all_files.count).to eq 1
-        expect(sut.all_files['/file']).to be_a(FileStat)
+        expect(inst2.all_files).to eq sut.all_files
+        expect(inst2.all_files.count).to eq 1
+        expect(inst2.all_files['/file']).to be_a(FileStat)
       end
 
       it 'can track whether some file has changed the content size' do
@@ -86,6 +86,37 @@ module Epuber
           expect(sut.all_files['/file_dep']).to_not be_nil
 
           expect(sut.up_to_date?('/file')).to be_truthy
+        end
+
+        it 'can add dependencies as array' do
+          File.write('/file_dep1', 'abc')
+          File.write('/file_dep2', 'abc')
+          File.write('/file', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency(%w(/file_dep1 /file_dep2), to: '/file')
+
+          expect(sut.all_files.count).to eq 3
+          expect(sut.all_files['/file']).to_not be_nil
+          expect(sut.all_files['/file_dep1']).to_not be_nil
+          expect(sut.all_files['/file_dep2']).to_not be_nil
+
+          expect(sut.up_to_date?('/file')).to be_truthy
+        end
+
+        it 'can save to file and load back with dependencies' do
+          File.write('/file', 'abc')
+          File.write('/file_dep', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency('/file_dep', to: '/file')
+          sut.save_to_file
+
+          inst2 = FileDatabase.new('/db')
+          expect(inst2.all_files).to eq sut.all_files
+          expect(inst2.all_files.count).to eq 2
+          expect(inst2.all_files['/file']).to be_a(FileStat)
+          expect(inst2.all_files['/file'].dependency_paths).to contain_exactly('/file_dep')
         end
 
         it 'resolve dependency' do

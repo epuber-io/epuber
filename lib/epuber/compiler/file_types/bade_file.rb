@@ -37,10 +37,7 @@ module Epuber
                                      .with_locals(variables)
 
             xhtml_content = renderer.render(new_line: '', indent: '')
-
           else
-            compilation_context.source_file_database.update_metadata(source_path) if compilation_context.debug?
-
             bade_content = load_source(compilation_context)
 
             renderer = Bade::Renderer.from_source(bade_content, source_path)
@@ -53,12 +50,23 @@ module Epuber
           end
 
           write_compiled(common_process(xhtml_content, compilation_context))
+          update_metadata!
+        end
+
+        # return [Array<String>]
+        #
+        def find_dependencies
+          (super + self.class.find_imports(File.read(abs_source_path))).uniq
         end
 
         # @return [String]
         #
         def precompiled_path
           File.join(Config.instance.build_cache_path(PRECOMPILED_CACHE_NAME), source_path + '.precompiled.yml')
+        end
+
+        def self.find_imports(content)
+          content.to_enum(:scan, /^\s*import ("|')([^'"]*)("|')/).map { Regexp.last_match[2] }
         end
       end
     end

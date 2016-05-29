@@ -67,19 +67,23 @@ module Epuber
         @all_files[file_path] = FileStat.new(file_path, dependency_paths: old_dependencies)
       end
 
-      # @param [String] file_path  path to file that will be dependent on
+      # @param [Array<String>, String] file_path  path to file that will be dependent on
       # @param [String] to  path to original file, that will has new dependency
       #
       def add_dependency(file_path, to: nil)
-        raise AttributeError, ':to is required' if to.nil?
+        raise ArgumentError, ':to is required' if to.nil?
+
+        file_paths = Array(file_path)
 
         to_stat = @all_files[to]
-        raise AttributeError, ':to file is not in database' if to_stat.nil?
+        raise ArgumentError, ":to (#{to}) file is not in database" if to_stat.nil?
 
-        to_stat.add_dependency!(file_path)
+        to_stat.add_dependency!(file_paths)
 
         begin
-          update_metadata(file_path) if @all_files[file_path].nil?
+          file_paths.each do |path|
+            update_metadata(path) if @all_files[path].nil?
+          end
         rescue Errno::ENOENT
           # no action, valid case where dependant file does not exist
         end

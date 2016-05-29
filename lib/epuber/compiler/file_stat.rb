@@ -38,10 +38,11 @@ module Epuber
         @dependency_paths = dependency_paths
       end
 
-      # @param [String] path
+      # @param [Array<String>, String] path
       #
       def add_dependency!(path)
-        @dependency_paths << path
+        @dependency_paths += Array(path)
+        @dependency_paths.uniq!
       end
 
       # @param [Array<String>] paths

@@ -26,6 +26,16 @@ module Epuber
           @source_path = source_path
         end
 
+        # return [Array<String>]
+        #
+        def find_dependencies
+          []
+        end
+
+        def process(_compilation_context)
+          # do nothing
+        end
+
         # Source file does not change from last build
         # @warning Using only this method can cause not updating files that are different for targets
         #

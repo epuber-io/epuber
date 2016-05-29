@@ -218,8 +218,37 @@ module Epuber
     #
     def process_file(file)
       file.compilation_context = compilation_context
+
+      resolve_dependencies(file) if file.is_a?(FileTypes::SourceFile)
       file.process(compilation_context)
+
       file.compilation_context = nil
+    end
+
+    # @param [FileTypes::SourceFile] file
+    #
+    def resolve_dependencies(file)
+      deps = file.find_dependencies
+
+      # compute better paths for FileDatabase
+      dirname = File.dirname(file.source_path)
+      paths = deps.map { |relative| Config.instance.pretty_path_from_project(File.expand_path(relative, dirname)).to_s }.uniq
+
+      # add missing files to file_resolver
+      paths.each do |path|
+        next if file_resolver.file_with_source_path(path)
+        file_resolver.add_file(FileTypes::SourceFile.new(path))
+      end
+
+      # add dependencies to databases
+      source_db = compilation_context.source_file_database
+      source_db.update_metadata(file.source_path) unless source_db.file_stat_for(file.source_path)
+      source_db.add_dependency(paths, to: file.source_path)
+
+      # add dependencies to databases
+      target_db = compilation_context.target_file_database
+      target_db.update_metadata(file.source_path) unless target_db.file_stat_for(file.source_path)
+      target_db.add_dependency(paths, to: file.source_path)
     end
 
     # @return nil
