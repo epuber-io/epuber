@@ -64,7 +64,7 @@ module Epuber
             build_path = Epuber::Config.instance.release_build_path(target)
             compiler.compile(build_path, check: true, write: @should_write,
                                        release: true, verbose: verbose?,
-                                      no_cache: true)
+                                     use_cache: false)
 
             archive_name = compiler.epub_name
 

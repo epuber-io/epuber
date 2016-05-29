@@ -103,6 +103,7 @@ END
 !.epuber/
 .epuber/build
 .epuber/release_build
+.epuber/build_cache
 
         END
         )
