@@ -36,12 +36,12 @@ module Epuber
         write_bookspec(@book_name)
         write_sublime_project(@book_name)
 
-        FileUtils.mkdir_p('images')
-        FileUtils.mkdir_p('fonts')
-        FileUtils.mkdir_p('styles')
+        create_folder('images')
+        create_folder('fonts')
+        create_folder('styles')
         write_default_style(@book_name)
 
-        FileUtils.mkdir_p('text')
+        create_folder('text')
 
         print_good_bye(@book_name)
       end
@@ -51,7 +51,7 @@ module Epuber
 
       def print_good_bye(book_id)
         puts <<-END.ansi.green
-Project initialized, please review #{book_id}.bookspec file, remove comments.
+Project initialized, please review #{book_id}.bookspec file, remove comments and fill some attributes like book title.
 END
       end
 
@@ -124,6 +124,16 @@ END
       #
       def write(file_path, string)
         File.write(file_path, string)
+        puts "   #{'create'.ansi.green}  #{file_path}"
+      end
+
+      # @param [String] dir_path path to dir
+      #
+      # @return [nil]
+      #
+      def create_folder(dir_path)
+        FileUtils.mkdir_p(dir_path)
+        puts "   #{'create'.ansi.green}  #{dir_path}/"
       end
 
       # @param text [String]
