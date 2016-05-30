@@ -7,7 +7,7 @@ module Epuber
   describe Compiler::OPFGenerator do
     before do
       book = Book.new
-      ctx = Compiler::CompilationContext.new(book, book.targets.first)
+      ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
       @sut = Compiler::OPFGenerator.new(ctx)
     end
@@ -34,7 +34,7 @@ module Epuber
         ### b.cover_image = 'cover.jpg'
       end
 
-      ctx = Compiler::CompilationContext.new(book, book.targets.first)
+      ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
       @sut = Compiler::OPFGenerator.new(ctx)
 
@@ -86,7 +86,7 @@ module Epuber
       resolver = Compiler::FileResolver.new('/source', '/dest')
       resolver.add_file(ncx_file)
 
-      ctx = Compiler::CompilationContext.new(book, book.targets.first)
+      ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = resolver
       @sut = Compiler::OPFGenerator.new(ctx)
 

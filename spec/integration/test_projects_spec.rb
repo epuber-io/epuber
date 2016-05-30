@@ -11,8 +11,8 @@ describe 'Test project' do
       # FileUtils.rmtree(Epuber::Config::WORKING_PATH)
       # FileUtils.remove(Dir.glob('*.epub'))
 
-      Epuber::Command.run(%w(compile --check --write --verbose))
-      Epuber::Command.run(%w(compile --release --verbose))
+      Epuber::Command.run(%w(build --check --write --verbose))
+      Epuber::Command.run(%w(build --release --verbose))
     end
   end
 end

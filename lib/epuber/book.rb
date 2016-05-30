@@ -78,7 +78,7 @@ module Epuber
     #
     # @return [Array<Target>]
     #
-    def targets
+    def all_targets
       if @default_target.sub_targets.length == 0
         [@default_target]
       else
@@ -96,6 +96,8 @@ module Epuber
 
     # Defines new target
     #
+    # @param [String, Symbol] name
+    #
     # @return [Target] result target
     #
     def target(name)
@@ -103,6 +105,21 @@ module Epuber
         target.book = self
         yield target if block_given?
       end
+    end
+
+    # Defines several new targets with same configuration
+    #
+    # @param [Array<String, Symbol>] names
+    #
+    # @return [Array<Target>] result target
+    #
+    def targets(*names, &block)
+      if names.empty?
+        UI.warning('Book#targets to get all targets is deprecated, use #all_targets instead', location: caller_locations.first)
+        return all_targets
+      end
+
+      names.map { |name| target(name, &block) }
     end
 
 
@@ -260,7 +277,7 @@ module Epuber
     def target_named(target_name)
       return target_name if target_name.is_a?(Epuber::Book::Target)
 
-      targets.find do |target|
+      all_targets.find do |target|
         target.name == target_name || target.name.to_s == target_name.to_s
       end
     end

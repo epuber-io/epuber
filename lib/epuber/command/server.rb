@@ -37,7 +37,7 @@ module Epuber
         require_relative '../server'
 
         target = if @selected_target_name.nil?
-                   book.targets.first
+                   book.all_targets.first
                  else
                    book.target_named(@selected_target_name)
                  end
