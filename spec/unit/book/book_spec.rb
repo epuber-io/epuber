@@ -144,7 +144,7 @@ module Epuber
 
       context 'targets' do
         it 'there is always at least one target' do
-          expect(@book.targets.length).to eq 1
+          expect(@book.all_targets.length).to eq 1
         end
 
         it 'can add target' do
@@ -152,7 +152,7 @@ module Epuber
             ibooks.isbn = 'abcd-1234'
           end
 
-          targets = @book.targets
+          targets = @book.all_targets
           expect(targets.length).to eq 1
 
           ibooks_target = targets[0]
@@ -181,6 +181,20 @@ module Epuber
         it 'there is reference to book from created target' do
           target = @book.target :some_target
           expect(target.book).to eq @book
+        end
+
+        it 'can create multiple targets at same time' do
+          targets = @book.targets :target1, :target2, :target3
+          expect(targets.count).to eq 3
+        end
+
+        it 'can create multiple targets at same time also with configure block' do
+          targets = @book.targets :target1, :target2, :target3 do |t|
+            t.add_const abc: 'some const'
+          end
+
+          expect(targets.count).to eq 3
+          expect(targets.map { |t| t.constants[:abc] }).to contain_exactly 'some const', 'some const', 'some const'
         end
       end
 

@@ -120,7 +120,10 @@ module Epuber
         stat.keep_dependencies!(file_paths)
 
         stat.dependency_paths.each do |path|
-          _cleanup_stat_dependency_list(file_paths, @all_files[path])
+          next_stat = @all_files[path]
+          next if next_stat.nil?
+
+          _cleanup_stat_dependency_list(file_paths, next_stat)
         end
       end
 

@@ -13,7 +13,7 @@ module Epuber
         FileUtils.touch(%w(/source/txt1.xhtml /source/txt2.xhtml /source/txt3.xhtml /source/txt4.xhtml))
 
         book              = Book.new
-        ctx               = Compiler::CompilationContext.new(book, book.targets.first)
+        ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
         ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
         @sut              = Compiler::NavGenerator.new(ctx)
       end
@@ -42,7 +42,7 @@ module Epuber
         end
         book.finish_toc
 
-        ctx               = Compiler::CompilationContext.new(book, book.targets.first)
+        ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
         resolver          = Compiler::FileResolver.new('/source', '/dest')
         book.default_target.root_toc.sub_items.each { |item| resolver.add_file_from_request(item.file_request) }
         ctx.file_resolver = resolver
@@ -80,7 +80,7 @@ module Epuber
         end
         book.finish_toc
 
-        ctx               = Compiler::CompilationContext.new(book, book.targets.first)
+        ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
         resolver          = Compiler::FileResolver.new('/source', '/dest')
         book.default_target.root_toc.sub_items.each { |item| resolver.add_file_from_request(item.file_request) }
         ctx.file_resolver = resolver

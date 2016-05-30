@@ -71,7 +71,7 @@ mixin iterate_spine(toc_item)
 
 
 		+section('Targets')
-			- book.targets.each do |b_target|
+			- book.all_targets.each do |b_target|
 				p(class: 'target_selected' if target == b_target): a(href: "/change_target/#{b_target.name}")= b_target.name
 			- end
 
