@@ -69,13 +69,15 @@ module Epuber
         image:  %w(.png .jpg .jpeg),
         font:   %w(.otf .ttf),
         style:  %w(.css .styl),
-        script: %w(.js),
+        script: %w(.js .coffee),
       }
 
       EXTENSIONS_RENAME = {
         '.styl' => '.css',
 
         '.bade' => '.xhtml',
+
+        '.coffee' => '.js',
       }
 
       class Abstract

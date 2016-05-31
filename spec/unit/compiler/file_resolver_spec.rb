@@ -89,6 +89,7 @@ module Epuber
       it 'changes extensions of specific files' do
         expect(@sut.class.renamed_file_with_path('file.bade')).to eq 'file.xhtml'
         expect(@sut.class.renamed_file_with_path('file.styl')).to eq 'file.css'
+        expect(@sut.class.renamed_file_with_path('file.coffee')).to eq 'file.js'
       end
 
       it 'supports adding multiple files' do
@@ -243,6 +244,7 @@ module Epuber
           expect(FileResolver.file_class_for('.css')).to be FileTypes::StaticFile
 
           expect(FileResolver.file_class_for('.js')).to be FileTypes::StaticFile
+          expect(FileResolver.file_class_for('.coffee')).to be FileTypes::CoffeeScriptFile
 
           expect(FileResolver.file_class_for('.bade')).to be FileTypes::BadeFile
           expect(FileResolver.file_class_for('.xhtml')).to be FileTypes::XHTMLFile

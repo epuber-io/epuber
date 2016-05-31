@@ -40,7 +40,8 @@ Epuber::Book.new do |book|
   # add all fonts to result file
   book.add_files '*.{otf,ttf}'
 
-  book.add_file 'example.js'
+  book.add_default_script 'example.js'
+  book.add_default_script 'example_coffee'
 
   book.toc do |toc, target|
     toc.file 'cover', :landmark_cover, :landmark_start_page

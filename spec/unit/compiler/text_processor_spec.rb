@@ -425,7 +425,7 @@ module Epuber
       context '.resolve_scripts' do
         it 'resolves not existing files in destination' do
           FileUtils.mkdir_p('/scripts')
-          FileUtils.touch(%w(/scripts/script.js /scripts/script2.js /file.xhtml))
+          FileUtils.touch(%w(/scripts/script.js /scripts/script2.coffee /file.xhtml))
 
           xml = <<-XML
             <html>
@@ -453,10 +453,10 @@ module Epuber
         it 'resolves existing file in destination' do
           # Given
           FileUtils.mkdir_p('/scripts')
-          FileUtils.touch(%w(/scripts/script.js /scripts/script2.js /file.xhtml))
+          FileUtils.touch(%w(/scripts/script.js /scripts/script2.coffee /file.xhtml))
 
           resolver = FileResolver.new('/', '/.build')
-          resolver.add_file_from_request(Book::FileRequest.new('script', false))
+          resolver.add_file_from_request(Book::FileRequest.new('script2', false))
 
           expect(resolver.files.count).to eq 1
 

@@ -19,6 +19,7 @@ module Epuber
     require_relative 'file_types/mime_type_file'
     require_relative 'file_types/container_xml_file'
     require_relative 'file_types/ibooks_display_options_file'
+    require_relative 'file_types/coffee_script_file'
 
 
     class FileResolver
@@ -281,6 +282,8 @@ module Epuber
       def self.file_class_for(extname)
         mapping = {
           '.styl'  => FileTypes::StylusFile,
+
+          '.coffee' => FileTypes::CoffeeScriptFile,
 
           '.bade'  => FileTypes::BadeFile,
           '.xhtml' => FileTypes::XHTMLFile,
