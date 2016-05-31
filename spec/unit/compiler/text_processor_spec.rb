@@ -67,7 +67,7 @@ module Epuber
         end
       end
 
-      context '.add_style_links' do
+      context '.add_styles' do
         it 'adds missing links to empty head' do
           doc = XHTMLProcessor.xml_document_from_string('')
           XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
@@ -105,6 +105,50 @@ module Epuber
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
           expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def'
+        end
+      end
+
+      context '.add_scripts' do
+        it 'adds missing scripts to empty head' do
+          # Given
+          doc = XHTMLProcessor.xml_document_from_string('')
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          expect(doc.css('script').size).to eq 0
+
+          # When
+          XHTMLProcessor.add_scripts(doc, %w(abc def))
+
+          # Then
+          expect(doc.css('script').map {|node| node['src']}).to contain_exactly 'abc', 'def'
+        end
+
+        it 'adds missing links to styles' do
+          input_str = '<html>
+              <head>
+                <script type="text/javascript" src="qwe"></script>
+              </head>
+            </html>'
+          doc = XHTMLProcessor.xml_document_from_string(input_str)
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          expect(doc.css('script').size).to eq 1
+
+          XHTMLProcessor.add_scripts(doc, %w(abc def))
+
+          expect(doc.css('script').map {|node| node['src']}).to contain_exactly 'abc', 'def', 'qwe'
+        end
+
+        it 'will not add duplicated items' do
+          doc = XHTMLProcessor.xml_document_from_string('')
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          XHTMLProcessor.add_scripts(doc, %w(abc def))
+          XHTMLProcessor.add_scripts(doc, %w(abc def))
+          XHTMLProcessor.add_scripts(doc, %w(abc def))
+          XHTMLProcessor.add_scripts(doc, %w(abc def))
+
+          expect(doc.css('script').map {|node| node['src']}).to contain_exactly 'abc', 'def'
         end
       end
 

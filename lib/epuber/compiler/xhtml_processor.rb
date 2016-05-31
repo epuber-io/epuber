@@ -105,6 +105,24 @@ module Epuber
         end
       end
 
+      # Method for adding scripts with links, method will not add duplicate items
+      #
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @param [Array<String>] styles  links to files
+      #
+      # @return nil
+      #
+      def self.add_scripts(xhtml_doc, scripts)
+        head  = xhtml_doc.at_css('html > head')
+        old_links = head.css('script').map { |node| node['src'] }
+
+        links_to_add = scripts - old_links
+
+        links_to_add.each do |path|
+          head << xhtml_doc.create_element('script', src: path, type: 'text/javascript')
+        end
+      end
+
       # Adds viewport meta tag to head of some document, but only if there is not some existing tag
       #
       # @param [Nokogiri::XML::Document] xhtml_doc

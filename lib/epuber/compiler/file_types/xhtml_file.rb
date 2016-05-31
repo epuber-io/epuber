@@ -29,6 +29,21 @@ module Epuber
           end
         end
 
+        # @param [Book::Target] target
+        # @param [FileResolver] file_resolver
+        #
+        # @return [Array<String>] list of paths to styles relative to this file
+        #
+        def default_scripts(target, file_resolver)
+          default_scripts = target.default_scripts.map do |default_style_request|
+            Array(file_resolver.file_from_request(default_style_request))
+          end.flatten
+
+          default_scripts.map do |style|
+            Pathname.new(style.final_destination_path).relative_path_from(Pathname.new(File.dirname(final_destination_path))).to_s
+          end
+        end
+
         # @param [Compiler::CompilationContext] compilation_context
         #
         def load_source(compilation_context)
@@ -67,15 +82,18 @@ module Epuber
           XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
 
           XHTMLProcessor.add_styles(xhtml_doc, default_styles(target, file_resolver))
+          XHTMLProcessor.add_scripts(xhtml_doc, default_scripts(target, file_resolver))
 
           XHTMLProcessor.add_viewport(xhtml_doc, target.default_viewport) unless target.default_viewport.nil?
-          self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
-          self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
 
+          # resolve links to files, add other linked resources and compute correct path
           XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
           XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)
           XHTMLProcessor.resolve_scripts(xhtml_doc, destination_path, file_resolver)
           XHTMLProcessor.resolve_stylesheets(xhtml_doc, destination_path, file_resolver)
+
+          self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
+          self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
 
           xhtml_string = xhtml_doc.to_s
 

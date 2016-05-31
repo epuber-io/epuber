@@ -24,6 +24,7 @@ module Epuber
         @root_toc  = TocItem.new
 
         @default_styles = []
+        @default_scripts = []
         @plugins = []
       end
 
@@ -34,6 +35,9 @@ module Epuber
 
         @default_styles.freeze
         @default_styles.each(&:freeze)
+
+        @default_scripts.freeze
+        @default_scripts.each(&:freeze)
 
         @plugins.freeze
         @plugins.each(&:freeze)
@@ -96,7 +100,7 @@ module Epuber
       #
       def files
         # parent files plus our files
-        all_files = ((parent && parent.files) || []) + @files + @default_styles
+        all_files = ((parent && parent.files) || []) + @files + @default_styles + @default_scripts
 
         unless @attributes_values[:cover_image].nil?
           all_files << @attributes_values[:cover_image]
@@ -116,6 +120,12 @@ module Epuber
       #
       def default_styles
         ((parent && parent.default_styles) || []) + @default_styles
+      end
+
+      # @return [Array<Epuber::Book::FileRequest>]
+      #
+      def default_scripts
+        ((parent && parent.default_scripts) || []) + @default_scripts
       end
 
       # @return [Array<String>]
@@ -259,6 +269,35 @@ module Epuber
           file_obj.only_one = false
 
           @default_styles << file_obj unless @default_styles.include?(file_obj)
+        end
+      end
+
+      # @param file_paths [Array<String>]
+      #
+      # @return [void]
+      #
+      def add_default_script(*file_paths)
+        file_paths.map do |file_path|
+          file_obj          = add_file(file_path, group: :script)
+          file_obj.only_one = true
+
+          @default_scripts << file_obj unless @default_scripts.include?(file_obj)
+        end
+      end
+
+      # Add default scripts to target, default scripts will be automatically added to xhtml document
+      #
+      # Only difference with #add_default_script is it adds multiple files with one pattern
+      # @param file_paths [Array<String>]
+      #
+      # @return [void]
+      #
+      def add_default_scripts(*file_paths)
+        file_paths.map do |file_path|
+          file_obj          = add_file(file_path, group: :script)
+          file_obj.only_one = false
+
+          @default_scripts << file_obj unless @default_scripts.include?(file_obj)
         end
       end
 
