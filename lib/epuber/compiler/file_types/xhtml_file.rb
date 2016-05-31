@@ -74,6 +74,8 @@ module Epuber
 
           XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
           XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)
+          XHTMLProcessor.resolve_scripts(xhtml_doc, destination_path, file_resolver)
+          XHTMLProcessor.resolve_stylesheets(xhtml_doc, destination_path, file_resolver)
 
           xhtml_string = xhtml_doc.to_s
 

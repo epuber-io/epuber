@@ -378,6 +378,128 @@ module Epuber
         end
       end
 
+      context '.resolve_scripts' do
+        it 'resolves not existing files in destination' do
+          FileUtils.mkdir_p('/scripts')
+          FileUtils.touch(%w(/scripts/script.js /scripts/script2.js /file.xhtml))
+
+          xml = <<-XML
+            <html>
+              <head>
+                <script src="script"></script>
+              </head>
+              <body>
+                <script src="script2"></script>
+              </body>
+            </html>
+          XML
+
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+          resolver = FileResolver.new('/', '/.build')
+
+          expect(resolver.files.count).to eq 0
+
+          XHTMLProcessor.resolve_scripts(doc, 'file.xhtml', resolver)
+
+          expect(doc.at_css('head script')['src']).to eq 'scripts/script.js'
+          expect(doc.at_css('body script')['src']).to eq 'scripts/script2.js'
+          expect(resolver.files.count).to eq 2
+        end
+
+        it 'resolves existing file in destination' do
+          # Given
+          FileUtils.mkdir_p('/scripts')
+          FileUtils.touch(%w(/scripts/script.js /scripts/script2.js /file.xhtml))
+
+          resolver = FileResolver.new('/', '/.build')
+          resolver.add_file_from_request(Book::FileRequest.new('script', false))
+
+          expect(resolver.files.count).to eq 1
+
+
+          xml = <<-XML
+            <html>
+              <head>
+                <script src="script"></script>
+              </head>
+              <body>
+                <script src="script2"></script>
+              </body>
+            </html>
+          XML
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+
+          # When
+          XHTMLProcessor.resolve_scripts(doc, 'file.xhtml', resolver)
+
+          # Then
+          expect(doc.at_css('head script')['src']).to eq 'scripts/script.js'
+          expect(doc.at_css('body script')['src']).to eq 'scripts/script2.js'
+          expect(resolver.files.count).to eq 2
+        end
+      end
+
+      context '.resolve_stylesheets' do
+        it 'resolves not existing files in destination' do
+          FileUtils.mkdir_p('/styles')
+          FileUtils.touch(%w(/styles/style1.css /styles/style2.styl /file.xhtml))
+
+          xml = <<-XML
+            <html>
+              <head>
+                <link rel="stylesheet" href="style1">
+              </head>
+              <body>
+                <link rel="stylesheet" href="style2">
+              </body>
+            </html>
+          XML
+
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+          resolver = FileResolver.new('/', '/.build')
+
+          expect(resolver.files.count).to eq 0
+
+          XHTMLProcessor.resolve_stylesheets(doc, 'file.xhtml', resolver)
+
+          expect(doc.at_css('head link')['href']).to eq 'styles/style1.css'
+          expect(doc.at_css('body link')['href']).to eq 'styles/style2.css'
+          expect(resolver.files.count).to eq 2
+        end
+
+        it 'resolves existing file in destination' do
+          # Given
+          FileUtils.mkdir_p('/styles')
+          FileUtils.touch(%w(/styles/style1.css /styles/style2.styl /file.xhtml))
+
+          xml = <<-XML
+            <html>
+              <head>
+                <link rel="stylesheet" href="style1">
+              </head>
+              <body>
+                <link rel="stylesheet" href="style2">
+              </body>
+            </html>
+          XML
+
+          doc = XHTMLProcessor.xml_document_from_string(xml)
+
+          resolver = FileResolver.new('/', '/.build')
+          resolver.add_file_from_request(Book::FileRequest.new('style1', false))
+
+          expect(resolver.files.count).to eq 1
+
+          # When
+          XHTMLProcessor.resolve_stylesheets(doc, 'file.xhtml', resolver)
+
+          # Then
+          expect(doc.at_css('head link')['href']).to eq 'styles/style1.css'
+          expect(doc.at_css('body link')['href']).to eq 'styles/style2.css'
+          expect(resolver.files.count).to eq 2
+        end
+      end
+
       context 'using_remote_resources?' do
         it 'detects using remote images' do
           doc = XHTMLProcessor.xml_document_from_string('<img src="http://lorempixel.com/400/200" />')

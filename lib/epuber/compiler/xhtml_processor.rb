@@ -229,24 +229,51 @@ module Epuber
       # @return nil
       #
       def self.resolve_images(xhtml_doc, file_path, file_resolver)
+        resolve_resources_in('img', 'src', :image, xhtml_doc, file_path, file_resolver)
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      # @param [String] file_path path of referring file
+      # @param [FileResolver] file_resolver
+      #
+      # @return nil
+      #
+      def self.resolve_scripts(xhtml_doc, file_path, file_resolver)
+        resolve_resources_in('script', 'src', :script, xhtml_doc, file_path, file_resolver)
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc
+      # @param [String] file_path path of referring file
+      # @param [FileResolver] file_resolver
+      #
+      # @return nil
+      #
+      def self.resolve_stylesheets(xhtml_doc, file_path, file_resolver)
+        resolve_resources_in('link[rel="stylesheet"]', 'href', :style, xhtml_doc, file_path, file_resolver)
+      end
+
+      def self.resolve_resources_in(node_css_query, attribute_name, resource_group, xhtml_doc, file_path, file_resolver)
         dirname = File.dirname(file_path)
 
-        xhtml_doc.css('img').each do |img|
-          path = img['src']
+        xhtml_doc.css(node_css_query).each do |img|
+          path = img[attribute_name]
           next if path.nil?
 
           begin
-            new_path = file_resolver.dest_finder.find_file(path, groups: :image, context_path: dirname)
+            new_path = file_resolver.dest_finder.find_file(path, groups: resource_group, context_path: dirname)
 
           rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
             begin
-              new_path = resolved_link_to_file(path, :image, dirname, file_resolver.source_finder).to_s
+              new_path = resolved_link_to_file(path, resource_group, dirname, file_resolver.source_finder).to_s
               pkg_abs_path = File.expand_path(new_path, dirname).unicode_normalize
               pkg_new_path = Pathname.new(pkg_abs_path).relative_path_from(Pathname.new(file_resolver.source_path)).to_s
 
-              file = FileTypes::ImageFile.new(pkg_new_path)
+              file_class = FileResolver.file_class_for(File.extname(new_path))
+              file = file_class.new(pkg_new_path)
               file.path_type = :manifest
               file_resolver.add_file(file)
+
+              new_path = FileResolver::renamed_file_with_path(new_path)
 
             rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
               UI.warning(e.to_s, location: img)
@@ -255,7 +282,7 @@ module Epuber
             end
           end
 
-          img['src'] = new_path
+          img[attribute_name] = new_path
         end
       end
     end

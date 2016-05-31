@@ -87,8 +87,8 @@ module Epuber
       end
 
       it 'changes extensions of specific files' do
-        expect(@sut.send(:renamed_file_with_path, 'file.bade')).to eq 'file.xhtml'
-        expect(@sut.send(:renamed_file_with_path, 'file.styl')).to eq 'file.css'
+        expect(@sut.class.renamed_file_with_path('file.bade')).to eq 'file.xhtml'
+        expect(@sut.class.renamed_file_with_path('file.styl')).to eq 'file.css'
       end
 
       it 'supports adding multiple files' do

@@ -242,7 +242,7 @@ module Epuber
       #
       # @return [String] path with changed extension
       #
-      def renamed_file_with_path(path)
+      def self.renamed_file_with_path(path)
         extname     = File.extname(path)
         new_extname = FileFinders::EXTENSIONS_RENAME[extname]
 
@@ -261,7 +261,7 @@ module Epuber
         if file.final_destination_path.nil?
           dest_path = if file.respond_to?(:source_path) && !file.source_path.nil?
                         file.abs_source_path = File.expand_path(file.source_path, source_path)
-                        renamed_file_with_path(file.source_path)
+                        self.class.renamed_file_with_path(file.source_path)
                       elsif !file.destination_path.nil?
                         file.destination_path
                       else
