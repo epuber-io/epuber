@@ -68,6 +68,14 @@ module Epuber
           xhtml_content
         end
 
+        # @param [Array] errors
+        #
+        def process_nokogiri_errors(errors)
+          errors.each do |e|
+            UI.warning(e)
+          end
+        end
+
         # @param [String] content xhtml in string
         # @param [Compiler::CompilationContext] compilation_context
         #
@@ -79,6 +87,11 @@ module Epuber
           file_resolver = compilation_context.file_resolver
 
           xhtml_doc = XHTMLProcessor.xml_document_from_string(content, source_path)
+
+          if compilation_context.release_build && xhtml_doc.errors.count > 0
+            process_nokogiri_errors(xhtml_doc.errors)
+          end
+
           XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
 
           XHTMLProcessor.add_styles(xhtml_doc, default_styles(target, file_resolver))
