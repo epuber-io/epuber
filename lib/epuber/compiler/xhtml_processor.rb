@@ -26,23 +26,41 @@ module Epuber
           text = text.lstrip
         end
 
-        doc = Nokogiri::XML(text)
+        xml_header = ''
+        if /\A\s*(<\?xml[^>]*\?>)/ =~ text
+          match = Regexp.last_match
+          xml_header = text[match.begin(1)...match.end(1)]
+          text[match.begin(1)...match.end(1)] = ''
+        end
+
+        doctypes = []
+        while /(\n|\?>|\A)?(<![^>]*>\n*)/ =~ text
+          doctypes << $2.strip
+
+          match = Regexp.last_match
+          text[match.begin(2)...match.end(2)] = ''
+        end
+
+        before = ([xml_header] + doctypes).compact.join("\n")
+        unless before.empty?
+          before = before + "\n"
+        end
+
+        parse_options = Nokogiri::XML::ParseOptions::DEFAULT_XML |
+                        Nokogiri::XML::ParseOptions::NOERROR | # to silence any errors or warnings printing into console
+                        Nokogiri::XML::ParseOptions::NOWARNING
+
+        doc = Nokogiri::XML("#{before}<root>#{text}</root>", nil, nil, parse_options)
         doc.encoding = 'UTF-8'
         doc.file_path = file_path
 
-        fragment = Nokogiri::XML.fragment(text)
-        root_elements = fragment.children.select { |el| el.element? }
+        root = root_node = doc.root
+        root_elements = root.children.select { |a| a.element? || a.comment? }
 
         if root_elements.count == 1
           doc.root = root_elements.first
-        elsif fragment.at_css('body').nil?
-          doc.root = doc.create_element('body')
-
-          fragment.children.select do |child|
-            child.element? || child.comment? || child.text?
-          end.each do |child|
-            doc.root.add_child(child)
-          end
+        elsif root_node.at_css('body').nil?
+          root_node.node_name = 'body'
         end
 
         doc

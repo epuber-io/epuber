@@ -35,6 +35,41 @@ module Epuber
           expect(doc.root.name).to eq 'body'
           expect(doc.root.children.count).to eq 2
         end
+
+        it 'can parse xml with headers' do
+          input = <<-XML.strip_heredoc
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+            <p>abc</p>
+            <p>abc2</p>
+            <p>abc3</p>
+            <p>abc4</p>
+            <p>abc5</p>
+            <p>abc6</p>
+            <p>abc7</p>
+          XML
+
+          doc = XHTMLProcessor.xml_document_from_string(input)
+
+          expect(doc.root.name).to eq 'body'
+          expect(doc.root.children.count).to eq 15 # 7 elements + 8 newlines
+
+          expected_output = <<-XML.strip_heredoc
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+            <body>
+            <p>abc</p>
+            <p>abc2</p>
+            <p>abc3</p>
+            <p>abc4</p>
+            <p>abc5</p>
+            <p>abc6</p>
+            <p>abc7</p>
+            </body>
+          XML
+
+          expect(doc.to_s).to eq expected_output
+        end
       end
 
       context '.add_missing_root_elements' do

@@ -78,6 +78,32 @@ module Epuber
 
           expect(File.read('some_file_dest.xhtml')).to eq source.lstrip # lstrip is to remove white characters at beginning
         end
+
+        it 'prints warning when XML is not alright while building release build' do
+          source = <<-XML.strip_heredoc
+            <body>
+              <p>abc
+            </body>
+          XML
+
+          File.write('some_file.xhtml', source)
+
+          file = XHTMLFile.new('some_file.xhtml')
+          file.destination_path = 'some_file_dest.xhtml'
+          resolve_file_paths(file)
+
+          @ctx.release_build = true
+          file.compilation_context = @ctx
+
+          expected_output =
+            'Opening and ending tag mismatch: p line 2 and body'.ansi.yellow + "\n" +
+            'Opening and ending tag mismatch: body line 1 and root'.ansi.yellow + "\n" +
+            'Premature end of data in tag root line 1'.ansi.yellow + "\n"
+
+          expect {
+            file.process(@ctx)
+          }.to output(expected_output).to_stdout
+        end
       end
 
 
