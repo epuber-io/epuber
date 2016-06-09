@@ -22,7 +22,7 @@ module Epuber
       #
       def initialize(path)
         @store_file_path = path
-        @all_files = YAML.load_file(path)
+        @all_files = YAML.load_file(path) || {}
       rescue
         @all_files = {}
       end
