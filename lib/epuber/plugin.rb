@@ -75,11 +75,16 @@ module Epuber
                  [PluginFile.new(path)]
                elsif ::File.directory?(path)
                  Dir.glob(File.expand_path('**/*.rb', path)).map do |file_path|
-                   PluginFile.new(file_path)
+                   PluginFile.new(Config.instance.pretty_path_from_project(file_path))
                  end
                else
                  raise LoadError, "#{self}: Can't find anything for #{path}"
                end
+
+      # expand abs_source_paths to every file
+      @files.each do |file|
+        file.abs_source_path = File.expand_path(file.source_path, Config.instance.project_path)
+      end
     end
 
     # @param [Class] klass  base class of all instances

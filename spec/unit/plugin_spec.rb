@@ -15,26 +15,27 @@ module Epuber
       it 'can load from file' do
         FileUtils.touch('plugin.rb')
 
-        expect {
-          Plugin.new('plugin.rb')
-        }.to_not raise_exception
+        plugin = Plugin.new('plugin.rb')
+        file = plugin.files.first
+        expect(file.source_path).to eq 'plugin.rb'
+        expect(file.abs_source_path).to eq '/plugin.rb'
       end
 
       it 'can load from empty folder' do
         FileUtils.mkdir_p('plugin')
 
-        expect {
-          Plugin.new('plugin')
-        }.to_not raise_exception
+        plugin = Plugin.new('plugin')
+        expect(plugin.files).to be_empty
       end
 
-      it 'can load from empty folder' do
+      it 'can load from folder with .rb file' do
         FileUtils.mkdir_p('plugin')
         FileUtils.touch('plugin/plugin.rb')
 
-        expect {
-          Plugin.new('plugin')
-        }.to_not raise_exception
+        plugin = Plugin.new('plugin')
+        file = plugin.files.first
+        expect(file.source_path).to eq 'plugin/plugin.rb'
+        expect(file.abs_source_path).to eq '/plugin/plugin.rb'
       end
 
       it "raise exception when the file doesn't exist" do

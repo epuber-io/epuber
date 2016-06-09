@@ -249,7 +249,7 @@ module Epuber
 
       # add all activated plugin files
       paths += compilation_context.plugins.map do |plugin|
-        plugin.files.map { |p_file| Config.instance.pretty_path_from_project(p_file.source_path) }
+        plugin.files.map { |p_file| p_file.source_path }
       end.flatten
 
       # add dependencies to databases
