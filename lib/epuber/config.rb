@@ -127,19 +127,23 @@ module Epuber
 
     # ---------------------------------------------------------------------------------------------------------------- #
 
-    # Singleton
-    #
-    # @return [Epuber::Config]
-    #
-    def self.instance
-      @instance ||= new
-    end
-
     class << self
       attr_accessor :test
 
       def test?
         test
+      end
+
+      # Singleton
+      #
+      # @return [Epuber::Config]
+      #
+      def instance
+        @instance ||= new
+      end
+
+      def clear_instance!
+        @instance = nil
       end
     end
 

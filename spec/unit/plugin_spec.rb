@@ -21,6 +21,31 @@ module Epuber
         expect(file.abs_source_path).to eq '/plugin.rb'
       end
 
+      it 'can load from file in deep structure' do
+        FileUtils.mkdir_p('/some/nested/dir/structure')
+
+        Dir.chdir('/some/nested/dir/structure') do
+          FileUtils.touch('plugin.rb')
+
+          plugin = Plugin.new('plugin.rb')
+          file = plugin.files.first
+
+          expect(file.source_path).to eq 'plugin.rb'
+          expect(file.abs_source_path).to eq '/some/nested/dir/structure/plugin.rb'
+        end
+      end
+
+      it 'can load from file in deep structure' do
+        FileUtils.mkdir_p('/some/nested/dir/structure')
+        FileUtils.touch('/some/nested/dir/structure/plugin.rb')
+
+        plugin = Plugin.new('some/nested/dir/structure/plugin.rb')
+        file = plugin.files.first
+
+        expect(file.source_path).to eq 'some/nested/dir/structure/plugin.rb'
+        expect(file.abs_source_path).to eq '/some/nested/dir/structure/plugin.rb'
+      end
+
       it 'can load from empty folder' do
         FileUtils.mkdir_p('plugin')
 
