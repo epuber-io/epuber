@@ -19,7 +19,7 @@ module Epuber
     # @return [String] relative path to file from root of project
     #
     def pretty_path_from_project(of_file)
-      Pathname.new(of_file.unicode_normalize).relative_path_from(Pathname.new(project_path))
+      Pathname.new(of_file.unicode_normalize).relative_path_from(Pathname.new(project_path)).to_s
     end
 
     # @return [String]
