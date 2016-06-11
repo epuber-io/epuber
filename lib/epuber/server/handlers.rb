@@ -31,7 +31,7 @@ module Epuber
         end
       end
 
-      [200, html_doc.to_html]
+      [200, html_doc.to_xhtml]
     end
 
     # @param [String] file_name  name of the file located in ./pages/
