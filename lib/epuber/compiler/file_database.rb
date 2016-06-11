@@ -67,6 +67,12 @@ module Epuber
         @all_files[file_path] = FileStat.new(file_path, dependency_paths: old_dependencies)
       end
 
+      def update_all_metadata
+        @all_files.each do |file_path, _|
+          update_metadata(file_path)
+        end
+      end
+
       # @param [Array<String>, String] file_path  path to file that will be dependent on
       # @param [String] to  path to original file, that will has new dependency
       #

@@ -97,7 +97,9 @@ module Epuber
     ensure
       self.class.globals_catcher.clear_all
 
+      compilation_context.source_file_database.update_all_metadata
       compilation_context.source_file_database.save_to_file
+      compilation_context.target_file_database.update_all_metadata
       compilation_context.target_file_database.save_to_file
     end
 

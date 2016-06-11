@@ -47,6 +47,8 @@ module Epuber
 
             xhtml_content = renderer.render(new_line: '', indent: '')
           else
+            UI.print_processing_debug_info('Parsing new version of source file') if compilation_context.incremental_build?
+
             bade_content = load_source(compilation_context)
 
             renderer = Bade::Renderer.from_source(bade_content, source_path)

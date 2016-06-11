@@ -186,6 +186,26 @@ module Epuber
 
           expect(sut.all_files['/file_dep'].dependency_paths).to be_empty
         end
+
+        it 'updates all metadata' do
+          File.write('/file', 'abc')
+          File.write('/file_dep', 'abc')
+          File.write('/file_dep2', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency('/file_dep', to: '/file')
+          sut.add_dependency('/file_dep2', to: '/file_dep')
+
+          expect(sut.up_to_date?('/file')).to be_truthy
+
+          FileUtils.touch('/file_dep2')
+
+          expect(sut.up_to_date?('/file')).to be_falsey
+
+          sut.update_all_metadata
+
+          expect(sut.up_to_date?('/file')).to be_truthy
+        end
       end
     end
 
