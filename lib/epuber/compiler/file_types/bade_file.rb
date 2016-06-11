@@ -32,15 +32,16 @@ module Epuber
 
           should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build?
 
-          begin
-            precompiled = Bade::Precompiled.from_yaml_file(precompiled_path)
-          rescue LoadError
-            precompiled = nil
+          precompiled = if should_load_from_precompiled
+                          begin
+                            Bade::Precompiled.from_yaml_file(precompiled_path)
+                          rescue LoadError
+                            UI.warning("Empty precompiled file at path #{pretty_precompiled_path}", location: self)
+                            nil
+                          end
+                        end
 
-            UI.warning("Empty precompiled file at path #{Config.instance.pretty_path_from_project(precompiled_path)}", location: self)
-          end
-
-          if should_load_from_precompiled && !precompiled.nil?
+          if !precompiled.nil?
             renderer = Bade::Renderer.from_precompiled(precompiled)
                                      .with_locals(variables)
 
@@ -71,6 +72,10 @@ module Epuber
         #
         def precompiled_path
           File.join(Config.instance.build_cache_path(PRECOMPILED_CACHE_NAME), source_path + '.precompiled.yml')
+        end
+
+        def pretty_precompiled_path
+          Config.instance.pretty_path_from_project(precompiled_path)
         end
 
         def self.find_imports(content)
