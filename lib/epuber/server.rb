@@ -422,11 +422,11 @@ module Epuber
         # remove nil paths (for example bookspec can't be found so the relative path is nil)
         changed.compact!
 
-        if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
-          notify_clients(:styles, changed)
-        else
+        # if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
+          # notify_clients(:styles, changed)
+        # else
           notify_clients(:reload, changed)
-        end
+        # end
       end
     end
 
