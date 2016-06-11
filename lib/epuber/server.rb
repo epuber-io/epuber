@@ -118,7 +118,13 @@ module Epuber
         $stderr = old_stderr
         puts "Started development server on #{server.host}:#{server.port}"
 
-        yield URI("http://#{server.host}:#{server.port}") if block_given?
+        host = if server.host == '0.0.0.0'
+                 'localhost'
+               else
+                 server.host
+               end
+
+        yield URI("http://#{host}:#{server.port}") if block_given?
       end
     end
 
