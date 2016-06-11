@@ -145,6 +145,8 @@ module Epuber
         Location.new(obj.document.file_path, obj.line)
       when Location
         obj
+      when Epuber::Compiler::FileTypes::AbstractFile
+        Location.new(obj.source_path, nil)
       end
     end
 
