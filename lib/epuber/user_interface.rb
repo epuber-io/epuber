@@ -33,10 +33,10 @@ module Epuber
     # @param [Bool] backtrace  output backtrace locations, nil == automatic, true == always and false == never
     #
     def self.error(message, location: nil)
-      $stdout.puts unless @last_processing_file_line.nil?
-
-      $stdout.puts(_format_message(:error, message, location: location))
-      _print_backtrace(location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations, location: location) if current_command && current_command.verbose?
+      _clear_processing_line_for_new_output do
+        $stdout.puts(_format_message(:error, message, location: location))
+        _print_backtrace(location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations, location: location) if current_command && current_command.verbose?
+      end
     end
 
     # @param [String] message message of the error
