@@ -53,6 +53,11 @@ module Epuber
 
             renderer = Bade::Renderer.from_source(bade_content, source_path)
                                      .with_locals(variables)
+            
+            # turn on optimizations when can
+            if renderer.respond_to?(:optimize=)
+              renderer.optimize = true
+            end
 
             FileUtils.mkdir_p(File.dirname(precompiled_path))
             renderer.precompiled.write_yaml_to_file(precompiled_path)
