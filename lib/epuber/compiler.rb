@@ -92,15 +92,15 @@ module Epuber
 
         source_paths = file_resolver.files.select { |a| a.is_a?(FileTypes::SourceFile) }.map { |a| a.source_path }
         compilation_context.source_file_database.cleanup(source_paths)
+        compilation_context.source_file_database.update_all_metadata
+        compilation_context.source_file_database.save_to_file
+
         compilation_context.target_file_database.cleanup(source_paths)
+        compilation_context.target_file_database.update_all_metadata
+        compilation_context.target_file_database.save_to_file
       end
     ensure
       self.class.globals_catcher.clear_all
-
-      compilation_context.source_file_database.update_all_metadata
-      compilation_context.source_file_database.save_to_file
-      compilation_context.target_file_database.update_all_metadata
-      compilation_context.target_file_database.save_to_file
     end
 
     # Archives current target files to epub
