@@ -86,39 +86,61 @@ module Epuber
           book = compilation_context.book
           file_resolver = compilation_context.file_resolver
 
-          xhtml_doc = XHTMLProcessor.xml_document_from_string(content, source_path)
+          xhtml_doc = UI.print_step_processing_time('parsing XHTML file') do
+            XHTMLProcessor.xml_document_from_string(content, source_path)
+          end
 
           if compilation_context.release_build && xhtml_doc.errors.count > 0
             process_nokogiri_errors(xhtml_doc.errors)
           end
 
-          XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
+          UI.print_step_processing_time('adding missing elements') do
+            XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
+          end
 
-          XHTMLProcessor.add_styles(xhtml_doc, default_styles(target, file_resolver))
-          XHTMLProcessor.add_scripts(xhtml_doc, default_scripts(target, file_resolver))
+          UI.print_step_processing_time('adding default things') do
+            XHTMLProcessor.add_styles(xhtml_doc, default_styles(target, file_resolver))
+            XHTMLProcessor.add_scripts(xhtml_doc, default_scripts(target, file_resolver))
 
-          XHTMLProcessor.add_viewport(xhtml_doc, target.default_viewport) unless target.default_viewport.nil?
+            XHTMLProcessor.add_viewport(xhtml_doc, target.default_viewport) unless target.default_viewport.nil?
+          end
 
           # resolve links to files, add other linked resources and compute correct path
-          XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
-          XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)
-          XHTMLProcessor.resolve_scripts(xhtml_doc, destination_path, file_resolver)
-          XHTMLProcessor.resolve_stylesheets(xhtml_doc, destination_path, file_resolver)
+          UI.print_step_processing_time('resolving links') do
+            XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
+          end
+          UI.print_step_processing_time('resolving image resources') do
+            XHTMLProcessor.resolve_images(xhtml_doc, destination_path, file_resolver)
+          end
+          UI.print_step_processing_time('resolving scripts') do
+            XHTMLProcessor.resolve_scripts(xhtml_doc, destination_path, file_resolver)
+          end
+          UI.print_step_processing_time('resolving stylesheets') do
+            XHTMLProcessor.resolve_stylesheets(xhtml_doc, destination_path, file_resolver)
+          end
 
-          self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
-          self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
+          UI.print_step_processing_time('investigating properties') do
+            self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
+            self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
+          end
 
-          xhtml_string = xhtml_doc.to_s
+          xhtml_string = UI.print_step_processing_time('converting to XHTML') do
+             xhtml_doc.to_s
+          end
 
           # perform transformations
-          compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
-            xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
+          UI.print_step_processing_time('performing final transformations') do
+            compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
+              xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
+            end
           end
 
           # perform custom validation
           if compilation_context.should_check
-            compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
-              checker.call(final_destination_path, xhtml_string, compilation_context)
+            UI.print_step_processing_time('performing final validations') do
+              compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
+                checker.call(final_destination_path, xhtml_string, compilation_context)
+              end
             end
           end
 

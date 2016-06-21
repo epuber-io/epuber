@@ -21,7 +21,8 @@ module Epuber
           ['--check',    'Performs additional validation on sources + checks result epub with epubcheck.'],
           ['--write',    'Performs additional transformations which writes to source files.'],
           ['--release',  'Create release version of the book, no caching, everything creates from scratch.'],
-          ['--no-cache', 'Turns off incremental build, can resolve some bugs but build takes much longer.']
+          ['--no-cache', 'Turns off incremental build, can resolve some bugs but build takes much longer.'],
+          ['--debug-steps-times', 'Shows times of each step'],
         ].concat(super)
       end
 
@@ -33,6 +34,8 @@ module Epuber
         @should_write = argv.flag?('write', false)
         @release_version = argv.flag?('release', false)
         @use_cache = argv.flag?('cache', true)
+
+        self.debug_steps_times = argv.flag?('debug-steps-times', false)
 
         super(argv)
       end

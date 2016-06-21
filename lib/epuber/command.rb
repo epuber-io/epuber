@@ -47,7 +47,11 @@ module Epuber
       UI.current_command = self
     end
 
+    attr_reader :debug_steps_times
+
     protected
+
+    attr_writer :debug_steps_times
 
     # @return [Epuber::Book::Book]
     #

@@ -107,6 +107,36 @@ module Epuber
       @current_file = nil
     end
 
+    # @param [Compiler::FileTypes::AbstractFile] file
+    # @param [String] step_name
+    # @param [Fixnum] time
+    #
+    def self.print_step_processing_time(step_name, time = nil)
+      if !current_command || !current_command.debug_steps_times
+        return yield
+      end
+
+      remove_processing_file_line
+
+      if block_given?
+        start = Time.now
+        returned_value = yield
+
+        time = Time.now - start
+      end
+
+      info_text = "Step #{step_name} took #{time * 1000} ms"
+      message = if @current_file.nil?
+                  "▸ #{info_text}"
+                else
+                  "▸ #{@current_file.source_path}: #{info_text}"
+                end
+
+      $stdout.puts(_format_message(:debug, message))
+
+      returned_value
+    end
+
     private
 
     def self._clear_processing_line_for_new_output

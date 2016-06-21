@@ -42,27 +42,31 @@ module Epuber
                         end
 
           if !precompiled.nil?
-            renderer = Bade::Renderer.from_precompiled(precompiled)
-                                     .with_locals(variables)
+            xhtml_content = UI.print_step_processing_time('rendering precompiled Bade') do
+              renderer = Bade::Renderer.from_precompiled(precompiled)
+                                       .with_locals(variables)
 
-            xhtml_content = renderer.render(new_line: '', indent: '')
+              renderer.render(new_line: '', indent: '')
+            end
           else
             UI.print_processing_debug_info('Parsing new version of source file') if compilation_context.incremental_build?
 
             bade_content = load_source(compilation_context)
 
-            renderer = Bade::Renderer.from_source(bade_content, source_path)
-                                     .with_locals(variables)
-            
-            # turn on optimizations when can
-            if renderer.respond_to?(:optimize=)
-              renderer.optimize = true
+            xhtml_content = UI.print_step_processing_time('rendering changed Bade') do
+              renderer = Bade::Renderer.from_source(bade_content, source_path)
+                                       .with_locals(variables)
+
+              # turn on optimizations when can
+              if renderer.respond_to?(:optimize=)
+                renderer.optimize = true
+              end
+
+              FileUtils.mkdir_p(File.dirname(precompiled_path))
+              renderer.precompiled.write_yaml_to_file(precompiled_path)
+
+              renderer.render(new_line: '', indent: '')
             end
-
-            FileUtils.mkdir_p(File.dirname(precompiled_path))
-            renderer.precompiled.write_yaml_to_file(precompiled_path)
-
-            xhtml_content = renderer.render(new_line: '', indent: '')
           end
 
           write_compiled(common_process(xhtml_content, compilation_context))
