@@ -53,14 +53,7 @@ module Epuber
     # @return [Epuber::Book]
     #
     def bookspec
-      require_relative 'book'
-      @bookspec ||= (
-        book = Epuber::Book.from_file(bookspec_path)
-        book.finish_toc
-        book.validate
-        book.freeze
-        book
-      )
+      @bookspec ||= self.class.load_bookspec(bookspec_path)
     end
 
     # @param [Epuber::Book] bookspec
@@ -144,6 +137,20 @@ module Epuber
 
       def clear_instance!
         @instance = nil
+      end
+
+      # @return [Epuber::Book]
+      #
+      def load_bookspec(path, frozen: true)
+        require_relative 'book'
+
+        book = Epuber::Book.from_file(path)
+        book.finish_toc
+        book.validate
+
+        book.freeze if frozen
+
+        book
       end
     end
 
