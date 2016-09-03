@@ -25,7 +25,9 @@ mixin body_header(current)
 
 mixin body_footer
 	#footer
-		p Epuber v#{Epuber::VERSION} | © #{Time.now.year} Roman Kříž
+		p
+		    a(href: Epuber::HOME_URL) Epuber v#{Epuber::VERSION}
+		    |  | © #{Time.now.year} Roman Kříž
 
 mixin page(title: nil, header_id: nil)
 	html

@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.authors  = ['Roman Kříž']
   spec.email    = ['samnung@gmail.com']
   spec.summary  = 'Epuber is simple tool to compile and pack source files into EPUB format.'
-  spec.homepage = 'https://github.com/epuber-io/epuber'
+  spec.homepage = Epuber::HOME_URL
   spec.license  = 'MIT'
   spec.required_ruby_version = '>= 2.0'
 
