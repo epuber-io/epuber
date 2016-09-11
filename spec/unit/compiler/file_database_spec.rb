@@ -74,7 +74,7 @@ module Epuber
       end
 
       context 'dependencies' do
-        it 'can have dependency' do
+        it 'can have dependecy' do
           File.write('/file_dep', 'abc')
           File.write('/file', 'abc')
 
@@ -84,6 +84,25 @@ module Epuber
           expect(sut.all_files.count).to eq 2
           expect(sut.all_files['/file']).to_not be_nil
           expect(sut.all_files['/file_dep']).to_not be_nil
+        end
+
+        it 'dependency is implicitly in unknown state' do
+          File.write('/file_dep', 'abc')
+          File.write('/file', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency('/file_dep', to: '/file')
+
+          expect(sut.up_to_date?('/file')).to be_falsey
+        end
+
+        it 'dependency is implicitly in unknown state, must call update_metadata' do
+          File.write('/file_dep', 'abc')
+          File.write('/file', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency('/file_dep', to: '/file')
+          sut.update_metadata('/file_dep') # added
 
           expect(sut.up_to_date?('/file')).to be_truthy
         end
@@ -100,6 +119,19 @@ module Epuber
           expect(sut.all_files['/file']).to_not be_nil
           expect(sut.all_files['/file_dep1']).to_not be_nil
           expect(sut.all_files['/file_dep2']).to_not be_nil
+
+          expect(sut.up_to_date?('/file')).to be_falsey
+        end
+
+        it 'can add dependencies as array, but must call update_metadata on each' do
+          File.write('/file_dep1', 'abc')
+          File.write('/file_dep2', 'abc')
+          File.write('/file', 'abc')
+
+          sut.update_metadata('/file')
+          sut.add_dependency(%w(/file_dep1 /file_dep2), to: '/file')
+          sut.update_metadata('/file_dep1')
+          sut.update_metadata('/file_dep2')
 
           expect(sut.up_to_date?('/file')).to be_truthy
         end
@@ -126,6 +158,12 @@ module Epuber
           sut.update_metadata('/file')
           sut.add_dependency('/file_dep', to: '/file')
 
+          # dependency is unknown file, so it must be falsey
+          expect(sut.up_to_date?('/file')).to be_falsey
+
+          sut.update_metadata('/file_dep')
+
+          # now the dependency is updated in database
           expect(sut.up_to_date?('/file')).to be_truthy
 
           # make the dependency file newer
@@ -155,12 +193,19 @@ module Epuber
 
           sut.update_metadata('/file')
           sut.add_dependency('/file_dep', to: '/file')
+          sut.update_metadata('/file_dep')
           sut.add_dependency('/file_dep2', to: '/file_dep')
+          sut.update_metadata('/file_dep2')
           sut.add_dependency('/file_dep3', to: '/file_dep2')
+          sut.update_metadata('/file_dep3')
           sut.add_dependency('/file_dep4', to: '/file_dep3')
+          sut.update_metadata('/file_dep4')
           sut.add_dependency('/file_dep5', to: '/file_dep4')
+          sut.update_metadata('/file_dep5')
           sut.add_dependency('/file_dep6', to: '/file_dep5')
+          sut.update_metadata('/file_dep6')
           sut.add_dependency('/file_dep7', to: '/file_dep6')
+          sut.update_metadata('/file_dep7')
 
           # make the dependency file newer
           File.write('/file_dep7', 'abc def')
@@ -194,7 +239,9 @@ module Epuber
 
           sut.update_metadata('/file')
           sut.add_dependency('/file_dep', to: '/file')
+          sut.update_metadata('/file_dep')
           sut.add_dependency('/file_dep2', to: '/file_dep')
+          sut.update_metadata('/file_dep2')
 
           expect(sut.up_to_date?('/file')).to be_truthy
 

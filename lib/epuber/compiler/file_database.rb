@@ -60,11 +60,11 @@ module Epuber
 
       # @param [String] file_path
       #
-      def update_metadata(file_path)
+      def update_metadata(file_path, load_stats: true)
         old_stat = @all_files[file_path]
         old_dependencies = old_stat ? old_stat.dependency_paths : []
 
-        @all_files[file_path] = FileStat.new(file_path, dependency_paths: old_dependencies)
+        @all_files[file_path] = FileStat.new(file_path, load_stats: load_stats, dependency_paths: old_dependencies)
       end
 
       def update_all_metadata
@@ -88,7 +88,7 @@ module Epuber
 
         begin
           file_paths.each do |path|
-            update_metadata(path) if @all_files[path].nil?
+            update_metadata(path, load_stats: false) if @all_files[path].nil?
           end
         rescue Errno::ENOENT
           # no action, valid case where dependant file does not exist

@@ -26,14 +26,21 @@ module Epuber
 
       # @param [String] path
       # @param [File::Stat] stat
+      # @param [Bool] load_stats
       #
-      def initialize(path, stat = nil, dependency_paths: [])
+      def initialize(path, stat = nil, load_stats: true, dependency_paths: [])
         @file_path = path
 
-        stat ||= File.stat(path)
-        @mtime = stat.mtime
-        @ctime = stat.ctime
-        @size = stat.size
+        if load_stats
+          begin
+            stat ||= File.stat(path)
+            @mtime = stat.mtime
+            @ctime = stat.ctime
+            @size = stat.size
+          rescue
+            # noop
+          end
+        end
 
         @dependency_paths = dependency_paths
       end
