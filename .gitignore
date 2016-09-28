@@ -22,3 +22,5 @@ tmp
 mkmf.log
 test_init_project
 .idea/
+test_fixtures
+vendor/gems
