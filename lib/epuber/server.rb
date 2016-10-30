@@ -312,6 +312,21 @@ module Epuber
       head.add_child(node)
     end
 
+    # @param html_doc [Nokogiri::HTML::Document]
+    # @param key [String]
+    # @param value [String]
+    #
+    def add_meta_to_head(name, content, html_doc, force: false)
+      head = html_doc.at_css('head')
+      meta = head.at_css("meta[name=\"#{name}\"]")
+      return if force == false && !meta.nil?
+
+      meta ||= html_doc.create_element('meta')
+      meta['name'] = name
+      meta['content'] = content
+      head.add_child(meta)
+    end
+
     def self.reload_bookspec
       last_target = target
       Config.instance.bookspec = nil

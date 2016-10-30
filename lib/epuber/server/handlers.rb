@@ -19,6 +19,7 @@ module Epuber
       add_file_to_head(:style, html_doc, 'book_content.styl')
 
       add_file_to_head(:js, html_doc, 'support.coffee')
+      add_meta_to_head(:viewport, 'width=device-width, initial-scale=1.0', html_doc)
       add_auto_refresh_script(html_doc)
 
       unless file_resolver.nil?
