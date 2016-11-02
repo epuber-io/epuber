@@ -362,12 +362,13 @@ module Epuber
         @compilation_thread = nil
       end
 
+      @compilation_thread = Thread.new do
+        result = _compile_book
+        completion.call(result) unless completion.nil?
+      end
+      
       if completion.nil?
-        _compile_book
-      else
-        @compilation_thread = Thread.new do
-          completion.call(_compile_book)
-        end
+        @compilation_thread.join
       end
     end
 
