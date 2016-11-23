@@ -409,7 +409,7 @@ module Epuber
     # @param _removed [Array<String>]
     #
     def self.changes_detected(_modified, _added, _removed)
-      all_changed = (_modified + _added + _removed).uniq
+      all_changed = (_modified + _added + _removed).uniq.map { |path| path.unicode_normalize }
 
       reload_bookspec if all_changed.any? { |file| file == book.file_path }
 
