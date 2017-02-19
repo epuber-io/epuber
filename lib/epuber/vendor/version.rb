@@ -3,7 +3,7 @@
 # Most of this code is taken from github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/vendor/version.rb
 
 def is_number(other)
-  other.is_a?(Numeric) || other.is_a?(Fixnum) || other.is_a?(Float)
+  other.is_a?(Numeric) || other.is_a?(Integer) || other.is_a?(Float)
 end
 
 module Epuber
@@ -52,7 +52,7 @@ module Epuber
     # @return [Numeric]
     #
     def <=>(other)
-      return unless other.is_a?(Version) || other.is_a?(String) || other.is_a?(Float) || other.is_a?(Fixnum)
+      return unless other.is_a?(Version) || other.is_a?(String) || other.is_a?(Float) || other.is_a?(Integer)
       other = other.is_a?(Version) ? other : Version.new(other)
 
       return 0 if @version == other.version

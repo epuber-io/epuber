@@ -11,7 +11,7 @@ module Epuber
         class TestClass < Object
           attribute :optional_string
           attribute :optional_number,
-                    types: [Fixnum]
+                    types: [Integer]
         end
 
         before do
@@ -70,11 +70,11 @@ module Epuber
                     auto_convert: { String => Date }
 
           attribute :lambda,
-                    types:        [Fixnum],
+                    types:        [Integer],
                     auto_convert: { String => ->(str) { str.to_i } }
 
           attribute :multi,
-                    auto_convert: { [Fixnum, Regexp] => ->(str) { str.to_s } }
+                    auto_convert: { [Integer, Regexp] => ->(str) { str.to_s } }
         end
 
         before do

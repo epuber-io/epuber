@@ -214,13 +214,13 @@ module Epuber
     attribute :version,
               inherited:    true,
               types:        [Version],
-              auto_convert: { [String, Fixnum, Float] => Version }
+              auto_convert: { [String, Integer, Float] => Version }
 
     # @return [String] build version of book
     #
     attribute :build_version,
               types:        [Version],
-              auto_convert: { [String, Fixnum, Float] => Version }
+              auto_convert: { [String, Integer, Float] => Version }
 
     # @return [String] base name for output epub file
     #
