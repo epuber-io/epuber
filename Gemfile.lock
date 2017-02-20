@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     epuber (0.4.0.beta)
-      activesupport (~> 4.2)
+      activesupport (~> 5.0)
       bade (>= 0.2.2, < 1.0.0)
       claide (~> 0.8)
       coffee-script (~> 2.4)
@@ -22,11 +22,10 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (4.2.7.1)
+    activesupport (5.0.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
-      json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
-      thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.5.0)
       public_suffix (~> 2.0, >= 2.0.2)
@@ -38,6 +37,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    concurrent-ruby (1.0.4)
     coveralls (0.8.19)
       json (>= 1.8, < 3)
       simplecov (~> 0.12.0)
@@ -54,12 +54,12 @@ GEM
     epuber-stylus (1.1.1)
       execjs
       stylus-source
-    eventmachine (1.2.1)
+    eventmachine (1.2.2)
     execjs (2.7.0)
     fakefs (0.10.2)
     ffi (1.9.17)
-    i18n (0.7.0)
-    json (1.8.6)
+    i18n (0.8.0)
+    json (2.0.3)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)

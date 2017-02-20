@@ -11,4 +11,6 @@ before_install:
   - gem install bundler
 
 install:
+  - gem update --system
+  - gem install bundler
   - bundle install --path vendor/bundle
