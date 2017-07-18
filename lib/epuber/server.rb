@@ -105,6 +105,8 @@ module Epuber
     # @return nil
     #
     def self.run!(book, target, verbose: false)
+      Encoding.default_internal = Encoding::UTF_8 if Encoding.default_internal.nil?
+
       self.book = book
       self.target = target
       self.verbose = verbose
