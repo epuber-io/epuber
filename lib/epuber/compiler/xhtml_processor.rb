@@ -258,6 +258,20 @@ module Epuber
         result
       end
 
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      #
+      # @return [Bool]
+      #
+      def self.using_mathml?(xhtml_doc)
+        !xhtml_doc.at_css('math|math', 'math' => 'http://www.w3.org/1998/Math/MathML').nil?
+      end
+
+      def self.resolve_mathml_namespace(xhtml_doc)
+        xhtml_doc.css('math').each do |math_node|
+          math_node.add_namespace('xmlns', 'http://www.w3.org/1998/Math/MathML')
+        end
+      end
+
       # @param [Nokogiri::XML::Document] xhtml_doc
       # @param [String] file_path path of referring file
       # @param [FileResolver] file_resolver

@@ -119,9 +119,12 @@ module Epuber
             XHTMLProcessor.resolve_stylesheets(xhtml_doc, destination_path, file_resolver)
           end
 
+          XHTMLProcessor.resolve_mathml_namespace(xhtml_doc)
+
           UI.print_step_processing_time('investigating properties') do
             self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
             self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
+            self.properties << :mathml if XHTMLProcessor.using_mathml?(xhtml_doc)
           end
 
           xhtml_string = UI.print_step_processing_time('converting to XHTML') do

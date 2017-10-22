@@ -59,6 +59,7 @@ module Epuber
         navigation:  'nav',
         scripted:    'scripted',
         remote_resources: 'remote-resources',
+        mathml: 'mathml',
       }.freeze
 
       OPF_UNIQUE_ID = 'bookid'
