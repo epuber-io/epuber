@@ -18,6 +18,7 @@ module Epuber
           Stylus.define('__is_verbose_mode', compilation_context.verbose?)
           Stylus.define('__target_name', compilation_context.target.name)
           Stylus.define('__book_title', compilation_context.book.title)
+          Stylus.define('__const', compilation_context.target.constants)
 
           write_compiled(Stylus.compile(File.new(abs_source_path)))
 

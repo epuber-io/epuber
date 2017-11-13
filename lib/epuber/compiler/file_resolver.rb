@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require_relative '../ruby_extensions/string'
+require 'active_support/core_ext/object/try'
 
 module Epuber
   class Compiler

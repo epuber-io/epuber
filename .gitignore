@@ -24,3 +24,4 @@ test_init_project
 .idea/
 test_fixtures
 vendor/gems
+test_project/.epuber
