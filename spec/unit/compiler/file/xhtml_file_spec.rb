@@ -96,9 +96,9 @@ module Epuber
           file.compilation_context = @ctx
 
           expected_output =
-            'Opening and ending tag mismatch: p line 2 and body'.ansi.yellow + "\n" +
-            'Opening and ending tag mismatch: body line 1 and root'.ansi.yellow + "\n" +
-            'Premature end of data in tag root line 1'.ansi.yellow + "\n"
+            '3:8: FATAL: Opening and ending tag mismatch: p line 2 and body'.ansi.yellow + "\n" +
+            '4:8: FATAL: Opening and ending tag mismatch: body line 1 and root'.ansi.yellow + "\n" +
+            '4:8: FATAL: Premature end of data in tag root line 1'.ansi.yellow + "\n"
 
           expect {
             file.process(@ctx)

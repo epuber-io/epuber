@@ -12,36 +12,83 @@ module Epuber
     module FileTypes
 
 
-
       describe StylusFile do
-        include FakeFS::SpecHelpers
 
-        let (:ctx) do
-          book = Book.new
+        context 'FakeFS parts' do
+          include FakeFS::SpecHelpers
 
-          ctx = CompilationContext.new(book, book.default_target)
-          ctx.file_resolver = FileResolver.new('/', '/.build')
+          let (:ctx) do
+            book = Book.new
 
-          ctx
-        end
+            ctx = CompilationContext.new(book, book.default_target)
+            ctx.file_resolver = FileResolver.new('/', '/.build')
 
-        it 'finds dependency files' do
-          source = %q(
+            ctx
+          end
+
+          it 'finds dependency files' do
+            source = %q(
 @import "abc.styl"
 @import 'def.styl'
 )
-          FileUtils.mkdir_p('/abc')
-          File.write('/abc/some_file.styl', source)
-          FileUtils.touch('/abc/abc.styl')
-          FileUtils.touch('/abc/def.styl')
+            FileUtils.mkdir_p('/abc')
+            File.write('/abc/some_file.styl', source)
+            FileUtils.touch('/abc/abc.styl')
+            FileUtils.touch('/abc/def.styl')
 
-          file = StylusFile.new('/abc/some_file.styl')
-          file.destination_path = 'abc/some_file.css'
-          file.compilation_context = ctx
-          resolve_file_paths(file)
+            file = StylusFile.new('/abc/some_file.styl')
+            file.destination_path = 'abc/some_file.css'
+            file.compilation_context = ctx
+            resolve_file_paths(file)
 
-          expect(file.find_dependencies).to contain_exactly 'abc.styl', 'def.styl'
+            expect(file.find_dependencies).to contain_exactly 'abc.styl', 'def.styl'
+          end
         end
+
+
+
+        context 'Real' do
+          FileUtils.mkdir_p('/tmp/epuber_stylus_tests')
+
+          let (:ctx) do
+            book = Book.new
+
+            ctx = CompilationContext.new(book, book.default_target)
+            ctx.file_resolver = FileResolver.new('/tmp/epuber_stylus_tests', '/tmp/epuber_stylus_tests/.build')
+
+            ctx
+          end
+
+          it 'allows to use constants inside stylus files' do
+            source = %q(
+__abc = {
+   hej: "hou"
+}
+
+a
+  // value: __const.some_value
+  value: __abc.hej
+
+)
+
+
+            File.write('/tmp/epuber_stylus_tests/some_file.styl', source)
+
+            file = StylusFile.new('/tmp/epuber_stylus_tests/some_file.styl')
+            file.destination_path = 'some_file.css'
+            file.compilation_context = ctx
+            resolve_file_paths(file)
+
+            ctx.book.default_target.add_const 'some_value' => 'abc'
+
+            file.process(ctx)
+
+
+            puts File.read(file.final_destination_path)
+
+          end
+        end
+
 
 
       end
