@@ -62,6 +62,7 @@ module Epuber
       #
       attr_accessor :book
 
+
       # @return [Epuber::Book] reference to book
       #
       def book
@@ -77,6 +78,23 @@ module Epuber
       #
       def sub_target(name)
         child = create_child_item(name)
+        child.book = self.book
+
+        yield child if block_given?
+
+        child
+      end
+
+      # Create new sub_target with name
+      #
+      # @param [String] name
+      #
+      # @return [Target] new created sub target
+      #
+      def sub_abstract_target(name)
+        child = create_child_item(name)
+        child.book = self.book
+        child.is_abstract = true
 
         yield child if block_given?
 
@@ -193,6 +211,12 @@ module Epuber
       attribute :create_mobi,
                 types:     [TrueClass, FalseClass],
                 inherited: true
+
+      # @return [Bool] allows to create abstract targets that are only used as template for other targets
+      #
+      attribute :is_abstract,
+                types: [TrueClass, FalseClass],
+                inherited: false
 
 
       # @param file_path [String | Epuber::Book::File]

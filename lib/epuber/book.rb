@@ -94,6 +94,10 @@ module Epuber
       end
     end
 
+    def buildable_targets
+      flat_all_targets.select { |t| !t.is_abstract }
+    end
+
     # Defines new target
     #
     # @param [String, Symbol] name
@@ -102,6 +106,13 @@ module Epuber
     #
     def target(name)
       @default_target.sub_target(name) do |target|
+        target.book = self
+        yield target if block_given?
+      end
+    end
+
+    def abstract_target(name)
+      @default_target.sub_abstract_target(name) do |target|
         target.book = self
         yield target if block_given?
       end

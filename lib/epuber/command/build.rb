@@ -107,7 +107,7 @@ module Epuber
 
           # when the list of targets is nil pick all available targets
           if targets.empty?
-            book.all_targets
+            book.buildable_targets
           else
             targets.map { |target_name| book.target_named(target_name) }
           end
