@@ -302,7 +302,7 @@ module Epuber
     def target_named(target_name)
       return target_name if target_name.is_a?(Epuber::Book::Target)
 
-      all_targets.find do |target|
+      flat_all_targets.find do |target|
         target.name == target_name || target.name.to_s == target_name.to_s
       end
     end
