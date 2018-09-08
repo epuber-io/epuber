@@ -212,7 +212,7 @@ module Epuber
       #
       def file_with_destination_path(path, path_type = :manifest)
         final_path = File.join(*self.class.path_comps_for(destination_path, path_type), path.unicode_normalize)
-        @final_destination_path_to_file[final_path]
+        @final_destination_path_to_file[path] || @final_destination_path_to_file[final_path]
       end
 
       # Method to find all files that should be deleted, because they are not in files in receiver
