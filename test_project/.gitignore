@@ -2,4 +2,6 @@
 *.mobi
 !.epuber/
 .epuber/build
+.epuber/build_cache
 .epuber/release_build
+.epuber/metadata

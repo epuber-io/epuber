@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.summary  = 'Epuber is simple tool to compile and pack source files into EPUB format.'
   spec.homepage = Epuber::HOME_URL
   spec.license  = 'MIT'
-  spec.required_ruby_version = '>= 2.2'
+  spec.required_ruby_version = '>= 2.3'
 
   spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec Gemfile LICENSE.txt README.md)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

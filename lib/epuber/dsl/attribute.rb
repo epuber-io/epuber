@@ -164,7 +164,7 @@ module Epuber
       #
       def validate_type(value)
         return if value.nil?
-        return if supported_types.any? { |klass| value.class == klass }
+        return if supported_types.any? { |klass| value.class <= klass }
 
         raise StandardError, "Non acceptable type `#{value.class}` for #{self}. Allowed types: `#{types.inspect}`"
       end

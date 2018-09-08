@@ -56,7 +56,7 @@ GEM
       stylus-source
     eventmachine (1.2.7)
     execjs (2.7.0)
-    fakefs (0.17.0)
+    fakefs (0.18.0)
     ffi (1.9.25)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
