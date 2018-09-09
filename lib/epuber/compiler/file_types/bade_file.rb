@@ -30,7 +30,7 @@ module Epuber
             __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(target.constants),
           }
 
-          should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build?
+          should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build? && (!compilation_context.should_write)
 
           precompiled = if should_load_from_precompiled
                           begin
