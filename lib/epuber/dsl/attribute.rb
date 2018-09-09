@@ -223,7 +223,7 @@ module Epuber
 
           if dest_class.nil?
             array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
-            array_keys_with_type = array_keys.select { |k, _v| k.any? { |klass| klass <= value.class } }
+            array_keys_with_type = array_keys.select { |k, _v| k.any? { |klass| value.class <= klass } }
 
             if array_keys_with_type.count > 0
               dest_class = array_keys_with_type.values.first
