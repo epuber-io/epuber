@@ -2,6 +2,7 @@
 
 require 'fileutils'
 
+require_relative '../templates'
 require_relative '../command'
 require_relative '../vendor/ruby_templater'
 
@@ -62,8 +63,7 @@ END
       # @return [void]
       #
       def write_bookspec(book_id)
-        template_path = File.expand_path(File.join('..', 'templates', 'template.bookspec'), File.dirname(__FILE__))
-        rendered = Epuber::RubyTemplater.from_file(template_path)
+        rendered = Epuber::RubyTemplater.from_file(Templates::TEMPLATE_BOOKSPEC)
                                         .with_locals(book_id: book_id)
                                         .render
 
@@ -96,23 +96,22 @@ END
       # @return [void]
       #
       def write_gitignore
-        write('.gitignore', <<-END
-# This is generated with `epuber init`
-*.epub
-*.mobi
-!.epuber/
-.epuber/build/
-.epuber/release_build/
-.epuber/build_cache/
-.epuber/metadata/
-
+        append_new_lines('.gitignore', <<~END
+          # This is generated with `epuber init`
+          *.epub
+          *.mobi
+          !.epuber/
+          .epuber/build/
+          .epuber/release_build/
+          .epuber/build_cache/
+          .epuber/metadata/
         END
         )
       end
 
       def write_default_style(book_id)
-        write("styles/#{book_id}.styl", <<-END
-// This is generated with `epuber init` script.
+        write("styles/#{book_id}.styl", <<~END
+          // This is generated with `epuber init` script.
         END
         )
       end
@@ -125,6 +124,30 @@ END
       def write(file_path, string)
         File.write(file_path, string)
         puts "   #{'create'.ansi.green}  #{file_path}"
+      end
+
+      # @param string [String] text to file
+      # @param file_path [String] path to file
+      #
+      # @return [void]
+      #
+      def append_new_lines(file_path, string)
+        unless File.exist?(file_path)
+          write(file_path, string)
+          return
+        end
+
+        existing_content = File.read(file_path)
+        string.split("\n").each do |line|
+          next if existing_content.include?(line)
+
+          existing_content << "\n#{line}"
+        end
+
+        existing_content << "\n"
+
+        File.write(file_path, existing_content)
+        puts "   #{'update'.ansi.green}  #{file_path}"
       end
 
       # @param [String] dir_path path to dir
