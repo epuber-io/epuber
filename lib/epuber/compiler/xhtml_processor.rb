@@ -103,6 +103,12 @@ module Epuber
 
           html.children.first.before(head)
         end
+
+        # https://github.com/IDPF/epubcheck/issues/631
+        if epub_version < 3.0
+          xhtml_doc.internal_subset.remove unless xhtml_doc.internal_subset.nil?
+          xhtml_doc.create_internal_subset('html', "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd")
+        end
       end
 
       # Method for adding style sheets with links, method will not add duplicate items
