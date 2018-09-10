@@ -67,16 +67,15 @@ module Epuber
     # @return [Epuber::Lockfile]
     #
     def bookspec_lockfile
-      @bookspec_lockfile ||= (
-        lockfile = Lockfile.from_file(bookspec_lockfile_path)
-        lockfile.version = Epuber::VERSION
-        lockfile
-      )
+      @bookspec_lockfile ||= Lockfile.from_file(bookspec_lockfile_path)
     end
 
     # @return nil
     #
     def save_lockfile
+      bookspec_lockfile.epuber_version = Epuber::VERSION
+      bookspec_lockfile.bade_version = Bade::VERSION
+
       bookspec_lockfile.write_to_file
     end
 
@@ -116,6 +115,16 @@ module Epuber
     #
     def target_file_stat_database_path(target)
       File.join(working_path, 'metadata', 'target_stats', target.name.to_s, 'file_stats.yml')
+    end
+
+    def warn_for_outdated_versions!
+      if bookspec_lockfile.epuber_version > Epuber::VERSION
+        UI.warning('Warning: the running version of Epuber is older than the version that created the lockfile. We suggest you upgrade to the latest version of Epuber by running `gem install epuber`')
+      end
+
+      if bookspec_lockfile.bade_version > Bade::VERSION
+        UI.warning('Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`')
+      end
     end
 
     # ---------------------------------------------------------------------------------------------------------------- #

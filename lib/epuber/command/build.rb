@@ -44,6 +44,8 @@ module Epuber
         super
         verify_one_bookspec_exists!
         verify_all_targets_exists!
+
+        Config.instance.warn_for_outdated_versions!
       end
 
       def run
