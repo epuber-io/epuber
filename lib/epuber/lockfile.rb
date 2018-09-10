@@ -55,7 +55,9 @@ module Epuber
     # @return [Epuber::Version]
     #
     def bade_version
-      Version.new(@internal_data['bade_version'])
+      value = @internal_data['bade_version']
+      value = Version.new(value) unless value.nil?
+      value
     end
 
     # @param [Epuber::Version] new_version

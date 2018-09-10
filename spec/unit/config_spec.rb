@@ -50,6 +50,11 @@ module Epuber
       File.write('some.bookspec.lock', lockfile.to_yaml)
 
       expect(Config.instance.bookspec_lockfile.epuber_version.to_s).to eq '0.1'
+      expect(Config.instance.bookspec_lockfile.bade_version).to eq nil
+
+      expect {
+        Config.instance.warn_for_outdated_versions!
+      }.to_not raise_error
     end
   end
 end
