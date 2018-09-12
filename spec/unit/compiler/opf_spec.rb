@@ -103,5 +103,16 @@ module Epuber
         expect(metadata).to have_xpath('/dc:date', '2014-12-10')
       end
     end
+
+    context '.create_id_from_path' do
+      it 'generates id without numbers at start' do
+        def create_id(path)
+          # `create_id_from_path` method is private, using this hack we can call the private method
+          @sut.send(:create_id_from_path, path)
+        end
+
+        expect(create_id('4HSK/text/copyright.xhtml')).to eq 'HSK.text.copyright.xhtml'
+      end
+    end
   end
 end

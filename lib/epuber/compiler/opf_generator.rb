@@ -257,7 +257,9 @@ module Epuber
       # @return [String]
       #
       def create_id_from_path(path)
-        path && path.gsub('/', '.')
+        return nil if path.nil?
+
+        path.gsub('/', '.').gsub(/^[0-9]*/, '')
       end
 
       # Creates proper mime-type for file
