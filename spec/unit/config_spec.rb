@@ -56,5 +56,13 @@ module Epuber
         Config.instance.warn_for_outdated_versions!
       }.to_not raise_error
     end
+
+    it "is working when there is no lockfile yet" do
+      Config.clear_instance!
+
+      File.write('some.bookspec', '')
+
+      expect(Config.instance.bookspec_lockfile.epuber_version).to_not be_nil
+    end
   end
 end

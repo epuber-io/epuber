@@ -13,6 +13,8 @@ module Epuber
       @internal_data = data
     end
 
+    # Load existing lockfile from given path, or create new one. You can define default attributes in block.
+    #
     # @return [self]
     #
     def self.from_file(file_path)
@@ -29,6 +31,7 @@ module Epuber
 
       inst = self.new(hash)
       inst.defined_from_file = file_path
+      yield inst if hash.empty? && block_given?
       inst
     end
 

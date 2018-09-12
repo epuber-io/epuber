@@ -67,7 +67,10 @@ module Epuber
     # @return [Epuber::Lockfile]
     #
     def bookspec_lockfile
-      @bookspec_lockfile ||= Lockfile.from_file(bookspec_lockfile_path)
+      @bookspec_lockfile ||= Lockfile.from_file(bookspec_lockfile_path) do |lockfile|
+        lockfile.epuber_version = Epuber::VERSION
+        lockfile.bade_version = Bade::VERSION
+      end
     end
 
     # @return nil
