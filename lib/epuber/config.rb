@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'pathname'
+require 'bade'
 require_relative 'lockfile'
 
 
