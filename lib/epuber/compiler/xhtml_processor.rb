@@ -34,7 +34,7 @@ module Epuber
         end
 
         doctypes = []
-        while /(\n|\?>|\A)?(<![^>]*>\n*)/ =~ text
+        while /(\n|\?>|\A)?(<!DOCTYPE [^>]*>\n*)/ =~ text
           doctypes << $2.strip
 
           match = Regexp.last_match

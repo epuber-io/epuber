@@ -70,6 +70,16 @@ module Epuber
 
           expect(doc.to_s).to eq expected_output
         end
+
+        it 'can parse copyright from 4 hour working week book' do
+          file_path = File.join(spec_root, 'fixtures/4HPT_copyright.xhtml')
+          FakeFS::FileSystem.clone(file_path)
+          input = File.read(file_path)
+
+          expect {
+            XHTMLProcessor.xml_document_from_string(input)
+          }.to_not raise_error
+        end
       end
 
       context '.add_missing_root_elements' do
