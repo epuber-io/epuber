@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    epuber (0.5.2)
+    epuber (0.5.3)
       activesupport (~> 5.0)
       bade (~> 0.2.4)
       claide (~> 1.0)
