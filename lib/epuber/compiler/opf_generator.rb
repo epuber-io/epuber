@@ -264,13 +264,23 @@ module Epuber
 
       # Creates proper mime-type for file
       #
-      # @param file [Epuber::Book::File]
+      # @param file [Epuber::Compiler::FileTypes::AbstractFile | String]
       #
       # @return [String]
       #
       def mime_type_for(file)
-        filename = file.destination_path
-        MIME::Types.of(filename).first.content_type
+        filename = if file.is_a?(String)
+                     file
+                   else
+                     file.destination_path
+                   end
+
+        case File.extname(filename)
+        when '.ttf'
+          'application/font-sfnt'
+        else
+          MIME::Types.of(filename).first.content_type
+        end
       end
 
       # Creates hash of namespaces for root package element

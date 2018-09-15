@@ -114,5 +114,19 @@ module Epuber
         expect(create_id('4HSK/text/copyright.xhtml')).to eq 'HSK.text.copyright.xhtml'
       end
     end
+
+    context '.mime_type_for' do
+      def mimetype(path)
+        @sut.send(:mime_type_for, path)
+      end
+
+      it 'picks correct mimetype for .ttf files' do
+        expect(mimetype('some-font.ttf')).to eq 'application/font-sfnt'
+      end
+
+      it 'picks correct mimetype for .jpg files' do
+        expect(mimetype('some-image.jpg')).to eq 'image/jpeg'
+      end
+    end
   end
 end
