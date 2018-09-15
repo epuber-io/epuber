@@ -66,12 +66,8 @@ module Epuber
             parent.send(key)
 
           elsif !attr.default_value.nil?
-            # write default value on first access to root object
-            root_obj = self.class.find_root(self) || self
-            root_obj.send(attr.writer_name, attr.default_value)
-
-            # and return the default value
-            attr.default_value
+            # just return the default value
+            attr.converted_value(attr.default_value)
           end
         end
 

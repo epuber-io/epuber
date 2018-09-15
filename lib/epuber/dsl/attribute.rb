@@ -47,8 +47,10 @@ module Epuber
         @auto_convert  = auto_convert
         @types         = if !types.nil?
                            types
-                         elsif @default_value
+                         elsif @default_value && @auto_convert.empty?
                            [@default_value.class]
+                         elsif !@auto_convert.empty?
+                           [@auto_convert.values.first]
                          else
                            [String]
                          end
@@ -234,6 +236,8 @@ module Epuber
             return dest_class.call(value)
           elsif dest_class.respond_to?(:parse)
             return dest_class.parse(value)
+          elsif dest_class <= String
+            return value.to_s
           elsif dest_class.respond_to?(:new)
             return dest_class.new(value)
           else
