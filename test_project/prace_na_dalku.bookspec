@@ -18,13 +18,17 @@ Epuber::Book.new do |book|
 
   book.cover_image = 'cover'
 
-  book.target :ibooks do |t|
-    t.add_const 'restart_store_url', 'https://itunes.apple.com/cz/book/restart/id490604028?mt=11'
-    t.custom_fonts = true
-  end
+  book.abstract_target :rich_targets do |at|
+    at.epub_version = 3.0
 
-  book.target :play do |t|
-    t.add_const 'restart_store_url', 'https://play.google.com/store/books/details?id=AU5RAQAAQBAJ'
+    at.sub_target :ibooks do |t|
+      t.add_const 'restart_store_url', 'https://itunes.apple.com/cz/book/restart/id490604028?mt=11'
+      t.custom_fonts = true
+    end
+
+    at.sub_target :play do |t|
+      t.add_const 'restart_store_url', 'https://play.google.com/store/books/details?id=AU5RAQAAQBAJ'
+    end
   end
 
   book.target :palmknihy do |t|
