@@ -7,9 +7,11 @@ module Epuber
   describe Config do
     include FakeFS::SpecHelpers
 
-    it "warns if the previous version of Epuber is newer" do
+    before do
       Config.clear_instance!
+    end
 
+    it "warns if the previous version of Epuber is newer" do
       lockfile = {
           'epuber_version' => '200000.0.0',
           'bade_version' => Bade::VERSION,
@@ -24,8 +26,6 @@ module Epuber
     end
 
     it "warns if the previous version of Bade is newer" do
-      Config.clear_instance!
-
       lockfile = {
           'epuber_version' => Epuber::VERSION,
           'bade_version' => '200000.0.0',
@@ -40,8 +40,6 @@ module Epuber
     end
 
     it "is backward compatible" do
-      Config.clear_instance!
-
       lockfile = {
           'version' => '0.1',
       }
@@ -58,11 +56,52 @@ module Epuber
     end
 
     it "is working when there is no lockfile yet" do
-      Config.clear_instance!
-
       File.write('some.bookspec', '')
 
       expect(Config.instance.bookspec_lockfile.epuber_version).to_not be_nil
+    end
+
+    context '#diff_version_from_last_build?' do
+      it 'detects when using different version of Epuber or Bade' do
+        lockfile = {
+            'epuber_version' => '200000.0.0',
+            'bade_version' => '200000.0.0',
+        }
+
+        File.write('some.bookspec', '')
+        File.write('some.bookspec.lock', lockfile.to_yaml)
+
+        expect(Config.instance.same_version_as_last_run?).to be_falsey
+      end
+
+      it 'detects when using same versions of Epuber and Bade' do
+        lockfile = {
+            'epuber_version' => Epuber::VERSION,
+            'bade_version' => Bade::VERSION,
+        }
+
+        File.write('some.bookspec', '')
+        File.write('some.bookspec.lock', lockfile.to_yaml)
+
+        expect(Config.instance.same_version_as_last_run?).to be_truthy
+      end
+
+      it 'is backward compatible' do
+        lockfile = {
+            'version' => '0.1',
+        }
+
+        File.write('some.bookspec', '')
+        File.write('some.bookspec.lock', lockfile.to_yaml)
+
+        expect(Config.instance.same_version_as_last_run?).to be_falsey
+      end
+
+      it 'is working when there is no lockfile yet' do
+        File.write('some.bookspec', '')
+
+        expect(Config.instance.same_version_as_last_run?).to_not be_falsey
+      end
     end
   end
 end

@@ -30,7 +30,7 @@ module Epuber
         super
         verify_one_bookspec_exists!
 
-        Config.instance.warn_for_outdated_versions!
+        pre_build_checks
       end
 
       def run

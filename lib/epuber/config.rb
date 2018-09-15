@@ -131,6 +131,18 @@ module Epuber
       end
     end
 
+    def same_version_as_last_run?
+      !(bookspec_lockfile.epuber_version != Epuber::VERSION ||
+          bookspec_lockfile.bade_version.nil? ||
+          bookspec_lockfile.bade_version != Bade::VERSION)
+    end
+
+    def remove_build_caches
+      FileUtils.rm_rf(File.join(working_path, 'build_cache'))
+      FileUtils.rm_rf(File.join(working_path, 'build'))
+      FileUtils.rm_rf(File.join(working_path, 'metadata'))
+    end
+
     # ---------------------------------------------------------------------------------------------------------------- #
 
     class << self

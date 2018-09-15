@@ -74,5 +74,14 @@ module Epuber
         Epuber::Config.instance.save_lockfile
       end
     end
+
+    def pre_build_checks
+      Config.instance.warn_for_outdated_versions!
+
+      if !Config.instance.same_version_as_last_run? && File.exist?(Config.instance.working_path)
+        UI.warning('Using different version of Epuber or Bade, removing all build caches')
+        Config.instance.remove_build_caches
+      end
+    end
   end
 end
