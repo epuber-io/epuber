@@ -277,7 +277,7 @@ module Epuber
 
         case File.extname(filename)
         when '.ttf', '.otf'
-          'application/font-sfnt'
+          'application/vnd.ms-opentype'
         else
           MIME::Types.of(filename).first.content_type
         end
