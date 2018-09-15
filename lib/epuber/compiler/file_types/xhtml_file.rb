@@ -98,13 +98,6 @@ module Epuber
             XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
           end
 
-          UI.print_step_processing_time('adding default things') do
-            XHTMLProcessor.add_styles(xhtml_doc, default_styles(target, file_resolver))
-            XHTMLProcessor.add_scripts(xhtml_doc, default_scripts(target, file_resolver))
-
-            XHTMLProcessor.add_viewport(xhtml_doc, target.default_viewport) unless target.default_viewport.nil?
-          end
-
           # resolve links to files, add other linked resources and compute correct path
           UI.print_step_processing_time('resolving links') do
             XHTMLProcessor.resolve_links(xhtml_doc, destination_path, file_resolver.dest_finder)
@@ -117,6 +110,13 @@ module Epuber
           end
           UI.print_step_processing_time('resolving stylesheets') do
             XHTMLProcessor.resolve_stylesheets(xhtml_doc, destination_path, file_resolver)
+          end
+
+          UI.print_step_processing_time('adding default things') do
+            XHTMLProcessor.add_styles(xhtml_doc, default_styles(target, file_resolver))
+            XHTMLProcessor.add_scripts(xhtml_doc, default_scripts(target, file_resolver))
+
+            XHTMLProcessor.add_viewport(xhtml_doc, target.default_viewport) unless target.default_viewport.nil?
           end
 
           XHTMLProcessor.resolve_mathml_namespace(xhtml_doc)

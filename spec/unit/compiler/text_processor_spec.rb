@@ -151,6 +151,22 @@ module Epuber
 
           expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def'
         end
+
+        it 'will not add style that is already there' do
+          input_str = '<html>
+              <head>
+                <link rel="stylesheet" type="text/css" href="qwe" />
+              </head>
+            </html>'
+          doc = XHTMLProcessor.xml_document_from_string(input_str)
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          expect(doc.css('link[rel="stylesheet"]').size).to eq 1
+
+          XHTMLProcessor.add_styles(doc, ['qwe'])
+
+          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'qwe'
+        end
       end
 
       context '.add_scripts' do
