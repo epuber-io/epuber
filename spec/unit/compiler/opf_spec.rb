@@ -121,7 +121,7 @@ module Epuber
       end
 
       it 'picks correct mimetype for .ttf files' do
-        expect(mimetype('some-font.ttf')).to eq 'application/font-sfnt'
+        expect(mimetype('some-font.ttf')).to eq 'application/vnd.ms-opentype'
       end
 
       it 'picks correct mimetype for .jpg files' do
