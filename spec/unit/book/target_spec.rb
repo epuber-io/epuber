@@ -99,6 +99,20 @@ module Epuber
           expect(target.ibooks?).to be_falsey
         end
       end
+
+      context '#epub_version' do
+        it 'subtarget respects set value from parent instead of default of itself' do
+          @root.epub_version = 2.0
+          # @child has default value 3.0, but it should respect set value to @root
+
+          expect(@child.epub_version).to eq 2.0
+        end
+
+        it 'subtarget respects own value even when the root has different value' do
+          @child.epub_version = 2.0
+          expect(@child.epub_version).to eq 2.0
+        end
+      end
     end
   end
 end

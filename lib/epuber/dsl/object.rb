@@ -19,11 +19,6 @@ module Epuber
         super
         @attributes_values = {}
         @file_path = nil
-
-        # iterate over all attributes to write default values
-        self.class.dsl_attributes.each do |key, _attr|
-          self.send(key)
-        end
       end
 
       # @return [String]

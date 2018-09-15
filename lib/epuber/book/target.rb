@@ -161,7 +161,6 @@ module Epuber
       attribute :epub_version,
                 required:     true,
                 inherited:    true,
-                types:        [Version],
                 auto_convert: { [String, Integer, Float] => Version },
                 default_value: 3.0
 
