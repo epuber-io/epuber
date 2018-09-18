@@ -142,6 +142,25 @@ module Epuber
           expect(doc.at_css('html body p')).to_not be_nil
           expect(doc.css('html body p').map(&:to_s).join).to eq input_str
         end
+
+        it 'adds all missing elements to empty <html/>' do
+          input = '<html/>'
+          doc = XHTMLProcessor.xml_document_from_string(input)
+          XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
+
+          expected = <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <html>
+              <head>
+                <title>Baf</title>
+                <meta charset="utf-8"/>
+              </head>
+              <body/>
+            </html>
+          XML
+
+          expect(doc.to_s).to eq expected
+        end
       end
 
       context '.add_styles' do

@@ -59,6 +59,8 @@ module Epuber
 
         if root_elements.count == 1
           doc.root = root_elements.first
+        elsif root_node.at_css('html')
+          doc.root = root_node.at_css('html')
         elsif root_node.at_css('body').nil?
           root_node.node_name = 'body'
         else
@@ -85,7 +87,11 @@ module Epuber
       def self.add_missing_root_elements(xhtml_doc, title, epub_version)
         # add missing body element
         if xhtml_doc.at_css('body').nil?
-          xhtml_doc.root.surround_with_element('body')
+          if xhtml_doc.root.node_name == 'html'
+            xhtml_doc.root << xhtml_doc.create_element('body')
+          else
+            xhtml_doc.root.surround_with_element('body')
+          end
         end
 
         # add missing root html element
@@ -103,7 +109,11 @@ module Epuber
           head << xhtml_doc.create_element('title', title)
           head << xhtml_doc.create_element('meta', charset: 'utf-8') if epub_version >= 3.0
 
-          html.children.first.before(head)
+          if (first = html.children.first)
+            first.before(head)
+          else
+            html << head
+          end
         end
 
         # https://github.com/IDPF/epubcheck/issues/631
