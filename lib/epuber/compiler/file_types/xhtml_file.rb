@@ -68,11 +68,11 @@ module Epuber
           xhtml_content
         end
 
-        # @param [Array] errors
+        # @param [Array<Epuber::Compiler::Problem>] errors
         #
         def process_nokogiri_errors(errors)
-          errors.each do |e|
-            UI.warning(e)
+          errors.each do |problem|
+            UI.warning(problem, location: self)
           end
         end
 
@@ -86,12 +86,12 @@ module Epuber
           book = compilation_context.book
           file_resolver = compilation_context.file_resolver
 
-          xhtml_doc = UI.print_step_processing_time('parsing XHTML file') do
-            XHTMLProcessor.xml_document_from_string(content, source_path)
+          xhtml_doc, errors = UI.print_step_processing_time('parsing XHTML file') do
+            XHTMLProcessor.xml_doc_from_str_with_errors(content, source_path)
           end
 
           if compilation_context.release_build && xhtml_doc.errors.count > 0
-            process_nokogiri_errors(xhtml_doc.errors)
+            process_nokogiri_errors(errors)
           end
 
           UI.print_step_processing_time('adding missing elements') do

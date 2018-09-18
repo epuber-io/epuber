@@ -19,14 +19,14 @@ module Epuber
       #
       # @return [Nokogiri::XML::Document] parsed document
       #
-      def self.xml_document_from_string(text, file_path = nil)
+      def self.xml_doc_from_str_with_errors(text, file_path = nil)
         if /\A[\n\r ]+(<\?xml)/ =~ text
           UI.warning('XML header must be at the beginning of document', location: UI::Location.new(file_path, 1))
 
           text = text.lstrip
         end
 
-        xml_header = ''
+        xml_header = nil
         if /\A\s*(<\?xml[^>]*\?>)/ =~ text
           match = Regexp.last_match
           xml_header = text[match.begin(1)...match.end(1)]
@@ -50,9 +50,18 @@ module Epuber
                         Nokogiri::XML::ParseOptions::NOERROR | # to silence any errors or warnings printing into console
                         Nokogiri::XML::ParseOptions::NOWARNING
 
-        doc = Nokogiri::XML("#{before}<root>#{text}</root>", nil, nil, parse_options)
+        doc = Nokogiri::XML("#{before}<root>#{text}</root>", file_path, nil, parse_options)
+        text_for_errors = before + text
         doc.encoding = 'UTF-8'
         doc.file_path = file_path
+
+        if doc.errors.empty?
+          errors = []
+        else
+          errors = doc.errors.map do |e|
+            Problem.new(:error, e.message, text_for_errors, line: e.line, column: e.column, file_path: file_path)
+          end
+        end
 
         root = root_node = doc.root
         root_elements = root.children.select { |a| a.element? || a.comment? }
@@ -67,7 +76,12 @@ module Epuber
           root_node.node_name = 'html'
         end
 
-        doc
+        [doc, errors]
+      end
+
+      def self.xml_document_from_string(text, file_path = nil)
+        xml, errros = self.xml_doc_from_str_with_errors(text, file_path)
+        xml
       end
 
 

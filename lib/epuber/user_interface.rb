@@ -191,7 +191,13 @@ module Epuber
 
       comps = []
       comps << message.to_s
-      comps << "  (in file #{location.path} line #{location.lineno}" unless location.nil?
+      if !location.nil? && !(message.is_a?(Epuber::Compiler::Problem) || message.is_a?(Epuber::Checker::TextChecker::MatchProblem))
+        if location.lineno
+          comps << "  (in file #{location.path} line #{location.lineno})"
+        else
+          comps << "  (in file #{location.path})"
+        end
+      end
 
       comps.join("\n").ansi.send(_color_from_level(level))
     end

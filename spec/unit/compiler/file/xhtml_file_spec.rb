@@ -74,13 +74,13 @@ module Epuber
           expect {
             file.process(@ctx)
           }.to output('XML header must be at the beginning of document
-  (in file some_file.xhtml line 1'.ansi.yellow + "\n").to_stdout
+  (in file some_file.xhtml line 1)'.ansi.yellow + "\n").to_stdout
 
           expect(File.read('some_file_dest.xhtml')).to eq source.lstrip # lstrip is to remove white characters at beginning
         end
 
         it 'prints warning when XML is not alright while building release build' do
-          source = <<-XML.strip_heredoc
+          source = <<~XML
             <body>
               <p>abc
             </body>
@@ -95,10 +95,23 @@ module Epuber
           @ctx.release_build = true
           file.compilation_context = @ctx
 
-          expected_output =
-            '3:8: FATAL: Opening and ending tag mismatch: p line 2 and body'.ansi.yellow + "\n" +
-            '4:8: FATAL: Opening and ending tag mismatch: body line 1 and root'.ansi.yellow + "\n" +
-            '4:8: FATAL: Premature end of data in tag root line 1'.ansi.yellow + "\n"
+          expected_output = [
+            [
+                'some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body',
+                '  </body>',
+                '         ^',
+            ].join("\n").ansi.yellow,
+            [
+                'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root',
+                '  </body>',
+                '         ^',
+            ].join("\n").ansi.yellow,
+            [
+                'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1',
+                '  </body>',
+                '         ^',
+            ].join("\n").ansi.yellow,
+          ].join("\n") + "\n"
 
           expect {
             file.process(@ctx)

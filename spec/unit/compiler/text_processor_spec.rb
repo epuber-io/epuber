@@ -430,7 +430,7 @@ module Epuber
           expect {
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
           }.to output('Not found file matching pattern `` from context path root.txt.
-  (in file root.txt line 1'.ansi.yellow + "\n").to_stdout
+  (in file root.txt line 1)'.ansi.yellow + "\n").to_stdout
         end
 
         it "prints warning when the desired file can't be found" do
@@ -442,7 +442,7 @@ module Epuber
           expect {
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
           }.to output('Not found file matching pattern `blabla` from context path root.txt.
-  (in file root.txt line 1'.ansi.yellow + "\n").to_stdout
+  (in file root.txt line 1)'.ansi.yellow + "\n").to_stdout
         end
 
         it 'silently skips tags without specified attributes' do

@@ -4,85 +4,25 @@ require 'active_support/core_ext/string/access'
 
 require_relative '../ruby_extensions/match_data'
 require_relative '../checker'
-
+require_relative '../compiler/problem'
 
 module Epuber
   class Checker
     class TextChecker < Checker
-      class MatchProblem
+      class MatchProblem < Compiler::Problem
         # @param message [String]
         # @param file_path [String]
         # @param match [MatchData]
         #
         def initialize(match, message, file_path)
-          @match = match
-          @message = message
-          @file_path = file_path
-        end
+          whole_text = match.pre_match + match.matched_string + match.post_match
 
-        # Formats caret symbol with space indent
-        #
-        # @param [Fixnum] indent
-        #
-        # @return [String]
-        #
-        def caret_symbol(indent)
-          ' ' * indent + '^'
-        end
+          line = match.pre_match_lines.count
+          column = (match.pre_match_lines.last || '').length + 1
+          length = match.matched_string.length
+          location = Epuber::Compiler::Problem::Location.new(line, column, length)
 
-        # Formats caret symbols for indent and length
-        #
-        # @param [Fixnum] length
-        # @param [Fixnum] indent
-        #
-        # @return [String]
-        #
-        def caret_symbols(indent, length)
-          start_sign = caret_symbol(indent)
-          end_sign = if length > 1
-                       caret_symbol(length-2)
-                     else
-                       ''
-                     end
-
-          "#{start_sign}#{end_sign}"
-        end
-
-        def formatted_match_line
-          match_line = @match.matched_string
-          pre_line = @match.pre_match_lines.last || ''
-
-          pre = match_pre_line = pre_line
-          if remove_tabs(match_pre_line).length > 100
-            pre = "#{match_pre_line.first(20)}...#{match_pre_line.last(30)}"
-          end
-
-          pre = remove_tabs(pre)
-
-          post_line = @match.post_match_lines.first || ''
-
-          post = if post_line.length > 50
-                   "#{post_line.first(50)}..."
-                 else
-                   post_line
-                 end
-
-          [pre, match_line, post]
-        end
-
-        def remove_tabs(text)
-          text.gsub("\t", ' ' * 4)
-        end
-
-        def to_s
-          pre_original = @match.pre_match_lines.last || ''
-          pre, match_text, post = formatted_match_line
-
-          pointers = caret_symbols(pre.length, match_text.length)
-
-          %{#{@file_path}:#{@match.line_number} column: #{pre_original.length} --- #{@message}
-  #{pre + match_text.ansi.red + post}
-  #{pointers}}
+          super(:warn, message, whole_text, location: location, file_path: file_path)
         end
       end
 
