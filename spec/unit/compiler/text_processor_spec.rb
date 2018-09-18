@@ -71,6 +71,38 @@ module Epuber
           expect(doc.to_s).to eq expected_output
         end
 
+        it 'can parse xml where is html root element missing' do
+          input = <<~XML
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+
+            <head>
+              <script type="text/javascript" src="../scripts/resize.js" />
+            </head>
+            <body>
+              <p>Some text here</p>
+            </body>
+          XML
+
+          doc = XHTMLProcessor.xml_document_from_string(input)
+          expect(doc.root.name).to eq 'html'
+
+          expected_output = <<~XML
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <script type="text/javascript" src="../scripts/resize.js"/>
+            </head>
+            <body>
+              <p>Some text here</p>
+            </body>
+            </html>
+          XML
+
+          expect(doc.to_s).to eq expected_output
+        end
+
         it 'can parse copyright from 4 hour working week book' do
           file_path = File.join(spec_root, 'fixtures/4HPT_copyright.xhtml')
           FakeFS::FileSystem.clone(file_path)

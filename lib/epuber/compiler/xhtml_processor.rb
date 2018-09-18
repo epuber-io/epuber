@@ -61,6 +61,8 @@ module Epuber
           doc.root = root_elements.first
         elsif root_node.at_css('body').nil?
           root_node.node_name = 'body'
+        else
+          root_node.node_name = 'html'
         end
 
         doc
