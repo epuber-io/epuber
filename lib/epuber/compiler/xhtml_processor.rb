@@ -94,17 +94,21 @@ module Epuber
           end
         end
 
+        html = xhtml_doc.at_css('html')
+
         # add missing root html element
-        if xhtml_doc.at_css('html').nil?
+        if html.nil?
           attrs               = {}
           attrs['xmlns']      = 'http://www.w3.org/1999/xhtml'
           attrs['xmlns:epub'] = 'http://www.idpf.org/2007/ops' if epub_version >= 3
-          xhtml_doc.root.surround_with_element('html', attrs)
+          html = xhtml_doc.root.surround_with_element('html', attrs)
+        elsif html.namespaces.empty?
+          html['xmlns']      = 'http://www.w3.org/1999/xhtml'
+          html['xmlns:epub'] = 'http://www.idpf.org/2007/ops' if epub_version >= 3
         end
 
         # add missing head in html
         if xhtml_doc.at_css('html > head').nil?
-          html = xhtml_doc.css('html').first
           head = xhtml_doc.create_element('head')
           head << xhtml_doc.create_element('title', title)
           head << xhtml_doc.create_element('meta', charset: 'utf-8') if epub_version >= 3.0
