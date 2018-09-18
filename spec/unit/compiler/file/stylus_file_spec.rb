@@ -60,22 +60,22 @@ module Epuber
           end
 
           it 'allows to use constants inside stylus files' do
-            source = %q(
-__abc = {
-   hej: "hou"
-}
+            source = <<~STYLUS
+              __abc = {
+                 hej: "hou"
+              }
+              
+              a
+                // value: __const.some_value
+                value: __abc.hej
+                value2: __const.some_value
 
-a
-  // value: __const.some_value
-  value: __abc.hej
-
-)
-
+            STYLUS
 
             File.write('/tmp/epuber_stylus_tests/some_file.styl', source)
 
             file = StylusFile.new('/tmp/epuber_stylus_tests/some_file.styl')
-            file.destination_path = 'some_file.css'
+            file.destination_path = '/tmp/epuber_stylus_tests/some_file.css'
             file.compilation_context = ctx
             resolve_file_paths(file)
 
@@ -83,18 +83,17 @@ a
 
             file.process(ctx)
 
+            expected = <<~CSS
+              a {
+                value: "hou";
+                value2: 'abc';
+              }
+            CSS
 
-            puts File.read(file.final_destination_path)
-
+            expect(File.read(file.final_destination_path)).to eq expected
           end
         end
-
-
-
       end
-
-
-
     end
   end
 end
