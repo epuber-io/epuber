@@ -164,4 +164,4 @@ DEPENDENCIES
   rubocop (~> 0.49)
 
 BUNDLED WITH
-   1.16.4
+   2.0.1
