@@ -121,13 +121,17 @@ module Epuber
           end
         end
 
-        if @target.epub_version >= 3 && toc_items.length > 0
+        if @target.epub_version >= 3 && toc_items.length > 0 && contains_item_with_title(toc_items)
           @xml.ol do
             iterate_lambda.call
           end
         else
           iterate_lambda.call
         end
+      end
+
+      def contains_item_with_title(toc_items)
+        toc_items.any? { |a| a.title || contains_item_with_title(a.sub_items) }
       end
 
       # @param toc_item [Epuber::Book::TocItem]

@@ -60,6 +60,43 @@ module Epuber
         expect(landmarks.css('li > a').map { |a| a['href'] }).to contain_exactly 'txt1.xhtml', 'txt1.xhtml'
       end
 
+      it 'does not create ol tag when there is no child' do
+        book = Book.new do |b|
+          b.title        = 'Práce na dálku'
+          b.author       = 'Jared Diamond'
+          b.published    = '10. 12. 2014'
+          b.publisher    = 'Jan Melvil Publishing'
+          b.language     = 'cs'
+          b.version      = 1.0
+          b.is_ibooks    = true
+          b.custom_fonts = true
+
+          b.toc do |toc, target|
+            toc.file 'txt1', 'Text 1', :landmark_start_page
+            toc.file 'txt2', 'Text 2, awesome!' do
+              toc.file 'txt3'
+            end
+          end
+        end
+        book.finish_toc
+
+        ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
+        resolver          = Compiler::FileResolver.new('/source', '/dest')
+        book.default_target.root_toc.sub_items.each { |item|
+          resolver.add_file_from_request(item.file_request)
+          item.sub_items.each { |subitem|
+            resolver.add_file_from_request(subitem.file_request)
+          }
+        }
+        ctx.file_resolver = resolver
+        @sut              = Compiler::NavGenerator.new(ctx)
+
+        nav_xml = @sut.generate_nav
+        toc = nav_xml.at_css('html > body > nav[epub|type="toc"]')
+
+        expect(toc.css('li > ul')).to be_empty
+      end
+
       it 'creates full metadata structure for default epub 2.0' do
         book = Book.new do |b|
           b.title        = 'Práce na dálku'
