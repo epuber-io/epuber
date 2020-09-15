@@ -46,37 +46,39 @@ end
 
 Except for paths to plugins `book.use`, every path could be only name of the file, even without extension. So you can rename them, move them, the correct path will always resolved. Only exception is when the same name has more then one file.
 
-           | Epuber
------------|------------------------------------------------------------
-:book:     | Creates seamless workflow for creating ebooks
-:monorail: | Defines different _targets_ for several book stores (iBookstore, Google Play store, ...)
-:wrench:   | Extend and customise the functionality with _plugins_
-:pencil2:  | Defines _constants_ so you can have link to related book in proper book store
-:pencil:   | Defines mechanisms to deal with duplicated 
-:tophat:   | Easy setup assistant to get started in a few minutes
-:ghost:    | Automatically validates generated text so you don't have to worry about typos and other mistakes
-:rocket:   | Saves you **hours** when developing new or updating existing book
-:page_with_curl: | Supports template engines, CSS preprocessors and standard EPUB formats at the same time
-:computer: | Have local development web server to iterate and experiment quickly
-:loop:     | Automatically refresh web browser when some source file changes
-:bomb:     | Quick jumping through pages with arrow keys on keyboard
-:closed_book: | Supports EPUB 2 and 3
+|                 | Epuber                                                                                           |
+|-----------------|------------------------------------------------------------------------------------------------- |
+|:book:           | Creates seamless workflow for creating ebooks                                                    |
+|:monorail:       | Defines different _targets_ for several book stores (iBookstore, Google Play store, ...)         |
+|:wrench:         | Extend and customise the functionality with _plugins_                                            |
+|:pencil2:        | Defines _constants_ so you can have link to related book in proper book store                    |
+|:pencil:         | Defines mechanisms to deal with duplicated                                                       |
+|:tophat:         | Easy setup assistant to get started in a few minutes                                             |
+|:ghost:          | Automatically validates generated text so you don't have to worry about typos and other mistakes |
+|:rocket:         | Saves you **hours** when developing new or updating existing book                                |
+|:page_with_curl: | Supports template engines, CSS preprocessors and standard EPUB formats at the same time          |
+|:computer:       | Have local development web server to iterate and experiment quickly                              |
+|:loop:           | Automatically refresh web browser when some source file changes                                  |
+|:bomb:           | Quick jumping through pages with arrow keys on keyboard                                          |
+|:closed_book:    | Supports EPUB 2 and 3                                                                            |
 
 
 ## Installation
 
 First of all Epuber uses [RMagick](https://github.com/rmagick/rmagick) which has several external dependencies, so you have to install that first:
 
-- ImageMagick
+- ImageMagick (only v6 for now)
 - pkg-config
 
 On OS X make sure you Xcode Command Line Tools installed:
     
     xcode-select --install
 
-And the easiest way to install prerequisites on OS X is to use [brew](http://brew.sh):
+And the easiest way to install prerequisites on macOS is to use [brew](http://brew.sh):
 
-    brew install imagemagick pkg-config
+    brew install imagemagick@6 node@12 pkg-config
+    brew link --force imagemagick@6
+    brew link --force --overwrite node@12
 
 On Ubuntu, you can run:
 
@@ -87,7 +89,7 @@ On Ubuntu, you can run:
 
 Then just type following line to terminal:
 
-    sudo gem install epuber
+    [sudo] gem install epuber
 
 If everything goes well, try running following line in terminal:
 
