@@ -117,6 +117,74 @@ module Epuber
             file.process(@ctx)
           }.to output(expected_output).to_stdout
         end
+
+        it 'handles space in link' do
+          source = <<~XML
+            <body>
+              <p><a href="http://hbr.org/ear/an/612017-PDF-EN G">abc</a></p>
+            </body>
+          XML
+
+          expected_output = <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+              <head>
+                <title/>
+                <meta charset="utf-8"/>
+              </head>
+              <body>
+              <p><a href="http://hbr.org/ear/an/612017-PDF-EN%20G">abc</a></p>
+            </body>
+            </html>
+          XML
+
+          File.write('some_file.xhtml', source)
+
+          file = XHTMLFile.new('some_file.xhtml')
+          file.destination_path = 'some_file_dest.xhtml'
+          resolve_file_paths(file)
+
+          @ctx.release_build = true
+          file.compilation_context = @ctx
+
+          file.process(@ctx)
+
+          expect(File.read('some_file_dest.xhtml')).to eq expected_output
+        end
+
+        it 'handles unicode in link' do
+          source = <<~XML
+            <body>
+              <p><a href="http://hbr.org/ear/an/612017–123">abc</a></p>
+            </body>
+          XML
+
+          expected_output = <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+              <head>
+                <title/>
+                <meta charset="utf-8"/>
+              </head>
+              <body>
+              <p><a href="http://hbr.org/ear/an/612017%E2%80%93123">abc</a></p>
+            </body>
+            </html>
+          XML
+
+          File.write('some_file.xhtml', source)
+
+          file = XHTMLFile.new('some_file.xhtml')
+          file.destination_path = 'some_file_dest.xhtml'
+          resolve_file_paths(file)
+
+          @ctx.release_build = true
+          file.compilation_context = @ctx
+
+          file.process(@ctx)
+
+          expect(File.read('some_file_dest.xhtml')).to eq expected_output
+        end
       end
 
 
