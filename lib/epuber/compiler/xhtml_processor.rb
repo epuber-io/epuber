@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'nokogiri'
-require 'uri'
+require 'addressable'
 
 
 module Epuber
@@ -208,7 +208,7 @@ module Epuber
           uri = URI(path)
         rescue URI::InvalidURIError
           begin
-            uri = URI(URI::encode(path))
+            uri = URI(Addressable::URI.encode(path))
           rescue URI::InvalidURIError
             # skip not valid uri
             raise UnparseableLinkError, "Unparseable link `#{path}`"

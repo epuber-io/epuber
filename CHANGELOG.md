@@ -1,8 +1,40 @@
-
 # CHANGELOG
 
-## v0.3.6
+## v0.6.0
+- update all dependencies
+- update RMagick to latest version (issue #69)
+- drop support for Ruby 2.4 and older
+- fix crash when resolving path to local file - missing URI::encode (issue #71)
 
+## v0.5.7
+- do not generate empty `<ol>` in `nav.xhtml` file
+
+## v0.5.6
+- add namespaces into XHTML files when there is not any namespace
+- better handling of empty `<html>`
+
+## v0.5.5
+- fix mimetype for OTF and TTF fonts
+- fix parsing of version on `.bookspec` file
+
+## v0.5.4
+- XHTML + Bade - improve adding default styles when there is the default style already present
+- OPF - fix IDs when root folder starts with number
+
+## v0.5.3
+- less pessimistic version specifies for nokogiri and stylus
+
+## v0.5.2
+- better handling of non-existing lockfile
+
+## v0.5.1
+- XHTML + Bade - improve adding default DOCTYPE for EPUB 2
+
+## v0.5.0
+- add support for abstract targets
+- drop support for Ruby 2.2
+
+## v0.3.6
 - add support for older versions of Ruby (2.1.X and 2.0.X) which doesn't support string unicode normalization
 
 
@@ -31,7 +63,7 @@
 ## v0.3.2
 
 - [Command::Init] create sublime project
-- [XHTMLProcessor] add `<meta charset="utf-8"/>` to default head (only for epub3.0+) 
+- [XHTMLProcessor] add `<meta charset="utf-8"/>` to default head (only for epub3.0+)
 - [OPFGenerator] fix duplicated items in spine
 - [UserInterface] rewrite some logs and make big improvements, overwriting processing lines, so result output is much shorter
 - [TocItem] now supports defined sub items only with fragment part

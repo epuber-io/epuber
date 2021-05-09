@@ -22,7 +22,7 @@ module Epuber
 
       expect {
         Config.instance.warn_for_outdated_versions!
-      }.to output(/Warning: the running version of Epuber is older than the version that created the lockfile. We suggest you upgrade to the latest version of Epuber by running `gem install epuber`./).to_stdout
+      }.to output(/Warning: the running version of Epuber is older than the version that created the lockfile. We suggest you upgrade to the latest version of Epuber by running `gem install epuber`\./).to_stdout
     end
 
     it "warns if the previous version of Bade is newer" do
@@ -36,7 +36,7 @@ module Epuber
 
       expect {
         Config.instance.warn_for_outdated_versions!
-      }.to output(/Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`./).to_stdout
+      }.to output(/Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`\./).to_stdout
     end
 
     it "is backward compatible" do
