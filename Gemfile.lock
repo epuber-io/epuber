@@ -53,7 +53,7 @@ GEM
       stylus-source
     eventmachine (1.2.7)
     execjs (2.7.0)
-    fakefs (0.20.1)
+    fakefs (1.3.2)
     ffi (1.15.0)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
@@ -151,7 +151,7 @@ DEPENDENCIES
   bundler
   debase
   epuber!
-  fakefs (~> 0.6)
+  fakefs (~> 1.3)
   rake (~> 12.2)
   rspec (~> 3.2)
   rubocop (~> 0.49)
