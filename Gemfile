@@ -6,3 +6,5 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'coveralls', require: false
+gem 'ruby-debug-ide'
+gem 'debase'
