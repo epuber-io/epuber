@@ -82,7 +82,7 @@ GEM
     rack-protection (2.1.0)
       rack
     rainbow (3.0.0)
-    rake (12.3.3)
+    rake (13.0.3)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -102,15 +102,15 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
-    rubocop (0.93.1)
+    rubocop (1.14.0)
       parallel (~> 1.10)
-      parser (>= 2.7.1.5)
+      parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.8)
+      regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 0.6.0)
+      rubocop-ast (>= 1.5.0, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 2.0)
+      unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.5.0)
       parser (>= 3.0.1.1)
     ruby-debug-ide (0.7.2)
@@ -141,7 +141,7 @@ GEM
     tilt (2.0.10)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (1.7.0)
+    unicode-display_width (2.0.0)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -152,9 +152,9 @@ DEPENDENCIES
   debase
   epuber!
   fakefs (~> 1.3)
-  rake (~> 12.2)
+  rake (~> 13.0)
   rspec (~> 3.2)
-  rubocop (~> 0.49)
+  rubocop (~> 1.14)
   ruby-debug-ide
 
 BUNDLED WITH
