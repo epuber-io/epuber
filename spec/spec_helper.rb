@@ -1,6 +1,3 @@
-require 'coveralls'
-Coveralls.wear!
-
 require 'pp' # to shut up error like 'TypeError: superclass mismatch for class File'
 require 'rspec'
 require 'fakefs/spec_helpers'
