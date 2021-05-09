@@ -2,7 +2,9 @@
 
 ## v0.6.0
 - update all dependencies
+- update RMagick to latest version (issue #69)
 - drop support for Ruby 2.4 and older
+- fix crash when resolving path to local file - missing URI::encode (issue #71)
 
 ## v0.5.7
 - do not generate empty `<ol>` in `nav.xhtml` file
