@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'thin', '~> 1.6'
 
   spec.add_runtime_dependency 'rmagick', '~> 2.14'
-  spec.add_runtime_dependency 'rubyzip', '~> 1.0'
+  spec.add_runtime_dependency 'rubyzip', '~> 2.3'
 
   spec.add_runtime_dependency 'epubcheck-ruby', '~> 4.0'
 
