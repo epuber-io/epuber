@@ -107,7 +107,7 @@ module Epuber
                 '         ^',
             ].join("\n").ansi.yellow,
             [
-                "some_file.xhtml:4 column: 8 --- 4:8: FATAL: EndTag: '</' not found",
+                "some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1",
                 '  </body>',
                 '         ^',
             ].join("\n").ansi.yellow,
