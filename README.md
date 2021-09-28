@@ -67,7 +67,7 @@ Except for paths to plugins `book.use`, every path could be only name of the fil
 
 First of all Epuber uses [RMagick](https://github.com/rmagick/rmagick) which has several external dependencies, so you have to install that first:
 
-- ImageMagick (only v6 for now)
+- ImageMagick
 - pkg-config
 
 On OS X make sure you Xcode Command Line Tools installed:
@@ -76,13 +76,11 @@ On OS X make sure you Xcode Command Line Tools installed:
 
 And the easiest way to install prerequisites on macOS is to use [brew](http://brew.sh):
 
-    brew install imagemagick@6 node@12 pkg-config
-    brew link --force imagemagick@6
-    brew link --force --overwrite node@12
+    brew install imagemagick node pkg-config
 
 On Ubuntu, you can run:
 
-    sudo apt-get install libmagickwand-dev
+    sudo apt install libmagickwand-dev
 
 
 ### Finish
@@ -107,12 +105,6 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/epuber-io/epuber. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
 
-
-## TODO
-
-- [ ] move all cards from Trello to GitHub
-- [ ] create documentation 
-- [ ] create several examples of book specification
 
 ## License
 
