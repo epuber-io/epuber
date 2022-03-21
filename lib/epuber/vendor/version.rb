@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 # Most of this code is taken from github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/vendor/version.rb
 

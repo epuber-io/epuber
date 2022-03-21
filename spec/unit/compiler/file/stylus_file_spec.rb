@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require_relative '../../../spec_helper'
 
@@ -64,7 +64,7 @@ module Epuber
               __abc = {
                  hej: "hou"
               }
-              
+
               a
                 // value: __const.some_value
                 value: __abc.hej

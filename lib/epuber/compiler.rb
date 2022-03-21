@@ -1,16 +1,12 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require 'English'
-
 require 'pathname'
 require 'fileutils'
-
 require 'zip'
 
 require_relative 'vendor/nokogiri_extensions'
-
 require_relative 'plugin'
-
 
 module Epuber
   class Compiler

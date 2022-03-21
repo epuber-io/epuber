@@ -1,9 +1,8 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require 'pathname'
 require 'bade'
 require_relative 'lockfile'
-
 
 module Epuber
   class Config

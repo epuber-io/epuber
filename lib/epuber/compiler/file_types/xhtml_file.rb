@@ -1,5 +1,4 @@
-# encoding: utf-8
-
+# frozen_string_literal: true
 
 module Epuber
   class Compiler
@@ -9,7 +8,6 @@ module Epuber
       require_relative 'source_file'
 
       class XHTMLFile < SourceFile
-
         # @return [Epuber::Book::TocItem]
         #
         attr_accessor :toc_item
@@ -52,7 +50,7 @@ module Epuber
           compilation_context.perform_plugin_things(Transformer, :source_text_file) do |transformer|
             xhtml_content = transformer.call(abs_source_path, xhtml_content, compilation_context)
           end
-          
+
           # perform custom validation
           if compilation_context.should_check
             compilation_context.perform_plugin_things(Checker, :source_text_file) do |checker|
