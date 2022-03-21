@@ -8,7 +8,6 @@ require 'fileutils'
 require 'zip'
 
 require_relative 'vendor/nokogiri_extensions'
-require_relative 'vendor/globals_context'
 
 require_relative 'plugin'
 
@@ -29,10 +28,10 @@ module Epuber
 
     EPUB_CONTENT_FOLDER = 'OEBPS'
 
-    # @return [Epuber::GlobalsContext]
+    # @return [Bade::Runtime::GlobalsTracker]
     #
-    def self.globals_catcher
-      @globals_catcher ||= Epuber::GlobalsContext.new
+    def self.globals_tracker
+      @globals_catcher ||= Bade::Runtime::GlobalsTracker.new
     end
 
     # @return [Epuber::Compiler::FileResolver]
@@ -70,7 +69,7 @@ module Epuber
       compilation_context.verbose = verbose
       compilation_context.use_cache = use_cache
 
-      self.class.globals_catcher.catch do
+      self.class.globals_tracker.catch do
         @build_folder = build_folder
 
         FileUtils.mkdir_p(build_folder)
@@ -100,7 +99,7 @@ module Epuber
         compilation_context.target_file_database.save_to_file
       end
     ensure
-      self.class.globals_catcher.clear_all
+      self.class.globals_tracker.clear_all
     end
 
     # Archives current target files to epub
