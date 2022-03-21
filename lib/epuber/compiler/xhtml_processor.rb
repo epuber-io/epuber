@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require 'nokogiri'
 require 'addressable'
@@ -20,6 +20,8 @@ module Epuber
       # @return [Nokogiri::XML::Document] parsed document
       #
       def self.xml_doc_from_str_with_errors(text, file_path = nil)
+        text = text.dup
+
         if /\A[\n\r ]+(<\?xml)/ =~ text
           UI.warning('XML header must be at the beginning of document', location: UI::Location.new(file_path, 1))
 

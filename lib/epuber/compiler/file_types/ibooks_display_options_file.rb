@@ -1,5 +1,4 @@
-# encoding: utf-8
-
+# frozen_string_literal: true
 
 module Epuber
   class Compiler
@@ -24,8 +23,3 @@ module Epuber
     end
   end
 end
-
-
-
-
-

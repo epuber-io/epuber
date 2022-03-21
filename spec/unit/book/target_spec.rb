@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require_relative '../../spec_helper'
 
@@ -58,7 +58,7 @@ module Epuber
           @root.add_const :key, 'value'
           expect(@root.constants).to eq({key: 'value'})
         end
-        
+
         it 'supports adding one key with key: value way' do
           @root.add_const :key => 'value'
           @root.add_const key2: 'value'

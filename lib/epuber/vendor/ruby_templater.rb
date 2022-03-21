@@ -1,9 +1,8 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 # rubocop:disable Lint/Eval
 
 require_relative 'hash_binding'
-
 
 module Epuber
   class RubyTemplater
