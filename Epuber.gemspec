@@ -14,14 +14,14 @@ Gem::Specification.new do |spec|
   spec.summary  = 'Epuber is simple tool to compile and pack source files into EPUB format.'
   spec.homepage = Epuber::HOME_URL
   spec.license  = 'MIT'
-  spec.required_ruby_version = '~> 2.5'
+  spec.required_ruby_version = '>= 2.5'
 
   spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w(epuber.gemspec Gemfile LICENSE.txt README.md)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'activesupport', '~> 6.0'
+  spec.add_runtime_dependency 'activesupport', '>= 6.0', '< 8.0'
   spec.add_runtime_dependency 'addressable', '~> 2.7'
   spec.add_runtime_dependency 'nokogiri', '~> 1.8', '>= 1.8.2'
   spec.add_runtime_dependency 'mime-types', '~> 3.0'
@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'epuber-stylus', '~> 1.1', '>= 1.1.1'
   spec.add_runtime_dependency 'coffee-script', '~> 2.4'
-  spec.add_runtime_dependency 'bade', '~> 0.2.4'
+  spec.add_runtime_dependency 'bade', '~> 0.3'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rspec', '~> 3.2'

@@ -1,7 +1,7 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require 'yaml'
+require 'psych'
 
 
 module Epuber
@@ -22,8 +22,8 @@ module Epuber
       #
       def initialize(path)
         @store_file_path = path
-        @all_files = YAML.load_file(path) || {}
-      rescue
+        @all_files = Psych.load_file(path, permitted_classes: [Epuber::Compiler::FileStat, Time]) || {}
+      rescue StandardError
         @all_files = {}
       end
 
