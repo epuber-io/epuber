@@ -5,5 +5,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in Epuber.gemspec
 gemspec
 
-gem 'ruby-debug-ide'
-gem 'debase'
+group :dev, optional: true do
+  gem 'debase', require: false
+  gem 'ruby-debug-ide', require: false
+end
