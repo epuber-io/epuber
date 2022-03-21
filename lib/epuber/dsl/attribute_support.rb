@@ -18,7 +18,7 @@ module Epuber
       # @return nil
       #
       def attribute(name, options = {})
-        attr = Attribute.new(name, options)
+        attr = Attribute.new(name, **options)
 
         dsl_attributes[name] = attr
 
