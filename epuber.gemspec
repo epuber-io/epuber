@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'epuber-stylus', '~> 1.1', '>= 1.1.1'
   spec.add_runtime_dependency 'coffee-script', '~> 2.4'
-  spec.add_runtime_dependency 'bade', '~> 0.3'
+  spec.add_runtime_dependency 'bade', '~> 0.3', '>= 0.3.1'
 
   spec.add_development_dependency 'rspec', '~> 3.2'
   spec.add_development_dependency 'rubocop', '~> 1.14'

@@ -27,7 +27,8 @@ module Epuber
     # @return [Bade::Runtime::GlobalsTracker]
     #
     def self.globals_tracker
-      @globals_catcher ||= Bade::Runtime::GlobalsTracker.new
+      @globals_tracker ||=
+        Bade::Runtime::GlobalsTracker.new(constants_location_prefixes: [Config.instance.project_path])
     end
 
     # @return [Epuber::Compiler::FileResolver]
