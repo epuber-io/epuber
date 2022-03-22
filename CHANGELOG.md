@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.7.0
+- remove Ruby constants created in Bade templates
+- add support for Ruby 3.0 + drop 2.5
+- update Bower components for book development webpage
+- update all RubyGems dependencies
+
 ## v0.6.0
 - update all dependencies
 - update RMagick to latest version (issue #69)
