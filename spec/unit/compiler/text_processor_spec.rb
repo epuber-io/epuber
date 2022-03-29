@@ -37,7 +37,7 @@ module Epuber
         end
 
         it 'can parse xml with headers' do
-          input = <<-XML.strip_heredoc
+          input = <<~XML
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <!DOCTYPE html>
             <p>abc</p>
@@ -54,7 +54,7 @@ module Epuber
           expect(doc.root.name).to eq 'body'
           expect(doc.root.children.count).to eq 15 # 7 elements + 8 newlines
 
-          expected_output = <<-XML.strip_heredoc
+          expected_output = <<~XML
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <!DOCTYPE html>
             <body>

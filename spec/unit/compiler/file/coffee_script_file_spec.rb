@@ -32,7 +32,7 @@ module Epuber
         end
 
         it 'handles ugly file with all xml bullshit lines' do
-          source = <<-COFFEE.strip_heredoc
+          source = <<~COFFEE
             math =
               root: Math.sqrt
               square: square
@@ -51,7 +51,7 @@ module Epuber
           file.compilation_context = ctx
           file.process(ctx)
 
-          expected_content = <<-JS.strip_heredoc
+          expected_content = <<~JS
             (function() {
               var math;
 
