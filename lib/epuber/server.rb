@@ -570,6 +570,7 @@ module Epuber
 
         case File.extname(full_path)
           when '.xhtml'
+            content_type :xhtml
             handle_xhtml_file(full_path)
           else
             handle_file(full_path)

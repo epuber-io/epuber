@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## UNRELEASED
+
+- fixed not working Epuber's script in server pages (wrong Content-Type header for XHTML files)
+
 ## v0.7.0
 - remove Ruby constants created in Bade templates
 - add support for Ruby 3.0 + drop 2.5
