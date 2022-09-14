@@ -487,7 +487,9 @@ module Epuber
     def handle_file(file_path)
       return not_found unless File.exists?(file_path)
 
-      last_modified(File.mtime(file_path))
+      mtime = File.mtime(file_path)
+      last_modified(mtime)
+      etag(mtime.to_s)
 
       case File.extname(file_path)
       when '.styl'
@@ -507,7 +509,7 @@ module Epuber
                     end
                   end
 
-        send_file(file_path, type: type)
+        send_file(file_path, type: type, last_modified: mtime)
       end
     end
 

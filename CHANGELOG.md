@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.7.2
+
+- fixed caching of generated files #86
+
 ## v0.7.1
 
 - fixed not working Epuber's script in server pages (wrong Content-Type header for XHTML files)
