@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.7.3
+
+- fixed usage of deprecated API that was removed in Ruby 3.2 #87
+
+
 ## v0.7.2
 
 - fixed caching of generated files #86
