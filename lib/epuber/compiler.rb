@@ -113,7 +113,7 @@ module Epuber
       Dir.chdir(@file_resolver.destination_path) do
         new_paths = @file_resolver.package_files.map(&:pkg_destination_path)
 
-        if ::File.exists?(epub_path)
+        if ::File.exist?(epub_path)
           Zip::File.open(epub_path, true) do |zip_file|
             old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
             diff = old_paths - new_paths

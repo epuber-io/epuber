@@ -72,7 +72,7 @@ module Epuber
 
             archive_name = compiler.epub_name
 
-            if ::File.exists?(archive_name)
+            if ::File.exist?(archive_name)
               FileUtils.remove_file(archive_name)
             end
 

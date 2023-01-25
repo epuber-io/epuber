@@ -64,7 +64,7 @@ module Epuber
         # @return nil
         #
         def self.write_to_file?(content, to_path)
-          return true unless File.exists?(to_path)
+          return true unless File.exist?(to_path)
 
           File.read(to_path) != content.to_s
         end

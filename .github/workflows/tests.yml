@@ -19,7 +19,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
     - name: Install Calibre
-      run: sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin
+      run: sudo -v && sudo apt-get install -y libegl1 libopengl0 && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin
     - name: Install dependencies
       run: bundle install
     - name: Run tests
