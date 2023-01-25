@@ -18,7 +18,7 @@ module Epuber
     # @return [self]
     #
     def self.from_file(file_path)
-      if File.exists?(file_path)
+      if File.exist?(file_path)
         hash = YAML.safe_load(File.read(file_path))
       else
         hash = {}

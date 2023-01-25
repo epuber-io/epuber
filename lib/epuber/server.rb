@@ -485,7 +485,7 @@ module Epuber
     # @param [String] file_path
     #
     def handle_file(file_path)
-      return not_found unless File.exists?(file_path)
+      return not_found unless File.exist?(file_path)
 
       mtime = File.mtime(file_path)
       last_modified(mtime)
