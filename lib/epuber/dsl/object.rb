@@ -3,6 +3,7 @@
 require_relative 'attribute'
 require_relative 'attribute_support'
 
+require 'active_support'
 require 'active_support/core_ext/string/inflections'
 
 
