@@ -1,7 +1,9 @@
 FROM ruby:2.7-alpine
 LABEL maintainer="roman@kriz.io"
 
-ENV EPUBER_VERSION="0.7.1"
+# Set Epuber version
+ARG EPUBER_VERSION
+ENV EPUBER_VERSION=${EPUBER_VERSION}
 
 # Install Epuber and all dependencies
 RUN apk --no-cache --update add imagemagick nodejs zip openjdk11 && \
@@ -9,5 +11,7 @@ RUN apk --no-cache --update add imagemagick nodejs zip openjdk11 && \
     gem update --system && \
     gem update --default && \
     gem update && \
+    EPUBER_VERSION=$(echo $EPUBER_VERSION | sed 's/^v//') && \
+    echo "Installing Epuber $EPUBER_VERSION" && \
     gem install epuber --version $EPUBER_VERSION && \
     apk del .build-deps
