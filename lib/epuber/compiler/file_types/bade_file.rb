@@ -44,6 +44,7 @@ module Epuber
             xhtml_content = UI.print_step_processing_time('rendering precompiled Bade') do
               renderer = Bade::Renderer.from_precompiled(precompiled)
                                        .with_locals(variables)
+              renderer.file_path = source_path
 
               renderer.render(new_line: '', indent: '')
             end
