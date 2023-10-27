@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.7.4
+
+- fixed using precompiled version of Bade and correct import and require paths
+
+
 ## v0.7.3
 
 - fixed usage of deprecated API that was removed in Ruby 3.2 #87
