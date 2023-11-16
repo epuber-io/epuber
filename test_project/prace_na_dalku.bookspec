@@ -75,7 +75,7 @@ Epuber::Book.new do |book|
     end
 
     toc.file 's03', 'JAK SPOLUPRACOVAT NA DÁLKU' do
-      toc.file 's03ch01', 'Bez překrývání <em>to</em> nejde'
+      toc.file 's03ch01', 'Bez překrývání to nejde'
       toc.file 's03ch02', 'Vidět znamená věřit'
       toc.file 's03ch03', 'Všechny informace na dosah'
     end
