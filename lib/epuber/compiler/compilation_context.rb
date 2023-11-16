@@ -100,6 +100,10 @@ module Epuber
         use_cache
       end
 
+      def release_build?
+        release_build
+      end
+
       def initialize(book, target)
         @book = book
         @target = target

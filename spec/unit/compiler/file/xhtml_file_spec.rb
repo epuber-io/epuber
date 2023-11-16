@@ -204,6 +204,28 @@ module Epuber
 
           expect(file.global_ids).to eq(['some_id'])
         end
+
+        it 'can parse global links' do
+          source = <<~XML
+            <body>
+              <a href="$some_id">abc</a>
+              <a href="#other_id">abc</a>
+            </body>
+          XML
+
+          File.write('some_file.xhtml', source)
+
+          file = XHTMLFile.new('some_file.xhtml')
+          file.destination_path = 'some_file_dest.xhtml'
+          resolve_file_paths(file)
+
+          @ctx.release_build = true
+          file.compilation_context = @ctx
+
+          file.process(@ctx)
+
+          expect(file.global_links).to eq(['some_id'])
+        end
       end
     end
   end
