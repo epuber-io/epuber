@@ -4,6 +4,7 @@ require 'fileutils'
 require 'os'
 
 require_relative '../command'
+require_relative '../epubcheck'
 
 module Epuber
   class Command
@@ -78,7 +79,7 @@ module Epuber
 
             archive_path = compiler.archive(archive_name)
 
-            system(%(epubcheck "#{archive_path}"))
+            Epubcheck.check(archive_path)
 
             convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
           end
@@ -89,7 +90,7 @@ module Epuber
             compiler.compile(build_path, check: @should_check, write: @should_write, verbose: verbose?, use_cache: @use_cache)
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
-            system(%(epubcheck "#{archive_path}")) if @should_check
+            Epubcheck.check(archive_path) if @should_check
 
             convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
           end
