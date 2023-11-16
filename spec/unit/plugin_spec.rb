@@ -6,8 +6,6 @@ require 'epuber/plugin'
 
 
 module Epuber
-
-
   describe Plugin do
     include FakeFS::SpecHelpers
 
@@ -64,18 +62,16 @@ module Epuber
       end
 
       it "raise exception when the file doesn't exist" do
-        expect {
+        expect do
           Plugin.new('plugin.rb')
-        }.to raise_exception LoadError
+        end.to raise_exception LoadError
       end
 
       it "raise exception when the folder doesn't exist" do
-        expect {
+        expect do
           Plugin.new('plugin/')
-        }.to raise_exception LoadError
+        end.to raise_exception LoadError
       end
     end
   end
-
-
 end

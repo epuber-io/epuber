@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'open3'
-
 module Epuber
   class Epubcheck
     class << self
@@ -10,7 +8,7 @@ module Epuber
       def check(path)
         res = system('epubcheck', path)
 
-        UI.error!('Epubcheck failed') if res == false
+        UI.error!('Epubcheck failed') unless res
       end
     end
   end

@@ -9,8 +9,6 @@ require 'epuber/compiler'
 
 
 module Epuber
-
-
   describe Helper do
     include FakeFS::SpecHelpers
 
@@ -83,6 +81,4 @@ module Epuber
       end
     end
   end
-
-
 end
