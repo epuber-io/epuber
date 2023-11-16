@@ -10,9 +10,6 @@ require 'epuber/compiler/file_types/xhtml_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe XHTMLFile do
         include FakeFS::SpecHelpers
 
@@ -185,10 +182,29 @@ module Epuber
 
           expect(File.read('some_file_dest.xhtml')).to eq expected_output
         end
+
+        it 'can parse global ids' do
+          source = <<~XML
+            <body>
+              <p id="$some_id">abc</p>
+              <p id="other_id">abc</p>
+            </body>
+          XML
+
+          File.write('some_file.xhtml', source)
+
+          file = XHTMLFile.new('some_file.xhtml')
+          file.destination_path = 'some_file_dest.xhtml'
+          resolve_file_paths(file)
+
+          @ctx.release_build = true
+          file.compilation_context = @ctx
+
+          file.process(@ctx)
+
+          expect(file.global_ids).to eq(['some_id'])
+        end
       end
-
-
-
     end
   end
 end

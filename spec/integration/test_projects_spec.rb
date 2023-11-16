@@ -6,7 +6,7 @@ require 'rspec'
 require 'fileutils'
 
 describe 'Test project' do
-  it 'do something' do
+  it 'do something', expensive: true do
     Dir.chdir('test_project') do
       # FileUtils.rmtree(Epuber::Config::WORKING_PATH)
       # FileUtils.remove(Dir.glob('*.epub'))

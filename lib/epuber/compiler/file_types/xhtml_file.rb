@@ -12,6 +12,10 @@ module Epuber
         #
         attr_accessor :toc_item
 
+        # @return [Array<String>]
+        #
+        attr_accessor :global_ids
+
         # @param [Book::Target] target
         # @param [FileResolver] file_resolver
         #
@@ -143,6 +147,11 @@ module Epuber
                 checker.call(final_destination_path, xhtml_string, compilation_context)
               end
             end
+          end
+
+          if xhtml_string.include?('id="$')
+            xhtml_doc = XHTMLProcessor.xml_document_from_string(xhtml_string, final_destination_path)
+            self.global_ids = XHTMLProcessor.find_global_ids(xhtml_doc)
           end
 
           xhtml_string
