@@ -55,13 +55,7 @@ module Epuber
 
         if @release_version
           # Remove all previous versions of compiled files
-          targets.each do |target|
-            build_path = Epuber::Config.instance.release_build_path(target)
-
-            if ::File.directory?(build_path)
-              FileUtils.remove_dir(build_path, true)
-            end
-          end
+          cleanup_build_folders
 
           # Build all targets to always clean directory
           targets.each do |target|
@@ -73,16 +67,16 @@ module Epuber
 
             archive_name = compiler.epub_name
 
-            if ::File.exist?(archive_name)
-              FileUtils.remove_file(archive_name)
-            end
+            FileUtils.remove_file(archive_name) if ::File.exist?(archive_name)
 
             archive_path = compiler.archive(archive_name)
 
             Epubcheck.check(archive_path)
 
-            convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
+            convert_epub_to_mobi(archive_path, "#{::File.basename(archive_path, '.epub')}.mobi") if target.create_mobi
           end
+
+          # Build all targets to always clean directory
         else
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
@@ -93,7 +87,7 @@ module Epuber
 
             Epubcheck.check(archive_path) if @should_check
 
-            convert_epub_to_mobi(archive_path, ::File.basename(archive_path, '.epub') + '.mobi') if target.create_mobi
+            convert_epub_to_mobi(archive_path, "#{::File.basename(archive_path, '.epub')}.mobi") if target.create_mobi
           end
         end
 
@@ -105,7 +99,7 @@ module Epuber
       # @return [Array<Epuber::Book::Target>]
       #
       def targets
-        @targets ||= (
+        @targets ||= begin
           targets = @targets_names
 
           # when the list of targets is nil pick all available targets
@@ -114,7 +108,7 @@ module Epuber
           else
             targets.map { |target_name| book.target_named(target_name) }
           end
-        )
+        end
       end
 
       def verify_all_targets_exists!
@@ -123,9 +117,9 @@ module Epuber
       end
 
       def validate_dir(path)
-        if ::File.directory?(path)
-          path
-        end
+        return unless ::File.directory?(path)
+
+        path
       end
 
       def find_calibre_app
@@ -143,7 +137,9 @@ module Epuber
           ::File.join(find_calibre_app, 'Contents/MacOS/ebook-convert')
         elsif OS.linux?
           script_path = '/usr/bin/ebook-convert'
-          UI.error!("Can't find ebook-convert in folder /usr/bin to convert EPUB to MOBI.") unless ::File.executable?(script_path)
+          unless ::File.executable?(script_path)
+            UI.error!("Can't find ebook-convert in folder /usr/bin to convert EPUB to MOBI.")
+          end
           script_path
         else
           UI.error!('Unsupported OS to convert EPUB to MOBI.')
@@ -152,6 +148,14 @@ module Epuber
 
       def convert_epub_to_mobi(epub_path, mobi_path)
         system(find_calibre_convert_file, epub_path, mobi_path)
+      end
+
+      def cleanup_build_folders
+        targets.each do |target|
+          build_path = Epuber::Config.instance.release_build_path(target)
+
+          FileUtils.remove_dir(build_path, true) if ::File.directory?(build_path)
+        end
       end
     end
   end

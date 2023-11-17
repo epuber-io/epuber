@@ -36,7 +36,7 @@ module Epuber
             @mtime = stat.mtime
             @ctime = stat.ctime
             @size = stat.size
-          rescue
+          rescue StandardError
             # noop
           end
         end

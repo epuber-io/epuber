@@ -60,7 +60,7 @@ module Epuber
         end
 
         it 'supports adding one key with key: value way' do
-          @root.add_const :key => 'value'
+          @root.add_const key: 'value'
           @root.add_const key2: 'value'
           expect(@root.constants).to eq({ key: 'value', key2: 'value' })
         end

@@ -9,8 +9,8 @@ module Epuber
       include FakeFS::SpecHelpers
 
       before do
-        FileUtils.mkdir_p(%w(source dest))
-        FileUtils.touch(%w(/source/txt1.xhtml /source/txt2.xhtml /source/txt3.xhtml /source/txt4.xhtml))
+        FileUtils.mkdir_p(%w[source dest])
+        FileUtils.touch(%w[/source/txt1.xhtml /source/txt2.xhtml /source/txt3.xhtml /source/txt4.xhtml])
 
         book              = Book.new
         ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
@@ -34,7 +34,7 @@ module Epuber
           b.is_ibooks    = true
           b.custom_fonts = true
 
-          b.toc do |toc, target|
+          b.toc do |toc, _target|
             toc.file 'txt1', 'Text 1', :landmark_start_page
             toc.file 'txt2', 'Text 2, awesome!'
             toc.file 'txt3', 'Text 3, <strong>COOL</strong>'
@@ -57,9 +57,9 @@ module Epuber
                                                                        'Text 3, <strong>COOL</strong>'
 
         landmarks = nav_xml.at_css('html > body > nav[epub|type="landmarks"]')
-        expect(landmarks.css('li > a').map { |a|
+        expect(landmarks.css('li > a').map do |a|
                  a['epub:type']
-               }).to contain_exactly 'bodymatter', 'ibooks:reader-start-page'
+               end).to contain_exactly 'bodymatter', 'ibooks:reader-start-page'
         expect(landmarks.css('li > a').map { |a| a['href'] }).to contain_exactly 'txt1.xhtml', 'txt1.xhtml'
       end
 
@@ -74,7 +74,7 @@ module Epuber
           b.is_ibooks    = true
           b.custom_fonts = true
 
-          b.toc do |toc, target|
+          b.toc do |toc, _target|
             toc.file 'txt1', 'Text 1', :landmark_start_page
             toc.file 'txt2', 'Text 2, awesome!' do
               toc.file 'txt3'
@@ -85,12 +85,12 @@ module Epuber
 
         ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
         resolver          = Compiler::FileResolver.new('/source', '/dest')
-        book.default_target.root_toc.sub_items.each { |item|
+        book.default_target.root_toc.sub_items.each do |item|
           resolver.add_file_from_request(item.file_request)
-          item.sub_items.each { |subitem|
+          item.sub_items.each do |subitem|
             resolver.add_file_from_request(subitem.file_request)
-          }
-        }
+          end
+        end
         ctx.file_resolver = resolver
         @sut              = Compiler::NavGenerator.new(ctx)
 
@@ -112,7 +112,7 @@ module Epuber
           b.custom_fonts = true
           b.epub_version = 2.0
 
-          b.toc do |toc, target|
+          b.toc do |toc, _target|
             toc.file 'txt1', 'Text 1'
             toc.file 'txt2', 'Text 2, awesome!'
             toc.file 'txt3', 'Text 3, <strong>COOL</strong>'

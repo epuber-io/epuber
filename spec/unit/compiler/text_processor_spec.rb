@@ -21,12 +21,12 @@ module Epuber
           doc = XHTMLProcessor.xml_document_from_string(input_str)
 
           expect(doc.root.name).to eq 'p'
-          expect(doc.to_s).to eq %{<?xml version="1.0" encoding="UTF-8"?>\n<p>abc</p>\n}
+          expect(doc.to_s).to eq %(<?xml version="1.0" encoding="UTF-8"?>\n<p>abc</p>\n)
           expect(doc.root.to_s).to eq input_str
         end
 
         it 'can parse simple xml without root element' do
-          input_str = %q{<p>abc</p><p>abc</p>}
+          input_str = '<p>abc</p><p>abc</p>'
 
           doc = XHTMLProcessor.xml_document_from_string(input_str)
 
@@ -106,9 +106,9 @@ module Epuber
           FakeFS::FileSystem.clone(file_path)
           input = File.read(file_path)
 
-          expect {
+          expect do
             XHTMLProcessor.xml_document_from_string(input)
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
 
@@ -168,7 +168,7 @@ module Epuber
 
           expect(doc.css('link[rel="stylesheet"]').size).to eq 0
 
-          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+          XHTMLProcessor.add_styles(doc, %w[abc def])
 
           expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def'
         end
@@ -184,7 +184,7 @@ module Epuber
 
           expect(doc.css('link[rel="stylesheet"]').size).to eq 1
 
-          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+          XHTMLProcessor.add_styles(doc, %w[abc def])
 
           expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def', 'qwe'
         end
@@ -193,10 +193,10 @@ module Epuber
           doc = XHTMLProcessor.xml_document_from_string('')
           XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
 
-          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
-          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
-          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
-          XHTMLProcessor.add_styles(doc, ['abc', 'def'])
+          XHTMLProcessor.add_styles(doc, %w[abc def])
+          XHTMLProcessor.add_styles(doc, %w[abc def])
+          XHTMLProcessor.add_styles(doc, %w[abc def])
+          XHTMLProcessor.add_styles(doc, %w[abc def])
 
           expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def'
         end
@@ -227,7 +227,7 @@ module Epuber
           expect(doc.css('script').size).to eq 0
 
           # When
-          XHTMLProcessor.add_scripts(doc, %w(abc def))
+          XHTMLProcessor.add_scripts(doc, %w[abc def])
 
           # Then
           expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def'
@@ -244,7 +244,7 @@ module Epuber
 
           expect(doc.css('script').size).to eq 1
 
-          XHTMLProcessor.add_scripts(doc, %w(abc def))
+          XHTMLProcessor.add_scripts(doc, %w[abc def])
 
           expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def', 'qwe'
         end
@@ -253,10 +253,10 @@ module Epuber
           doc = XHTMLProcessor.xml_document_from_string('')
           XHTMLProcessor.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
 
-          XHTMLProcessor.add_scripts(doc, %w(abc def))
-          XHTMLProcessor.add_scripts(doc, %w(abc def))
-          XHTMLProcessor.add_scripts(doc, %w(abc def))
-          XHTMLProcessor.add_scripts(doc, %w(abc def))
+          XHTMLProcessor.add_scripts(doc, %w[abc def])
+          XHTMLProcessor.add_scripts(doc, %w[abc def])
+          XHTMLProcessor.add_scripts(doc, %w[abc def])
+          XHTMLProcessor.add_scripts(doc, %w[abc def])
 
           expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def'
         end
@@ -375,9 +375,9 @@ module Epuber
 
           finder = FileFinders::Normal.new('/')
 
-          expect {
+          expect do
             XHTMLProcessor.resolved_link_to_file('some_not_existing_file', nil, 'root.txt', finder)
-          }.to raise_error FileFinders::FileNotFoundError
+          end.to raise_error FileFinders::FileNotFoundError
         end
 
         it 'raise error when the path is empty' do
@@ -385,9 +385,9 @@ module Epuber
 
           finder = FileFinders::Normal.new('/')
 
-          expect {
+          expect do
             XHTMLProcessor.resolved_link_to_file('', nil, 'root.txt', finder)
-          }.to raise_error FileFinders::FileNotFoundError
+          end.to raise_error FileFinders::FileNotFoundError
         end
 
         it 'will not raise for valid path' do
@@ -399,9 +399,9 @@ module Epuber
 
           finder = FileFinders::Normal.new('/')
 
-          expect {
+          expect do
             XHTMLProcessor.resolved_link_to_file('image/stan_mindsetbw.png', nil, 'text/root.txt', finder)
-          }.to_not raise_error
+          end.to_not raise_error
         end
       end
 
@@ -426,9 +426,9 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a href=""/>', 'root.txt')
 
-          expect {
+          expect do
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          }.to output('Not found file matching pattern `` from context path root.txt.
+          end.to output('Not found file matching pattern `` from context path root.txt.
   (in file root.txt line 1)'.ansi.yellow + "\n").to_stdout
         end
 
@@ -438,9 +438,9 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a href="blabla"/>', 'root.txt')
 
-          expect {
+          expect do
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          }.to output('Not found file matching pattern `blabla` from context path root.txt.
+          end.to output('Not found file matching pattern `blabla` from context path root.txt.
   (in file root.txt line 1)'.ansi.yellow + "\n").to_stdout
         end
 
@@ -449,17 +449,17 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = XHTMLProcessor.xml_document_from_string('<a/>')
 
-          expect {
+          expect do
             XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          }.to_not output.to_stdout
+          end.to_not output.to_stdout
         end
       end
 
       context '.resolve_links' do
         before do
           FileUtils.mkdir_p('folder')
-          FileUtils.touch(%w(root.xhtml ref1.xhtml ref2.xhtml folder/ref10.xhtml))
-          FileUtils.touch(%w(image1.jpeg image2.jpg folder/image3.png))
+          FileUtils.touch(%w[root.xhtml ref1.xhtml ref2.xhtml folder/ref10.xhtml])
+          FileUtils.touch(%w[image1.jpeg image2.jpg folder/image3.png])
 
           @finder = FileFinders::Normal.new('/')
         end
@@ -500,7 +500,7 @@ module Epuber
       context '.resolve_images' do
         it 'resolves not existing file in destination' do
           FileUtils.mkdir_p('/images')
-          FileUtils.touch(%w(/images/image1.png /images/image2.jpg /file.xhtml))
+          FileUtils.touch(%w[/images/image1.png /images/image2.jpg /file.xhtml])
 
           xml = '<div><img src="image1" /></div>'
           doc = XHTMLProcessor.xml_document_from_string(xml)
@@ -516,7 +516,7 @@ module Epuber
 
         it 'resolves existing file in destination' do
           FileUtils.mkdir_p('/images')
-          FileUtils.touch(%w(/images/image1.png /images/image2.jpg /file.xhtml))
+          FileUtils.touch(%w[/images/image1.png /images/image2.jpg /file.xhtml])
 
           resolver = FileResolver.new('/', '/.build')
           resolver.add_file_from_request(Book::FileRequest.new('image1.png', false))
@@ -538,7 +538,7 @@ module Epuber
       context '.resolve_scripts' do
         it 'resolves not existing files in destination' do
           FileUtils.mkdir_p('/scripts')
-          FileUtils.touch(%w(/scripts/script.js /scripts/script2.coffee /file.xhtml))
+          FileUtils.touch(%w[/scripts/script.js /scripts/script2.coffee /file.xhtml])
 
           xml = <<-XML
             <html>
@@ -566,7 +566,7 @@ module Epuber
         it 'resolves existing file in destination' do
           # Given
           FileUtils.mkdir_p('/scripts')
-          FileUtils.touch(%w(/scripts/script.js /scripts/script2.coffee /file.xhtml))
+          FileUtils.touch(%w[/scripts/script.js /scripts/script2.coffee /file.xhtml])
 
           resolver = FileResolver.new('/', '/.build')
           resolver.add_file_from_request(Book::FileRequest.new('script2', false))
@@ -599,7 +599,7 @@ module Epuber
       context '.resolve_stylesheets' do
         it 'resolves not existing files in destination' do
           FileUtils.mkdir_p('/styles')
-          FileUtils.touch(%w(/styles/style1.css /styles/style2.styl /file.xhtml))
+          FileUtils.touch(%w[/styles/style1.css /styles/style2.styl /file.xhtml])
 
           xml = <<-XML
             <html>
@@ -627,7 +627,7 @@ module Epuber
         it 'resolves existing file in destination' do
           # Given
           FileUtils.mkdir_p('/styles')
-          FileUtils.touch(%w(/styles/style1.css /styles/style2.styl /file.xhtml))
+          FileUtils.touch(%w[/styles/style1.css /styles/style2.styl /file.xhtml])
 
           xml = <<-XML
             <html>

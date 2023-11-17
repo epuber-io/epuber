@@ -26,12 +26,12 @@ module Epuber
             __file_resolver: file_resolver,
             __file: self,
             __toc_item: toc_item,
-            __const: Hash.new { |_hash, key|
+            __const: Hash.new do |_hash, key|
                        UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0])
-                     }.merge!(target.constants),
+                     end.merge!(target.constants),
           }
 
-          should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build? && (!compilation_context.should_write)
+          should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build? && !compilation_context.should_write
 
           precompiled = if should_load_from_precompiled
                           begin
@@ -51,7 +51,9 @@ module Epuber
               renderer.render(new_line: '', indent: '')
             end
           else
-            UI.print_processing_debug_info('Parsing new version of source file') if compilation_context.incremental_build?
+            if compilation_context.incremental_build?
+              UI.print_processing_debug_info('Parsing new version of source file')
+            end
 
             bade_content = load_source(compilation_context)
 
@@ -60,9 +62,7 @@ module Epuber
                                        .with_locals(variables)
 
               # turn on optimizations when can
-              if renderer.respond_to?(:optimize=)
-                renderer.optimize = true
-              end
+              renderer.optimize = true if renderer.respond_to?(:optimize=)
 
               FileUtils.mkdir_p(File.dirname(precompiled_path))
               renderer.precompiled.write_yaml_to_file(precompiled_path)
@@ -84,7 +84,7 @@ module Epuber
         # @return [String]
         #
         def precompiled_path
-          File.join(Config.instance.build_cache_path(PRECOMPILED_CACHE_NAME), source_path + '.precompiled.yml')
+          File.join(Config.instance.build_cache_path(PRECOMPILED_CACHE_NAME), "#{source_path}.precompiled.yml")
         end
 
         def pretty_precompiled_path

@@ -4,9 +4,7 @@ module Epuber
   class Compiler
     class Problem
       class Location
-        attr_reader :line
-        attr_reader :column
-        attr_reader :length
+        attr_reader :line, :column, :length
 
         def initialize(line, column, length = nil)
           @line = line
@@ -15,20 +13,14 @@ module Epuber
         end
       end
 
-      attr_reader :level
-      attr_reader :message
-      attr_reader :source
-      attr_reader :location
-      attr_reader :file_path
+      attr_reader :level, :message, :source, :location, :file_path
 
       def initialize(level, message, source, location: nil, line: nil, column: nil, length: nil, file_path: nil)
         @level = level
         @message = message
         @source = source
         @location = location
-        if @location.nil? && line && column
-          @location = Location.new(line, column, length)
-        end
+        @location = Location.new(line, column, length) if @location.nil? && line && column
 
         @file_path = file_path
       end
@@ -40,7 +32,7 @@ module Epuber
       # @return [String]
       #
       def self.caret_symbol(indent)
-        ' ' * indent + '^'
+        "#{' ' * indent}^"
       end
 
       # Formats caret symbols for indent and length
@@ -89,9 +81,7 @@ module Epuber
         post_line = post.split("\n").first || ''
 
         pre = match_pre_line = pre_line
-        if remove_tabs(match_pre_line).length > 100
-          pre = "#{match_pre_line.first(20)}...#{match_pre_line.last(30)}"
-        end
+        pre = "#{match_pre_line.first(20)}...#{match_pre_line.last(30)}" if remove_tabs(match_pre_line).length > 100
 
         pre = remove_tabs(pre)
 
@@ -114,8 +104,8 @@ module Epuber
 
         [
           "#{@file_path}:#{line} column: #{column} --- #{@message}",
-          '  ' + pre + colored_match_text + post,
-          '  ' + pointers,
+          "  #{pre}#{colored_match_text}#{post}",
+          "  #{pointers}",
         ].join("\n")
       end
     end

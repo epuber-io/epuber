@@ -12,7 +12,7 @@ def xpath_namespace_hack(xpath)
   # implicit namespace
   xpath.split('/').map do |node|
     nodename = node.gsub(/^([A-Za-z0-9_:]+).*/, '\1')
-    if nodename.length == 0 || nodename.start_with?('@') || nodename.include?(':')
+    if nodename.empty? || nodename.start_with?('@') || nodename.include?(':')
       node
     else
       "xmlns:#{node}"

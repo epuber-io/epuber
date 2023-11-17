@@ -42,7 +42,7 @@ module Epuber
         it 'can find file in root folder with groups filtering' do
           FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
 
-          files = @finder.find_files('*', groups: [:text, :style])
+          files = @finder.find_files('*', groups: %i[text style])
           expect(files.count).to eq 2
           expect(files).to eq ['c.xhtml', 'd.css']
         end
@@ -50,9 +50,9 @@ module Epuber
         it 'raises exception when unknown group name' do
           FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
 
-          expect {
+          expect do
             @finder.find_files('*', groups: :baf)
-          }.to raise_error ::StandardError
+          end.to raise_error ::StandardError
         end
 
         it 'finds file without specifying extension' do
@@ -158,17 +158,17 @@ module Epuber
         it "raises error when no file couldn't be found" do
           FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
 
-          expect {
+          expect do
             @finder.find_file('baf')
-          }.to raise_error FileFinders::FileNotFoundError
+          end.to raise_error FileFinders::FileNotFoundError
         end
 
         it "raises error when no file couldn't be found" do
           FileUtils.touch(['a.xhtml', 'b.xhtml'])
 
-          expect {
+          expect do
             @finder.find_file('*.xhtml')
-          }.to raise_error FileFinders::MultipleFilesFoundError
+          end.to raise_error FileFinders::MultipleFilesFoundError
         end
 
         it 'returns relative path to context path' do
@@ -207,21 +207,21 @@ module Epuber
 
       context '.group_filter_paths' do
         it 'returns the same array for nil groups' do
-          input = %w(some/path/abc.txt some/path/abc2.txt a.txt)
+          input = %w[some/path/abc.txt some/path/abc2.txt a.txt]
           output = FileFinders::Abstract.group_filter_paths(input, nil)
           expect(output).to be input
         end
 
         it 'returns filtered array for text groups' do
-          input = %w(abc.xhtml a.png t.txt e.html)
+          input = %w[abc.xhtml a.png t.txt e.html]
           output = FileFinders::Abstract.group_filter_paths(input, :text)
-          expect(output).to eq %w(abc.xhtml e.html)
+          expect(output).to eq %w[abc.xhtml e.html]
         end
 
         it 'returns filtered array for text and image groups' do
-          input = %w(abc.xhtml a.png t.txt e.html font.otf)
-          output = FileFinders::Abstract.group_filter_paths(input, [:text, :image])
-          expect(output).to eq %w(abc.xhtml a.png e.html)
+          input = %w[abc.xhtml a.png t.txt e.html font.otf]
+          output = FileFinders::Abstract.group_filter_paths(input, %i[text image])
+          expect(output).to eq %w[abc.xhtml a.png e.html]
         end
       end
     end

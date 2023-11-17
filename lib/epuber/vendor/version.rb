@@ -10,7 +10,7 @@ module Epuber
   class Version
     include Comparable
 
-    VERSION_RE ||= /\A[0-9]+(\.[0-9a-zA-Z]+)*\z/
+    VERSION_RE ||= /\A[0-9]+(\.[0-9a-zA-Z]+)*\z/.freeze
 
     # True if the +version+ string matches RubyGems' requirements.
     #
@@ -24,9 +24,7 @@ module Epuber
     # @param [String, Numeric] version input primitive value for version
     #
     def initialize(version)
-      unless self.class.correct?(version)
-        raise StandardError, "Malformed version number string #{version}"
-      end
+      raise StandardError, "Malformed version number string #{version}" unless self.class.correct?(version)
 
       @version = version.to_s.strip
     end
@@ -42,7 +40,7 @@ module Epuber
     # @return [String]
     #
     def to_s
-      "#{segments.join('.')}"
+      segments.join('.').to_s
     end
 
     # Compares this version with +other+ returning -1, 0, or 1 if the
@@ -68,7 +66,8 @@ module Epuber
       i = 0
 
       while i <= limit
-        lhs, rhs = lhsegments[i] || 0, rhsegments[i] || 0
+        lhs = lhsegments[i] || 0
+        rhs = rhsegments[i] || 0
         i += 1
 
         next      if lhs == rhs

@@ -51,7 +51,7 @@ module Epuber
 
       # @return [Array<self>] list of sub targets
       #
-      alias_method :sub_targets, :sub_items
+      alias sub_targets sub_items
 
       # @return [Epuber::Book::TocItem]
       #
@@ -65,7 +65,7 @@ module Epuber
       # @return [Epuber::Book] reference to book
       #
       def book
-        @book || (parent && parent.book)
+        @book || parent&.book
       end
 
       # Create new sub_target with name
@@ -76,7 +76,7 @@ module Epuber
       #
       def sub_target(name)
         child = create_child_item(name)
-        child.book = self.book
+        child.book = book
 
         yield child if block_given?
 
@@ -91,7 +91,7 @@ module Epuber
       #
       def sub_abstract_target(name)
         child = create_child_item(name)
-        child.book = self.book
+        child.book = book
         child.is_abstract = true
 
         yield child if block_given?
@@ -118,9 +118,7 @@ module Epuber
         # parent files plus our files
         all_files = ((parent && parent.files) || []) + @files + @default_styles + @default_scripts
 
-        unless @attributes_values[:cover_image].nil?
-          all_files << @attributes_values[:cover_image]
-        end
+        all_files << @attributes_values[:cover_image] unless @attributes_values[:cover_image].nil?
 
         all_files
       end
@@ -129,7 +127,7 @@ module Epuber
       # @return [Hash<String, Object>]
       #
       def constants
-        ((parent && parent.constants) || {}).merge(@constants)
+        (parent&.constants || {}).merge(@constants)
       end
 
       # @return [Array<Epuber::Book::FileRequest>]
@@ -195,7 +193,7 @@ module Epuber
       attribute :cover_image,
                 types: [FileRequest],
                 inherited: true,
-                auto_convert: { [String] => ->(value) {
+                auto_convert: { [String] => lambda { |value|
                                               FileRequest.new(value, group: :image, properties: [:cover_image])
                                             } }
 

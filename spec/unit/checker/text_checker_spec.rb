@@ -97,7 +97,7 @@ some text containing some problem'
           end
 
           it 'handle long text before match properly' do
-            text = 'some long text containing some problem ' * 10 + 'abc'
+            text = "#{'some long text containing some problem ' * 10}abc"
             text =~ /abc/
             match = Regexp.last_match
 
@@ -111,7 +111,7 @@ some text containing some problem'
           end
 
           it 'handle long text before match properly' do
-            text = 'bla bla abcd ' + 'some long text containing some problem ' * 10
+            text = "bla bla abcd #{'some long text containing some problem ' * 10}"
             text =~ /abcd/
             match = Regexp.last_match
 

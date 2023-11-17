@@ -21,20 +21,18 @@ module Epuber
     self.command = 'epuber'
     self.version = VERSION
     self.description = 'Epuber, easy creating and maintaining e-book.'
-    self.plugin_prefixes = plugin_prefixes + %w(epuber)
+    self.plugin_prefixes = plugin_prefixes + %w[epuber]
 
     def self.run(argv = [])
-      begin
-        UI.current_command = self
-        super
-        UI.current_command = nil
-      rescue Interrupt
-        UI.error('[!] Cancelled')
-      rescue => e
-        UI.error!(e)
+      UI.current_command = self
+      super
+      UI.current_command = nil
+    rescue Interrupt
+      UI.error('[!] Cancelled')
+    rescue StandardError => e
+      UI.error!(e)
 
-        UI.current_command = nil
-      end
+      UI.current_command = nil
     end
 
     def validate!
@@ -69,18 +67,18 @@ module Epuber
     end
 
     def write_lockfile
-      unless Epuber::Config.test?
-        Epuber::Config.instance.save_lockfile
-      end
+      return if Epuber::Config.test?
+
+      Epuber::Config.instance.save_lockfile
     end
 
     def pre_build_checks
       Config.instance.warn_for_outdated_versions!
 
-      if !Config.instance.same_version_as_last_run? && File.exist?(Config.instance.working_path)
-        UI.warning('Using different version of Epuber or Bade, removing all build caches')
-        Config.instance.remove_build_caches
-      end
+      return unless !Config.instance.same_version_as_last_run? && File.exist?(Config.instance.working_path)
+
+      UI.warning('Using different version of Epuber or Bade, removing all build caches')
+      Config.instance.remove_build_caches
     end
   end
 end

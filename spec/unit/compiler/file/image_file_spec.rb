@@ -15,7 +15,7 @@ module Epuber
           @tmp_dir = Dir.mktmpdir
         end
 
-        let (:ctx) do
+        let(:ctx) do
           book = Book.new
 
           ctx = CompilationContext.new(book, book.default_target)
@@ -46,7 +46,7 @@ module Epuber
           source = File.join(spec_root, 'fixtures/6000x6000.png')
           dest = File.join(@tmp_dir, 'dest_image.png')
 
-          source_magick_file = Magick::Image::read(source).first
+          source_magick_file = Magick::Image.read(source).first
           expect(source_magick_file.rows).to eq 6000
           expect(source_magick_file.columns).to eq 6000
 
@@ -58,7 +58,7 @@ module Epuber
           file.process(nil)
 
 
-          dest_magick_file = Magick::Image::read(dest).first
+          dest_magick_file = Magick::Image.read(dest).first
           expect(dest_magick_file.rows).to_not eq 6000
           expect(dest_magick_file.columns).to_not eq 6000
           expect(dest_magick_file.rows * dest_magick_file.columns).to be < 3_000_000

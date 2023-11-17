@@ -7,20 +7,20 @@ module Epuber
     describe Init do
       include FakeFS::SpecHelpers
 
-      it "inits empty folder" do
+      it 'inits empty folder' do
         FakeFS::FileSystem.clone(Templates::DIR)
 
         working_dir = '/app'
         Dir.mkdir(working_dir)
         Dir.chdir(working_dir)
 
-        expect(Dir.entries(".")).to contain_exactly '.', '..'
+        expect(Dir.entries('.')).to contain_exactly '.', '..'
 
         argv = CLAide::ARGV.new(['book_name'])
         init = Init.new(argv)
         init.run
 
-        expect(Dir.entries(".")).to contain_exactly '.', '..',
+        expect(Dir.entries('.')).to contain_exactly '.', '..',
                                                     '.gitignore',
                                                     'book_name.bookspec',
                                                     'book_name.sublime-project',
@@ -30,7 +30,7 @@ module Epuber
                                                     'text'
       end
 
-      it "inits folder with .gitignore" do
+      it 'inits folder with .gitignore' do
         FakeFS::FileSystem.clone(Templates::DIR)
 
         working_dir = '/app'

@@ -49,11 +49,10 @@ module Epuber
 
           next unless attr.required? && value.nil?
 
-          if attr.singularize?
-            raise ValidationError, "missing required attribute `#{key.to_s.singularize}|#{key}`"
-          else
-            raise ValidationError, "missing required attribute `#{key}`"
-          end
+          raise ValidationError, "missing required attribute `#{key.to_s.singularize}|#{key}`" if attr.singularize?
+
+
+          raise ValidationError, "missing required attribute `#{key}`"
         end
       end
 
@@ -85,10 +84,7 @@ module Epuber
         unless obj.is_a?(self)
           msg = "Invalid object #{obj.class}, expected object of class #{self}"
 
-          if file_path
-            msg += ", loaded from file #{file_path}"
-
-          end
+          msg += ", loaded from file #{file_path}" if file_path
 
           raise StandardError, msg
         end
@@ -129,7 +125,7 @@ module Epuber
       #
       def method_missing(name, *args)
         if /([^=]+)=?/ =~ name
-          attr_name = $1
+          attr_name = ::Regexp.last_match(1)
           location = caller_locations.first
           raise NameError,
                 "Unknown attribute or method `#{attr_name}` for class `#{self.class}` in file `#{location.path}:#{location.lineno}`"

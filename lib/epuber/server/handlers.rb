@@ -49,7 +49,7 @@ module Epuber
     #
     def handle_bade(file_path)
       [200, self.class.render_bade(file_path)]
-    rescue => e
+    rescue StandardError => e
       env['sinatra.error'] = e
       ShowExceptions.new(self).call(env)
     end

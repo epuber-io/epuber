@@ -52,7 +52,7 @@ module Epuber
         context 'parsing and storing options' do
           it 'parse simple symbol' do
             sub_item = @root.item('', :landmark, :landmark_2)
-            expect(sub_item.options).to eq [:landmark, :landmark_2]
+            expect(sub_item.options).to eq %i[landmark landmark_2]
           end
 
           it 'parse simple key value' do

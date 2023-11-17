@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 transform :result_text_xhtml_string do |transformer|
   transformer.replace_all(/( |\(|\[| |„|>)(k|s|v|u|o|z|K|S|V|U|O|Z|I|A) /, '\1\2 ', multiple_times: true)
 

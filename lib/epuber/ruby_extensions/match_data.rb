@@ -17,7 +17,7 @@ class MatchData
   #
   def line_number
     n = pre_match_lines.length
-    n += 1 if n == 0 # it can't be zero, this happens only when the match is at the beginning of file or string
+    n += 1 if n.zero? # it can't be zero, this happens only when the match is at the beginning of file or string
     n
   end
 

@@ -87,7 +87,7 @@ module Epuber
         remove_unnecessary_files
         remove_empty_folders
 
-        source_paths = file_resolver.files.select { |a| a.is_a?(FileTypes::SourceFile) }.map { |a| a.source_path }
+        source_paths = file_resolver.files.select { |a| a.is_a?(FileTypes::SourceFile) }.map(&:source_path)
         compilation_context.source_file_database.cleanup(source_paths)
         compilation_context.source_file_database.update_all_metadata
         compilation_context.source_file_database.save_to_file
@@ -148,7 +148,7 @@ module Epuber
       epub_name += @book.build_version.to_s unless @book.build_version.nil?
       epub_name += "-#{@target.name}" if @target != @book.default_target
       epub_name += "-#{configuration_suffix}" unless configuration_suffix.nil?
-      epub_name + '.epub'
+      "#{epub_name}.epub"
     end
 
 
@@ -160,7 +160,7 @@ module Epuber
       Dir.chdir(@file_resolver.destination_path) do
         Dir.glob('**/*')
            .select { |d| File.directory?(d) }
-           .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
+           .select { |d| (Dir.entries(d) - %w[. ..]).empty? }
            .each do |d|
           puts "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
           Dir.rmdir(d)
@@ -171,11 +171,13 @@ module Epuber
     # @return nil
     #
     def remove_unnecessary_files
-      unnecessary_paths = @file_resolver.unneeded_files_in_destination.map { |path|
+      unnecessary_paths = @file_resolver.unneeded_files_in_destination.map do |path|
         File.join(@file_resolver.destination_path, path)
-      }
+      end
       unnecessary_paths.each do |path|
-        puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`" if compilation_context.verbose?
+        if compilation_context.verbose?
+          puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
+        end
 
         File.delete(path)
       end
@@ -204,11 +206,11 @@ module Epuber
       @file_resolver.add_file(container_xml)
       process_file(container_xml)
 
-      if @target.epub_version >= 2.0 && @target.epub_version < 3.0
-        ibooks_options = FileTypes::IBooksDisplayOptionsFile.new
-        @file_resolver.add_file(ibooks_options)
-        process_file(ibooks_options)
-      end
+      return unless @target.epub_version >= 2.0 && @target.epub_version < 3.0
+
+      ibooks_options = FileTypes::IBooksDisplayOptionsFile.new
+      @file_resolver.add_file(ibooks_options)
+      process_file(ibooks_options)
     end
 
     # @return nil
@@ -251,7 +253,7 @@ module Epuber
 
       # add all activated plugin files
       paths += compilation_context.plugins.map do |plugin|
-        plugin.files.map { |p_file| p_file.source_path }
+        plugin.files.map(&:source_path)
       end.flatten
 
       # add dependencies to databases

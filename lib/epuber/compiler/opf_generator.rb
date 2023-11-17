@@ -163,7 +163,7 @@ module Epuber
             attrs['media-type'] = mime_type_for(file)
 
             properties = file.properties
-            if properties.length > 0 && @target.epub_version >= 3
+            if properties.length.positive? && @target.epub_version >= 3
               pretty_properties = properties.to_a.map { |property| PROPERTIES_MAP[property] }.join(' ')
               attrs['properties'] = pretty_properties
             end

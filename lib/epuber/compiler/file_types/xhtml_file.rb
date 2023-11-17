@@ -73,9 +73,7 @@ module Epuber
             end
           end
 
-          if compilation_context.should_write
-            self.class.write_to_file(xhtml_content, abs_source_path)
-          end
+          self.class.write_to_file(xhtml_content, abs_source_path) if compilation_context.should_write
 
           xhtml_content
         end
@@ -102,9 +100,7 @@ module Epuber
             XHTMLProcessor.xml_doc_from_str_with_errors(content, source_path)
           end
 
-          if compilation_context.release_build && xhtml_doc.errors.count > 0
-            process_nokogiri_errors(errors)
-          end
+          process_nokogiri_errors(errors) if compilation_context.release_build && xhtml_doc.errors.count.positive?
 
           UI.print_step_processing_time('adding missing elements') do
             XHTMLProcessor.add_missing_root_elements(xhtml_doc, book.title, target.epub_version)
@@ -134,9 +130,9 @@ module Epuber
           XHTMLProcessor.resolve_mathml_namespace(xhtml_doc)
 
           UI.print_step_processing_time('investigating properties') do
-            self.properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
-            self.properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
-            self.properties << :mathml if XHTMLProcessor.using_mathml?(xhtml_doc)
+            properties << :remote_resources if XHTMLProcessor.using_remote_resources?(xhtml_doc)
+            properties << :scripted if XHTMLProcessor.using_javascript?(xhtml_doc)
+            properties << :mathml if XHTMLProcessor.using_mathml?(xhtml_doc)
           end
 
           xhtml_string = UI.print_step_processing_time('converting to XHTML') do
@@ -196,12 +192,10 @@ module Epuber
                          .relative_path_from(Pathname(File.dirname(final_destination_path.unicode_normalize))).to_s
 
               node['href'] = "#{rel_path}##{href}"
+            elsif compilation_context.release_build?
+              UI.error!("Can't find global id #{href}", location: node)
             else
-              if compilation_context.release_build?
-                UI.error!("Can't find global id #{href}", location: node)
-              else
-                UI.warning("Can't find global id #{href}", location: node)
-              end
+              UI.warning("Can't find global id #{href}", location: node)
             end
           end
 

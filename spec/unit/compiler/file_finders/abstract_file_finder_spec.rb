@@ -16,21 +16,21 @@ module Epuber
       context '::MultipleFilesFoundError' do
         it 'can handle to_s for empty groups' do
           expect do
-            FileFinders::MultipleFilesFoundError.new('some_pattern*', [], '/some_context_path/aaa', ['abc', 'def']).to_s
+            FileFinders::MultipleFilesFoundError.new('some_pattern*', [], '/some_context_path/aaa', %w[abc def]).to_s
           end.to_not raise_error
         end
 
         it 'can handle to_s for nil groups' do
           expect do
             FileFinders::MultipleFilesFoundError.new('some_pattern*', nil, '/some_context_path/aaa',
-                                                     ['abc', 'def']).to_s
+                                                     %w[abc def]).to_s
           end.to_not raise_error
         end
 
         it 'can handle to_s for one group' do
           expect do
             FileFinders::MultipleFilesFoundError.new('some_pattern*', :text, '/some_context_path/aaa',
-                                                     ['abc', 'def']).to_s
+                                                     %w[abc def]).to_s
           end.to_not raise_error
         end
       end

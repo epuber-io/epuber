@@ -37,16 +37,14 @@ module Epuber
 
         doctypes = []
         while /(\n|\?>|\A)?(<!DOCTYPE [^>]*>\n*)/ =~ text
-          doctypes << $2.strip
+          doctypes << ::Regexp.last_match(2).strip
 
           match = Regexp.last_match
           text[match.begin(2)...match.end(2)] = ''
         end
 
         before = ([xml_header] + doctypes).compact.join("\n")
-        unless before.empty?
-          before = before + "\n"
-        end
+        before += "\n" unless before.empty?
 
         parse_options = Nokogiri::XML::ParseOptions::DEFAULT_XML |
                         Nokogiri::XML::ParseOptions::NOERROR | # to silence any errors or warnings printing into console
@@ -82,7 +80,7 @@ module Epuber
       end
 
       def self.xml_document_from_string(text, file_path = nil)
-        xml, errros = self.xml_doc_from_str_with_errors(text, file_path)
+        xml, = xml_doc_from_str_with_errors(text, file_path)
         xml
       end
 
@@ -136,10 +134,10 @@ module Epuber
         end
 
         # https://github.com/IDPF/epubcheck/issues/631
-        if epub_version < 3.0
-          xhtml_doc.internal_subset.remove unless xhtml_doc.internal_subset.nil?
-          xhtml_doc.create_internal_subset('html', "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd")
-        end
+        return unless epub_version < 3.0
+
+        xhtml_doc.internal_subset&.remove
+        xhtml_doc.create_internal_subset('html', '-//W3C//DTD XHTML 1.1//EN', 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd')
       end
 
       # Method for adding style sheets with links, method will not add duplicate items
@@ -242,23 +240,21 @@ module Epuber
         founded_links = []
 
         xhtml_doc.css("#{tag_name}[#{attribute_name}]").each do |node|
-          begin
-            src = node[attribute_name]
-            # @type [String] src
+          src = node[attribute_name]
+          # @type [String] src
 
-            next if src.nil?
-            next if src.start_with?('$')
+          next if src.nil?
+          next if src.start_with?('$')
 
-            target_file = resolved_link_to_file(src, groups, file_path, file_finder)
-            founded_links << target_file
+          target_file = resolved_link_to_file(src, groups, file_path, file_finder)
+          founded_links << target_file
 
-            node[attribute_name] = target_file.to_s
-          rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
-            UI.warning(e.to_s, location: node)
+          node[attribute_name] = target_file.to_s
+        rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
+          UI.warning(e.to_s, location: node)
 
-            # skip not found files
-            next
-          end
+          # skip not found files
+          next
         end
 
         founded_links

@@ -60,9 +60,7 @@ module Epuber
     #
     # @return [Epuber::Book]
     #
-    def bookspec=(bookspec)
-      @bookspec = bookspec
-    end
+    attr_writer :bookspec
 
     # @return [Epuber::Lockfile]
     #
@@ -125,9 +123,9 @@ module Epuber
         UI.warning('Warning: the running version of Epuber is older than the version that created the lockfile. We suggest you upgrade to the latest version of Epuber by running `gem install epuber`.')
       end
 
-      if bookspec_lockfile.bade_version && bookspec_lockfile.bade_version > Bade::VERSION
-        UI.warning('Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`.')
-      end
+      return unless bookspec_lockfile.bade_version && bookspec_lockfile.bade_version > Bade::VERSION
+
+      UI.warning('Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`.')
     end
 
     def same_version_as_last_run?

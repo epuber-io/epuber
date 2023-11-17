@@ -61,16 +61,16 @@ module Epuber
         end
       end
 
-      BINARY_EXTENSIONS = %w(.png .jpeg .jpg .otf .ttf)
-      STATIC_EXTENSIONS = BINARY_EXTENSIONS + %w(.css .js)
+      BINARY_EXTENSIONS = %w[.png .jpeg .jpg .otf .ttf].freeze
+      STATIC_EXTENSIONS = BINARY_EXTENSIONS + %w[.css .js]
 
       GROUP_EXTENSIONS = {
-        text: %w(.xhtml .html .bade),
-        image: %w(.png .jpg .jpeg),
-        font: %w(.otf .ttf),
-        style: %w(.css .styl),
-        script: %w(.js .coffee),
-      }
+        text: %w[.xhtml .html .bade],
+        image: %w[.png .jpg .jpeg],
+        font: %w[.otf .ttf],
+        style: %w[.css .styl],
+        script: %w[.js .coffee],
+      }.freeze
 
       EXTENSIONS_RENAME = {
         '.styl' => '.css',
@@ -78,7 +78,7 @@ module Epuber
         '.bade' => '.xhtml',
 
         '.coffee' => '.js',
-      }
+      }.freeze
 
       class Abstract
         # @return [String] path where should look for source files
@@ -150,7 +150,7 @@ module Epuber
           end
 
           if files.empty? && search_everywhere && !pattern.start_with?('**')
-            files = __find_files('**/' + pattern, groups, @source_path_abs, searching_path || @source_path_abs)
+            files = __find_files("**/#{pattern}", groups, @source_path_abs, searching_path || @source_path_abs)
           end
 
           files
@@ -165,7 +165,7 @@ module Epuber
         # @return [Array<String>] list of founded files
         #
         def find_all(pattern, groups: nil, context_path: @source_path_abs)
-          __find_files('**/' + pattern, groups, context_path)
+          __find_files("**/#{pattern}", groups, context_path)
         end
 
         # @param [Array<String>] paths  list of file paths
@@ -220,15 +220,17 @@ module Epuber
           files = __core_find_files(pattern, groups, context_path, orig_context_path)
 
           # try to find files with any extension
-          files = __core_find_files(pattern + '.*', groups, context_path, orig_context_path) if files.empty?
+          files = __core_find_files("#{pattern}.*", groups, context_path, orig_context_path) if files.empty?
 
           files
         end
 
-        # Core method for finding files, it only search for files, filter by input groups and map the final paths to pretty relative paths from context_path
+        # Core method for finding files, it only search for files, filter by input groups and map the final paths to
+        # pretty relative paths from context_path
         #
         # @param [String] pattern  pattern of the desired files
-        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see
+        #                                GROUP_EXTENSIONS
         # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
         # @param [String] orig_context_path  original context path, wo it will work nicely with iterative searching
         #
@@ -256,11 +258,11 @@ module Epuber
           self.class.relative_paths_from(file_paths, orig_context_path)
         end
 
-        def __core_find_files_from_pattern(pattern)
+        def __core_find_files_from_pattern(_pattern)
           raise 'Implement this in subclass'
         end
 
-        def __core_file?(path)
+        def __core_file?(_path)
           raise 'Implement this in subclass'
         end
       end

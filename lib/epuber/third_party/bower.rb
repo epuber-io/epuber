@@ -10,7 +10,7 @@ module Epuber
           uri: 'uri.js/src/',
           spin: 'spin.js/',
           keymaster: 'keymaster/',
-        }
+        }.freeze
 
         def path_to_js(component)
           path = JS_COMPONENTS[component]

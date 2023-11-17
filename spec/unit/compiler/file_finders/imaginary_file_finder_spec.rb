@@ -15,7 +15,7 @@ module Epuber
       describe Imaginary do
         it 'support splitting path into components' do
           comps = Imaginary.path_parts('some/path/is/awesome/file.txt')
-          expect(comps).to eq %w(some path is awesome file.txt)
+          expect(comps).to eq %w[some path is awesome file.txt]
         end
 
         it 'supports adding file' do

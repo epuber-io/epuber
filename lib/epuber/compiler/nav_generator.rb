@@ -26,7 +26,7 @@ module Epuber
       # resource page http://www.idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-landmarks
       LANDMARKS_MAP = {
         landmark_cover: { type: 'cover', text: 'Cover page' },
-        landmark_start_page: { type: %w(bodymatter ibooks:reader-start-page), text: 'Start Reading' },
+        landmark_start_page: { type: %w[bodymatter ibooks:reader-start-page], text: 'Start Reading' },
         landmark_copyright: { type: 'copyright-page', text: 'Copyright page' },
         landmark_toc: { type: 'toc', text: 'Table of contents' },
       }.freeze
@@ -120,7 +120,7 @@ module Epuber
           end
         end
 
-        if @target.epub_version >= 3 && toc_items.length > 0 && contains_item_with_title(toc_items)
+        if @target.epub_version >= 3 && toc_items.length.positive? && contains_item_with_title(toc_items)
           @xml.ol do
             iterate_lambda.call
           end

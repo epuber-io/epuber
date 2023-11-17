@@ -61,12 +61,12 @@ module Epuber
         @default_target.send(sym)
       end
 
-      unless readonly
-        # setter
-        setter_method = sym.to_s + '='
-        define_method(setter_method) do |newValue|
-          @default_target.send(setter_method, newValue)
-        end
+      return if readonly
+
+      # setter
+      setter_method = "#{sym}="
+      define_method(setter_method) do |newValue|
+        @default_target.send(setter_method, newValue)
       end
     end
 
@@ -78,7 +78,7 @@ module Epuber
     # @return [Array<Target>]
     #
     def all_targets
-      if @default_target.sub_targets.length == 0
+      if @default_target.sub_targets.empty?
         [@default_target]
       else
         @default_target.sub_targets
@@ -86,7 +86,7 @@ module Epuber
     end
 
     def flat_all_targets
-      if @default_target.sub_targets.length == 0
+      if @default_target.sub_targets.empty?
         [@default_target]
       else
         @default_target.flat_sub_items
@@ -94,7 +94,7 @@ module Epuber
     end
 
     def buildable_targets
-      flat_all_targets.select { |t| !t.is_abstract }
+      flat_all_targets.reject(&:is_abstract)
     end
 
     # Defines new target

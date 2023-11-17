@@ -1,9 +1,10 @@
-require 'pp' # to shut up error like 'TypeError: superclass mismatch for class File'
+# frozen_string_literal: true
+
 require 'rspec'
 require 'fakefs/spec_helpers'
 
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'epuber'
 
 require_relative 'matchers/xml'
@@ -17,9 +18,7 @@ module FakeFS
 
       new_time = File.mtime(new)
       old_list.each do |old|
-        if File.exist?(old)
-          return false unless new_time > File.mtime(old)
-        end
+        return false if File.exist?(old) && new_time <= File.mtime(old)
       end
       true
     end
@@ -28,9 +27,7 @@ end
 
 
 RSpec.configure do |c|
-  if ENV['SKIP_EXPENSIVE_TESTS'] == 'true'
-    c.filter_run_excluding expensive: true
-  end
+  c.filter_run_excluding expensive: true if ENV['SKIP_EXPENSIVE_TESTS'] == 'true'
 
   c.before(:each) do
     Epuber::Config.class_eval { @instance = nil }
@@ -46,10 +43,8 @@ def spec_root
 end
 
 def resolve_file_paths(file)
-  # hack lines, because this normally does FileResolver
-  if file.respond_to?(:source_path)
-    file.abs_source_path = file.source_path
-  end
+  # HACK: lines, because this normally does FileResolver
+  file.abs_source_path = file.source_path if file.respond_to?(:source_path)
 
   file.pkg_destination_path = file.destination_path
   file.final_destination_path = file.destination_path

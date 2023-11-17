@@ -15,7 +15,7 @@ module Epuber
         generate_xml do |xml|
           xml.container(version: 1.0, xmlns: 'urn:oasis:names:tc:opendocument:xmlns:container') do
             xml.rootfiles do
-              @file_resolver.package_files.select { |file| file.kind_of?(FileTypes::OPFFile) }.each do |file|
+              @file_resolver.package_files.select { |file| file.is_a?(FileTypes::OPFFile) }.each do |file|
                 path = file.pkg_destination_path
                 xml.rootfile('full-path' => path, 'media-type' => MIME::Types.of(path).first.content_type)
               end

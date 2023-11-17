@@ -50,8 +50,10 @@ module Epuber
                    @text.gsub!(pattern, replacement, &block)
                  end
 
-        result = replace_all(pattern, replacement, multiple_times: multiple_times,
-                             &block) if multiple_times && !result.nil?
+        if multiple_times && !result.nil?
+          result = replace_all(pattern, replacement, multiple_times: multiple_times,
+                               &block)
+        end
         result
       end
     end

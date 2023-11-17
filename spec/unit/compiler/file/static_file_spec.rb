@@ -13,7 +13,7 @@ module Epuber
       describe StaticFile do
         include FakeFS::SpecHelpers
 
-        let (:ctx) do
+        let(:ctx) do
           book = Book.new
 
           ctx = CompilationContext.new(book, book.default_target)

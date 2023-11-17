@@ -12,7 +12,7 @@ module Epuber
 
         # @param [Compiler::CompilationContext] compilation_context
         #
-        def process(compilation_context)
+        def process(_compilation_context)
           write_generate(content.to_s)
         end
 

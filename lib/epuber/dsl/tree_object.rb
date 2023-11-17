@@ -94,8 +94,7 @@ module Epuber
 
       protected
 
-      attr_writer :parent
-      attr_writer :sub_items
+      attr_writer :parent, :sub_items
     end
   end
 end

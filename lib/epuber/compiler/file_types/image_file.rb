@@ -16,7 +16,7 @@ module Epuber
           dest = final_destination_path
           source = abs_source_path
 
-          img = Magick::Image::read(source).first
+          img = Magick::Image.read(source).first
 
           resolution = img.columns * img.rows
           max_resolution = 3_000_000

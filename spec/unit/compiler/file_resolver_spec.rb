@@ -47,7 +47,7 @@ module Epuber
       end
 
       it 'handles multiple addition of the same file' do
-        FileUtils.touch(%w(/source/file.txt /source/image.png))
+        FileUtils.touch(%w[/source/file.txt /source/image.png])
 
         @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
 
@@ -59,13 +59,13 @@ module Epuber
       end
 
       it 'handles multiple addition of same files' do
-        FileUtils.touch(%w(/source/file.txt /source/image.png))
+        FileUtils.touch(%w[/source/file.txt /source/image.png])
 
         @sut.add_file_from_request(Book::FileRequest.new('*.txt', false))
         expect(@sut.files.count).to eq 1
 
 
-        FileUtils.touch(%w(/source/file1.txt))
+        FileUtils.touch(%w[/source/file1.txt])
 
         @sut.add_file_from_request(Book::FileRequest.new('*.txt', false))
         expect(@sut.files.count).to eq 2
@@ -92,7 +92,7 @@ module Epuber
       end
 
       it 'supports adding multiple files' do
-        FileUtils.touch(%w(/source/file1.xhtml /source/file2.xhtml /source/file3.xhtml /source/file4.xhtml))
+        FileUtils.touch(%w[/source/file1.xhtml /source/file2.xhtml /source/file3.xhtml /source/file4.xhtml])
 
         @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
 
@@ -101,9 +101,9 @@ module Epuber
       end
 
       it 'can calculate path depend on path type' do
-        expect(FileResolver.path_comps_for('/root', :manifest)).to eq %w(/root OEBPS)
-        expect(FileResolver.path_comps_for('/root', :spine)).to eq %w(/root OEBPS)
-        expect(FileResolver.path_comps_for('/root', :package)).to eq %w(/root)
+        expect(FileResolver.path_comps_for('/root', :manifest)).to eq %w[/root OEBPS]
+        expect(FileResolver.path_comps_for('/root', :spine)).to eq %w[/root OEBPS]
+        expect(FileResolver.path_comps_for('/root', :package)).to eq %w[/root]
       end
 
       it 'supports searching files in source folder' do
@@ -114,9 +114,9 @@ module Epuber
 
       it 'support searching files in destination folder' do
         FileUtils.mkdir_p('/source/folder')
-        FileUtils.touch(%w(/source/folder/file1.xhtml /source/folder/file2.xhtml /source/folder/file3.xhtml
-                           /source/folder/file4.xhtml))
-        FileUtils.touch(%w(/source/image1.png /source/image2.jpg /source/image3.jpg /source/image4.jpg))
+        FileUtils.touch(%w[/source/folder/file1.xhtml /source/folder/file2.xhtml /source/folder/file3.xhtml
+                           /source/folder/file4.xhtml])
+        FileUtils.touch(%w[/source/image1.png /source/image2.jpg /source/image3.jpg /source/image4.jpg])
 
         @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
         @sut.add_file_from_request(Book::FileRequest.new('*.{png,jpg}', false))
@@ -130,8 +130,8 @@ module Epuber
 
       context '#file_with_source_path' do
         it 'can return file instance from source path' do
-          FileUtils.mkdir_p(%w(/source/valid))
-          FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+          FileUtils.mkdir_p(%w[/source/valid])
+          FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
           req = Book::FileRequest.new('valid/*.xhtml', false)
           @sut.add_file_from_request(req)
@@ -145,8 +145,8 @@ module Epuber
         end
 
         it 'can return file instance from absolute source path' do
-          FileUtils.mkdir_p(%w(/source/valid))
-          FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+          FileUtils.mkdir_p(%w[/source/valid])
+          FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
           req = Book::FileRequest.new('valid/*.xhtml', false)
           @sut.add_file_from_request(req)
@@ -161,8 +161,8 @@ module Epuber
       end
 
       it 'can return file instance from destination path' do
-        FileUtils.mkdir_p(%w(/source/valid))
-        FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+        FileUtils.mkdir_p(%w[/source/valid])
+        FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
         req = Book::FileRequest.new('valid/*.xhtml', false)
         @sut.add_file_from_request(req)
@@ -173,11 +173,11 @@ module Epuber
       end
 
       it 'can find unnecessary files in destination path' do
-        FileUtils.mkdir_p(%w(/dest/valid /dest/not_valid))
-        FileUtils.touch(%w(/dest/valid/1.xhtml /dest/valid/2.xhtml /dest/not_valid/1.xhtml))
+        FileUtils.mkdir_p(%w[/dest/valid /dest/not_valid])
+        FileUtils.touch(%w[/dest/valid/1.xhtml /dest/valid/2.xhtml /dest/not_valid/1.xhtml])
 
-        FileUtils.mkdir_p(%w(/source/valid /source/not_valid))
-        FileUtils.touch(%w(/source/valid/1.xhtml /source/valid/2.xhtml))
+        FileUtils.mkdir_p(%w[/source/valid /source/not_valid])
+        FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
         req = Book::FileRequest.new('valid/*.xhtml', false)
         @sut.add_file_from_request(req, :package)
@@ -199,7 +199,7 @@ module Epuber
       end
 
       it 'can find file instances from multi file request' do
-        FileUtils.touch(%w(/source/some_file.xhtml /source/some_file2.xhtml))
+        FileUtils.touch(%w[/source/some_file.xhtml /source/some_file2.xhtml])
 
         req = Book::FileRequest.new('*.xhtml', false)
         files = @sut.add_file_from_request(req)
@@ -211,7 +211,7 @@ module Epuber
       end
 
       it 'can get file instance with different file request' do
-        FileUtils.touch(%w(/source/some_file.xhtml /source/some_file2.xhtml))
+        FileUtils.touch(%w[/source/some_file.xhtml /source/some_file2.xhtml])
 
         req = Book::FileRequest.new('*.xhtml', false)
         files = @sut.add_file_from_request(req)
@@ -228,7 +228,7 @@ module Epuber
       end
 
       it 'can find/search file instance with different file request' do
-        FileUtils.touch(%w(/source/some_file.xhtml /source/some_file2.xhtml))
+        FileUtils.touch(%w[/source/some_file.xhtml /source/some_file2.xhtml])
 
         req = Book::FileRequest.new('*.xhtml', false)
         files = @sut.add_file_from_request(req)

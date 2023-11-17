@@ -18,18 +18,16 @@ module Epuber
     # @return [self]
     #
     def self.from_file(file_path)
-      if File.exist?(file_path)
-        hash = YAML.safe_load(File.read(file_path))
-      else
-        hash = {}
-      end
+      hash = if File.exist?(file_path)
+               YAML.safe_load(File.read(file_path))
+             else
+               {}
+             end
 
       # backward compatibility for version 0.5 and older
-      if hash.include?('version')
-        hash['epuber_version'] = hash.delete('version')
-      end
+      hash['epuber_version'] = hash.delete('version') if hash.include?('version')
 
-      inst = self.new(hash)
+      inst = new(hash)
       inst.defined_from_file = file_path
       yield inst if hash.empty? && block_given?
       inst

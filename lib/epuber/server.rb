@@ -41,9 +41,7 @@ module Epuber
           body = pretty(env, e)
         end
 
-        unless body.is_a?(Array)
-          body = [body]
-        end
+        body = [body] unless body.is_a?(Array)
 
         [500, { 'Content-Type' => content_type,
                 'Content-Length' => Rack::Utils.bytesize(body.join).to_s },
@@ -133,11 +131,11 @@ module Epuber
       @verbose = verbose
       @default_thin_logger ||= Thin::Logging.logger
 
-      unless verbose
+      if verbose
+        Thin::Logging.logger = @default_thin_logger
+      else
         Thin::Logging.logger = Logger.new(nil)
         Thin::Logging.logger.level = :fatal
-      else
-        Thin::Logging.logger = @default_thin_logger
       end
 
       set :logging, verbose
@@ -151,20 +149,18 @@ module Epuber
     end
 
     def self.start_listening_if_needed
-      return unless self.listener.nil?
+      return unless listener.nil?
 
       self.listener = Listen.to(Config.instance.project_path, debug: true) do |modified, added, removed|
-        begin
-          changes_detected(modified, added, removed)
-        rescue => e
-          # print error, do not send error further, listener will die otherwise
-          $stderr.puts e
-          $stderr.puts e.backtrace
-        end
+        changes_detected(modified, added, removed)
+      rescue StandardError => e
+        # print error, do not send error further, listener will die otherwise
+        warn e
+        warn e.backtrace
       end
 
-      listener.ignore(%r{\.idea})
-      listener.ignore(%r{#{Config.instance.working_path}})
+      listener.ignore(/\.idea/)
+      listener.ignore(/#{Config.instance.working_path}/)
       listener.ignore(%r{#{Config::WORKING_PATH}/})
 
       listener.start
@@ -224,9 +220,9 @@ module Epuber
     # @return [Epuber::Book::File, nil]
     #
     def spine_file_at(index)
-      if !file_resolver.nil? && index >= 0 && index < file_resolver.spine_files.count
-        file_resolver.spine_files[index]
-      end
+      return unless !file_resolver.nil? && index >= 0 && index < file_resolver.spine_files.count
+
+      file_resolver.spine_files[index]
     end
 
     # @param [String] path
@@ -243,9 +239,7 @@ module Epuber
     def add_script_file_to_head(html_doc, file_name, *args)
       source = File.read(File.expand_path("server/#{file_name}", File.dirname(__FILE__)))
 
-      if File.extname(file_name) == '.coffee'
-        source = CoffeeScript.compile(source)
-      end
+      source = CoffeeScript.compile(source) if File.extname(file_name) == '.coffee'
 
       args.each do |hash|
         hash.each do |key, value|
@@ -308,9 +302,9 @@ module Epuber
                raise "Unknown file type `#{type}`"
              end
 
-      return if head.css('script, link').any? { |n|
+      return if head.css('script, link').any? do |n|
                   (!n['href'].nil? && n['href'] == node['href']) || (!n['src'].nil? && n['src'] == node['src'])
-                }
+                end
 
       head.add_child(node)
     end
@@ -339,24 +333,22 @@ module Epuber
         self.target = new_target
       else
         self.target = book.targets.first
-        _log :ui, "[!] Not found previous target after reloading bookspec file, jumping to first #{self.target.name}"
+        _log :ui, "[!] Not found previous target after reloading bookspec file, jumping to first #{target.name}"
       end
     end
 
     def self._compile_book
-      begin
-        compiler = Epuber::Compiler.new(book, target)
-        compiler.compile(build_path)
-        self.file_resolver = compiler.file_resolver
+      compiler = Epuber::Compiler.new(book, target)
+      compiler.compile(build_path)
+      self.file_resolver = compiler.file_resolver
 
-        true
-      rescue => e
-        self.file_resolver = compiler.file_resolver
+      true
+    rescue StandardError => e
+      self.file_resolver = compiler.file_resolver
 
-        Epuber::UI.error("Compile error: #{e}", location: e)
+      Epuber::UI.error("Compile error: #{e}", location: e)
 
-        false
-      end
+      false
     end
 
     def self.compile_book(&completion)
@@ -367,12 +359,12 @@ module Epuber
 
       @compilation_thread = Thread.new do
         result = _compile_book
-        completion.call(result) unless completion.nil?
+        completion&.call(result)
       end
 
-      if completion.nil?
-        @compilation_thread.join
-      end
+      return unless completion.nil?
+
+      @compilation_thread.join
     end
 
     # @param message [String]
@@ -388,7 +380,7 @@ module Epuber
     # @param type [Symbol]
     def self.notify_clients(type, data = nil)
       _log :info, "Notifying clients with type #{type.inspect}"
-      raise "Not known type `#{type}`" unless [:styles, :reload, :compile_start, :compile_end].include?(type)
+      raise "Not known type `#{type}`" unless %i[styles reload compile_start compile_end].include?(type)
 
       message = {
         name: type,
@@ -413,12 +405,12 @@ module Epuber
     # @param _removed [Array<String>]
     #
     def self.changes_detected(_modified, _added, _removed)
-      all_changed = (_modified + _added + _removed).uniq.map { |path| path.unicode_normalize }
+      all_changed = (_modified + _added + _removed).uniq.map(&:unicode_normalize)
 
       reload_bookspec if all_changed.any? { |file| file == book.file_path }
 
       changed = filter_not_project_files(all_changed) || []
-      return if changed.count == 0
+      return if changed.count.zero?
 
       notify_clients(:compile_start)
 

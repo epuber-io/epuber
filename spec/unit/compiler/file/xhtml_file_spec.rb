@@ -68,9 +68,9 @@ module Epuber
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
-          expect {
+          expect do
             file.process(@ctx)
-          }.to output('XML header must be at the beginning of document
+          end.to output('XML header must be at the beginning of document
   (in file some_file.xhtml line 1)'.ansi.yellow + "\n").to_stdout
 
           expect(File.read('some_file_dest.xhtml')).to eq source.lstrip # lstrip is to remove white characters at beginning
@@ -104,15 +104,15 @@ module Epuber
               '         ^',
             ].join("\n").ansi.yellow,
             [
-              "some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1",
+              'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1',
               '  </body>',
               '         ^',
             ].join("\n").ansi.yellow,
           ].join("\n") + "\n"
 
-          expect {
+          expect do
             file.process(@ctx)
-          }.to output(expected_output).to_stdout
+          end.to output(expected_output).to_stdout
         end
 
         it 'handles space in link' do

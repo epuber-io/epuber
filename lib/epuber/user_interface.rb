@@ -35,8 +35,10 @@ module Epuber
     def self.error(message, location: nil)
       _clear_processing_line_for_new_output do
         $stdout.puts(_format_message(:error, message, location: location))
-        _print_backtrace(location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations,
-                         location: location) if current_command && current_command.verbose?
+        if current_command&.verbose?
+          _print_backtrace(location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations,
+                           location: location)
+        end
       end
     end
 
@@ -60,16 +62,16 @@ module Epuber
     # @param [String] info_text
     #
     def self.print_processing_debug_info(info_text)
-      if current_command && current_command.verbose?
-        _clear_processing_line_for_new_output do
-          message = if @current_file.nil?
-                      "▸ #{info_text}"
-                    else
-                      "▸ #{@current_file.source_path}: #{info_text}"
-                    end
+      return unless current_command&.verbose?
 
-          $stdout.puts(message.ansi.send(_color_from_level(:debug)))
-        end
+      _clear_processing_line_for_new_output do
+        message = if @current_file.nil?
+                    "▸ #{info_text}"
+                  else
+                    "▸ #{@current_file.source_path}: #{info_text}"
+                  end
+
+        $stdout.puts(message.ansi.send(_color_from_level(:debug)))
       end
     end
 
@@ -109,9 +111,7 @@ module Epuber
     # @param [Fixnum] time
     #
     def self.print_step_processing_time(step_name, time = nil)
-      if !current_command || !current_command.debug_steps_times
-        return yield
-      end
+      return yield if !current_command || !current_command.debug_steps_times
 
       remove_processing_file_line
 
@@ -134,8 +134,6 @@ module Epuber
       returned_value
     end
 
-    private
-
     def self._clear_processing_line_for_new_output
       last_line = remove_processing_file_line
 
@@ -151,10 +149,10 @@ module Epuber
     #
     def self._color_from_level(level)
       case level
-      when :error;   :red
-      when :warning; :yellow
-      when :normal;  :white
-      when :debug;   :blue
+      when :error then   :red
+      when :warning then :yellow
+      when :normal then  :white
+      when :debug then   :blue
       else
         raise "Unknown output level #{level}"
       end
@@ -189,11 +187,11 @@ module Epuber
       comps = []
       comps << message.to_s
       if !location.nil? && !(message.is_a?(Epuber::Compiler::Problem) || message.is_a?(Epuber::Checker::TextChecker::MatchProblem))
-        if location.lineno
-          comps << "  (in file #{location.path} line #{location.lineno})"
-        else
-          comps << "  (in file #{location.path})"
-        end
+        comps << if location.lineno
+                   "  (in file #{location.path} line #{location.lineno})"
+                 else
+                   "  (in file #{location.path})"
+                 end
       end
 
       comps.join("\n").ansi.send(_color_from_level(level))
@@ -206,7 +204,7 @@ module Epuber
     #
     def self._format_backtrace(locations, location: nil)
       index = locations.index(location) || 0
-      locations[index, locations.size].map { |loc| loc.to_s }
+      locations[index, locations.size].map(&:to_s)
     end
 
     # @param [Thread::Backtrace::Location] location location of the error

@@ -11,6 +11,8 @@ module Epuber
           #
           attr_accessor :entries
 
+          # @return [String]
+          #
           attr_reader :name
 
           def initialize(name)
@@ -32,8 +34,12 @@ module Epuber
         end
 
         class FileEntry
+          # @return [String]
+          #
           attr_reader :name
 
+          # @return [String]
+          #
           attr_reader :absolute_path
 
           def initialize(name, absolute_path)
@@ -42,7 +48,7 @@ module Epuber
           end
 
           def ==(other)
-            other.is_a?(FileEntry) ? name == other.name : name == other.to_s
+            name == (other.is_a?(FileEntry) ? other.name : other.to_s)
           end
         end
 
@@ -87,9 +93,7 @@ module Epuber
           parts = self.class.path_parts(pattern)
           found_entries = find_recurser(root, parts).flatten
           file_entries = found_entries.reject { |entry| entry.is_a?(DirEntry) }
-          file_entries.map do |item|
-            item.absolute_path
-          end
+          file_entries.map(&:absolute_path)
         end
 
         def __core_file?(path)
@@ -134,7 +138,7 @@ module Epuber
                               end
                             else
                               regex_body = pattern_to_regex(pattern)
-                              dir.entries.reject { |k, _v| /\A#{regex_body}\Z/ !~ k }.values
+                              dir.entries.select { |k, _v| /\A#{regex_body}\Z/ =~ k }.values
                             end
 
           if parts.empty? # we're done recursing

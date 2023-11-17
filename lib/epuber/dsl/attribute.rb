@@ -109,25 +109,25 @@ module Epuber
       #         is not specified.
       #
       attr_reader :required
-      alias_method :required?, :required
+      alias required? required
 
       # @return [Bool] whether the attribute should be specified only on the root specification.
       #
       attr_reader :root_only
-      alias_method :root_only?, :root_only
+      alias root_only? root_only
 
 
       # @return [Bool] whether there should be a singular alias for the attribute writer.
       #
       attr_reader :singularize
-      alias_method :singularize?, :singularize
+      alias singularize? singularize
 
       # @return [Bool] whether the attribute describes file patterns.
       #
       # @note   This is mostly used by the linter.
       #
       attr_reader :file_patterns
-      alias_method :file_patterns?, :file_patterns
+      alias file_patterns? file_patterns
 
       # @return [Bool] defines whether the attribute reader should join the values with the parent.
       #
@@ -185,7 +185,7 @@ module Epuber
         end
 
         if keys
-          value.keys.each do |key|
+          value.each_key do |key|
             unless allowed_keys.include?(key)
               raise StandardError, "Unknown key `#{key}` for #{self}. Allowed keys: `#{allowed_keys.inspect}`"
             end
@@ -228,9 +228,7 @@ module Epuber
             array_keys           = @auto_convert.select { |k, _v| k.is_a?(Array) }
             array_keys_with_type = array_keys.select { |k, _v| k.any? { |klass| value.class <= klass } }
 
-            if array_keys_with_type.count > 0
-              dest_class = array_keys_with_type.values.first
-            end
+            dest_class = array_keys_with_type.values.first if array_keys_with_type.count.positive?
           end
 
           if dest_class.respond_to?(:call)

@@ -73,7 +73,7 @@ module Epuber
 
             expect { book.validate }.to_not raise_error
 
-            expect(book.authors).to contain_exactly(a_kind_of NormalContributor)
+            expect(book.authors).to contain_exactly(a_kind_of(NormalContributor))
           end
         end
 

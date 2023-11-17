@@ -91,9 +91,7 @@ module Epuber
               item.file_request = file_obj
             end
 
-            unless file_fragment.nil? || file_fragment.empty?
-              item.file_fragment = file_fragment
-            end
+            item.file_fragment = file_fragment unless file_fragment.nil? || file_fragment.empty?
           end
 
           if title.is_a?(String)

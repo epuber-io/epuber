@@ -54,7 +54,7 @@ module Epuber
         builder = Nokogiri::XML::Builder.new(encoding: 'utf-8') do |xml|
           @xml = xml
 
-          block.call(xml) unless block.nil?
+          block&.call(xml)
 
           @xml = nil
         end

@@ -60,7 +60,7 @@ module Epuber
     # @return [Class]
     #
     def self.class_for_source_type(type)
-      checker_class = self.map_source_type__class[type]
+      checker_class = map_source_type__class[type]
       raise "#{self} class not found for type: #{type.inspect}" if checker_class.nil?
 
       checker_class

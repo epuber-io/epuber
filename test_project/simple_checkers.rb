@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # encoding utf-8
 
 check :result_text_xhtml_string do |checker|

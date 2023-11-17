@@ -14,7 +14,7 @@ module Epuber
         context 'FakeFS parts' do
           include FakeFS::SpecHelpers
 
-          let (:ctx) do
+          let(:ctx) do
             book = Book.new
 
             ctx = CompilationContext.new(book, book.default_target)
@@ -47,7 +47,7 @@ module Epuber
         context 'Real' do
           FileUtils.mkdir_p('/tmp/epuber_stylus_tests')
 
-          let (:ctx) do
+          let(:ctx) do
             book = Book.new
 
             ctx = CompilationContext.new(book, book.default_target)

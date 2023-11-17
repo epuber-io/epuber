@@ -25,7 +25,7 @@ module Epuber
     class FileResolver
       class ResolveError < StandardError; end
 
-      PATH_TYPES = [:spine, :manifest, :package, nil]
+      PATH_TYPES = [:spine, :manifest, :package, nil].freeze
 
       # @return [String] path where should look for source files
       #
@@ -125,24 +125,16 @@ module Epuber
         existing_file = @final_destination_path_to_file[file.final_destination_path]
 
         # save mapping from file_request to file, file_request can be different, but result file could be the same ...
-        unless file.try(:file_request).nil?
-          @request_to_files[file.file_request] << (existing_file || file)
-        end
+        @request_to_files[file.file_request] << (existing_file || file) unless file.try(:file_request).nil?
 
         # return existing file if already exists, new file will be thrown away
         return existing_file unless existing_file.nil?
 
-        if [:spine].include?(type)
-          @spine_files << file
-        end
+        @spine_files << file if [:spine].include?(type)
 
-        if [:spine, :manifest].include?(type)
-          @manifest_files << file
-        end
+        @manifest_files << file if %i[spine manifest].include?(type)
 
-        if [:spine, :manifest, :package].include?(type)
-          @package_files << file
-        end
+        @package_files << file if %i[spine manifest package].include?(type)
 
         @files << file
 
@@ -151,13 +143,11 @@ module Epuber
 
         @final_destination_path_to_file[file.final_destination_path] = file
 
-        if file.respond_to?(:source_path) && !file.source_path.nil?
-          @source_path_to_file[file.source_path] = file
-        end
+        @source_path_to_file[file.source_path] = file if file.respond_to?(:source_path) && !file.source_path.nil?
 
-        if file.respond_to?(:abs_source_path) && !file.abs_source_path.nil?
-          @abs_source_path_to_file[file.abs_source_path] = file
-        end
+        return unless file.respond_to?(:abs_source_path) && !file.abs_source_path.nil?
+
+        @abs_source_path_to_file[file.abs_source_path] = file
       end
 
       # Get instance of file from request instance
@@ -219,16 +209,14 @@ module Epuber
       # @return [Array<String>] list of files that should be deleted in destination directory
       #
       def unneeded_files_in_destination
-        requested_paths = files.map do |file|
-          file.pkg_destination_path
-        end
+        requested_paths = files.map(&:pkg_destination_path)
 
         existing_paths = FileFinders::Normal.new(destination_path).find_all('*')
 
         unnecessary_paths = existing_paths - requested_paths
 
-        unnecessary_paths.select! do |path|
-          !::File.directory?(File.join(destination_path, path))
+        unnecessary_paths.reject! do |path|
+          ::File.directory?(File.join(destination_path, path))
         end
 
         unnecessary_paths
@@ -259,21 +247,21 @@ module Epuber
       # @return [nil]
       #
       def resolve_destination_path(file)
-        if file.final_destination_path.nil?
-          dest_path = if file.respond_to?(:source_path) && !file.source_path.nil?
-                        file.abs_source_path = File.expand_path(file.source_path, source_path)
-                        self.class.renamed_file_with_path(file.source_path)
-                      elsif !file.destination_path.nil?
-                        file.destination_path
-                      else
-                        raise ResolveError,
-                              "What should I do with file that doesn't have source path or destination path? file: #{file.inspect}"
-                      end
+        return unless file.final_destination_path.nil?
 
-          file.destination_path = dest_path
-          file.pkg_destination_path = File.join(*self.class.path_comps_for(file.path_type), dest_path)
-          file.final_destination_path = File.join(destination_path, file.pkg_destination_path)
-        end
+        dest_path = if file.respond_to?(:source_path) && !file.source_path.nil?
+                      file.abs_source_path = File.expand_path(file.source_path, source_path)
+                      self.class.renamed_file_with_path(file.source_path)
+                    elsif !file.destination_path.nil?
+                      file.destination_path
+                    else
+                      raise ResolveError,
+                            "What should I do with file that doesn't have source path or destination path? file: #{file.inspect}"
+                    end
+
+        file.destination_path = dest_path
+        file.pkg_destination_path = File.join(*self.class.path_comps_for(file.path_type), dest_path)
+        file.final_destination_path = File.join(destination_path, file.pkg_destination_path)
       end
 
       # @param [String] extname  extension of file
@@ -309,8 +297,6 @@ module Epuber
           Array(root_path) + [Compiler::EPUB_CONTENT_FOLDER]
         when :package
           Array(root_path)
-        else
-          nil
         end
       end
     end

@@ -14,7 +14,7 @@ module Epuber
 
       it 'can load from file' do
         expect(sut.store_file_path).to eq '/db'
-        expect(sut.all_files).to eq Hash.new
+        expect(sut.all_files).to eq({})
       end
 
       it 'can save to file and load back' do
@@ -65,7 +65,7 @@ module Epuber
         expect(sut.all_files['/file']).to_not be_nil
         expect(sut.all_files['/file_old']).to_not be_nil
 
-        sut.cleanup(%w(/file))
+        sut.cleanup(%w[/file])
 
         expect(sut.all_files.count).to eq 1
         expect(sut.all_files['/file']).to_not be_nil
@@ -112,7 +112,7 @@ module Epuber
           File.write('/file', 'abc')
 
           sut.update_metadata('/file')
-          sut.add_dependency(%w(/file_dep1 /file_dep2), to: '/file')
+          sut.add_dependency(%w[/file_dep1 /file_dep2], to: '/file')
 
           expect(sut.all_files.count).to eq 3
           expect(sut.all_files['/file']).to_not be_nil
@@ -128,7 +128,7 @@ module Epuber
           File.write('/file', 'abc')
 
           sut.update_metadata('/file')
-          sut.add_dependency(%w(/file_dep1 /file_dep2), to: '/file')
+          sut.add_dependency(%w[/file_dep1 /file_dep2], to: '/file')
           sut.update_metadata('/file_dep1')
           sut.update_metadata('/file_dep2')
 
@@ -221,7 +221,7 @@ module Epuber
           sut.add_dependency('/file_dep', to: '/file')
           sut.add_dependency('/file_dep2', to: '/file_dep')
 
-          sut.cleanup(%w(/file /file_dep))
+          sut.cleanup(%w[/file /file_dep])
 
           expect(sut.all_files.count).to eq 2
           expect(sut.all_files['/file']).to_not be_nil
