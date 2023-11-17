@@ -4,6 +4,7 @@
 
 Epuber is simple tool to compile and pack source files into EPUB format. Offers to define multiple "targets" which allows to create multiple versions of the book by running only one command. Eliminates copying code and information, eliminates needs to use _git_ branches to differ ebook content.
 
+For more information look at [documentation](./docs/README.md).
 
 ## Features
 
@@ -71,7 +72,7 @@ First of all Epuber uses [RMagick](https://github.com/rmagick/rmagick) which has
 - pkg-config
 
 On OS X make sure you Xcode Command Line Tools installed:
-    
+
     xcode-select --install
 
 And the easiest way to install prerequisites on macOS is to use [brew](http://brew.sh):

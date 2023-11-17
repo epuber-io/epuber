@@ -81,6 +81,7 @@ module Epuber
 
         process_all_target_files
         generate_other_files
+        process_global_ids
 
         # build folder cleanup
         remove_unnecessary_files
@@ -284,6 +285,40 @@ module Epuber
       toc_item.sub_items.each do |child|
         parse_toc_item(child)
       end
+    end
+
+    def process_global_ids
+      xhtml_files = @file_resolver.files.select { |file| file.is_a?(FileTypes::XHTMLFile) }
+      global_ids = validate_global_ids(xhtml_files)
+
+      xhtml_files.each do |file|
+        file.process_global_ids(compilation_context, global_ids)
+      end
+    end
+
+    # Validates duplicity of global ids in all files + returns map of global ids to files
+    #
+    # @param xhtml_files [Array<FileTypes::XHTMLFile>]
+    # @return [Hash<String, FileTypes::XHTMLFile>]
+    #
+    def validate_global_ids(xhtml_files)
+      map = {}
+      xhtml_files.each do |file|
+        file.global_ids.each do |id|
+          if map.key?(id)
+            message = "Duplicate global id `#{id}` in file `#{file.source_path}`."
+            if compilation_context.release_build?
+              UI.error!(message)
+            else
+              UI.warning("#{message} Will fail during release build.")
+            end
+          end
+
+          map[id] = file
+        end
+      end
+
+      map
     end
 
     # @param cmd [String]

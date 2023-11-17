@@ -12,6 +12,21 @@ module Epuber
         #
         attr_accessor :toc_item
 
+        # @return [Array<String>]
+        #
+        attr_accessor :global_ids
+
+        # @return [Array<String>]
+        #
+        attr_accessor :global_links
+
+        def initialize(source_path)
+          super
+
+          self.global_ids = []
+          self.global_links = []
+        end
+
         # @param [Book::Target] target
         # @param [FileResolver] file_resolver
         #
@@ -57,7 +72,6 @@ module Epuber
               checker.call(abs_source_path, xhtml_content, compilation_context)
             end
           end
-
 
           if compilation_context.should_write
             self.class.write_to_file(xhtml_content, abs_source_path)
@@ -145,6 +159,12 @@ module Epuber
             end
           end
 
+          if xhtml_string.include?('="$')
+            xhtml_doc = XHTMLProcessor.xml_document_from_string(xhtml_string, final_destination_path)
+            self.global_ids = XHTMLProcessor.find_global_ids(xhtml_doc)
+            self.global_links = XHTMLProcessor.find_global_links(xhtml_doc)
+          end
+
           xhtml_string
         end
 
@@ -152,6 +172,40 @@ module Epuber
         #
         def process(compilation_context)
           write_processed(common_process(load_source(compilation_context), compilation_context))
+        end
+
+        # @param [Compiler::CompilationContext] compilation_context
+        # @param [Hash<String, XHTMLFile>] global_ids
+        #
+        def process_global_ids(compilation_context, global_ids)
+          return if self.global_ids.empty? && global_links.empty?
+
+          xhtml_doc = XHTMLProcessor.xml_document_from_string(File.read(final_destination_path), final_destination_path)
+
+          XHTMLProcessor.find_global_ids_nodes(xhtml_doc).each do |node|
+            id = node['id']
+            node['id'] = id[1..-1]
+          end
+
+          XHTMLProcessor.find_global_links_nodes(xhtml_doc).each do |node|
+            href = node['href'][1..-1]
+
+            dest_file = global_ids[href]
+            if dest_file
+              rel_path = Pathname(dest_file.final_destination_path.unicode_normalize)
+                         .relative_path_from(Pathname(File.dirname(final_destination_path.unicode_normalize))).to_s
+
+              node['href'] = "#{rel_path}##{href}"
+            else
+              if compilation_context.release_build?
+                UI.error!("Can't find global id #{href}", location: node)
+              else
+                UI.warning("Can't find global id #{href}", location: node)
+              end
+            end
+          end
+
+          write_processed(xhtml_doc.to_s)
         end
       end
     end

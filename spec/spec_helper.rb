@@ -53,3 +53,12 @@ def resolve_file_paths(file)
   file.pkg_destination_path = file.destination_path
   file.final_destination_path = file.destination_path
 end
+
+def write_file(path, content)
+  FileUtils.mkdir_p(File.dirname(path))
+  File.write(path, content)
+end
+
+def load_xhtml(path)
+  Epuber::Compiler::XHTMLProcessor.xml_document_from_string(File.read(path), path)
+end

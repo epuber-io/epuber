@@ -248,6 +248,7 @@ module Epuber
             # @type [String] src
 
             next if src.nil?
+            next if src.start_with?('$')
 
             target_file = resolved_link_to_file(src, groups, file_path, file_finder)
             founded_links << target_file
@@ -349,7 +350,6 @@ module Epuber
 
           begin
             new_path = file_resolver.dest_finder.find_file(path, groups: resource_group, context_path: dirname)
-
           rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
             begin
               new_path = resolved_link_to_file(path, resource_group, dirname, file_resolver.source_finder).to_s
@@ -361,8 +361,7 @@ module Epuber
               file.path_type = :manifest
               file_resolver.add_file(file)
 
-              new_path = FileResolver::renamed_file_with_path(new_path)
-
+              new_path = FileResolver.renamed_file_with_path(new_path)
             rescue UnparseableLinkError, FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError => e
               UI.warning(e.to_s, location: img)
 
@@ -372,6 +371,38 @@ module Epuber
 
           img[attribute_name] = new_path
         end
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @return [Array<Nokogiri::XML::Node>] list of nodes with global ids
+      #
+      def self.find_global_ids_nodes(xhtml_doc)
+        xhtml_doc
+          .css('[id^="$"]')
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @return [Array<string>] list of global ids (without dollar signs)
+      #
+      def self.find_global_ids(xhtml_doc)
+        find_global_ids_nodes(xhtml_doc)
+          .map { |node| node['id'][1..-1] }
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @return [Array<Nokogiri::XML::Node>] list of nodes with global links
+      #
+      def self.find_global_links_nodes(xhtml_doc)
+        xhtml_doc
+          .css('[href^="$"]')
+      end
+
+      # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
+      # @return [Array<string>] list of global ids (without dollar signs)
+      #
+      def self.find_global_links(xhtml_doc)
+        find_global_links_nodes(xhtml_doc)
+          .map { |node| node['href'][1..-1] }
       end
     end
   end
