@@ -12,7 +12,6 @@ module Nokogiri
   end
 end
 
-
 module Epuber
   class Compiler
     class Generator

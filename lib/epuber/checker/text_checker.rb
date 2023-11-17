@@ -61,7 +61,8 @@ module Epuber
         matches = text.to_enum(:scan, regexp).map { Regexp.last_match }
         matches.each do |match|
           # @type match [MatchData]
-          UI.print_processing_problem MatchProblem.new(match, message, Config.instance.pretty_path_from_project(file_path))
+          UI.print_processing_problem MatchProblem.new(match, message,
+                                                       Config.instance.pretty_path_from_project(file_path))
         end
       end
     end

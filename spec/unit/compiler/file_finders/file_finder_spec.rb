@@ -10,7 +10,6 @@ require 'epuber/compiler'
 
 module Epuber
   class Compiler
-
     describe FileFinders::Normal do
       include FakeFS::SpecHelpers
 
@@ -114,7 +113,8 @@ module Epuber
           FileUtils.mkdir_p('.git')
 
           FileUtils.touch(['dir_1/one.xhtml', 'dir_1/two.xhtml', 'dir_1/three.css'])
-          FileUtils.touch(['dir_1/dir_11/dir_111/one.xhtml', 'dir_1/dir_11/dir_111/two.xhtml', 'dir_1/dir_11/dir_111/three.css'])
+          FileUtils.touch(['dir_1/dir_11/dir_111/one.xhtml', 'dir_1/dir_11/dir_111/two.xhtml',
+                           'dir_1/dir_11/dir_111/three.css'])
           FileUtils.touch(['dir_2/fif.stylus', 'dir_2/baf.md', 'dir_2/hi.css'])
           FileUtils.touch(['dir_3/abc.xhtml', 'dir_3/abc_md.md', 'dir_3/abc.txt'])
           FileUtils.touch(['.gitignore', 'README.txt'])
@@ -136,7 +136,8 @@ module Epuber
           FileUtils.mkdir_p('.git')
 
           FileUtils.touch(['dir_1/one.xhtml', 'dir_1/two.xhtml', 'dir_1/three.css'])
-          FileUtils.touch(['dir_1/dir_11/dir_111/one.xhtml', 'dir_1/dir_11/dir_111/two.xhtml', 'dir_1/dir_11/dir_111/three.css'])
+          FileUtils.touch(['dir_1/dir_11/dir_111/one.xhtml', 'dir_1/dir_11/dir_111/two.xhtml',
+                           'dir_1/dir_11/dir_111/three.css'])
           FileUtils.touch(['dir_2/fif.stylus', 'dir_2/baf.md', 'dir_2/hi.css', 'dir_2/one.bade'])
           FileUtils.touch(['dir_3/abc.xhtml', 'dir_3/abc_md.md', 'dir_3/abc.txt'])
           FileUtils.touch(['.gitignore', 'README.txt'])

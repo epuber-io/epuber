@@ -53,6 +53,7 @@ module Epuber
     #
     def <=>(other)
       return unless other.is_a?(Version) || other.is_a?(String) || other.is_a?(Float) || other.is_a?(Integer)
+
       other = other.is_a?(Version) ? other : Version.new(other)
 
       return 0 if @version == other.version

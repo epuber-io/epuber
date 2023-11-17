@@ -125,7 +125,8 @@ module Epuber
     #
     def targets(*names, &block)
       if names.empty?
-        UI.warning('Book#targets to get all targets is deprecated, use #all_targets instead', location: caller_locations.first)
+        UI.warning('Book#targets to get all targets is deprecated, use #all_targets instead',
+                   location: caller_locations.first)
         return all_targets
       end
 
@@ -155,10 +156,10 @@ module Epuber
     # @return [Array<Contributor>] authors of book
     #
     attribute :authors,
-              types:        [Contributor, NormalContributor],
-              container:    Array,
-              required:     true,
-              singularize:  true,
+              types: [Contributor, NormalContributor],
+              container: Array,
+              required: true,
+              singularize: true,
               auto_convert: { [String, Hash] => ->(value) { Contributor.from_obj(value, 'aut') } }
 
 
@@ -214,7 +215,7 @@ module Epuber
     # @return [Date] date of book was published
     #
     attribute :published,
-              types:        [Date],
+              types: [Date],
               auto_convert: { String => Date }
 
 
@@ -222,14 +223,14 @@ module Epuber
     # @note Is used only for ibooks versions
     #
     attribute :version,
-              inherited:    true,
-              types:        [Version],
+              inherited: true,
+              types: [Version],
               auto_convert: { [String, Integer, Float] => Version }
 
     # @return [String] build version of book
     #
     attribute :build_version,
-              types:        [Version],
+              types: [Version],
               auto_convert: { [String, Integer, Float] => Version }
 
     # @return [String] base name for output epub file
@@ -249,7 +250,6 @@ module Epuber
     def add_files(*file_paths)
       @default_target.add_files(*file_paths)
     end
-
 
     # Add constant to target, constants can be used within text files
     #

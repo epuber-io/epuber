@@ -140,7 +140,7 @@ module Epuber
           end
 
           xhtml_string = UI.print_step_processing_time('converting to XHTML') do
-             xhtml_doc.to_s
+            xhtml_doc.to_s
           end
 
           # perform transformations

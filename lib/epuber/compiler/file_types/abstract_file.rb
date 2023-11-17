@@ -4,7 +4,6 @@ module Epuber
   class Compiler
     module FileTypes
       class AbstractFile
-
         # @return [String] relative destination path
         #
         attr_accessor :destination_path

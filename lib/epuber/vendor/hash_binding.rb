@@ -12,6 +12,7 @@ module Epuber
     #
     def method_missing(name)
       raise NameError, "Not found value for key #{name}" unless @vars.key?(name)
+
       @vars[name]
     end
 

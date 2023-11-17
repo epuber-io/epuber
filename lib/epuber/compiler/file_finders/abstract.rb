@@ -65,10 +65,10 @@ module Epuber
       STATIC_EXTENSIONS = BINARY_EXTENSIONS + %w(.css .js)
 
       GROUP_EXTENSIONS = {
-        text:   %w(.xhtml .html .bade),
-        image:  %w(.png .jpg .jpeg),
-        font:   %w(.otf .ttf),
-        style:  %w(.css .styl),
+        text: %w(.xhtml .html .bade),
+        image: %w(.png .jpg .jpeg),
+        font: %w(.otf .ttf),
+        style: %w(.css .styl),
         script: %w(.js .coffee),
       }
 
@@ -81,7 +81,6 @@ module Epuber
       }
 
       class Abstract
-
         # @return [String] path where should look for source files
         #
         attr_reader :source_path
@@ -98,7 +97,6 @@ module Epuber
           @source_path_abs = ::File.expand_path(@source_path).unicode_normalize.freeze
           @ignored_patterns = []
         end
-
 
         # @param [Array<Symbol> | Symbol] groups
         #

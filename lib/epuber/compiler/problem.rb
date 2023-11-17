@@ -53,7 +53,7 @@ module Epuber
       def self.caret_symbols(indent, length)
         start_sign = caret_symbol(indent)
         end_sign = if length > 1
-                     caret_symbol(length-2)
+                     caret_symbol(length - 2)
                    else
                      ''
                    end
@@ -74,10 +74,10 @@ module Epuber
         lines = text.split("\n")
 
         line = lines[line_index] || ''
-        matched_text = line[column_index ... column_index + location.length] || ''
+        matched_text = line[column_index...column_index + location.length] || ''
 
-        pre = (lines[0 ... line_index] + [line[0 ... column_index]]).join("\n")
-        post = ([line[column_index + location.length .. line.length]] + (lines[location.line .. lines.count] || [])).join("\n")
+        pre = (lines[0...line_index] + [line[0...column_index]]).join("\n")
+        post = ([line[column_index + location.length..line.length]] + (lines[location.line..lines.count] || [])).join("\n")
 
         [pre, matched_text, post]
       end

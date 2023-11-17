@@ -94,19 +94,19 @@ module Epuber
 
           expected_output = [
             [
-                'some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body',
-                '  </body>',
-                '         ^',
+              'some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body',
+              '  </body>',
+              '         ^',
             ].join("\n").ansi.yellow,
             [
-                'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root',
-                '  </body>',
-                '         ^',
+              'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root',
+              '  </body>',
+              '         ^',
             ].join("\n").ansi.yellow,
             [
-                "some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1",
-                '  </body>',
-                '         ^',
+              "some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1",
+              '  </body>',
+              '         ^',
             ].join("\n").ansi.yellow,
           ].join("\n") + "\n"
 

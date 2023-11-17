@@ -87,7 +87,8 @@ module Epuber
             begin
               @attributes_values[key] = attr.converted_value(value)
             rescue Exception => e
-              UI.warning("Invalid value `#{value}` for attribute `#{name}`, original error `#{e}`", location: caller_locations[1])
+              UI.warning("Invalid value `#{value}` for attribute `#{name}`, original error `#{e}`",
+                         location: caller_locations[1])
             end
           end
         end

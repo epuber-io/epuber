@@ -38,8 +38,8 @@ module Epuber
         Dir.chdir(working_dir)
 
         gitignore_contents = <<~END
-        .DS_Store
-        Bla
+          .DS_Store
+          Bla
         END
         File.write('.gitignore', gitignore_contents)
 

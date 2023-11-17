@@ -12,7 +12,6 @@ require 'epuber/compiler/file_finders/imaginary'
 module Epuber
   class Compiler
     module FileFinders
-
       describe Imaginary do
         it 'support splitting path into components' do
           comps = Imaginary.path_parts('some/path/is/awesome/file.txt')
@@ -77,7 +76,6 @@ module Epuber
             end.to raise_error(FileNotFoundError)
           end
         end
-
       end
     end
   end

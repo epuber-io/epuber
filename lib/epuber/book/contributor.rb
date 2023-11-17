@@ -73,7 +73,6 @@ module Epuber
         @last_name  = last_name
       end
 
-
       # @return [String]
       #
       def pretty_name

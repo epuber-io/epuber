@@ -7,7 +7,6 @@ module Epuber
     require_relative 'file_stat'
 
     class FileDatabase
-
       # @return [Hash<String, Epuber::Compiler::FileStat>]
       #
       attr_accessor :all_files
@@ -130,7 +129,6 @@ module Epuber
           _cleanup_stat_dependency_list(file_paths, next_stat)
         end
       end
-
     end
   end
 end

@@ -2,7 +2,6 @@
 
 module Epuber
   class CheckerTransformerBase
-
     # Type of source value for this checker, valid values are:
     #    :result_text_xhtml_string     just before writing result xhtml to build folder
     #
@@ -41,8 +40,6 @@ module Epuber
       [:run_only_before_release]
     end
 
-
-
     def call(*args)
       raise NotImplementedError, 'You should override this method'
     end
@@ -58,7 +55,6 @@ module Epuber
       {}
     end
 
-
     # @param type [Symbol]
     #
     # @return [Class]
@@ -66,6 +62,7 @@ module Epuber
     def self.class_for_source_type(type)
       checker_class = self.map_source_type__class[type]
       raise "#{self} class not found for type: #{type.inspect}" if checker_class.nil?
+
       checker_class
     end
   end

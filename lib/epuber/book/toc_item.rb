@@ -11,7 +11,7 @@ module Epuber
       #
       attribute :file_request,
                 auto_convert: { String => FileRequest },
-                inherited:    true
+                inherited: true
 
       # @return [String]
       #

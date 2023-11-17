@@ -131,7 +131,8 @@ module Epuber
         if /([^=]+)=?/ =~ name
           attr_name = $1
           location = caller_locations.first
-          raise NameError, "Unknown attribute or method `#{attr_name}` for class `#{self.class}` in file `#{location.path}:#{location.lineno}`"
+          raise NameError,
+                "Unknown attribute or method `#{attr_name}` for class `#{self.class}` in file `#{location.path}:#{location.lineno}`"
         else
           super
         end

@@ -11,16 +11,16 @@ module Epuber
       context '.text_at' do
         it 'can split single line text at start' do
           input = <<~TEXT
-          some text single line
+            some text single line
           TEXT
           location = Problem::Location.new(1, 1, 4)
 
-          expect(Problem.text_at(input, location)).to eq ['', 'some',  ' text single line']
+          expect(Problem.text_at(input, location)).to eq ['', 'some', ' text single line']
         end
 
         it 'can split single line text in middle' do
           input = <<~TEXT
-          some text single line
+            some text single line
           TEXT
           location = Problem::Location.new(1, 6, 4)
 
@@ -29,7 +29,7 @@ module Epuber
 
         it 'can split single line text at end' do
           input = <<~TEXT
-          some text single line
+            some text single line
           TEXT
           location = Problem::Location.new(1, 18, 4)
 
@@ -38,7 +38,7 @@ module Epuber
 
         it 'can split single line text with no length' do
           input = <<~TEXT
-          some text single line
+            some text single line
           TEXT
           location = Problem::Location.new(1, 6)
 
@@ -53,7 +53,9 @@ module Epuber
           TEXT
           location = Problem::Location.new(2, 6, 4)
 
-          expect(Problem.text_at(input, location)).to eq ["some text single line\nsome ", 'text', " single line 2\nsome text single line 3"]
+          expect(Problem.text_at(input,
+                                 location)).to eq ["some text single line\nsome ", 'text',
+                                                   " single line 2\nsome text single line 3"]
         end
       end
 
@@ -67,7 +69,7 @@ module Epuber
 
           location = Problem::Location.new(2, 6, 4)
 
-          expect(Problem.formatted_match_line(input, location)). to eq ['some ', 'text', ' single line 2']
+          expect(Problem.formatted_match_line(input, location)).to eq ['some ', 'text', ' single line 2']
         end
       end
     end

@@ -5,7 +5,6 @@ require_relative '../transformer'
 module Epuber
   class Transformer
     class TextTransformer < Transformer
-
       # @return [String]
       #
       attr_accessor :text
@@ -51,7 +50,8 @@ module Epuber
                    @text.gsub!(pattern, replacement, &block)
                  end
 
-        result = replace_all(pattern, replacement, multiple_times: multiple_times, &block) if multiple_times && !result.nil?
+        result = replace_all(pattern, replacement, multiple_times: multiple_times,
+                             &block) if multiple_times && !result.nil?
         result
       end
     end

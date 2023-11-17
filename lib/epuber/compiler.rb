@@ -159,9 +159,9 @@ module Epuber
     def remove_empty_folders
       Dir.chdir(@file_resolver.destination_path) do
         Dir.glob('**/*')
-          .select { |d| File.directory?(d) }
-          .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
-          .each do |d|
+           .select { |d| File.directory?(d) }
+           .select { |d| (Dir.entries(d) - %w(. ..)).empty? }
+           .each do |d|
           puts "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
           Dir.rmdir(d)
         end
@@ -171,7 +171,9 @@ module Epuber
     # @return nil
     #
     def remove_unnecessary_files
-      unnecessary_paths = @file_resolver.unneeded_files_in_destination.map { |path| File.join(@file_resolver.destination_path, path) }
+      unnecessary_paths = @file_resolver.unneeded_files_in_destination.map { |path|
+        File.join(@file_resolver.destination_path, path)
+      }
       unnecessary_paths.each do |path|
         puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`" if compilation_context.verbose?
 
@@ -240,6 +242,7 @@ module Epuber
       # add missing files to file_resolver
       paths.each do |path|
         next if file_resolver.file_with_source_path(path)
+
         file_resolver.add_file(FileTypes::SourceFile.new(path))
       end
 

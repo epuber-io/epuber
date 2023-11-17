@@ -26,7 +26,9 @@ module Epuber
             __file_resolver: file_resolver,
             __file: self,
             __toc_item: toc_item,
-            __const: Hash.new { |_hash, key| UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0]) }.merge!(target.constants),
+            __const: Hash.new { |_hash, key|
+                       UI.warning("Undefined constant with key `#{key}`", location: caller_locations[0])
+                     }.merge!(target.constants),
           }
 
           should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build? && (!compilation_context.should_write)

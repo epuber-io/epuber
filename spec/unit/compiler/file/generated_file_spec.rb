@@ -11,9 +11,6 @@ require 'epuber/compiler/file_types/generated_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe GeneratedFile do
         include FakeFS::SpecHelpers
 
@@ -29,11 +26,7 @@ module Epuber
           expect(File.exist?('b.txt')).to be_truthy
           expect(File.read('b.txt')).to eq 'some content'
         end
-
       end
-
-
-
     end
   end
 end

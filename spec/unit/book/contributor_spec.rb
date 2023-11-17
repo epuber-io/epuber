@@ -47,7 +47,7 @@ module Epuber
       it 'parse Contributor from Hash with symbols :file_as and :pretty_name' do
         hash = {
           pretty_name: 'Jason Fried',
-          file_as:     'FRIED, Jason',
+          file_as: 'FRIED, Jason',
         }
 
         contributor = Contributor.from_obj(hash, 'aut')
@@ -60,7 +60,7 @@ module Epuber
       it 'parse Contributor from Hash with symbols :first_name and :last_name' do
         hash = {
           first_name: 'Jason',
-          last_name:  'Fried',
+          last_name: 'Fried',
         }
 
         contributor = Contributor.from_obj(hash, 'aut')
@@ -87,6 +87,5 @@ module Epuber
         expect(contributor.last_name).to eq 'Hansson'
       end
     end
-
   end
 end

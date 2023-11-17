@@ -6,7 +6,6 @@ module Epuber
       require_relative 'generated_file'
 
       class OPFFile < GeneratedFile
-
         def initialize
           super
 

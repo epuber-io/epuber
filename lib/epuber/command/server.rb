@@ -13,7 +13,7 @@ module Epuber
 
       def self.options
         [
-          ['--open',   'Opens the web page in default web browser, working only on OS X'],
+          ['--open', 'Opens the web page in default web browser, working only on OS X'],
         ].concat(super)
       end
 

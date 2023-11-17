@@ -35,7 +35,8 @@ module Epuber
     def self.error(message, location: nil)
       _clear_processing_line_for_new_output do
         $stdout.puts(_format_message(:error, message, location: location))
-        _print_backtrace(location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations, location: location) if current_command && current_command.verbose?
+        _print_backtrace(location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations,
+                         location: location) if current_command && current_command.verbose?
       end
     end
 
@@ -47,10 +48,6 @@ module Epuber
         $stdout.puts(_format_message(:warning, message, location: location))
       end
     end
-
-
-
-
 
     # @param [#to_s] problem some problem, object just have to know to convert self into string with method #to_s
     #
@@ -154,12 +151,12 @@ module Epuber
     #
     def self._color_from_level(level)
       case level
-        when :error;   :red
-        when :warning; :yellow
-        when :normal;  :white
-        when :debug;   :blue
-        else
-          raise "Unknown output level #{level}"
+      when :error;   :red
+      when :warning; :yellow
+      when :normal;  :white
+      when :debug;   :blue
+      else
+        raise "Unknown output level #{level}"
       end
     end
 

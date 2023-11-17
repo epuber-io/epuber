@@ -4,20 +4,20 @@ require_relative '../../spec_helper'
 
 module Epuber
   module DSL
+    class TestTreeObject < TreeObject
+      attribute :with_default_value,
+                inherited: true,
+                required: true,
+                default_value: ''
+
+      attribute :default_convert,
+                inherited: true,
+                required: true,
+                default_value: 1,
+                auto_convert: { [Float, Integer] => String }
+    end
+
     describe TreeObject do
-      class TestTreeObject < TreeObject
-        attribute :with_default_value,
-                  inherited: true,
-                  required: true,
-                  default_value: ''
-
-        attribute :default_convert,
-                  inherited: true,
-                  required: true,
-                  default_value: 1,
-                  auto_convert: { [Float, Integer] => String }
-      end
-
       before do
         @root = TestTreeObject.new
         @item1 = @root.create_child_item do |item|

@@ -10,9 +10,6 @@ require 'epuber/compiler/file_types/static_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe StaticFile do
         include FakeFS::SpecHelpers
 
@@ -42,11 +39,7 @@ module Epuber
           expect(File.exist?('b.txt')).to be_truthy
           expect(File.read('b.txt')).to eq 'some content, so we can compare it'
         end
-
       end
-
-
-
     end
   end
 end

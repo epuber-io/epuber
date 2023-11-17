@@ -23,7 +23,6 @@ require_relative 'third_party/bower'
 
 
 module Epuber
-
   # API:
   # [LATER]   /file/<path-or-pattern> -- displays pretty file (image, text file) (for example: /file/text/s01.xhtml or /file/text/s01.bade)
   #
@@ -46,7 +45,7 @@ module Epuber
           body = [body]
         end
 
-        [500, { 'Content-Type'   => content_type,
+        [500, { 'Content-Type' => content_type,
                 'Content-Length' => Rack::Utils.bytesize(body.join).to_s },
          body]
       end
@@ -183,7 +182,6 @@ module Epuber
       self.class.build_path
     end
 
-
     # @param level [Symbol]
     # @param message [String]
     #
@@ -238,6 +236,7 @@ module Epuber
     def self.relative_path_to_book_file(path)
       file = file_resolver.file_with_source_path(path)
       return if file.nil?
+
       file.pkg_destination_path
     end
 
@@ -302,14 +301,16 @@ module Epuber
       head = html_doc.at_css('head')
       node = case type
              when :style
-               html_doc.create_element('link',  href: "/server/raw/#{file_path}" ,rel: 'stylesheet', type: 'text/css')
+               html_doc.create_element('link', href: "/server/raw/#{file_path}", rel: 'stylesheet', type: 'text/css')
              when :js
                html_doc.create_element('script', src: "/server/raw/#{file_path}", type: 'text/javascript')
              else
                raise "Unknown file type `#{type}`"
              end
 
-      return if head.css('script, link').any? { |n| (!n['href'].nil? && n['href'] == node['href']) || (!n['src'].nil? && n['src'] == node['src']) }
+      return if head.css('script, link').any? { |n|
+                  (!n['href'].nil? && n['href'] == node['href']) || (!n['src'].nil? && n['src'] == node['src'])
+                }
 
       head.add_child(node)
     end
@@ -388,6 +389,7 @@ module Epuber
     def self.notify_clients(type, data = nil)
       _log :info, "Notifying clients with type #{type.inspect}"
       raise "Not known type `#{type}`" unless [:styles, :reload, :compile_start, :compile_end].include?(type)
+
       message = {
         name: type,
       }
@@ -441,9 +443,9 @@ module Epuber
         changed.compact!
 
         # if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
-          # notify_clients(:styles, changed)
+        # notify_clients(:styles, changed)
         # else
-          notify_clients(:reload, changed)
+        notify_clients(:reload, changed)
         # end
       end
     end
@@ -460,12 +462,12 @@ module Epuber
         ws.onopen do
           sockets << ws
 
-          ws.send({name: :hello}.to_json)
+          ws.send({ name: :hello }.to_json)
 
           thread = Thread.new do
             loop do
               sleep(10)
-              ws.send({name: :heartbeat}.to_json)
+              ws.send({ name: :heartbeat }.to_json)
             end
           end
         end
@@ -571,11 +573,11 @@ module Epuber
         full_path = File.expand_path(path, build_path)
 
         case File.extname(full_path)
-          when '.xhtml'
-            content_type :xhtml
-            handle_xhtml_file(full_path)
-          else
-            handle_file(full_path)
+        when '.xhtml'
+          content_type :xhtml
+          handle_xhtml_file(full_path)
+        else
+          handle_file(full_path)
         end
       end
     end
@@ -621,6 +623,7 @@ module Epuber
     get '/raw/*' do
       path = find_file
       next not_found if path.nil?
+
       handle_file(File.expand_path(path, build_path))
     end
 

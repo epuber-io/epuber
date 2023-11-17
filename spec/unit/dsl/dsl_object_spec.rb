@@ -6,14 +6,32 @@ require_relative '../../spec_helper'
 
 module Epuber
   module DSL
+    class TestClass < Object
+      attribute :optional_string
+      attribute :optional_number,
+                types: [Integer]
+    end
+
+    class TestRequiredClass < Object
+      attribute :required_string,
+                required: true
+    end
+
+    class TestAutoClass < Object
+      attribute :simple,
+                types: [Date],
+                auto_convert: { String => Date }
+
+      attribute :lambda,
+                types: [Integer],
+                auto_convert: { String => ->(str) { str.to_i } }
+
+      attribute :multi,
+                auto_convert: { [Integer, Regexp] => ->(str) { str.to_s } }
+    end
+
     describe Object do
       context 'simple attributes' do
-        class TestClass < Object
-          attribute :optional_string
-          attribute :optional_number,
-                    types: [Integer]
-        end
-
         before do
           @example = TestClass.new
         end
@@ -39,11 +57,6 @@ module Epuber
       end
 
       context 'required attributes' do
-        class TestRequiredClass < Object
-          attribute :required_string,
-                    required: true
-        end
-
         before do
           @example = TestRequiredClass.new
         end
@@ -64,19 +77,6 @@ module Epuber
       end
 
       context 'auto conversion' do
-        class TestAutoClass < Object
-          attribute :simple,
-                    types:        [Date],
-                    auto_convert: { String => Date }
-
-          attribute :lambda,
-                    types:        [Integer],
-                    auto_convert: { String => ->(str) { str.to_i } }
-
-          attribute :multi,
-                    auto_convert: { [Integer, Regexp] => ->(str) { str.to_s } }
-        end
-
         before do
           @sut = TestAutoClass.new
         end

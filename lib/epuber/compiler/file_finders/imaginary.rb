@@ -83,7 +83,6 @@ module Epuber
           make_dir_p(path)[file_name] = FileEntry.new(file_name, file_path)
         end
 
-
         def __core_find_files_from_pattern(pattern)
           parts = self.class.path_parts(pattern)
           found_entries = find_recurser(root, parts).flatten
@@ -117,25 +116,25 @@ module Epuber
           return [] if pattern.nil?
 
           matches         = case pattern
-                              when '**'
-                                case parts
-                                  when ['*']
-                                    parts = [] # end recursion
-                                    directories_under(dir).map do |d|
-                                      d.entries.select do |f|
-                                        (f.is_a?(FileEntry) || f.is_a?(DirEntry)) &&
-                                          f.name.match(/\A(?!\.)/)
-                                      end
-                                    end.flatten.uniq
-                                  when []
-                                    parts = [] # end recursion
-                                    dir.entries.values.flatten.uniq
-                                  else
-                                    directories_under(dir)
-                                end
+                            when '**'
+                              case parts
+                              when ['*']
+                                parts = [] # end recursion
+                                directories_under(dir).map do |d|
+                                  d.entries.select do |f|
+                                    (f.is_a?(FileEntry) || f.is_a?(DirEntry)) &&
+                                      f.name.match(/\A(?!\.)/)
+                                  end
+                                end.flatten.uniq
+                              when []
+                                parts = [] # end recursion
+                                dir.entries.values.flatten.uniq
                               else
-                                regex_body = pattern_to_regex(pattern)
-                                dir.entries.reject { |k, _v| /\A#{regex_body}\Z/ !~ k }.values
+                                directories_under(dir)
+                              end
+                            else
+                              regex_body = pattern_to_regex(pattern)
+                              dir.entries.reject { |k, _v| /\A#{regex_body}\Z/ !~ k }.values
                             end
 
           if parts.empty? # we're done recursing
@@ -156,13 +155,13 @@ module Epuber
 
         def pattern_to_regex(pattern)
           pattern.gsub('.', '\.')
-            .gsub('?', '.')
-            .gsub('*', '.*')
-            .gsub('(', '\(')
-            .gsub(')', '\)')
-            .gsub(/\{(.*?)\}/) do
-              "(#{Regexp.last_match[1].gsub(',', '|')})"
-            end
+                 .gsub('?', '.')
+                 .gsub('*', '.*')
+                 .gsub('(', '\(')
+                 .gsub(')', '\)')
+                 .gsub(/\{(.*?)\}/) do
+            "(#{Regexp.last_match[1].gsub(',', '|')})"
+          end
             .gsub(/\A\./, '(?!\.).')
         end
       end

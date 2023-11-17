@@ -14,6 +14,7 @@ module FakeFS
   module FileUtils
     def uptodate?(new, old_list)
       return false unless File.exist?(new)
+
       new_time = File.mtime(new)
       old_list.each do |old|
         if File.exist?(old)

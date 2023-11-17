@@ -53,10 +53,13 @@ module Epuber
 
         toc = nav_xml.at_css('html > body > nav[epub|type="toc"]')
         expect(toc.css('li > a').map { |a| a['href'] }).to contain_exactly 'txt1.xhtml', 'txt2.xhtml', 'txt3.xhtml'
-        expect(toc.css('li > a').map(&:inner_html)).to contain_exactly 'Text 1', 'Text 2, awesome!', 'Text 3, <strong>COOL</strong>'
+        expect(toc.css('li > a').map(&:inner_html)).to contain_exactly 'Text 1', 'Text 2, awesome!',
+                                                                       'Text 3, <strong>COOL</strong>'
 
         landmarks = nav_xml.at_css('html > body > nav[epub|type="landmarks"]')
-        expect(landmarks.css('li > a').map { |a| a['epub:type'] }).to contain_exactly 'bodymatter', 'ibooks:reader-start-page'
+        expect(landmarks.css('li > a').map { |a|
+                 a['epub:type']
+               }).to contain_exactly 'bodymatter', 'ibooks:reader-start-page'
         expect(landmarks.css('li > a').map { |a| a['href'] }).to contain_exactly 'txt1.xhtml', 'txt1.xhtml'
       end
 

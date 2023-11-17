@@ -9,7 +9,6 @@ module Epuber
     require_relative 'generator'
 
     class NavGenerator < Generator
-
       NCX_NAMESPACES = {
         'xmlns' => 'http://www.daisy.org/z3986/2005/ncx/',
       }.freeze
@@ -26,10 +25,10 @@ module Epuber
 
       # resource page http://www.idpf.org/epub/301/spec/epub-contentdocs.html#sec-xhtml-nav-def-types-landmarks
       LANDMARKS_MAP = {
-        landmark_cover:      { type: 'cover', text: 'Cover page' },
+        landmark_cover: { type: 'cover', text: 'Cover page' },
         landmark_start_page: { type: %w(bodymatter ibooks:reader-start-page), text: 'Start Reading' },
-        landmark_copyright:  { type: 'copyright-page', text: 'Copyright page' },
-        landmark_toc:        { type: 'toc', text: 'Table of contents' },
+        landmark_copyright: { type: 'copyright-page', text: 'Copyright page' },
+        landmark_toc: { type: 'toc', text: 'Table of contents' },
       }.freeze
 
       # Generates XML for toc document, the structure differs depend on epub_version

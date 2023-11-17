@@ -2,7 +2,6 @@
 
 module Epuber
   module Helper
-
     # @param [Book::TocItem] toc_item
     # @param [Compiler::FileResolver] file_resolver
     # @param [String] context_path

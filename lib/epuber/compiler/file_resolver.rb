@@ -184,7 +184,7 @@ module Epuber
         end
 
         if file_request.only_one
-          files.first  # @request_to_files always returns array, see #initialize method
+          files.first # @request_to_files always returns array, see #initialize method
         else
           files
         end
@@ -266,7 +266,8 @@ module Epuber
                       elsif !file.destination_path.nil?
                         file.destination_path
                       else
-                        raise ResolveError, "What should I do with file that doesn't have source path or destination path? file: #{file.inspect}"
+                        raise ResolveError,
+                              "What should I do with file that doesn't have source path or destination path? file: #{file.inspect}"
                       end
 
           file.destination_path = dest_path
@@ -281,17 +282,17 @@ module Epuber
       #
       def self.file_class_for(extname)
         mapping = {
-          '.styl'  => FileTypes::StylusFile,
+          '.styl' => FileTypes::StylusFile,
 
           '.coffee' => FileTypes::CoffeeScriptFile,
 
-          '.bade'  => FileTypes::BadeFile,
+          '.bade' => FileTypes::BadeFile,
           '.xhtml' => FileTypes::XHTMLFile,
-          '.html'  => FileTypes::XHTMLFile,
+          '.html' => FileTypes::XHTMLFile,
 
-          '.jpg'   => FileTypes::ImageFile,
-          '.jpeg'  => FileTypes::ImageFile,
-          '.png'   => FileTypes::ImageFile,
+          '.jpg' => FileTypes::ImageFile,
+          '.jpeg' => FileTypes::ImageFile,
+          '.png' => FileTypes::ImageFile,
         }
 
         mapping[extname] || FileTypes::StaticFile
@@ -304,12 +305,12 @@ module Epuber
       #
       def self.path_comps_for(root_path = nil, path_type)
         case path_type
-          when :spine, :manifest
-            Array(root_path) + [Compiler::EPUB_CONTENT_FOLDER]
-          when :package
-            Array(root_path)
-          else
-            nil
+        when :spine, :manifest
+          Array(root_path) + [Compiler::EPUB_CONTENT_FOLDER]
+        when :package
+          Array(root_path)
+        else
+          nil
         end
       end
     end

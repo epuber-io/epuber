@@ -66,9 +66,9 @@ module Epuber
         raise AttributeError, "other must be class of #{self.class}" unless other.is_a?(FileStat)
 
         file_path == other.file_path &&
-             size == other.size &&
-            mtime == other.mtime &&
-            ctime == other.ctime
+          size == other.size &&
+          mtime == other.mtime &&
+          ctime == other.ctime
       end
     end
   end

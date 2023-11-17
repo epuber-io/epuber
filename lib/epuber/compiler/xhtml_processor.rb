@@ -86,7 +86,6 @@ module Epuber
         xml
       end
 
-
       # Method to add all missing items in XML root
       #
       # Required items:
@@ -151,7 +150,7 @@ module Epuber
       # @return nil
       #
       def self.add_styles(xhtml_doc, styles)
-        head  = xhtml_doc.at_css('html > head')
+        head = xhtml_doc.at_css('html > head')
         old_links = head.css('link[rel="stylesheet"]').map { |node| node['href'] }
 
         links_to_add = styles - old_links
@@ -169,7 +168,7 @@ module Epuber
       # @return nil
       #
       def self.add_scripts(xhtml_doc, scripts)
-        head  = xhtml_doc.at_css('html > head')
+        head = xhtml_doc.at_css('html > head')
         old_links = head.css('script').map { |node| node['src'] }
 
         links_to_add = scripts - old_links

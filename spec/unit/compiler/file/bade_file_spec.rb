@@ -10,9 +10,6 @@ require 'epuber/compiler/file_types/bade_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe BadeFile do
         include FakeFS::SpecHelpers
 
@@ -106,12 +103,7 @@ import 'def.bade'
 
           expect(file.find_dependencies).to contain_exactly 'abc.bade', 'def.bade'
         end
-
-
       end
-
-
-
     end
   end
 end

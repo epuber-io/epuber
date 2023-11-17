@@ -12,12 +12,11 @@ require 'epuber/compiler/file_types/stylus_file'
 
 module Epuber
   class Compiler
-
     describe FileResolver do
       include FakeFS::SpecHelpers
 
       before do
-        FileUtils.mkdir_p(%w(source dest))
+        FileUtils.mkdir_p(%w[source dest])
         @sut = FileResolver.new('/source', '/dest')
       end
 
@@ -97,7 +96,8 @@ module Epuber
 
         @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
 
-        expect(@sut.files.map(&:source_path)).to contain_exactly 'file1.xhtml', 'file2.xhtml', 'file3.xhtml', 'file4.xhtml'
+        expect(@sut.files.map(&:source_path)).to contain_exactly 'file1.xhtml', 'file2.xhtml', 'file3.xhtml',
+                                                                 'file4.xhtml'
       end
 
       it 'can calculate path depend on path type' do
@@ -114,7 +114,8 @@ module Epuber
 
       it 'support searching files in destination folder' do
         FileUtils.mkdir_p('/source/folder')
-        FileUtils.touch(%w(/source/folder/file1.xhtml /source/folder/file2.xhtml /source/folder/file3.xhtml /source/folder/file4.xhtml))
+        FileUtils.touch(%w(/source/folder/file1.xhtml /source/folder/file2.xhtml /source/folder/file3.xhtml
+                           /source/folder/file4.xhtml))
         FileUtils.touch(%w(/source/image1.png /source/image2.jpg /source/image3.jpg /source/image4.jpg))
 
         @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
@@ -259,7 +260,5 @@ module Epuber
         end
       end
     end
-
-
   end
 end

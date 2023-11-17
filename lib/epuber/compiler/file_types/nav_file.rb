@@ -6,7 +6,6 @@ module Epuber
       require_relative 'generated_file'
 
       class NavFile < GeneratedFile
-
         # @return [Epuber::Version]
         #
         attr_reader :epub_version

@@ -10,7 +10,7 @@ module Epuber
       def initialize(parent = nil)
         super()
 
-        @parent      = parent
+        @parent = parent
         @sub_items = []
 
         parent.sub_items << self unless parent.nil?

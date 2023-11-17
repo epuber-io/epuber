@@ -10,9 +10,6 @@ require 'epuber/compiler/file_types/abstract_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe AbstractFile do
         include FakeFS::SpecHelpers
 
@@ -30,9 +27,6 @@ module Epuber
           end
         end
       end
-
-
-
     end
   end
 end

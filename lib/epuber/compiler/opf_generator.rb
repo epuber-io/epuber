@@ -11,20 +11,19 @@ require_relative '../book/toc_item'
 module Epuber
   class Compiler
     class OPFGenerator < Generator
-
       EPUB2_NAMESPACES = {
-        'xmlns'     => 'http://www.idpf.org/2007/opf',
-        'xmlns:dc'  => 'http://purl.org/dc/elements/1.1/',
+        'xmlns' => 'http://www.idpf.org/2007/opf',
+        'xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
         'xmlns:opf' => 'http://www.idpf.org/2007/opf',
       }.freeze
 
       EPUB3_NAMESPACES = {
-        'prefix'     => 'rendition: http://www.idpf.org/vocab/rendition/',
+        'prefix' => 'rendition: http://www.idpf.org/vocab/rendition/',
         'xmlns:epub' => 'http://www.idpf.org/2007/ops',
       }.freeze
 
       IBOOKS_NAMESPACES = {
-        'prefix'       => 'rendition: http://www.idpf.org/vocab/rendition/# ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/',
+        'prefix' => 'rendition: http://www.idpf.org/vocab/rendition/# ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/',
         'xmlns:ibooks' => 'http://apple.com/ibooks/html-extensions',
       }.freeze
 
@@ -32,32 +31,32 @@ module Epuber
       LANDMARKS_MAP = {
 
         # my favorite
-        landmark_cover:      'cover',
+        landmark_cover: 'cover',
         landmark_start_page: 'text',
-        landmark_copyright:  'copyright-page',
-        landmark_toc:        'toc',
+        landmark_copyright: 'copyright-page',
+        landmark_toc: 'toc',
 
         # others
-        landmark_title:                 'title-page',
-        landmark_index:                 'index',
-        landmark_glossary:              'glossary',
-        landmark_acknowledgements:      'acknowledgements',
-        landmark_bibliography:          'bibliography',
-        landmark_colophon:              'colophon',
-        landmark_dedication:            'dedication',
-        landmark_epigraph:              'epigraph',
-        landmark_foreword:              'foreword',
+        landmark_title: 'title-page',
+        landmark_index: 'index',
+        landmark_glossary: 'glossary',
+        landmark_acknowledgements: 'acknowledgements',
+        landmark_bibliography: 'bibliography',
+        landmark_colophon: 'colophon',
+        landmark_dedication: 'dedication',
+        landmark_epigraph: 'epigraph',
+        landmark_foreword: 'foreword',
         landmark_list_of_illustrations: 'loi',
-        landmark_list_of_tables:        'lot',
-        landmark_notes:                 'notes',
-        landmark_preface:               'preface',
+        landmark_list_of_tables: 'lot',
+        landmark_notes: 'notes',
+        landmark_preface: 'preface',
 
       }.freeze
 
       PROPERTIES_MAP = {
         cover_image: 'cover-image',
-        navigation:  'nav',
-        scripted:    'scripted',
+        navigation: 'nav',
+        scripted: 'scripted',
         remote_resources: 'remote-resources',
         mathml: 'mathml',
       }.freeze

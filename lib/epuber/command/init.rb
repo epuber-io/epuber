@@ -50,9 +50,9 @@ module Epuber
       private
 
       def print_good_bye(book_id)
-        puts <<-END.ansi.green
-Project initialized, please review #{book_id}.bookspec file, remove comments and fill some attributes like book title.
-END
+        puts <<~END.ansi.green
+          Project initialized, please review #{book_id}.bookspec file, remove comments and fill some attributes like book title.
+        END
       end
 
       # Creates <book-id>.bookspec file from template

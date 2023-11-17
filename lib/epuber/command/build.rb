@@ -68,8 +68,8 @@ module Epuber
             compiler = Epuber::Compiler.new(book, target)
             build_path = Epuber::Config.instance.release_build_path(target)
             compiler.compile(build_path, check: true, write: @should_write,
-                                       release: true, verbose: verbose?,
-                                     use_cache: false)
+                                         release: true, verbose: verbose?,
+                                         use_cache: false)
 
             archive_name = compiler.epub_name
 
@@ -87,7 +87,8 @@ module Epuber
           targets.each do |target|
             compiler = Epuber::Compiler.new(book, target)
             build_path = Epuber::Config.instance.build_path(target)
-            compiler.compile(build_path, check: @should_check, write: @should_write, verbose: verbose?, use_cache: @use_cache)
+            compiler.compile(build_path, check: @should_check, write: @should_write, verbose: verbose?,
+                                         use_cache: @use_cache)
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
             Epubcheck.check(archive_path) if @should_check

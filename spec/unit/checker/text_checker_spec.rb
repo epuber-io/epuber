@@ -8,8 +8,6 @@ require 'epuber/checker/text_checker'
 module Epuber
   class Checker
     class TextChecker
-
-
       describe MatchProblem do
         context '#to_s' do
           it 'can format simple problem' do
@@ -78,7 +76,7 @@ module Epuber
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 29 --- Some message'
             expect(sut.shift).to eq "          some text containing some #{'problem'.ansi.red}"
-            expect(sut.shift).to eq    '                                    ^     ^'
+            expect(sut.shift).to eq '                                    ^     ^'
             expect(sut).to be_empty
           end
 
@@ -127,8 +125,6 @@ some text containing some problem'
           end
         end
       end
-
-
     end
   end
 end

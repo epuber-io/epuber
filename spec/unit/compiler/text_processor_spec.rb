@@ -11,8 +11,6 @@ require 'epuber/compiler/xhtml_processor'
 
 module Epuber
   class Compiler
-
-
     describe XHTMLProcessor do
       include FakeFS::SpecHelpers
 
@@ -172,7 +170,7 @@ module Epuber
 
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def'
+          expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def'
         end
 
         it 'adds missing links to styles' do
@@ -188,7 +186,7 @@ module Epuber
 
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def', 'qwe'
+          expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def', 'qwe'
         end
 
         it 'will not add duplicated items' do
@@ -200,7 +198,7 @@ module Epuber
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
           XHTMLProcessor.add_styles(doc, ['abc', 'def'])
 
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'abc', 'def'
+          expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def'
         end
 
         it 'will not add style that is already there' do
@@ -216,7 +214,7 @@ module Epuber
 
           XHTMLProcessor.add_styles(doc, ['qwe'])
 
-          expect(doc.css('link[rel="stylesheet"]').map {|node| node['href']}).to contain_exactly 'qwe'
+          expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'qwe'
         end
       end
 
@@ -232,7 +230,7 @@ module Epuber
           XHTMLProcessor.add_scripts(doc, %w(abc def))
 
           # Then
-          expect(doc.css('script').map {|node| node['src']}).to contain_exactly 'abc', 'def'
+          expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def'
         end
 
         it 'adds missing links to styles' do
@@ -248,7 +246,7 @@ module Epuber
 
           XHTMLProcessor.add_scripts(doc, %w(abc def))
 
-          expect(doc.css('script').map {|node| node['src']}).to contain_exactly 'abc', 'def', 'qwe'
+          expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def', 'qwe'
         end
 
         it 'will not add duplicated items' do
@@ -260,7 +258,7 @@ module Epuber
           XHTMLProcessor.add_scripts(doc, %w(abc def))
           XHTMLProcessor.add_scripts(doc, %w(abc def))
 
-          expect(doc.css('script').map {|node| node['src']}).to contain_exactly 'abc', 'def'
+          expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def'
         end
       end
 
@@ -418,7 +416,8 @@ module Epuber
 
           links = XHTMLProcessor.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
 
-          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.txt#abc"/><a href="abc/ref10.xhtml"/></div>'
+          expect(doc.root.to_xml(indent: 0,
+                                 save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.txt#abc"/><a href="abc/ref10.xhtml"/></div>'
           expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.txt#abc'), URI('abc/ref10.xhtml')
         end
 
@@ -470,7 +469,8 @@ module Epuber
 
           links = XHTMLProcessor.resolve_links(doc, 'root.xhtml', @finder)
 
-          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.xhtml#abc"/><a href="folder/ref10.xhtml"/></div>'
+          expect(doc.root.to_xml(indent: 0,
+                                 save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.xhtml#abc"/><a href="folder/ref10.xhtml"/></div>'
           expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.xhtml#abc'), URI('folder/ref10.xhtml')
         end
 
@@ -480,7 +480,8 @@ module Epuber
 
           links = XHTMLProcessor.resolve_links(doc, 'root.xhtml', @finder)
 
-          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq '<map><area href="ref1.xhtml"/><area href="ref2.xhtml#abc"/><area href="folder/ref10.xhtml"/></map>'
+          expect(doc.root.to_xml(indent: 0,
+                                 save_with: 0)).to eq '<map><area href="ref1.xhtml"/><area href="ref2.xhtml#abc"/><area href="folder/ref10.xhtml"/></map>'
           expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.xhtml#abc'), URI('folder/ref10.xhtml')
         end
       end
@@ -688,7 +689,5 @@ module Epuber
         end
       end
     end
-
-
   end
 end

@@ -7,7 +7,6 @@ require 'epuber/compiler'
 
 module Epuber
   class Compiler
-
     describe FileDatabase do
       include FakeFS::SpecHelpers
 
@@ -255,6 +254,5 @@ module Epuber
         end
       end
     end
-
   end
 end

@@ -10,10 +10,7 @@ require 'epuber/compiler/file_types/stylus_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
       describe StylusFile do
-
         context 'FakeFS parts' do
           include FakeFS::SpecHelpers
 

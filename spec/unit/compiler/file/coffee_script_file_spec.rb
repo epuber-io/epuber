@@ -10,9 +10,6 @@ require 'epuber/compiler/file_types/coffee_script_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe CoffeeScriptFile do
         before do
           @tmp_dir = Dir.mktmpdir
@@ -68,11 +65,7 @@ module Epuber
 
           expect(File.read(dest_path)).to eq expected_content
         end
-
       end
-
-
-
     end
   end
 end

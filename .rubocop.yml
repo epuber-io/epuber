@@ -1,3 +1,5 @@
+AllCops:
+  TargetRubyVersion: 2.5
 
 Style/Encoding:
   Enabled: true
@@ -31,6 +33,8 @@ Metrics/ClassLength:
   Max: 300
 
 Metrics/BlockLength:
+  Enabled: false
+Metrics/ModuleLength:
   Enabled: false
 
 # It will be obvious which code is complex, Rubocop should only lint simple

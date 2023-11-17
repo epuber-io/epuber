@@ -221,6 +221,7 @@ module Epuber
           validate_type(value)
         rescue StandardError
           raise if @auto_convert.nil?
+
           dest_class = @auto_convert[value.class]
 
           if dest_class.nil?
@@ -241,7 +242,8 @@ module Epuber
           elsif dest_class.respond_to?(:new)
             return dest_class.new(value)
           else
-            raise StandardError, "Object/class #{dest_class} doesn't support any convert method (#call, .parse or implicit .new)"
+            raise StandardError,
+                  "Object/class #{dest_class} doesn't support any convert method (#call, .parse or implicit .new)"
           end
         end
 

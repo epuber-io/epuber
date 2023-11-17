@@ -68,7 +68,6 @@ module Epuber
         @book || (parent && parent.book)
       end
 
-
       # Create new sub_target with name
       #
       # @param [String] name
@@ -158,8 +157,8 @@ module Epuber
       # @return [String] version of result epub
       #
       attribute :epub_version,
-                required:     true,
-                inherited:    true,
+                required: true,
+                inherited: true,
                 auto_convert: { [String, Integer, Float] => Version },
                 default_value: 3.0
 
@@ -176,38 +175,40 @@ module Epuber
       # @return [String] target will use custom font (for iBooks only)
       #
       attribute :custom_fonts,
-                types:     [TrueClass, FalseClass],
+                types: [TrueClass, FalseClass],
                 inherited: true
 
       # @return [Bool] hint for compiler to add some iBooks related stuff
       #
       attribute :is_ibooks,
-                types:     [TrueClass, FalseClass],
+                types: [TrueClass, FalseClass],
                 inherited: true
 
       # @return [Bool] whether the target uses fixed layout
       #
       attribute :fixed_layout,
-                types:     [TrueClass, FalseClass],
+                types: [TrueClass, FalseClass],
                 inherited: true
 
       # @return [FileRequest] file request to cover image
       #
       attribute :cover_image,
-                types:        [FileRequest],
-                inherited:    true,
-                auto_convert: { [String] => ->(value) { FileRequest.new(value, group: :image, properties: [:cover_image]) } }
+                types: [FileRequest],
+                inherited: true,
+                auto_convert: { [String] => ->(value) {
+                                              FileRequest.new(value, group: :image, properties: [:cover_image])
+                                            } }
 
       # @return [Size] size of view port, mainly this is used for fixed layout
       #
       attribute :default_viewport,
-                types:     [Size],
+                types: [Size],
                 inherited: true
 
       # @return [Bool] whether the target should create mobi
       #
       attribute :create_mobi,
-                types:     [TrueClass, FalseClass],
+                types: [TrueClass, FalseClass],
                 inherited: true
 
       # @return [Bool] allows to create abstract targets that are only used as template for other targets
@@ -263,7 +264,6 @@ module Epuber
           @constants[key] = value
         end
       end
-
 
       # @param file_paths [Array<String>]
       #

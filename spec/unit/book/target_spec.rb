@@ -56,20 +56,20 @@ module Epuber
       context '#add_const' do
         it 'supports adding one key with key, value way' do
           @root.add_const :key, 'value'
-          expect(@root.constants).to eq({key: 'value'})
+          expect(@root.constants).to eq({ key: 'value' })
         end
 
         it 'supports adding one key with key: value way' do
           @root.add_const :key => 'value'
           @root.add_const key2: 'value'
-          expect(@root.constants).to eq({key: 'value', key2: 'value'})
+          expect(@root.constants).to eq({ key: 'value', key2: 'value' })
         end
 
         it 'supports adding multiple keys with key: value way' do
           @root.add_const key: 'value',
                           key2: 'value',
                           key3: 'value'
-          expect(@root.constants).to eq({key: 'value', key2: 'value', key3: 'value'})
+          expect(@root.constants).to eq({ key: 'value', key2: 'value', key3: 'value' })
         end
       end
 

@@ -10,9 +10,6 @@ require 'epuber/compiler/file_types/image_file'
 module Epuber
   class Compiler
     module FileTypes
-
-
-
       describe ImageFile do
         before do
           @tmp_dir = Dir.mktmpdir
@@ -72,9 +69,6 @@ module Epuber
           FileUtils.remove_entry(@tmp_dir)
         end
       end
-
-
-
     end
   end
 end

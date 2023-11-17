@@ -10,7 +10,6 @@ require 'epuber/compiler'
 
 module Epuber
   class Compiler
-
     describe FileFinders do
       include FakeFS::SpecHelpers
 
@@ -23,17 +22,18 @@ module Epuber
 
         it 'can handle to_s for nil groups' do
           expect do
-            FileFinders::MultipleFilesFoundError.new('some_pattern*', nil, '/some_context_path/aaa', ['abc', 'def']).to_s
+            FileFinders::MultipleFilesFoundError.new('some_pattern*', nil, '/some_context_path/aaa',
+                                                     ['abc', 'def']).to_s
           end.to_not raise_error
         end
 
         it 'can handle to_s for one group' do
           expect do
-            FileFinders::MultipleFilesFoundError.new('some_pattern*', :text, '/some_context_path/aaa', ['abc', 'def']).to_s
+            FileFinders::MultipleFilesFoundError.new('some_pattern*', :text, '/some_context_path/aaa',
+                                                     ['abc', 'def']).to_s
           end.to_not raise_error
         end
       end
-
     end
   end
 end

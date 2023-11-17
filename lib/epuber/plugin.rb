@@ -97,7 +97,6 @@ module Epuber
       end.flatten
     end
 
-
     # @return [Array<Checker>]
     #
     def checkers
