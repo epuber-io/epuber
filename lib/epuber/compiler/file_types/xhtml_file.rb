@@ -178,7 +178,7 @@ module Epuber
         # @param [Hash<String, XHTMLFile>] global_ids
         #
         def process_global_ids(compilation_context, global_ids)
-          return if self.global_ids.empty? || global_links.empty?
+          return if self.global_ids.empty? && global_links.empty?
 
           xhtml_doc = XHTMLProcessor.xml_document_from_string(File.read(final_destination_path), final_destination_path)
 
