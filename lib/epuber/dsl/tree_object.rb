@@ -68,8 +68,8 @@ module Epuber
       #
       # @return [self]
       #
-      def create_child_item(*args, **kwargs)
-        child = self.class.new(*args, **kwargs)
+      def create_child_item(*args)
+        child = self.class.new(*args)
 
         parent_object_before = self.class.current_parent_object
 
