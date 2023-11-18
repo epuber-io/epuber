@@ -38,7 +38,7 @@ module Epuber
         RUBY
 
         expect do
-          Epuber::Command.run(%w[build])
+          Epuber::Command.run(%w[build --release])
         end.to raise_error(SystemExit)
       end
     end
