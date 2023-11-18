@@ -59,6 +59,8 @@ module Epuber
 
           # Build all targets to always clean directory
           targets.each do |target|
+            Epuber::Config.instance.release_build = true
+
             compiler = Epuber::Compiler.new(book, target)
             build_path = Epuber::Config.instance.release_build_path(target)
             compiler.compile(build_path, check: true, write: @should_write,
@@ -74,6 +76,8 @@ module Epuber
             Epubcheck.check(archive_path)
 
             convert_epub_to_mobi(archive_path, "#{::File.basename(archive_path, '.epub')}.mobi") if target.create_mobi
+
+            Epuber::Config.instance.release_build = false
           end
 
           # Build all targets to always clean directory
