@@ -484,6 +484,7 @@ module Epuber
       mtime = File.mtime(file_path)
       last_modified(mtime)
       etag(mtime.to_s)
+      cache_control :public, :must_revalidate
 
       case File.extname(file_path)
       when '.styl'
