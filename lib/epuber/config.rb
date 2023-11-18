@@ -62,6 +62,10 @@ module Epuber
     #
     attr_writer :bookspec
 
+    # @return [Boolean]
+    #
+    attr_accessor :release_build
+
     # @return [Epuber::Lockfile]
     #
     def bookspec_lockfile

@@ -76,6 +76,11 @@ module Epuber
         file_resolver.add_file(FileTypes::SourceFile.new(Config.instance.pretty_path_from_project(@book.file_path).to_s))
         compilation_context.plugins
 
+        # validate bookspec
+        compilation_context.perform_plugin_things(Checker, :bookspec) do |checker|
+          checker.call(@book, compilation_context)
+        end
+
         parse_toc_item(@target.root_toc)
         parse_target_file_requests
 
