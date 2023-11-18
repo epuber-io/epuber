@@ -47,33 +47,38 @@ module Epuber
         end
 
         it 'handles xml header on next line' do
-          source = '
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-  <head>
-    <title/>
-    <meta charset="utf-8"/>
-  </head>
-  <body id="Nastaveni-mysli_001-az-304-1">
-    <div class="_idGenObjectStyleOverride-1">
-      <p>Some bullshit content</p>
-    </div>
-  </body>
-</html>
-'
+          source = <<~XML
+
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+              <head>
+                <title/>
+                <meta charset="utf-8"/>
+              </head>
+              <body id="Nastaveni-mysli_001-az-304-1">
+                <div class="_idGenObjectStyleOverride-1">
+                  <p>Some bullshit content</p>
+                </div>
+              </body>
+            </html>
+          XML
           File.write('some_file.xhtml', source)
 
           file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
+          expected_message = <<~TEXT.rstrip
+            XML header must be at the beginning of document
+              (in file some_file.xhtml line 1)
+          TEXT
+
           expect do
             file.process(@ctx)
-          end.to output('XML header must be at the beginning of document
-  (in file some_file.xhtml line 1)'.ansi.yellow + "\n").to_stdout
+          end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
 
-          expect(File.read('some_file_dest.xhtml')).to eq source.lstrip # lstrip is to remove white characters at beginning
+          expect(File.read('some_file_dest.xhtml')).to eq source.lstrip
         end
 
         it 'prints warning when XML is not alright while building release build' do
@@ -92,22 +97,22 @@ module Epuber
           @ctx.release_build = true
           file.compilation_context = @ctx
 
-          expected_output = [
-            [
-              'some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body',
-              '  </body>',
-              '         ^',
-            ].join("\n").ansi.yellow,
-            [
-              'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root',
-              '  </body>',
-              '         ^',
-            ].join("\n").ansi.yellow,
-            [
-              'some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1',
-              '  </body>',
-              '         ^',
-            ].join("\n").ansi.yellow,
+          expected_output = [ # rubocop:disable Style/StringConcatenation
+            <<~TEXT.rstrip.ansi.yellow,
+              some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body
+                </body>
+                       ^
+            TEXT
+            <<~TEXT.rstrip.ansi.yellow,
+              some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root
+                </body>
+                       ^
+            TEXT
+            <<~TEXT.rstrip.ansi.yellow,
+              some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1
+                </body>
+                       ^
+            TEXT
           ].join("\n") + "\n"
 
           expect do

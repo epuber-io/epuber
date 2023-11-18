@@ -8,20 +8,20 @@ module Epuber
         #
         attr_accessor :destination_path
 
-        # @return [Symbol] group of this file (:text, :image, :font, ...), see Epuber::Compiler::FileFinder::GROUP_EXTENSIONS
+        # @return [Symbol] group of this file (:text, :image, :font, ...), see
+        #                  Epuber::Compiler::FileFinder::GROUP_EXTENSIONS
         #
         attr_accessor :group
 
         # @return [Set<Symbol>] list of properties
         #
-        attr_accessor :properties
+        attr_writer :properties
 
         # @return [Set<Symbol>] list of properties
         #
         def properties
           @properties ||= Set.new
         end
-
 
         # @return [String] final relative destination path from root of the package calculated by FileResolver
         #

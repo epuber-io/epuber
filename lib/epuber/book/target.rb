@@ -12,7 +12,7 @@ module Epuber
       # @param [Target] parent  reference to parent target
       # @param [String] name  name of this target
       #
-      def initialize(parent = nil, name)
+      def initialize(name, parent: nil)
         super(parent)
 
         @name      = name
@@ -59,8 +59,7 @@ module Epuber
 
       # @return [Epuber::Book] reference to book
       #
-      attr_accessor :book
-
+      attr_writer :book
 
       # @return [Epuber::Book] reference to book
       #

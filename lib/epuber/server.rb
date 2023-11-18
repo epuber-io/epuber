@@ -24,7 +24,8 @@ require_relative 'third_party/bower'
 
 module Epuber
   # API:
-  # [LATER]   /file/<path-or-pattern> -- displays pretty file (image, text file) (for example: /file/text/s01.xhtml or /file/text/s01.bade)
+  # [LATER]   /file/<path-or-pattern> -- displays pretty file (image, text file) (for example: /file/text/s01.xhtml or
+  #                                      /file/text/s01.bade)
   #
   class Server < Sinatra::Base
     require_relative 'server/handlers'
@@ -115,7 +116,7 @@ module Epuber
 
       super() do |server|
         $stderr = old_stderr
-        puts "Started development server on #{server.host}:#{server.port}"
+        UI.puts "Started development server on #{server.host}:#{server.port}"
 
         host = if server.host == '0.0.0.0'
                  'localhost'
@@ -186,13 +187,13 @@ module Epuber
     def self._log(level, message)
       case level
       when :ui
-        puts message
+        UI.puts message
       when :info
-        puts "INFO: #{message}" if verbose
+        UI.puts "INFO: #{message}" if verbose
       when :get
-        puts " GET: #{message}" if verbose
+        UI.puts " GET: #{message}" if verbose
       when :ws
-        puts "  WS: #{message}" if verbose
+        UI.puts "  WS: #{message}" if verbose
       else
         raise "Unknown log level #{level}"
       end
@@ -400,12 +401,12 @@ module Epuber
       files_paths.select { |file| file_resolver.file_with_source_path(file) || book.file_path == file }
     end
 
-    # @param _modified [Array<String>]
-    # @param _added [Array<String>]
-    # @param _removed [Array<String>]
+    # @param modified [Array<String>]
+    # @param added [Array<String>]
+    # @param removed [Array<String>]
     #
-    def self.changes_detected(_modified, _added, _removed)
-      all_changed = (_modified + _added + _removed).uniq.map(&:unicode_normalize)
+    def self.changes_detected(modified, added, removed)
+      all_changed = (modified + added + removed).uniq.map(&:unicode_normalize)
 
       reload_bookspec if all_changed.any? { |file| file == book.file_path }
 
@@ -434,11 +435,15 @@ module Epuber
         # remove nil paths (for example bookspec can't be found so the relative path is nil)
         changed.compact!
 
-        # if changed.size > 0 && changed.all? { |file| file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style]) }
-        # notify_clients(:styles, changed)
-        # else
-        notify_clients(:reload, changed)
-        # end
+        changed_only_styles = changed.all? do |file|
+          file.end_with?(*Epuber::Compiler::FileFinders::GROUP_EXTENSIONS[:style])
+        end
+
+        if changed.size.positive? && changed_only_styles
+          notify_clients(:styles, changed)
+        else
+          notify_clients(:reload, changed)
+        end
       end
     end
 

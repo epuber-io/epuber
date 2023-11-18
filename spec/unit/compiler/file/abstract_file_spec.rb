@@ -13,7 +13,7 @@ module Epuber
       describe AbstractFile do
         include FakeFS::SpecHelpers
 
-        context 'write_to_file?' do
+        describe 'write_to_file?' do
           it 'do not need to write when the file is same' do
             File.write('a.txt', 'some content, so we can compare it')
 

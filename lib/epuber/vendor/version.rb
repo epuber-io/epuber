@@ -2,7 +2,7 @@
 
 # Most of this code is taken from github.com/CocoaPods/Core/blob/master/lib/cocoapods-core/vendor/version.rb
 
-def is_number(other)
+def number?(other)
   other.is_a?(Numeric) || other.is_a?(Integer) || other.is_a?(Float)
 end
 
@@ -18,7 +18,7 @@ module Epuber
       version.to_s =~ VERSION_RE
     end
 
-    attr_reader :version, :segments
+    attr_reader :version
 
 
     # @param [String, Numeric] version input primitive value for version
@@ -71,8 +71,8 @@ module Epuber
         i += 1
 
         next      if lhs == rhs
-        return -1 if lhs.is_a?(String) && is_number(rhs)
-        return  1 if is_number(lhs) && rhs.is_a?(String)
+        return -1 if lhs.is_a?(String) && number?(rhs)
+        return  1 if number?(lhs) && rhs.is_a?(String)
 
         return lhs <=> rhs
       end

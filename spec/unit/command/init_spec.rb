@@ -37,10 +37,10 @@ module Epuber
         Dir.mkdir(working_dir)
         Dir.chdir(working_dir)
 
-        gitignore_contents = <<~END
+        gitignore_contents = <<~TEXT
           .DS_Store
           Bla
-        END
+        TEXT
         File.write('.gitignore', gitignore_contents)
 
         argv = CLAide::ARGV.new(['book_name'])

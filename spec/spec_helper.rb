@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'pp' # rubocop:disable Lint/RedundantRequireStatement
 require 'rspec'
 require 'fakefs/spec_helpers'
 
@@ -30,11 +31,29 @@ RSpec.configure do |c|
   c.filter_run_excluding expensive: true if ENV['SKIP_EXPENSIVE_TESTS'] == 'true'
 
   c.before do
-    Epuber::Config.class_eval { @instance = nil }
+    Epuber::Config.clear_instance!
     Epuber::Config.instance
+  end
+
+  c.after do
+    Epuber::Config.clear_instance!
   end
 end
 
+RSpec.shared_context 'with temp dir' do
+  around do |example|
+    Dir.mktmpdir('rspec-') do |dir|
+      @temp_dir = dir
+      Epuber::Config.clear_instance!
+
+      Dir.chdir(dir) do
+        example.run
+      end
+    end
+  end
+
+  attr_reader :temp_dir
+end
 
 
 

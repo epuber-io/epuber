@@ -1,24 +1,10 @@
 # frozen_string_literal: true
 
 module Epuber
-  describe Compiler do
-    before do
-      @prev_dir = Dir.pwd
-
-      @tmp_dir = Dir.mktmpdir
-      Dir.chdir(@tmp_dir)
-
-      Config.clear_instance!
-    end
-
-    after do
-      Dir.chdir(@prev_dir)
-
-      FileUtils.remove_entry(@tmp_dir)
-      Config.clear_instance!
-    end
-
+  describe Compiler do # rubocop:disable RSpec/FilePath
     describe 'global ids' do
+      include_context 'with temp dir'
+
       it 'can link global ids' do
         write_file('text/file1.xhtml', <<~HTML)
           <div>

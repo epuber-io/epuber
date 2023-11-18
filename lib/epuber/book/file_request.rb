@@ -29,7 +29,7 @@ module Epuber
       # @param [Symbol] group group of file, see Epuber::Compiler::FileFinder::GROUP_EXTENSIONS
       # @param [Array<Symbol>, Set<Symbol>] properties list of properties
       #
-      def initialize(source_pattern, only_one = true, group: nil, properties: [])
+      def initialize(source_pattern, only_one: true, group: nil, properties: [])
         @source_pattern = source_pattern
         @only_one       = only_one
         @group          = group

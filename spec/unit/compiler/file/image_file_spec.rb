@@ -11,26 +11,20 @@ module Epuber
   class Compiler
     module FileTypes
       describe ImageFile do
-        before do
-          @tmp_dir = Dir.mktmpdir
-        end
+        include_context 'with temp dir'
 
         let(:ctx) do
           book = Book.new
 
           ctx = CompilationContext.new(book, book.default_target)
-          ctx.file_resolver = FileResolver.new(@tmp_dir, File.join(@tmp_dir, '/.build'))
+          ctx.file_resolver = FileResolver.new(temp_dir, File.join(temp_dir, '/.build'))
 
           ctx
         end
 
-        after do
-          FileUtils.remove_entry(@tmp_dir)
-        end
-
         it "copy file's content to destination" do
           img_source = File.join(spec_root, '../test_project/images/001_Frie_9780804137508_art_r1_fmt.png')
-          img_dest = File.join(@tmp_dir, 'dest_image.png')
+          img_dest = File.join(temp_dir, 'dest_image.png')
 
           expect(File).to exist(img_source)
           expect(File).not_to exist(img_dest)
@@ -48,7 +42,7 @@ module Epuber
 
         it 'downscales the image when is too large', expensive: true do
           source = File.join(spec_root, 'fixtures/6000x6000.png')
-          dest = File.join(@tmp_dir, 'dest_image.png')
+          dest = File.join(temp_dir, 'dest_image.png')
 
           source_magick_file = Magick::Image.read(source).first
           expect(source_magick_file.rows).to eq 6000

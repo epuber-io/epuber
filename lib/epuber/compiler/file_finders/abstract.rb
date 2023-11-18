@@ -16,6 +16,8 @@ module Epuber
         # @param [String] context_path
         #
         def initialize(pattern, context_path)
+          super()
+
           @pattern = pattern
           @context_path = context_path
         end
@@ -48,6 +50,8 @@ module Epuber
         # @param [Array<String>] files_paths  list of founded files
         #
         def initialize(pattern, groups, context_path, files_paths)
+          super()
+
           @pattern = pattern
           @groups = Array(groups)
           @context_path = context_path
@@ -111,7 +115,8 @@ module Epuber
         # When it founds too many (more than two) it will raise MultipleFilesFoundError
         #
         # @param [String] pattern  pattern of the desired files
-        # @param [Array<Symbol> | Symbol] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+        # @param [Array<Symbol> | Symbol] groups  list of group names, nil or empty array for all groups, for valid
+        #                                         values see GROUP_EXTENSIONS
         # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
         #
         # @return [Array<String>] list of founded files
@@ -126,7 +131,8 @@ module Epuber
         # #source_path and after that it tries to search recursively from #source_path.
         #
         # @param [String] pattern  pattern of the desired files
-        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see
+        #                                GROUP_EXTENSIONS
         # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
         #
         # @return [Array<String>] list of founded files
@@ -139,7 +145,9 @@ module Epuber
             searching_path = ::File.expand_path(context_path, @source_path_abs)
 
             unless searching_path.start_with?(@source_path_abs)
-              raise "You can't search from folder (#{searching_path}) that is not sub folder of the source_path (#{source_path}) expanded to (#{@source_path_abs})."
+              raise <<~ERROR
+                You can't search from folder (#{searching_path}) that is not sub folder of the source_path (#{source_path}) expanded to (#{@source_path_abs}).
+              ERROR
             end
 
             files = __find_files(pattern, groups, searching_path)
@@ -159,7 +167,8 @@ module Epuber
         # Looks for all files from #source_path recursively
         #
         # @param [String] pattern  pattern of the desired files
-        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see
+        #                                GROUP_EXTENSIONS
         # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
         #
         # @return [Array<String>] list of founded files
@@ -207,7 +216,8 @@ module Epuber
         # Looks for files at given context path, if there is no file, it will try again with pattern for any extension
         #
         # @param [String] pattern  pattern of the desired files
-        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see GROUP_EXTENSIONS
+        # @param [Array<Symbol>] groups  list of group names, nil or empty array for all groups, for valid values see
+        #                                GROUP_EXTENSIONS
         # @param [String] context_path  path for root of searching, it is also defines start folder of relative path
         # @param [String] orig_context_path  original context path, wo it will work nicely with iterative searching
         #

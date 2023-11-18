@@ -20,9 +20,13 @@ module Epuber
       File.write('some.bookspec', '')
       File.write('some.bookspec.lock', lockfile.to_yaml)
 
+      expected_message = <<~MSG.rstrip
+        Warning: the running version of Epuber is older than the version that created the lockfile. We suggest you upgrade to the latest version of Epuber by running `gem install epuber`
+      MSG
+
       expect do
         described_class.instance.warn_for_outdated_versions!
-      end.to output(/Warning: the running version of Epuber is older than the version that created the lockfile. We suggest you upgrade to the latest version of Epuber by running `gem install epuber`\./).to_stdout
+      end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
     end
 
     it 'warns if the previous version of Bade is newer' do
@@ -34,9 +38,13 @@ module Epuber
       File.write('some.bookspec', '')
       File.write('some.bookspec.lock', lockfile.to_yaml)
 
+      expected_message = <<~MSG.rstrip
+        Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`.
+      MSG
+
       expect do
         described_class.instance.warn_for_outdated_versions!
-      end.to output(/Warning: the running version of Bade is older than the version that created the lockfile. We suggest you upgrade to the latest version of Bade by running `gem install bade`\./).to_stdout
+      end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
     end
 
     it 'is backward compatible' do

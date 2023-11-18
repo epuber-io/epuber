@@ -61,13 +61,13 @@ module Epuber
       it 'handles multiple addition of same files' do
         FileUtils.touch(%w[/source/file.txt /source/image.png])
 
-        @sut.add_file_from_request(Book::FileRequest.new('*.txt', false))
+        @sut.add_file_from_request(Book::FileRequest.new('*.txt', only_one: false))
         expect(@sut.files.count).to eq 1
 
 
         FileUtils.touch(%w[/source/file1.txt])
 
-        @sut.add_file_from_request(Book::FileRequest.new('*.txt', false))
+        @sut.add_file_from_request(Book::FileRequest.new('*.txt', only_one: false))
         expect(@sut.files.count).to eq 2
       end
 
@@ -94,7 +94,7 @@ module Epuber
       it 'supports adding multiple files' do
         FileUtils.touch(%w[/source/file1.xhtml /source/file2.xhtml /source/file3.xhtml /source/file4.xhtml])
 
-        @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
+        @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', only_one: false))
 
         expect(@sut.files.map(&:source_path)).to contain_exactly 'file1.xhtml', 'file2.xhtml', 'file3.xhtml',
                                                                  'file4.xhtml'
@@ -118,8 +118,8 @@ module Epuber
                            /source/folder/file4.xhtml])
         FileUtils.touch(%w[/source/image1.png /source/image2.jpg /source/image3.jpg /source/image4.jpg])
 
-        @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', false))
-        @sut.add_file_from_request(Book::FileRequest.new('*.{png,jpg}', false))
+        @sut.add_file_from_request(Book::FileRequest.new('*.xhtml', only_one: false))
+        @sut.add_file_from_request(Book::FileRequest.new('*.{png,jpg}', only_one: false))
 
         file = @sut.dest_finder.find_file('file1', context_path: 'folder')
         expect(file).to eq 'file1.xhtml'
@@ -133,7 +133,7 @@ module Epuber
           FileUtils.mkdir_p(%w[/source/valid])
           FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
-          req = Book::FileRequest.new('valid/*.xhtml', false)
+          req = Book::FileRequest.new('valid/*.xhtml', only_one: false)
           @sut.add_file_from_request(req)
 
           file = @sut.file_with_source_path('valid/2.xhtml')
@@ -148,7 +148,7 @@ module Epuber
           FileUtils.mkdir_p(%w[/source/valid])
           FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
-          req = Book::FileRequest.new('valid/*.xhtml', false)
+          req = Book::FileRequest.new('valid/*.xhtml', only_one: false)
           @sut.add_file_from_request(req)
 
           file = @sut.file_with_source_path('/source/valid/2.xhtml')
@@ -164,7 +164,7 @@ module Epuber
         FileUtils.mkdir_p(%w[/source/valid])
         FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
-        req = Book::FileRequest.new('valid/*.xhtml', false)
+        req = Book::FileRequest.new('valid/*.xhtml', only_one: false)
         @sut.add_file_from_request(req)
 
         file = @sut.file_with_destination_path('valid/2.xhtml')
@@ -179,7 +179,7 @@ module Epuber
         FileUtils.mkdir_p(%w[/source/valid /source/not_valid])
         FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
 
-        req = Book::FileRequest.new('valid/*.xhtml', false)
+        req = Book::FileRequest.new('valid/*.xhtml', only_one: false)
         @sut.add_file_from_request(req, :package)
 
         unneeded = @sut.unneeded_files_in_destination
@@ -201,10 +201,10 @@ module Epuber
       it 'can find file instances from multi file request' do
         FileUtils.touch(%w[/source/some_file.xhtml /source/some_file2.xhtml])
 
-        req = Book::FileRequest.new('*.xhtml', false)
+        req = Book::FileRequest.new('*.xhtml', only_one: false)
         files = @sut.add_file_from_request(req)
 
-        same_req = Book::FileRequest.new('*.xhtml', false)
+        same_req = Book::FileRequest.new('*.xhtml', only_one: false)
         founded_files = @sut.file_from_request(same_req)
 
         expect(founded_files).to eq files
@@ -213,7 +213,7 @@ module Epuber
       it 'can get file instance with different file request' do
         FileUtils.touch(%w[/source/some_file.xhtml /source/some_file2.xhtml])
 
-        req = Book::FileRequest.new('*.xhtml', false)
+        req = Book::FileRequest.new('*.xhtml', only_one: false)
         files = @sut.add_file_from_request(req)
 
         req_with_fragment = Book::FileRequest.new('some_file#fragment')
@@ -230,7 +230,7 @@ module Epuber
       it 'can find/search file instance with different file request' do
         FileUtils.touch(%w[/source/some_file.xhtml /source/some_file2.xhtml])
 
-        req = Book::FileRequest.new('*.xhtml', false)
+        req = Book::FileRequest.new('*.xhtml', only_one: false)
         files = @sut.add_file_from_request(req)
 
         req_with_fragment = Book::FileRequest.new('some_file#fragment')

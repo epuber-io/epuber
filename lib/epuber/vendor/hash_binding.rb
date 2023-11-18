@@ -8,6 +8,12 @@ module Epuber
       @vars = vars
     end
 
+    # @return [Boolean]
+    #
+    def respond_to_missing?(name, _include_private = false)
+      @vars.key?(name) || super
+    end
+
     # @param [String] name
     #
     def method_missing(name)
@@ -16,12 +22,12 @@ module Epuber
       @vars[name]
     end
 
-    # rubocop:disable Style/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
 
     def get_binding
       binding
     end
 
-    # rubocop:enable Style/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
   end
 end

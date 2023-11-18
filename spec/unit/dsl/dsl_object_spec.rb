@@ -31,7 +31,7 @@ module Epuber
     end
 
     describe Object do
-      context 'simple attributes' do
+      describe 'simple attributes' do
         before do
           @example = TestClass.new
         end
@@ -56,7 +56,7 @@ module Epuber
         end
       end
 
-      context 'required attributes' do
+      describe 'required attributes' do
         before do
           @example = TestRequiredClass.new
         end
@@ -76,7 +76,7 @@ module Epuber
         end
       end
 
-      context 'auto conversion' do
+      describe 'auto conversion' do
         before do
           @sut = TestAutoClass.new
         end

@@ -21,6 +21,8 @@ module Epuber
         # @param [String] source_path  relative path from project root to source file
         #
         def initialize(source_path)
+          super()
+
           @source_path = source_path
         end
 
@@ -94,7 +96,9 @@ module Epuber
             UI.print_processing_debug_info("Writing compiled version to #{pkg_destination_path}")
             self.class.write_to_file!(content, final_destination_path)
           else
-            UI.print_processing_debug_info("Not writing to disk ... compiled version at #{pkg_destination_path} is same")
+            UI.print_processing_debug_info(<<~MSG)
+              Not writing to disk ... compiled version at #{pkg_destination_path} is same
+            MSG
           end
         end
 
@@ -103,7 +107,9 @@ module Epuber
             UI.print_processing_debug_info("Writing processed version to #{pkg_destination_path}")
             self.class.write_to_file!(content, final_destination_path)
           else
-            UI.print_processing_debug_info("Not writing to disk ... processed version at #{pkg_destination_path} is same")
+            UI.print_processing_debug_info(<<~MSG)
+              Not writing to disk ... processed version at #{pkg_destination_path} is same
+            MSG
           end
         end
       end

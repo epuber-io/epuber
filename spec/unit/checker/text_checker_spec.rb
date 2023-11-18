@@ -110,7 +110,7 @@ some text containing some problem'
             expect(sut).to be_empty
           end
 
-          it 'handle long text before match properly' do
+          it 'handle long text before match properly 2' do
             text = "bla bla abcd #{'some long text containing some problem ' * 10}"
             text =~ /abcd/
             match = Regexp.last_match

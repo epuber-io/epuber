@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Epuber
   module DSL
     module AttributeSupport
@@ -86,7 +85,7 @@ module Epuber
           else
             begin
               @attributes_values[key] = attr.converted_value(value)
-            rescue Exception => e
+            rescue StandardError => e
               UI.warning("Invalid value `#{value}` for attribute `#{name}`, original error `#{e}`",
                          location: caller_locations[1])
             end

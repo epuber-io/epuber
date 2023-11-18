@@ -18,7 +18,7 @@ module Epuber
         super(file_path)
         @instances = []
 
-        eval(::File.read(file_path), binding, file_path)
+        eval(::File.read(file_path), binding, file_path) # rubocop:disable Security/Eval
       end
 
       # @param [Symbol] name  name of the plugin function

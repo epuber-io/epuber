@@ -12,25 +12,24 @@ Style/GlobalVars:
     - $global_xpath # used in test/matchers/xml.rb
 
 # I want empty lines!
-Style/EmptyLines:
+Layout/EmptyLines:
   Enabled: false
 
-Style/RegexpLiteral:
-  MaxSlashes: 0
-
+# We all have wide screen monitors, so why only 80?
+Layout/LineLength:
+  Max: 120
 
 # We adopted raise instead of fail.
-SignalException:
+Style/SignalException:
   EnforcedStyle: only_raise
 
 
-# We all have wide screen monitors, so why only 80?
-Metrics/LineLength:
-  Max: 120
-
 # WTF: why is default 10?
 Metrics/MethodLength:
-  Max: 50
+  Max: 60
+
+Metrics/ParameterLists:
+  Max: 10
 
 Metrics/ClassLength:
   Enabled: false
@@ -57,9 +56,14 @@ Metrics/PerceivedComplexity:
 
 
 
+Naming/VariableNumber:
+  Exclude:
+    - spec/unit/book/toc_item_spec.rb
+
+
 # At the moment not ready to be used
 # https://github.com/bbatsov/rubocop/issues/947
-Documentation:
+Style/Documentation:
   Enabled: false
 
 # Having these make it easier to *not* forget to add one when adding a new
@@ -73,3 +77,10 @@ Style/TrailingCommaInHashLiteral:
 
 Lint/RequireParentheses:
   Enabled: true
+
+
+
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/ExampleLength:
+  Max: 100

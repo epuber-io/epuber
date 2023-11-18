@@ -12,7 +12,7 @@ module Epuber
         @root.isbn = '123-145'
         @root.book = @book
 
-        @child = described_class.new(@root, 'child')
+        @child = described_class.new('child', parent: @root)
       end
 
       it 'store name' do

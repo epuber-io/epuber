@@ -5,7 +5,7 @@ require_relative '../spec_helper'
 require 'rspec'
 require 'fileutils'
 
-describe 'Test project' do
+describe 'Test project' do # rubocop:disable RSpec/DescribeClass
   it 'do something', expensive: true do
     Dir.chdir('test_project') do
       # FileUtils.rmtree(Epuber::Config::WORKING_PATH)

@@ -184,25 +184,24 @@ module Epuber
           raise StandardError, "Can't set `#{name}` attribute for subspecs (in `#{spec.name}`)."
         end
 
-        if keys
-          value.each_key do |key|
-            unless allowed_keys.include?(key)
-              raise StandardError, "Unknown key `#{key}` for #{self}. Allowed keys: `#{allowed_keys.inspect}`"
-            end
-          end
-        end
+        return unless keys
 
         # @return [Array] the flattened list of the allowed keys for the hash of a given specification.
         #
-        def allowed_keys
+        allowed_keys = lambda do
           if keys.is_a?(Hash)
             keys.keys.concat(keys.values.flatten.compact)
           else
             keys
           end
         end
-      end
 
+        value.each_key do |key|
+          unless allowed_keys.include?(key)
+            raise StandardError, "Unknown key `#{key}` for #{self}. Allowed keys: `#{allowed_keys.inspect}`"
+          end
+        end
+      end
 
       #---------------------------------------------------------------------#
 

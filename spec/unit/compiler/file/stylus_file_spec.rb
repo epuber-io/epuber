@@ -11,7 +11,7 @@ module Epuber
   class Compiler
     module FileTypes
       describe StylusFile do
-        context 'FakeFS parts' do
+        describe 'FakeFS parts' do
           include FakeFS::SpecHelpers
 
           let(:ctx) do
@@ -24,10 +24,11 @@ module Epuber
           end
 
           it 'finds dependency files' do
-            source = %q(
-@import "abc.styl"
-@import 'def.styl'
-)
+            source = <<~STYLUS
+              @import "abc.styl"
+              @import 'def.styl'
+            STYLUS
+
             FileUtils.mkdir_p('/abc')
             File.write('/abc/some_file.styl', source)
             FileUtils.touch('/abc/abc.styl')
@@ -44,7 +45,7 @@ module Epuber
 
 
 
-        context 'Real' do
+        describe 'Real' do
           FileUtils.mkdir_p('/tmp/epuber_stylus_tests')
 
           let(:ctx) do

@@ -163,7 +163,7 @@ module Epuber
           end.to raise_error FileFinders::FileNotFoundError
         end
 
-        it "raises error when no file couldn't be found" do
+        it "raises error when no file couldn't be found 2" do
           FileUtils.touch(['a.xhtml', 'b.xhtml'])
 
           expect do

@@ -18,7 +18,7 @@ module Epuber
         expect(@root.file_request).to eq 's01'
       end
 
-      context 'sub items creating' do
+      describe 'sub items creating' do
         describe '.file' do
           it 'adds item' do
             expect(@root.sub_items.length).to be 0
@@ -49,7 +49,7 @@ module Epuber
           expect(sub_item.file_request).to eq 's01' # file path should be inherited
         end
 
-        context 'parsing and storing options' do
+        describe 'parsing and storing options' do
           it 'parse simple symbol' do
             sub_item = @root.item('', :landmark, :landmark_2)
             expect(sub_item.options).to eq %i[landmark landmark_2]

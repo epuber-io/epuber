@@ -13,24 +13,24 @@ module Epuber
     describe FileFinders do
       include FakeFS::SpecHelpers
 
-      context '::MultipleFilesFoundError' do
+      describe FileFinders::MultipleFilesFoundError do
         it 'can handle to_s for empty groups' do
           expect do
-            FileFinders::MultipleFilesFoundError.new('some_pattern*', [], '/some_context_path/aaa', %w[abc def]).to_s
+            described_class.new('some_pattern*', [], '/some_context_path/aaa', %w[abc def]).to_s
           end.not_to raise_error
         end
 
         it 'can handle to_s for nil groups' do
           expect do
-            FileFinders::MultipleFilesFoundError.new('some_pattern*', nil, '/some_context_path/aaa',
-                                                     %w[abc def]).to_s
+            described_class.new('some_pattern*', nil, '/some_context_path/aaa',
+                                %w[abc def]).to_s
           end.not_to raise_error
         end
 
         it 'can handle to_s for one group' do
           expect do
-            FileFinders::MultipleFilesFoundError.new('some_pattern*', :text, '/some_context_path/aaa',
-                                                     %w[abc def]).to_s
+            described_class.new('some_pattern*', :text, '/some_context_path/aaa',
+                                %w[abc def]).to_s
           end.not_to raise_error
         end
       end

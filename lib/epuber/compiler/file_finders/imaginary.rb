@@ -107,11 +107,13 @@ module Epuber
           current.is_a?(FileEntry)
         end
 
-        private
-
-        def self.path_parts(path)
-          path.split(File::SEPARATOR).reject(&:empty?)
+        class << self
+          def path_parts(path)
+            path.split(File::SEPARATOR).reject(&:empty?)
+          end
         end
+
+        private
 
         def find_recurser(dir, parts)
           return [] unless dir.respond_to? :[]

@@ -11,19 +11,13 @@ module Epuber
   class Compiler
     module FileTypes
       describe CoffeeScriptFile do
-        before do
-          @tmp_dir = Dir.mktmpdir
-        end
-
-        after do
-          FileUtils.remove_entry(@tmp_dir)
-        end
+        include_context 'with temp dir'
 
         let(:ctx) do
           book = Book.new
 
           ctx = CompilationContext.new(book, book.default_target)
-          ctx.file_resolver = FileResolver.new(@tmp_dir, File.join(@tmp_dir, '/.build'))
+          ctx.file_resolver = FileResolver.new(temp_dir, File.join(temp_dir, '/.build'))
 
           ctx
         end
@@ -36,8 +30,8 @@ module Epuber
               cube: (x) -> x * square x
           COFFEE
 
-          source_path = File.join(@tmp_dir, 'some_file.coffee')
-          dest_path = File.join(@tmp_dir, 'some_file.js')
+          source_path = File.join(temp_dir, 'some_file.coffee')
+          dest_path = File.join(temp_dir, 'some_file.js')
 
           File.write(source_path, source)
 

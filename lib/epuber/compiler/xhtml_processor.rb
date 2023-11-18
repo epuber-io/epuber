@@ -194,7 +194,8 @@ module Epuber
       # Method which will resolve path to file from pattern
       #
       # @param [String] path  pattern or path of the file
-      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching for file from tag <img>
+      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching
+      #                                         for file from tag <img>
       # @param [String] file_path  path to file from which is searching for other file
       # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
       #
@@ -232,7 +233,8 @@ module Epuber
       # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
       # @param [String] tag_name  CSS selector for tag
       # @param [String] attribute_name  name of attribute
-      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching for file from tag <img>
+      # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching
+      #                                         for file from tag <img>
       # @param [String] file_path  path to file from which is searching for other file
       # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
       #

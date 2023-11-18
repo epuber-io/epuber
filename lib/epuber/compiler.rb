@@ -71,9 +71,11 @@ module Epuber
 
         FileUtils.mkdir_p(build_folder)
 
-        puts "  handling target #{@target.name.inspect} in build dir `#{Config.instance.pretty_path_from_project(build_folder)}`"
+        UI.puts "  #{<<~MSG}"
+          building target #{@target.name.inspect} (build dir: #{Config.instance.pretty_path_from_project(build_folder)})
+        MSG
 
-        file_resolver.add_file(FileTypes::SourceFile.new(Config.instance.pretty_path_from_project(@book.file_path).to_s))
+        file_resolver.add_file(FileTypes::SourceFile.new(Config.instance.pretty_path_from_project(@book.file_path)))
         compilation_context.plugins
 
         # validate bookspec
@@ -124,7 +126,7 @@ module Epuber
             old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
             diff = old_paths - new_paths
             diff.each do |file_to_remove|
-              puts "DEBUG: removing file from result EPUB: #{file_to_remove}" if compilation_context.verbose?
+              UI.puts "DEBUG: removing file from result EPUB: #{file_to_remove}" if compilation_context.verbose?
               zip_file.remove(file_to_remove)
             end
           end
@@ -167,9 +169,9 @@ module Epuber
            .select { |d| File.directory?(d) }
            .select { |d| (Dir.entries(d) - %w[. ..]).empty? }
            .each do |d|
-          puts "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
-          Dir.rmdir(d)
-        end
+             UI.puts "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
+             Dir.rmdir(d)
+           end
       end
     end
 
@@ -181,7 +183,7 @@ module Epuber
       end
       unnecessary_paths.each do |path|
         if compilation_context.verbose?
-          puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
+          UI.puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
         end
 
         File.delete(path)

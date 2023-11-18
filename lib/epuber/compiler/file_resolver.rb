@@ -222,25 +222,62 @@ module Epuber
         unnecessary_paths
       end
 
-
       ##################################################################################################################
 
-      private
+      class << self
+        # @param [String] path  path to some file
+        #
+        # @return [String] path with changed extension
+        #
+        def renamed_file_with_path(path)
+          extname     = File.extname(path)
+          new_extname = FileFinders::EXTENSIONS_RENAME[extname]
 
-      # @param [String] path  path to some file
-      #
-      # @return [String] path with changed extension
-      #
-      def self.renamed_file_with_path(path)
-        extname     = File.extname(path)
-        new_extname = FileFinders::EXTENSIONS_RENAME[extname]
+          if new_extname.nil?
+            path
+          else
+            path.sub(/#{Regexp.escape(extname)}$/, new_extname)
+          end
+        end
 
-        if new_extname.nil?
-          path
-        else
-          path.sub(/#{Regexp.escape(extname)}$/, new_extname)
+        # @param [String] extname  extension of file
+        #
+        # @return [Class]
+        #
+        def file_class_for(extname)
+          mapping = {
+            '.styl' => FileTypes::StylusFile,
+
+            '.coffee' => FileTypes::CoffeeScriptFile,
+
+            '.bade' => FileTypes::BadeFile,
+            '.xhtml' => FileTypes::XHTMLFile,
+            '.html' => FileTypes::XHTMLFile,
+
+            '.jpg' => FileTypes::ImageFile,
+            '.jpeg' => FileTypes::ImageFile,
+            '.png' => FileTypes::ImageFile,
+          }
+
+          mapping[extname] || FileTypes::StaticFile
+        end
+
+        # @param [String] root_path  path to root of the package
+        # @param [Symbol] path_type  path type of file
+        #
+        # @return [Array<String>] path components
+        #
+        def path_comps_for(root_path, path_type)
+          case path_type
+          when :spine, :manifest
+            Array(root_path) + [Compiler::EPUB_CONTENT_FOLDER]
+          when :package
+            Array(root_path)
+          end
         end
       end
+
+      private
 
       # @param file [Epuber::Compiler::AbstractFile]
       #
@@ -255,49 +292,14 @@ module Epuber
                     elsif !file.destination_path.nil?
                       file.destination_path
                     else
-                      raise ResolveError,
-                            "What should I do with file that doesn't have source path or destination path? file: #{file.inspect}"
+                      raise ResolveError, <<~ERROR
+                        What should I do with file that doesn't have source path or destination path? file: #{file.inspect}
+                      ERROR
                     end
 
         file.destination_path = dest_path
-        file.pkg_destination_path = File.join(*self.class.path_comps_for(file.path_type), dest_path)
+        file.pkg_destination_path = File.join(*self.class.path_comps_for(nil, file.path_type), dest_path)
         file.final_destination_path = File.join(destination_path, file.pkg_destination_path)
-      end
-
-      # @param [String] extname  extension of file
-      #
-      # @return [Class]
-      #
-      def self.file_class_for(extname)
-        mapping = {
-          '.styl' => FileTypes::StylusFile,
-
-          '.coffee' => FileTypes::CoffeeScriptFile,
-
-          '.bade' => FileTypes::BadeFile,
-          '.xhtml' => FileTypes::XHTMLFile,
-          '.html' => FileTypes::XHTMLFile,
-
-          '.jpg' => FileTypes::ImageFile,
-          '.jpeg' => FileTypes::ImageFile,
-          '.png' => FileTypes::ImageFile,
-        }
-
-        mapping[extname] || FileTypes::StaticFile
-      end
-
-      # @param [String] root_path  path to root of the package
-      # @param [Symbol] path_type  path type of file
-      #
-      # @return [Array<String>] path components
-      #
-      def self.path_comps_for(root_path = nil, path_type)
-        case path_type
-        when :spine, :manifest
-          Array(root_path) + [Compiler::EPUB_CONTENT_FOLDER]
-        when :package
-          Array(root_path)
-        end
       end
     end
   end

@@ -138,7 +138,9 @@ module Epuber
         expect(node.at_css('content')['src']).to eq 'txt2.xhtml'
 
         node = nav_points.shift
-        expect(node.at_css('navLabel > text').inner_html).to eq 'Text 3, <strong>COOL</strong>' # epub 2 doesn't allow to use tags inside of <text>
+
+        # epub 2 doesn't allow to use tags inside of <text>
+        expect(node.at_css('navLabel > text').inner_html).to eq 'Text 3, <strong>COOL</strong>'
         expect(node.at_css('content')['src']).to eq 'txt3.xhtml'
       end
     end

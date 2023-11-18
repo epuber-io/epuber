@@ -46,7 +46,7 @@ module Epuber
         expect(book.epub_version).to eq '3.0'
       end
 
-      context 'attributes' do
+      describe 'attributes' do
         describe '#authors, #author' do
           it 'automatically converts into NormalContributor' do
             book = @book
@@ -142,7 +142,7 @@ module Epuber
         expect { book.validate }.not_to raise_error
       end
 
-      context 'targets' do
+      describe 'targets' do
         it 'there is always at least one target' do
           expect(@book.all_targets.length).to eq 1
         end
@@ -198,7 +198,7 @@ module Epuber
         end
       end
 
-      context 'toc' do
+      describe 'toc' do
         it 'can add toc items' do
           expect(@target.root_toc.sub_items.length).to eq 0
 

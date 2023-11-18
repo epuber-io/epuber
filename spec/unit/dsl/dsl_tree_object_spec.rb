@@ -35,14 +35,14 @@ module Epuber
         end
       end
 
-      context 'flat child items' do
+      describe 'flat child items' do
         it 'creates array of all sub_items' do
           child_items = @root.flat_sub_items
           expect(child_items.count).to eq(7)
         end
       end
 
-      context 'default values' do
+      describe 'default values' do
         it 'set value to root can be read by child' do
           @root.with_default_value = '1'
           expect(@item1.with_default_value).to eq '1'

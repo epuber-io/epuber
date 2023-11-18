@@ -9,8 +9,8 @@ module Epuber
   describe Plugin do
     include FakeFS::SpecHelpers
 
-    context 'init' do
-      it 'can load from file' do
+    describe '.init' do
+      it 'from file' do
         FileUtils.touch('plugin.rb')
 
         plugin = described_class.new('plugin.rb')
@@ -19,7 +19,7 @@ module Epuber
         expect(file.abs_source_path).to eq '/plugin.rb'
       end
 
-      it 'can load from file in deep structure' do
+      it 'from file in deep structure' do
         FileUtils.mkdir_p('/some/nested/dir/structure')
 
         Dir.chdir('/some/nested/dir/structure') do
@@ -33,7 +33,7 @@ module Epuber
         end
       end
 
-      it 'can load from file in deep structure' do
+      it 'from file in deep structure 2' do
         FileUtils.mkdir_p('/some/nested/dir/structure')
         FileUtils.touch('/some/nested/dir/structure/plugin.rb')
 
@@ -44,14 +44,14 @@ module Epuber
         expect(file.abs_source_path).to eq '/some/nested/dir/structure/plugin.rb'
       end
 
-      it 'can load from empty folder' do
+      it 'from empty folder' do
         FileUtils.mkdir_p('plugin')
 
         plugin = described_class.new('plugin')
         expect(plugin.files).to be_empty
       end
 
-      it 'can load from folder with .rb file' do
+      it 'from folder with .rb file' do
         FileUtils.mkdir_p('plugin')
         FileUtils.touch('plugin/plugin.rb')
 

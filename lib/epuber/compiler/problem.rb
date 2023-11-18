@@ -69,7 +69,8 @@ module Epuber
         matched_text = line[column_index...column_index + location.length] || ''
 
         pre = (lines[0...line_index] + [line[0...column_index]]).join("\n")
-        post = ([line[column_index + location.length..line.length]] + (lines[location.line..lines.count] || [])).join("\n")
+        post = ([line[column_index + location.length..line.length]] + (lines[location.line..lines.count] || []))
+               .join("\n")
 
         [pre, matched_text, post]
       end

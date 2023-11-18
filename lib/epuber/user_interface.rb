@@ -106,6 +106,12 @@ module Epuber
       @current_file = nil
     end
 
+    def self.puts(message)
+      _clear_processing_line_for_new_output do
+        $stdout.puts(message)
+      end
+    end
+
     # @param [Compiler::FileTypes::AbstractFile] file
     # @param [String] step_name
     # @param [Fixnum] time
@@ -186,7 +192,10 @@ module Epuber
 
       comps = []
       comps << message.to_s
-      if !location.nil? && !(message.is_a?(Epuber::Compiler::Problem) || message.is_a?(Epuber::Checker::TextChecker::MatchProblem))
+      message_already_formatted = (
+        message.is_a?(Epuber::Compiler::Problem) || message.is_a?(Epuber::Checker::TextChecker::MatchProblem)
+      )
+      if !location.nil? && !message_already_formatted
         path = location.path
 
         # calculate relative path when path is absolute and in project
@@ -217,7 +226,7 @@ module Epuber
     # @param [Thread::Backtrace::Location] location location of the error
     #
     def self._print_backtrace(locations, location: nil)
-      puts(_format_backtrace(locations, location: location)) if current_command.verbose?
+      $stdout.puts(_format_backtrace(locations, location: location)) if current_command.verbose?
     end
   end
 

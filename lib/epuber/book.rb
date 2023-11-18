@@ -65,8 +65,8 @@ module Epuber
 
       # setter
       setter_method = "#{sym}="
-      define_method(setter_method) do |newValue|
-        @default_target.send(setter_method, newValue)
+      define_method(setter_method) do |new_value|
+        @default_target.send(setter_method, new_value)
       end
     end
 

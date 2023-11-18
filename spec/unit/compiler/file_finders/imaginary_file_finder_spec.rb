@@ -57,7 +57,7 @@ module Epuber
         end
 
 
-        context 'crashes' do
+        describe 'crashes' do
           it "doesn't crash when searched path is empty, only raises valid error" do
             finder = described_class.new('/')
             finder.add_file('/abc/def')

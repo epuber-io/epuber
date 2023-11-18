@@ -72,7 +72,7 @@ module Epuber
         expect(sut.all_files['/file_old']).to be_nil
       end
 
-      context 'dependencies' do
+      describe 'dependencies' do
         it 'can have dependecy' do
           File.write('/file_dep', 'abc')
           File.write('/file', 'abc')

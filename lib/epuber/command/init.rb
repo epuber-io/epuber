@@ -50,9 +50,9 @@ module Epuber
       private
 
       def print_good_bye(book_id)
-        puts <<~END.ansi.green
+        UI.puts <<~TEXT.ansi.green
           Project initialized, please review #{book_id}.bookspec file, remove comments and fill some attributes like book title.
-        END
+        TEXT
       end
 
       # Creates <book-id>.bookspec file from template
@@ -76,16 +76,18 @@ module Epuber
       # @return [void]
       #
       def write_sublime_project(book_id)
-        text = '{
-  "folders": [
-    {
-      "follow_symlinks": true,
-      "path": ".",
-      "folder_exclude_patterns": [".epuber"],
-      "file_exclude_patterns": ["*.epub"]
-    }
-  ]
-}'
+        text = <<~JSON
+          {
+            "folders": [
+              {
+                "follow_symlinks": true,
+                "path": ".",
+                "folder_exclude_patterns": [".epuber"],
+                "file_exclude_patterns": ["*.epub"]
+              }
+            ]
+          }
+        JSON
 
         write("#{book_id}.sublime-project", text)
       end
@@ -95,7 +97,7 @@ module Epuber
       # @return [void]
       #
       def write_gitignore
-        append_new_lines('.gitignore', <<~END
+        append_new_lines('.gitignore', <<~TEXT)
           # This is generated with `epuber init`
           *.epub
           *.mobi
@@ -104,15 +106,13 @@ module Epuber
           .epuber/release_build/
           .epuber/build_cache/
           .epuber/metadata/
-        END
-        )
+        TEXT
       end
 
       def write_default_style(book_id)
-        write("styles/#{book_id}.styl", <<~END
+        write("styles/#{book_id}.styl", <<~STYLUS)
           // This is generated with `epuber init` script.
-        END
-        )
+        STYLUS
       end
 
       # @param string [String] text to file
@@ -122,7 +122,7 @@ module Epuber
       #
       def write(file_path, string)
         File.write(file_path, string)
-        puts "   #{'create'.ansi.green}  #{file_path}"
+        UI.puts "   #{'create'.ansi.green}  #{file_path}"
       end
 
       # @param string [String] text to file
@@ -146,7 +146,7 @@ module Epuber
         existing_content << "\n"
 
         File.write(file_path, existing_content)
-        puts "   #{'update'.ansi.green}  #{file_path}"
+        UI.puts "   #{'update'.ansi.green}  #{file_path}"
       end
 
       # @param [String] dir_path path to dir
@@ -155,7 +155,7 @@ module Epuber
       #
       def create_folder(dir_path)
         FileUtils.mkdir_p(dir_path)
-        puts "   #{'create'.ansi.green}  #{dir_path}/"
+        UI.puts "   #{'create'.ansi.green}  #{dir_path}/"
       end
 
       # @param text [String]
@@ -167,7 +167,7 @@ module Epuber
         result = $stdin.gets.chomp
 
         while result.empty?
-          puts 'Value cannot be empty, please fill it!'.ansi.red
+          UI.puts 'Value cannot be empty, please fill it!'.ansi.red
           print text
           result = $stdin.gets.chomp
         end

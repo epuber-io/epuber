@@ -31,7 +31,10 @@ module Epuber
                      end.merge!(target.constants),
           }
 
-          should_load_from_precompiled = up_to_date && precompiled_exists && compilation_context.incremental_build? && !compilation_context.should_write
+          should_load_from_precompiled = up_to_date &&
+                                         precompiled_exists &&
+                                         compilation_context.incremental_build? &&
+                                         !compilation_context.should_write
 
           precompiled = if should_load_from_precompiled
                           begin

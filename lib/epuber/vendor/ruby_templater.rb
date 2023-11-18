@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Lint/Eval
-
 require_relative 'hash_binding'
 
 module Epuber
@@ -62,9 +60,7 @@ module Epuber
     def render
       hash_binding = HashBinding.new(locals)
       eval_string = %(%(#{source_text}))
-      eval(eval_string, hash_binding.get_binding)
+      eval(eval_string, hash_binding.get_binding) # rubocop:disable Security/Eval
     end
   end
 end
-
-# rubocop:enable Lint/Eval

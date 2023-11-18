@@ -37,8 +37,9 @@ module Epuber
             Array(file_resolver.file_from_request(default_style_request))
           end.flatten
 
+          dirname = Pathname.new(File.dirname(final_destination_path))
           default_styles.map do |style|
-            Pathname.new(style.final_destination_path).relative_path_from(Pathname.new(File.dirname(final_destination_path))).to_s
+            Pathname.new(style.final_destination_path).relative_path_from(dirname).to_s
           end
         end
 
@@ -52,8 +53,9 @@ module Epuber
             Array(file_resolver.file_from_request(default_style_request))
           end.flatten
 
+          dirname = Pathname.new(File.dirname(final_destination_path))
           default_scripts.map do |style|
-            Pathname.new(style.final_destination_path).relative_path_from(Pathname.new(File.dirname(final_destination_path))).to_s
+            Pathname.new(style.final_destination_path).relative_path_from(dirname).to_s
           end
         end
 

@@ -73,13 +73,11 @@ module Epuber
       # @return [Self]
       #
       def self.from_string(string, file_path = nil)
-        # rubocop:disable Lint/Eval
         obj = if file_path
-                eval(string, nil, file_path)
+                eval(string, nil, file_path) # rubocop:disable Security/Eval
               else
-                eval(string)
+                eval(string) # rubocop:disable Security/Eval
               end
-        # rubocop:enable Lint/Eval
 
         unless obj.is_a?(self)
           msg = "Invalid object #{obj.class}, expected object of class #{self}"
@@ -117,6 +115,10 @@ module Epuber
       #
       attr_accessor :attributes_values
 
+      def respond_to_missing?(name, include_private = false)
+        @attributes_values.key?(name) || super
+      end
+
       # Raise exception when there is used some unknown method or attribute
       #
       # This is just for creating better message in raised exception
@@ -127,8 +129,11 @@ module Epuber
         if /([^=]+)=?/ =~ name
           attr_name = ::Regexp.last_match(1)
           location = caller_locations.first
-          raise NameError,
-                "Unknown attribute or method `#{attr_name}` for class `#{self.class}` in file `#{location.path}:#{location.lineno}`"
+          message = <<~MSG
+            Unknown attribute or method `#{attr_name}` for class `#{self.class}` in file `#{location.path}:#{location.lineno}`
+          MSG
+
+          raise NameError, message
         else
           super
         end

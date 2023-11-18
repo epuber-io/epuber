@@ -412,12 +412,23 @@ module Epuber
 
           finder = FileFinders::Normal.new('/')
 
-          doc = described_class.xml_document_from_string('<div><a href="ref1" /><a href="ref2.txt#abc"/><a href="ref10" /></div>')
+          doc = described_class.xml_document_from_string(<<~XML)
+            <div>
+              <a href="ref1" />
+              <a href="ref2.txt#abc"/>
+              <a href="ref10" />
+            </div>
+          XML
 
           links = described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
 
-          expect(doc.root.to_xml(indent: 0,
-                                 save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.txt#abc"/><a href="abc/ref10.xhtml"/></div>'
+          expect(doc.root.to_xml).to eq <<~XML.rstrip
+            <div>
+              <a href="ref1.xhtml"/>
+              <a href="ref2.txt#abc"/>
+              <a href="abc/ref10.xhtml"/>
+            </div>
+          XML
           expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.txt#abc'), URI('abc/ref10.xhtml')
         end
 
@@ -426,10 +437,14 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href=""/>', 'root.txt')
 
+          expected_message = <<~MSG.rstrip
+            Not found file matching pattern `` from context path root.txt.
+              (in file root.txt line 1)
+          MSG
+
           expect do
             described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          end.to output('Not found file matching pattern `` from context path root.txt.
-  (in file root.txt line 1)'.ansi.yellow + "\n").to_stdout
+          end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
         end
 
         it "prints warning when the desired file can't be found" do
@@ -438,10 +453,14 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href="blabla"/>', 'root.txt')
 
+          expected_message = <<~MSG.rstrip
+            Not found file matching pattern `blabla` from context path root.txt.
+              (in file root.txt line 1)
+          MSG
+
           expect do
             described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          end.to output('Not found file matching pattern `blabla` from context path root.txt.
-  (in file root.txt line 1)'.ansi.yellow + "\n").to_stdout
+          end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
         end
 
         it 'silently skips tags without specified attributes' do
@@ -465,23 +484,44 @@ module Epuber
         end
 
         it 'resolves links in <a>' do
-          doc = described_class.xml_document_from_string('<div><a href="ref1" /><a href="ref2.xhtml#abc"/><a href="ref10" /></div>')
+          doc = described_class.xml_document_from_string(<<~XML)
+            <div>
+              <a href="ref1" />
+              <a href="ref2.xhtml#abc"/>
+              <a href="ref10" />
+            </div>
+          XML
 
           links = described_class.resolve_links(doc, 'root.xhtml', @finder)
 
-          expect(doc.root.to_xml(indent: 0,
-                                 save_with: 0)).to eq '<div><a href="ref1.xhtml"/><a href="ref2.xhtml#abc"/><a href="folder/ref10.xhtml"/></div>'
+          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq <<~XML.rstrip
+            <div>
+              <a href="ref1.xhtml"/>
+              <a href="ref2.xhtml#abc"/>
+              <a href="folder/ref10.xhtml"/>
+            </div>
+          XML
           expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.xhtml#abc'), URI('folder/ref10.xhtml')
         end
 
         it 'resolves links in <map>' do
-          source = '<map><area href="ref1" /><area href="ref2.xhtml#abc"/><area href="ref10" /></map>'
-          doc = described_class.xml_document_from_string(source)
+          doc = described_class.xml_document_from_string(<<~XML)
+            <map>
+              <area href="ref1" />
+              <area href="ref2.xhtml#abc"/>
+              <area href="ref10" />
+            </map>
+          XML
 
           links = described_class.resolve_links(doc, 'root.xhtml', @finder)
 
-          expect(doc.root.to_xml(indent: 0,
-                                 save_with: 0)).to eq '<map><area href="ref1.xhtml"/><area href="ref2.xhtml#abc"/><area href="folder/ref10.xhtml"/></map>'
+          expect(doc.root.to_xml(indent: 0, save_with: 0)).to eq <<~XML.rstrip
+            <map>
+              <area href="ref1.xhtml"/>
+              <area href="ref2.xhtml#abc"/>
+              <area href="folder/ref10.xhtml"/>
+            </map>
+          XML
           expect(links).to contain_exactly URI('ref1.xhtml'), URI('ref2.xhtml#abc'), URI('folder/ref10.xhtml')
         end
       end
@@ -519,7 +559,7 @@ module Epuber
           FileUtils.touch(%w[/images/image1.png /images/image2.jpg /file.xhtml])
 
           resolver = FileResolver.new('/', '/.build')
-          resolver.add_file_from_request(Book::FileRequest.new('image1.png', false))
+          resolver.add_file_from_request(Book::FileRequest.new('image1.png', only_one: false))
 
           expect(resolver.files.count).to eq 1
 
@@ -569,7 +609,7 @@ module Epuber
           FileUtils.touch(%w[/scripts/script.js /scripts/script2.coffee /file.xhtml])
 
           resolver = FileResolver.new('/', '/.build')
-          resolver.add_file_from_request(Book::FileRequest.new('script2', false))
+          resolver.add_file_from_request(Book::FileRequest.new('script2', only_one: false))
 
           expect(resolver.files.count).to eq 1
 
@@ -643,7 +683,7 @@ module Epuber
           doc = described_class.xml_document_from_string(xml)
 
           resolver = FileResolver.new('/', '/.build')
-          resolver.add_file_from_request(Book::FileRequest.new('style1', false))
+          resolver.add_file_from_request(Book::FileRequest.new('style1', only_one: false))
 
           expect(resolver.files.count).to eq 1
 
@@ -657,7 +697,7 @@ module Epuber
         end
       end
 
-      context 'using_remote_resources?' do
+      describe 'using_remote_resources?' do
         it 'detects using remote images' do
           doc = described_class.xml_document_from_string('<img src="http://lorempixel.com/400/200" />')
           expect(described_class).to be_using_remote_resources(doc)
