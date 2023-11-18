@@ -63,6 +63,38 @@ module Epuber
           </div>
         HTML
       end
+
+      it 'can handle missing id anchor' do
+        write_file('text/file1.xhtml', <<~HTML)
+          <div>
+            <p><a href="$some_id">abc</a></p>
+          </div>
+        HTML
+
+        write_file('text/file2.xhtml', <<~HTML)
+          <div>
+            <p id="some_id">abc</p>
+          </div>
+        HTML
+
+        write_file('book.bookspec', <<~RUBY)
+          Epuber::Book.new do |book|
+            book.title = 'test'
+            book.author = 'test test'
+            book.isbn = '123'
+            book.target :ibooks
+
+            book.toc do |toc, target|
+              toc.file 'text/file1'
+              toc.file 'text/file2'
+            end
+          end
+        RUBY
+
+        expect do
+          Epuber::Command.run(%w[build ibooks])
+        end.to output(%r{Can't find global id 'some_id' from link in file text/file1.xhtml}).to_stdout
+      end
     end
   end
 end

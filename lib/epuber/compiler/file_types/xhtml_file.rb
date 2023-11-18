@@ -192,10 +192,14 @@ module Epuber
                          .relative_path_from(Pathname(File.dirname(final_destination_path.unicode_normalize))).to_s
 
               node['href'] = "#{rel_path}##{href}"
-            elsif compilation_context.release_build?
-              UI.error!("Can't find global id #{href}", location: node)
             else
-              UI.warning("Can't find global id #{href}", location: node)
+              message = "Can't find global id '#{href}' from link in file #{source_path}"
+              location = UserInterface::Location.new(path: final_destination_path, lineno: node.line)
+              if compilation_context.release_build?
+                UI.error!(message, location: location)
+              else
+                UI.warning(message, location: location)
+              end
             end
           end
 

@@ -8,7 +8,7 @@ require_relative 'command'
 
 module Epuber
   class UserInterface
-    Location = Struct.new(:path, :lineno)
+    Location = Struct.new(:path, :lineno, :column, keyword_init: true)
 
     class << self
       # @return [Epuber::Command]
@@ -165,13 +165,13 @@ module Epuber
     def self._location_from_obj(obj)
       case obj
       when ::Thread::Backtrace::Location
-        Location.new(obj.path, obj.lineno)
+        Location.new(path: obj.path, lineno: obj.lineno)
       when ::Nokogiri::XML::Node
-        Location.new(obj.document.file_path, obj.line)
+        Location.new(path: obj.document.file_path, lineno: obj.line)
       when Location
         obj
       when Epuber::Compiler::FileTypes::AbstractFile
-        Location.new(obj.source_path, nil)
+        Location.new(path: obj.source_path)
       end
     end
 
@@ -187,11 +187,18 @@ module Epuber
       comps = []
       comps << message.to_s
       if !location.nil? && !(message.is_a?(Epuber::Compiler::Problem) || message.is_a?(Epuber::Checker::TextChecker::MatchProblem))
-        comps << if location.lineno
-                   "  (in file #{location.path} line #{location.lineno})"
-                 else
-                   "  (in file #{location.path})"
-                 end
+        path = location.path
+
+        # calculate relative path when path is absolute and in project
+        path = path[Config.instance.project_path.size + 1..-1] if path.start_with?(Config.instance.project_path)
+
+        line_parts = [
+          "  (in file #{path}",
+        ]
+        line_parts << "line #{location.lineno}" if location.lineno
+        line_parts << "column #{location.column}" if location.column
+
+        comps << "#{line_parts.join(' ')})"
       end
 
       comps.join("\n").ansi.send(_color_from_level(level))

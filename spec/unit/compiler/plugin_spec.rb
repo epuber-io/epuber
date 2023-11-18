@@ -40,6 +40,7 @@ module Epuber
         expect do
           Epuber::Command.run(%w[build --release])
         end.to raise_error(SystemExit)
+           .and output(/ISBN is invalid/).to_stdout
       end
     end
   end

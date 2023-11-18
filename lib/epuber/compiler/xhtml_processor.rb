@@ -13,7 +13,8 @@ module Epuber
 
       # Method for parsing incomplete XML, supports multiple root elements
       #
-      # @warning Because of nature of XML, when input string don't contain root element, it will create own called `body`, since it will be used in next steps.
+      # @warning Because of nature of XML, when input string don't contain root element, it will create own called
+      # `body`, since it will be used in next steps.
       #
       # @param [String] text  input XHTML text
       #
@@ -23,7 +24,8 @@ module Epuber
         text = text.dup
 
         if /\A[\n\r ]+(<\?xml)/ =~ text
-          UI.warning('XML header must be at the beginning of document', location: UI::Location.new(file_path, 1))
+          UI.warning('XML header must be at the beginning of document',
+                     location: UI::Location.new(path: file_path, lineno: 1))
 
           text = text.lstrip
         end
