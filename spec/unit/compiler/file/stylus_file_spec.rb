@@ -33,7 +33,7 @@ module Epuber
             FileUtils.touch('/abc/abc.styl')
             FileUtils.touch('/abc/def.styl')
 
-            file = StylusFile.new('/abc/some_file.styl')
+            file = described_class.new('/abc/some_file.styl')
             file.destination_path = 'abc/some_file.css'
             file.compilation_context = ctx
             resolve_file_paths(file)
@@ -71,7 +71,7 @@ module Epuber
 
             File.write('/tmp/epuber_stylus_tests/some_file.styl', source)
 
-            file = StylusFile.new('/tmp/epuber_stylus_tests/some_file.styl')
+            file = described_class.new('/tmp/epuber_stylus_tests/some_file.styl')
             file.destination_path = '/tmp/epuber_stylus_tests/some_file.css'
             file.compilation_context = ctx
             resolve_file_paths(file)

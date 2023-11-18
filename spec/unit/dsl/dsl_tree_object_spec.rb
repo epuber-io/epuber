@@ -36,7 +36,7 @@ module Epuber
       end
 
       context 'flat child items' do
-        it 'should create array of all sub_items' do
+        it 'creates array of all sub_items' do
           child_items = @root.flat_sub_items
           expect(child_items.count).to eq(7)
         end

@@ -8,7 +8,7 @@ module Epuber
   class Book
     describe TocItem do
       before do
-        @root          = TocItem.new
+        @root          = described_class.new
         @root.title    = 'Section 1'
         @root.file_request = 's01'
       end
@@ -19,8 +19,8 @@ module Epuber
       end
 
       context 'sub items creating' do
-        context '.file' do
-          it 'should add item' do
+        describe '.file' do
+          it 'adds item' do
             expect(@root.sub_items.length).to be 0
 
             @root.file 'ch01', 'Chapter 1'
@@ -66,7 +66,7 @@ module Epuber
           end
         end
 
-        context '#full_source_pattern' do
+        describe '#full_source_pattern' do
           it 'returns the same pattern when pattern includes path' do
             expect(@root.full_source_pattern).to eq 's01'
             expect(@root.local_source_pattern).to eq 's01'

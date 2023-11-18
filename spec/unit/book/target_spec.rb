@@ -8,11 +8,11 @@ module Epuber
     describe Target do
       before do
         @book = Book.new
-        @root = Target.new('root')
+        @root = described_class.new('root')
         @root.isbn = '123-145'
         @root.book = @book
 
-        @child = Target.new(@root, 'child')
+        @child = described_class.new(@root, 'child')
       end
 
       it 'store name' do
@@ -43,7 +43,7 @@ module Epuber
         expect(@child.isbn).to eq '123'
       end
 
-      context '#book' do
+      describe '#book' do
         it 'keep reference to book' do
           expect(@root.book).to eq @book
         end
@@ -53,7 +53,7 @@ module Epuber
         end
       end
 
-      context '#add_const' do
+      describe '#add_const' do
         it 'supports adding one key with key, value way' do
           @root.add_const :key, 'value'
           expect(@root.constants).to eq({ key: 'value' })
@@ -73,34 +73,34 @@ module Epuber
         end
       end
 
-      context '#is_ibooks?' do
+      describe '#is_ibooks?' do
         it 'default is false' do
-          expect(@root.ibooks?).to be_falsey
+          expect(@root).not_to be_ibooks
         end
 
         it 'is true when the name is ibooks' do
-          target = Target.new('ibooks')
-          expect(target.ibooks?).to be_truthy
+          target = described_class.new('ibooks')
+          expect(target).to be_ibooks
         end
 
         it 'is true when the attribute is set to true' do
           @root.is_ibooks = true
-          expect(@root.ibooks?).to be_truthy
+          expect(@root).to be_ibooks
         end
 
         it 'is false when the attribute is set to false' do
           @root.is_ibooks = false
-          expect(@root.ibooks?).to be_falsey
+          expect(@root).not_to be_ibooks
         end
 
         it 'is false when the attribute is set to false even when the name is ibooks' do
-          target = Target.new('ibooks')
+          target = described_class.new('ibooks')
           target.is_ibooks = false
-          expect(target.ibooks?).to be_falsey
+          expect(target).not_to be_ibooks
         end
       end
 
-      context '#epub_version' do
+      describe '#epub_version' do
         it 'subtarget respects set value from parent instead of default of itself' do
           @root.epub_version = 2.0
           # @child has default value 3.0, but it should respect set value to @root

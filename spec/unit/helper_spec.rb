@@ -12,7 +12,7 @@ module Epuber
   describe Helper do
     include FakeFS::SpecHelpers
 
-    context '.destination_path_for_toc_item' do
+    describe '.destination_path_for_toc_item' do
       before do
         FileUtils.mkdir_p('/src')
         FileUtils.mkdir_p('/dest')
@@ -37,20 +37,20 @@ module Epuber
       it 'creates pretty path for simple example' do
         @resolver.add_file_from_request(@simple_item.file_request)
 
-        path = Helper.destination_path_for_toc_item(@simple_item, @resolver, '/')
+        path = described_class.destination_path_for_toc_item(@simple_item, @resolver, '/')
         expect(path).to eq 'dest/OEBPS/path/a.txt'
 
-        path = Helper.destination_path_for_toc_item(@simple_item, @resolver, '/dest/OEBPS')
+        path = described_class.destination_path_for_toc_item(@simple_item, @resolver, '/dest/OEBPS')
         expect(path).to eq 'path/a.txt'
       end
 
       it 'creates pretty path with fragment' do
         @resolver.add_file_from_request(@fragment_item.file_request)
 
-        path = Helper.destination_path_for_toc_item(@fragment_item, @resolver, '/')
+        path = described_class.destination_path_for_toc_item(@fragment_item, @resolver, '/')
         expect(path).to eq 'dest/OEBPS/path/a.txt#fragment'
 
-        path = Helper.destination_path_for_toc_item(@fragment_item, @resolver, '/dest/OEBPS')
+        path = described_class.destination_path_for_toc_item(@fragment_item, @resolver, '/dest/OEBPS')
         expect(path).to eq 'path/a.txt#fragment'
       end
 
@@ -60,10 +60,10 @@ module Epuber
 
         @resolver.add_file_from_request(@fragment_item.file_request)
 
-        path = Helper.destination_path_for_toc_item(@fragment_item, @resolver, '/')
+        path = described_class.destination_path_for_toc_item(@fragment_item, @resolver, '/')
         expect(path).to eq 'dest/OEBPS/path/a.txt#fragment'
 
-        path = Helper.destination_path_for_toc_item(@fragment_item, @resolver, '/dest/OEBPS')
+        path = described_class.destination_path_for_toc_item(@fragment_item, @resolver, '/dest/OEBPS')
         expect(path).to eq 'path/a.txt#fragment'
       end
 
@@ -73,10 +73,10 @@ module Epuber
 
         @resolver.add_file_from_request(@only_fragment_item.file_request)
 
-        path = Helper.destination_path_for_toc_item(@only_fragment_item, @resolver, '/')
+        path = described_class.destination_path_for_toc_item(@only_fragment_item, @resolver, '/')
         expect(path).to eq 'dest/OEBPS/path/a.txt#fragment'
 
-        path = Helper.destination_path_for_toc_item(@only_fragment_item, @resolver, '/dest/OEBPS')
+        path = described_class.destination_path_for_toc_item(@only_fragment_item, @resolver, '/dest/OEBPS')
         expect(path).to eq 'path/a.txt#fragment'
       end
     end

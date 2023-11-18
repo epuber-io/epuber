@@ -37,7 +37,7 @@ module Epuber
 '
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
@@ -64,7 +64,7 @@ module Epuber
 '
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
@@ -85,7 +85,7 @@ module Epuber
 
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
@@ -137,7 +137,7 @@ module Epuber
 
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
@@ -171,7 +171,7 @@ module Epuber
 
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
@@ -193,7 +193,7 @@ module Epuber
 
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
@@ -215,7 +215,7 @@ module Epuber
 
           File.write('some_file.xhtml', source)
 
-          file = XHTMLFile.new('some_file.xhtml')
+          file = described_class.new('some_file.xhtml')
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 

@@ -17,13 +17,13 @@ module Epuber
           it 'do not need to write when the file is same' do
             File.write('a.txt', 'some content, so we can compare it')
 
-            expect(AbstractFile.write_to_file?('some content, so we can compare it', 'a.txt')).to be_falsey
+            expect(described_class).not_to be_write_to_file('some content, so we can compare it', 'a.txt')
           end
 
           it 'needs to write when the file is different' do
             File.write('a.txt', 'some content, so we can compare it')
 
-            expect(AbstractFile.write_to_file?('some different content', 'a.txt')).to be_truthy
+            expect(described_class).to be_write_to_file('some different content', 'a.txt')
           end
         end
       end

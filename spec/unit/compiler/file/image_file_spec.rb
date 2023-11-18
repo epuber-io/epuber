@@ -24,21 +24,25 @@ module Epuber
           ctx
         end
 
+        after do
+          FileUtils.remove_entry(@tmp_dir)
+        end
+
         it "copy file's content to destination" do
           img_source = File.join(spec_root, '../test_project/images/001_Frie_9780804137508_art_r1_fmt.png')
           img_dest = File.join(@tmp_dir, 'dest_image.png')
 
-          expect(File.exist?(img_source)).to be_truthy
-          expect(File.exist?(img_dest)).to be_falsey
+          expect(File).to exist(img_source)
+          expect(File).not_to exist(img_dest)
 
-          file = ImageFile.new(img_source)
+          file = described_class.new(img_source)
           file.destination_path = img_dest
           resolve_file_paths(file)
 
           file.compilation_context = ctx
           file.process(nil)
 
-          expect(File.exist?(img_dest)).to be_truthy
+          expect(File).to exist(img_dest)
           expect(FileUtils.compare_file(img_source, img_dest)).to eq true
         end
 
@@ -50,7 +54,7 @@ module Epuber
           expect(source_magick_file.rows).to eq 6000
           expect(source_magick_file.columns).to eq 6000
 
-          file = ImageFile.new(source)
+          file = described_class.new(source)
           file.destination_path = dest
           resolve_file_paths(file)
 
@@ -59,14 +63,10 @@ module Epuber
 
 
           dest_magick_file = Magick::Image.read(dest).first
-          expect(dest_magick_file.rows).to_not eq 6000
-          expect(dest_magick_file.columns).to_not eq 6000
+          expect(dest_magick_file.rows).not_to eq 6000
+          expect(dest_magick_file.columns).not_to eq 6000
           expect(dest_magick_file.rows * dest_magick_file.columns).to be < 3_000_000
           expect(dest_magick_file.rows * dest_magick_file.columns).to be > 2_900_000
-        end
-
-        after do
-          FileUtils.remove_entry(@tmp_dir)
         end
       end
     end

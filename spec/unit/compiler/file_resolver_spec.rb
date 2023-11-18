@@ -17,7 +17,7 @@ module Epuber
 
       before do
         FileUtils.mkdir_p(%w[source dest])
-        @sut = FileResolver.new('/source', '/dest')
+        @sut = described_class.new('/source', '/dest')
       end
 
       it 'is empty after initialization' do
@@ -29,14 +29,14 @@ module Epuber
         FileUtils.touch('/source/file.txt')
 
         ret_file = @sut.add_file_from_request(Book::FileRequest.new('file.txt'))
-        expect(ret_file).to_not be_nil
+        expect(ret_file).not_to be_nil
 
         expect(@sut.files.count).to eq 1
         expect(@sut.manifest_files.count).to eq 1
         expect(@sut.spine_files.count).to eq 0
 
         file = @sut.files.first
-        expect(file).to_not be_nil
+        expect(file).not_to be_nil
         expect(file.path_type).to eq :manifest
         expect(file.source_path).to eq 'file.txt'
         expect(file.abs_source_path).to eq '/source/file.txt'
@@ -101,9 +101,9 @@ module Epuber
       end
 
       it 'can calculate path depend on path type' do
-        expect(FileResolver.path_comps_for('/root', :manifest)).to eq %w[/root OEBPS]
-        expect(FileResolver.path_comps_for('/root', :spine)).to eq %w[/root OEBPS]
-        expect(FileResolver.path_comps_for('/root', :package)).to eq %w[/root]
+        expect(described_class.path_comps_for('/root', :manifest)).to eq %w[/root OEBPS]
+        expect(described_class.path_comps_for('/root', :spine)).to eq %w[/root OEBPS]
+        expect(described_class.path_comps_for('/root', :package)).to eq %w[/root]
       end
 
       it 'supports searching files in source folder' do
@@ -128,7 +128,7 @@ module Epuber
         expect(file).to eq '../image2.jpg'
       end
 
-      context '#file_with_source_path' do
+      describe '#file_with_source_path' do
         it 'can return file instance from source path' do
           FileUtils.mkdir_p(%w[/source/valid])
           FileUtils.touch(%w[/source/valid/1.xhtml /source/valid/2.xhtml])
@@ -138,7 +138,7 @@ module Epuber
 
           file = @sut.file_with_source_path('valid/2.xhtml')
 
-          expect(file).to_not be_nil
+          expect(file).not_to be_nil
           expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
           expect(file.source_path).to eq 'valid/2.xhtml'
           expect(file.abs_source_path).to eq '/source/valid/2.xhtml'
@@ -153,7 +153,7 @@ module Epuber
 
           file = @sut.file_with_source_path('/source/valid/2.xhtml')
 
-          expect(file).to_not be_nil
+          expect(file).not_to be_nil
           expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
           expect(file.source_path).to eq 'valid/2.xhtml'
           expect(file.abs_source_path).to eq '/source/valid/2.xhtml'
@@ -168,7 +168,7 @@ module Epuber
         @sut.add_file_from_request(req)
 
         file = @sut.file_with_destination_path('valid/2.xhtml')
-        expect(file).to_not be_nil
+        expect(file).not_to be_nil
         expect(file.final_destination_path).to eq '/dest/OEBPS/valid/2.xhtml'
       end
 
@@ -218,11 +218,11 @@ module Epuber
 
         req_with_fragment = Book::FileRequest.new('some_file#fragment')
         new_file = @sut.add_file_from_request(req_with_fragment)
-        expect(new_file).to_not be_nil
+        expect(new_file).not_to be_nil
         expect(new_file).to be files.first
 
         founded_file = @sut.file_from_request(req_with_fragment)
-        expect(founded_file).to_not be_nil
+        expect(founded_file).not_to be_nil
         expect(founded_file).to be files.first
         expect(founded_file).to be new_file
       end
@@ -235,28 +235,28 @@ module Epuber
 
         req_with_fragment = Book::FileRequest.new('some_file#fragment')
         founded_file = @sut.file_from_request(req_with_fragment)
-        expect(founded_file).to_not be_nil
+        expect(founded_file).not_to be_nil
         expect(founded_file).to be files.first
       end
 
-      context '.file_class_for' do
+      describe '.file_class_for' do
         it 'selects correct file type from file extension' do
-          expect(FileResolver.file_class_for('.styl')).to be FileTypes::StylusFile
-          expect(FileResolver.file_class_for('.css')).to be FileTypes::StaticFile
+          expect(described_class.file_class_for('.styl')).to be FileTypes::StylusFile
+          expect(described_class.file_class_for('.css')).to be FileTypes::StaticFile
 
-          expect(FileResolver.file_class_for('.js')).to be FileTypes::StaticFile
-          expect(FileResolver.file_class_for('.coffee')).to be FileTypes::CoffeeScriptFile
+          expect(described_class.file_class_for('.js')).to be FileTypes::StaticFile
+          expect(described_class.file_class_for('.coffee')).to be FileTypes::CoffeeScriptFile
 
-          expect(FileResolver.file_class_for('.bade')).to be FileTypes::BadeFile
-          expect(FileResolver.file_class_for('.xhtml')).to be FileTypes::XHTMLFile
-          expect(FileResolver.file_class_for('.html')).to be FileTypes::XHTMLFile
+          expect(described_class.file_class_for('.bade')).to be FileTypes::BadeFile
+          expect(described_class.file_class_for('.xhtml')).to be FileTypes::XHTMLFile
+          expect(described_class.file_class_for('.html')).to be FileTypes::XHTMLFile
 
-          expect(FileResolver.file_class_for('.png')).to be FileTypes::ImageFile
-          expect(FileResolver.file_class_for('.jpeg')).to be FileTypes::ImageFile
-          expect(FileResolver.file_class_for('.jpg')).to be FileTypes::ImageFile
+          expect(described_class.file_class_for('.png')).to be FileTypes::ImageFile
+          expect(described_class.file_class_for('.jpeg')).to be FileTypes::ImageFile
+          expect(described_class.file_class_for('.jpg')).to be FileTypes::ImageFile
 
-          expect(FileResolver.file_class_for('.otf')).to be FileTypes::StaticFile
-          expect(FileResolver.file_class_for('.ttf')).to be FileTypes::StaticFile
+          expect(described_class.file_class_for('.otf')).to be FileTypes::StaticFile
+          expect(described_class.file_class_for('.ttf')).to be FileTypes::StaticFile
         end
       end
     end

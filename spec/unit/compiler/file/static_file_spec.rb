@@ -25,9 +25,9 @@ module Epuber
         it "copy file's content to destination" do
           File.write('a.txt', 'some content, so we can compare it')
 
-          expect(File.exist?('b.txt')).to be_falsey
+          expect(File).not_to exist('b.txt')
 
-          file = StaticFile.new('a.txt')
+          file = described_class.new('a.txt')
           file.destination_path = 'b.txt'
 
           file.abs_source_path = '/a.txt'
@@ -36,7 +36,7 @@ module Epuber
           file.compilation_context = ctx
           file.process(nil)
 
-          expect(File.exist?('b.txt')).to be_truthy
+          expect(File).to exist('b.txt')
           expect(File.read('b.txt')).to eq 'some content, so we can compare it'
         end
       end

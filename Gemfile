@@ -6,6 +6,5 @@ source 'https://rubygems.org'
 gemspec
 
 group :dev, optional: true do
-  gem 'debase', require: false
-  gem 'ruby-debug-ide', require: false
+  gem 'rubocop-rspec', require: false
 end

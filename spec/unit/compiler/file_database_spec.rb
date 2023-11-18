@@ -10,7 +10,7 @@ module Epuber
     describe FileDatabase do
       include FakeFS::SpecHelpers
 
-      let(:sut) { FileDatabase.new('/db') }
+      let(:sut) { described_class.new('/db') }
 
       it 'can load from file' do
         expect(sut.store_file_path).to eq '/db'
@@ -23,7 +23,7 @@ module Epuber
         sut.update_metadata('/file')
         sut.save_to_file
 
-        inst2 = FileDatabase.new('/db')
+        inst2 = described_class.new('/db')
         expect(inst2.all_files).to eq sut.all_files
         expect(inst2.all_files.count).to eq 1
         expect(inst2.all_files['/file']).to be_a(FileStat)
@@ -35,7 +35,7 @@ module Epuber
 
         File.write('/file', 'abc def')
 
-        expect(sut.changed?('/file')).to be_truthy
+        expect(sut).to be_changed('/file')
       end
 
       it 'can track whether some file has changed the mtime or ctime' do
@@ -44,14 +44,14 @@ module Epuber
 
         File.write('/file', 'abc')
 
-        expect(sut.changed?('/file')).to be_truthy
+        expect(sut).to be_changed('/file')
       end
 
       it 'can track whether some file has not changed' do
         File.write('/file', 'abc')
         sut.update_metadata('/file')
 
-        expect(sut.changed?('/file')).to be_falsey
+        expect(sut).not_to be_changed('/file')
       end
 
       it 'can cleanup old files' do
@@ -62,13 +62,13 @@ module Epuber
         sut.update_metadata('/file_old')
 
         expect(sut.all_files.count).to eq 2
-        expect(sut.all_files['/file']).to_not be_nil
-        expect(sut.all_files['/file_old']).to_not be_nil
+        expect(sut.all_files['/file']).not_to be_nil
+        expect(sut.all_files['/file_old']).not_to be_nil
 
         sut.cleanup(%w[/file])
 
         expect(sut.all_files.count).to eq 1
-        expect(sut.all_files['/file']).to_not be_nil
+        expect(sut.all_files['/file']).not_to be_nil
         expect(sut.all_files['/file_old']).to be_nil
       end
 
@@ -81,8 +81,8 @@ module Epuber
           sut.add_dependency('/file_dep', to: '/file')
 
           expect(sut.all_files.count).to eq 2
-          expect(sut.all_files['/file']).to_not be_nil
-          expect(sut.all_files['/file_dep']).to_not be_nil
+          expect(sut.all_files['/file']).not_to be_nil
+          expect(sut.all_files['/file_dep']).not_to be_nil
         end
 
         it 'dependency is implicitly in unknown state' do
@@ -92,7 +92,7 @@ module Epuber
           sut.update_metadata('/file')
           sut.add_dependency('/file_dep', to: '/file')
 
-          expect(sut.up_to_date?('/file')).to be_falsey
+          expect(sut).not_to be_up_to_date('/file')
         end
 
         it 'dependency is implicitly in unknown state, must call update_metadata' do
@@ -103,7 +103,7 @@ module Epuber
           sut.add_dependency('/file_dep', to: '/file')
           sut.update_metadata('/file_dep') # added
 
-          expect(sut.up_to_date?('/file')).to be_truthy
+          expect(sut).to be_up_to_date('/file')
         end
 
         it 'can add dependencies as array' do
@@ -115,11 +115,11 @@ module Epuber
           sut.add_dependency(%w[/file_dep1 /file_dep2], to: '/file')
 
           expect(sut.all_files.count).to eq 3
-          expect(sut.all_files['/file']).to_not be_nil
-          expect(sut.all_files['/file_dep1']).to_not be_nil
-          expect(sut.all_files['/file_dep2']).to_not be_nil
+          expect(sut.all_files['/file']).not_to be_nil
+          expect(sut.all_files['/file_dep1']).not_to be_nil
+          expect(sut.all_files['/file_dep2']).not_to be_nil
 
-          expect(sut.up_to_date?('/file')).to be_falsey
+          expect(sut).not_to be_up_to_date('/file')
         end
 
         it 'can add dependencies as array, but must call update_metadata on each' do
@@ -132,7 +132,7 @@ module Epuber
           sut.update_metadata('/file_dep1')
           sut.update_metadata('/file_dep2')
 
-          expect(sut.up_to_date?('/file')).to be_truthy
+          expect(sut).to be_up_to_date('/file')
         end
 
         it 'can save to file and load back with dependencies' do
@@ -143,7 +143,7 @@ module Epuber
           sut.add_dependency('/file_dep', to: '/file')
           sut.save_to_file
 
-          inst2 = FileDatabase.new('/db')
+          inst2 = described_class.new('/db')
           expect(inst2.all_files).to eq sut.all_files
           expect(inst2.all_files.count).to eq 2
           expect(inst2.all_files['/file']).to be_a(FileStat)
@@ -158,17 +158,17 @@ module Epuber
           sut.add_dependency('/file_dep', to: '/file')
 
           # dependency is unknown file, so it must be falsey
-          expect(sut.up_to_date?('/file')).to be_falsey
+          expect(sut).not_to be_up_to_date('/file')
 
           sut.update_metadata('/file_dep')
 
           # now the dependency is updated in database
-          expect(sut.up_to_date?('/file')).to be_truthy
+          expect(sut).to be_up_to_date('/file')
 
           # make the dependency file newer
           File.write('/file_dep', 'abc def')
 
-          expect(sut.up_to_date?('/file')).to be_falsey
+          expect(sut).not_to be_up_to_date('/file')
         end
 
         it 'handle not-existing files correctly' do
@@ -177,7 +177,7 @@ module Epuber
           sut.update_metadata('/file')
           sut.add_dependency('/file_dep', to: '/file')
 
-          expect(sut.up_to_date?('/file')).to be_truthy
+          expect(sut).to be_up_to_date('/file')
         end
 
         it 'resolve transitive dependency' do
@@ -209,7 +209,7 @@ module Epuber
           # make the dependency file newer
           File.write('/file_dep7', 'abc def')
 
-          expect(sut.up_to_date?('/file')).to be_falsey
+          expect(sut).not_to be_up_to_date('/file')
         end
 
         it 'cleans up transitive dependency' do
@@ -224,8 +224,8 @@ module Epuber
           sut.cleanup(%w[/file /file_dep])
 
           expect(sut.all_files.count).to eq 2
-          expect(sut.all_files['/file']).to_not be_nil
-          expect(sut.all_files['/file_dep']).to_not be_nil
+          expect(sut.all_files['/file']).not_to be_nil
+          expect(sut.all_files['/file_dep']).not_to be_nil
           expect(sut.all_files['/file_dep2']).to be_nil
 
           expect(sut.all_files['/file_dep'].dependency_paths).to be_empty
@@ -242,15 +242,15 @@ module Epuber
           sut.add_dependency('/file_dep2', to: '/file_dep')
           sut.update_metadata('/file_dep2')
 
-          expect(sut.up_to_date?('/file')).to be_truthy
+          expect(sut).to be_up_to_date('/file')
 
           FileUtils.touch('/file_dep2')
 
-          expect(sut.up_to_date?('/file')).to be_falsey
+          expect(sut).not_to be_up_to_date('/file')
 
           sut.update_all_metadata
 
-          expect(sut.up_to_date?('/file')).to be_truthy
+          expect(sut).to be_up_to_date('/file')
         end
       end
     end

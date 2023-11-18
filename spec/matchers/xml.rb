@@ -59,7 +59,7 @@ RSpec::Matchers.define :have_xpath do |xpath, text|
 
 
     test_with_message "not found any nodes for xpath #{@original_xpath}" do
-      expect(nodes.empty?).to be_falsey
+      expect(nodes).not_to be_empty
     end
 
     if text

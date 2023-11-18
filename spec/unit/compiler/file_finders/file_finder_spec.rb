@@ -14,16 +14,16 @@ module Epuber
       include FakeFS::SpecHelpers
 
       before do
-        @finder = FileFinders::Normal.new('.')
+        @finder = described_class.new('.')
       end
 
 
       it 'stores info from init' do
-        finder = FileFinders::Normal.new('dasdasas')
+        finder = described_class.new('dasdasas')
         expect(finder.source_path).to eq 'dasdasas'
       end
 
-      context '#find_files' do
+      describe '#find_files' do
         it 'can find file in root folder' do
           FileUtils.touch(['a.xhtml', 'b.xhtml'])
 
@@ -63,7 +63,7 @@ module Epuber
         end
       end
 
-      context '#find_files cases with context_path' do
+      describe '#find_files cases with context_path' do
         it 'can find files in context folder' do
           FileUtils.mkdir_p('abc')
           FileUtils.touch(['abc/file1.xhtml', 'abc/file2.xhtml', 'abc/file3.xhtml'])
@@ -105,7 +105,7 @@ module Epuber
         end
       end
 
-      context '#find_all' do
+      describe '#find_all' do
         it 'can find all files in project' do
           FileUtils.mkdir_p('dir_1/dir_11/dir_111')
           FileUtils.mkdir_p('dir_2')
@@ -147,7 +147,7 @@ module Epuber
         end
       end
 
-      context '#find_file' do
+      describe '#find_file' do
         it 'can find exactly one file' do
           FileUtils.touch(['c.xhtml', 'd.css', 'abc.txt'])
 
@@ -187,7 +187,7 @@ module Epuber
         end
       end
 
-      context '#ignored_patterns' do
+      describe '#ignored_patterns' do
         it 'support ignoring patterns' do
           @finder.ignored_patterns << '/abc/**'
 
@@ -205,7 +205,7 @@ module Epuber
         end
       end
 
-      context '.group_filter_paths' do
+      describe '.group_filter_paths' do
         it 'returns the same array for nil groups' do
           input = %w[some/path/abc.txt some/path/abc2.txt a.txt]
           output = FileFinders::Abstract.group_filter_paths(input, nil)

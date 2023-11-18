@@ -46,7 +46,7 @@ mixin bla()
           FileUtils.touch('dep.bade')
           File.write('some_file.bade', source)
 
-          file = BadeFile.new('some_file.bade')
+          file = described_class.new('some_file.bade')
           file.destination_path = 'some_file.xhtml'
           resolve_file_paths(file)
 
@@ -81,7 +81,7 @@ import "abc.bade"
 import 'def.bade'
 )
 
-          imports = BadeFile.find_imports(source)
+          imports = described_class.find_imports(source)
 
           expect(imports).to contain_exactly 'abc.bade', 'def.bade'
         end
@@ -96,7 +96,7 @@ import 'def.bade'
           FileUtils.touch('/abc/abc.bade')
           FileUtils.touch('/abc/def.bade')
 
-          file = BadeFile.new('/abc/some_file.bade')
+          file = described_class.new('/abc/some_file.bade')
           file.destination_path = 'abc/some_file.xhtml'
           file.compilation_context = ctx
           resolve_file_paths(file)

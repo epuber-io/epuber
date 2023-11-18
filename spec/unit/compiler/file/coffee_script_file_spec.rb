@@ -41,7 +41,7 @@ module Epuber
 
           File.write(source_path, source)
 
-          file = CoffeeScriptFile.new(source_path)
+          file = described_class.new(source_path)
           file.destination_path = dest_path
           resolve_file_paths(file)
 

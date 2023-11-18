@@ -9,13 +9,13 @@ module Epuber
   class Checker
     class TextChecker
       describe MatchProblem do
-        context '#to_s' do
+        describe '#to_s' do
           it 'can format simple problem' do
             text = 'some text containing some problem'
             text =~ /text/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 6 --- Some message'
@@ -29,7 +29,7 @@ module Epuber
             text =~ /t/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 6 --- Some message'
@@ -43,7 +43,7 @@ module Epuber
             text =~ /problem/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 6 --- Some message'
@@ -57,7 +57,7 @@ module Epuber
             text =~ /problem/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 1 --- Some message'
@@ -71,7 +71,7 @@ module Epuber
             text =~ /problem/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 29 --- Some message'
@@ -87,7 +87,7 @@ some text containing some problem'
             text =~ /problem/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:3 column: 27 --- Some message'
@@ -101,7 +101,7 @@ some text containing some problem'
             text =~ /abc/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 391 --- Some message'
@@ -115,7 +115,7 @@ some text containing some problem'
             text =~ /abcd/
             match = Regexp.last_match
 
-            problem = MatchProblem.new(match, 'Some message', '/path/to/file.txt')
+            problem = described_class.new(match, 'Some message', '/path/to/file.txt')
             sut     = problem.to_s.split("\n")
 
             expect(sut.shift).to eq '/path/to/file.txt:1 column: 9 --- Some message'

@@ -9,7 +9,7 @@ module Epuber
       book = Book.new
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
-      @sut = Compiler::OPFGenerator.new(ctx)
+      @sut = described_class.new(ctx)
     end
 
     it 'creates minimal xml structure for empty book' do
@@ -36,7 +36,7 @@ module Epuber
 
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
-      @sut = Compiler::OPFGenerator.new(ctx)
+      @sut = described_class.new(ctx)
 
       opf_xml = @sut.generate_opf
       with_xpath(opf_xml, '/package/metadata') do |metadata|
@@ -88,7 +88,7 @@ module Epuber
 
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = resolver
-      @sut = Compiler::OPFGenerator.new(ctx)
+      @sut = described_class.new(ctx)
 
       opf_xml = @sut.generate_opf
       with_xpath(opf_xml, '/package/metadata') do |metadata|
@@ -104,7 +104,7 @@ module Epuber
       end
     end
 
-    context '.create_id_from_path' do
+    describe '.create_id_from_path' do
       it 'generates id without numbers at start' do
         def create_id(path)
           # `create_id_from_path` method is private, using this hack we can call the private method
@@ -115,7 +115,7 @@ module Epuber
       end
     end
 
-    context '.mime_type_for' do
+    describe '.mime_type_for' do
       def mimetype(path)
         @sut.send(:mime_type_for, path)
       end

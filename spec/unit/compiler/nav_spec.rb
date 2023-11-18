@@ -15,7 +15,7 @@ module Epuber
         book              = Book.new
         ctx               = Compiler::CompilationContext.new(book, book.all_targets.first)
         ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
-        @sut              = Compiler::NavGenerator.new(ctx)
+        @sut              = described_class.new(ctx)
       end
 
       it 'creates minimal xml structure for empty book' do
@@ -46,7 +46,7 @@ module Epuber
         resolver          = Compiler::FileResolver.new('/source', '/dest')
         book.default_target.root_toc.sub_items.each { |item| resolver.add_file_from_request(item.file_request) }
         ctx.file_resolver = resolver
-        @sut              = Compiler::NavGenerator.new(ctx)
+        @sut              = described_class.new(ctx)
 
         nav_xml = @sut.generate_nav
         expect(nav_xml).to have_xpath('/html/head/title', book.title)
@@ -92,7 +92,7 @@ module Epuber
           end
         end
         ctx.file_resolver = resolver
-        @sut              = Compiler::NavGenerator.new(ctx)
+        @sut              = described_class.new(ctx)
 
         nav_xml = @sut.generate_nav
         toc = nav_xml.at_css('html > body > nav[epub|type="toc"]')
@@ -124,7 +124,7 @@ module Epuber
         resolver          = Compiler::FileResolver.new('/source', '/dest')
         book.default_target.root_toc.sub_items.each { |item| resolver.add_file_from_request(item.file_request) }
         ctx.file_resolver = resolver
-        @sut              = Compiler::NavGenerator.new(ctx)
+        @sut              = described_class.new(ctx)
 
         ncx = @sut.generate_nav
 

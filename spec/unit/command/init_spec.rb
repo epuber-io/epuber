@@ -17,7 +17,7 @@ module Epuber
         expect(Dir.entries('.')).to contain_exactly '.', '..'
 
         argv = CLAide::ARGV.new(['book_name'])
-        init = Init.new(argv)
+        init = described_class.new(argv)
         init.run
 
         expect(Dir.entries('.')).to contain_exactly '.', '..',
@@ -44,7 +44,7 @@ module Epuber
         File.write('.gitignore', gitignore_contents)
 
         argv = CLAide::ARGV.new(['book_name'])
-        init = Init.new(argv)
+        init = described_class.new(argv)
         init.run
 
         expected = <<~NEW

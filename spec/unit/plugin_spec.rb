@@ -13,7 +13,7 @@ module Epuber
       it 'can load from file' do
         FileUtils.touch('plugin.rb')
 
-        plugin = Plugin.new('plugin.rb')
+        plugin = described_class.new('plugin.rb')
         file = plugin.files.first
         expect(file.source_path).to eq 'plugin.rb'
         expect(file.abs_source_path).to eq '/plugin.rb'
@@ -25,7 +25,7 @@ module Epuber
         Dir.chdir('/some/nested/dir/structure') do
           FileUtils.touch('plugin.rb')
 
-          plugin = Plugin.new('plugin.rb')
+          plugin = described_class.new('plugin.rb')
           file = plugin.files.first
 
           expect(file.source_path).to eq 'plugin.rb'
@@ -37,7 +37,7 @@ module Epuber
         FileUtils.mkdir_p('/some/nested/dir/structure')
         FileUtils.touch('/some/nested/dir/structure/plugin.rb')
 
-        plugin = Plugin.new('some/nested/dir/structure/plugin.rb')
+        plugin = described_class.new('some/nested/dir/structure/plugin.rb')
         file = plugin.files.first
 
         expect(file.source_path).to eq 'some/nested/dir/structure/plugin.rb'
@@ -47,7 +47,7 @@ module Epuber
       it 'can load from empty folder' do
         FileUtils.mkdir_p('plugin')
 
-        plugin = Plugin.new('plugin')
+        plugin = described_class.new('plugin')
         expect(plugin.files).to be_empty
       end
 
@@ -55,7 +55,7 @@ module Epuber
         FileUtils.mkdir_p('plugin')
         FileUtils.touch('plugin/plugin.rb')
 
-        plugin = Plugin.new('plugin')
+        plugin = described_class.new('plugin')
         file = plugin.files.first
         expect(file.source_path).to eq 'plugin/plugin.rb'
         expect(file.abs_source_path).to eq '/plugin/plugin.rb'
@@ -63,13 +63,13 @@ module Epuber
 
       it "raise exception when the file doesn't exist" do
         expect do
-          Plugin.new('plugin.rb')
+          described_class.new('plugin.rb')
         end.to raise_exception LoadError
       end
 
       it "raise exception when the folder doesn't exist" do
         expect do
-          Plugin.new('plugin/')
+          described_class.new('plugin/')
         end.to raise_exception LoadError
       end
     end

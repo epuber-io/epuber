@@ -7,7 +7,7 @@ module Epuber
   class Book
     describe Book do
       before do
-        @book = Book.new do |book|
+        @book = described_class.new do |book|
           book.title    = 'Práce na dálku'
           book.subtitle = 'Abc'
 
@@ -25,7 +25,7 @@ module Epuber
         @target = @book.default_target
       end
 
-      it 'should parse simple book and store all informations' do
+      it 'parses simple book and store all informations' do
         book = @book
 
         expect(book.title).to eq 'Práce na dálku'
@@ -38,16 +38,16 @@ module Epuber
         expect(book.print_isbn).to eq '978-80-87270-98-0'
         expect(book.isbn).to eq '978-80-87270-98-2'
 
-        expect(@target).to_not be_nil
+        expect(@target).not_to be_nil
       end
 
       it 'has defaults' do
-        book = Book.new
+        book = described_class.new
         expect(book.epub_version).to eq '3.0'
       end
 
       context 'attributes' do
-        context '#authors, #author' do
+        describe '#authors, #author' do
           it 'automatically converts into NormalContributor' do
             book = @book
             expect(book.author).to be_a NormalContributor
@@ -56,7 +56,7 @@ module Epuber
           end
 
           it 'is required' do
-            book = Book.new do |b|
+            book = described_class.new do |b|
               b.title    = 'Práce na dálku'
               b.subtitle = 'Abc'
             end
@@ -65,20 +65,20 @@ module Epuber
           end
 
           it 'supports array' do
-            book = Book.new do |b|
+            book = described_class.new do |b|
               b.title    = 'Práce na dálku'
               b.subtitle = 'Abc'
               b.authors  = ['Abc def']
             end
 
-            expect { book.validate }.to_not raise_error
+            expect { book.validate }.not_to raise_error
 
             expect(book.authors).to contain_exactly(a_kind_of(NormalContributor))
           end
         end
 
         it '#title is required' do
-          book = Book.new do |b|
+          book = described_class.new do |b|
             b.subtitle = 'Abc'
 
             b.author = {
@@ -90,7 +90,7 @@ module Epuber
           expect { book.validate }.to raise_error ValidationError
         end
 
-        context '#published' do
+        describe '#published' do
           it 'is automatically converted to date if needed' do
             @book.published = '2014-11-10'
 
@@ -107,7 +107,7 @@ module Epuber
         it '#version is optional' do
           @book.version = '1.0.1'
 
-          expect { @book.validate }.to_not raise_error
+          expect { @book.validate }.not_to raise_error
         end
 
         it '#is_ibooks is stored and optional' do
@@ -115,12 +115,12 @@ module Epuber
 
           expect do
             @book.validate
-          end.to_not raise_error
+          end.not_to raise_error
         end
       end
 
       it 'block is optional, you can build whatever you like' do
-        expect { Book.new }.to_not raise_error
+        expect { described_class.new }.not_to raise_error
       end
 
       it 'can parse from string' do
@@ -135,11 +135,11 @@ module Epuber
               end
         END_BOOK
 
-        book = Book.from_string(string)
+        book = described_class.from_string(string)
 
-        expect(book).to be_a Book
+        expect(book).to be_a described_class
 
-        expect { book.validate }.to_not raise_error
+        expect { book.validate }.not_to raise_error
       end
 
       context 'targets' do

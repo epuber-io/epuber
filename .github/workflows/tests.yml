@@ -25,7 +25,9 @@ jobs:
       run: sudo -v && sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
 
     - name: Install dependencies
-      run: bundle install
+      run: |
+        bundle config set --local with 'dev'
+        bundle install
 
     - name: Run tests
       run: bundle exec rspec

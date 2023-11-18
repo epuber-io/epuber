@@ -52,7 +52,7 @@ module Epuber
         it 'optional value should validate without problem' do
           expect do
             @example.validate
-          end.to_not raise_error
+          end.not_to raise_error
         end
       end
 
@@ -61,18 +61,18 @@ module Epuber
           @example = TestRequiredClass.new
         end
 
-        it 'should not validate without specified attribute' do
+        it 'does not validate without specified attribute' do
           expect do
             @example.validate
           end.to raise_error Object::ValidationError
         end
 
-        it 'should validate with specified attribute' do
+        it 'validates with specified attribute' do
           @example.required_string = 'abc'
 
           expect do
             @example.validate
-          end.to_not raise_error
+          end.not_to raise_error
         end
       end
 
@@ -81,7 +81,7 @@ module Epuber
           @sut = TestAutoClass.new
         end
 
-        context '#simple' do
+        describe '#simple' do
           it 'converse string into date' do
             @sut.simple = '11. 10. 2014'
 
@@ -89,7 +89,7 @@ module Epuber
           end
         end
 
-        context '#lambda' do
+        describe '#lambda' do
           it 'converse string into number' do
             @sut.lambda = '1'
 
@@ -97,7 +97,7 @@ module Epuber
           end
         end
 
-        context '#multi' do
+        describe '#multi' do
           it 'converse number into string' do
             @sut.multi = 1
             expect(@sut.multi).to eq '1'

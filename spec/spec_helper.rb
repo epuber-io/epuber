@@ -29,7 +29,7 @@ end
 RSpec.configure do |c|
   c.filter_run_excluding expensive: true if ENV['SKIP_EXPENSIVE_TESTS'] == 'true'
 
-  c.before(:each) do
+  c.before do
     Epuber::Config.class_eval { @instance = nil }
     Epuber::Config.instance
   end

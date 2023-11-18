@@ -14,12 +14,12 @@ module Epuber
     module FileFinders
       describe Imaginary do
         it 'support splitting path into components' do
-          comps = Imaginary.path_parts('some/path/is/awesome/file.txt')
+          comps = described_class.path_parts('some/path/is/awesome/file.txt')
           expect(comps).to eq %w[some path is awesome file.txt]
         end
 
         it 'supports adding file' do
-          finder = Imaginary.new('/')
+          finder = described_class.new('/')
           finder.add_file('abc.txt')
 
           expected = Imaginary::DirEntry.new('/')
@@ -29,7 +29,7 @@ module Epuber
         end
 
         it 'supports adding nested file' do
-          finder = Imaginary.new('/')
+          finder = described_class.new('/')
           finder.add_file('some/path/abc.txt')
 
           expected = Imaginary::DirEntry.new('/')
@@ -41,7 +41,7 @@ module Epuber
         end
 
         it 'can find file in root folder' do
-          finder = Imaginary.new('/')
+          finder = described_class.new('/')
           finder.add_file('abc.txt')
 
           path = finder.find_files('abc.txt')
@@ -49,7 +49,7 @@ module Epuber
         end
 
         it 'can find file in specific context_path' do
-          finder = Imaginary.new('/')
+          finder = described_class.new('/')
           finder.add_file('folder/baf/abc.txt')
 
           path = finder.find_files('abc.txt', context_path: 'folder/baf')
@@ -59,7 +59,7 @@ module Epuber
 
         context 'crashes' do
           it "doesn't crash when searched path is empty, only raises valid error" do
-            finder = Imaginary.new('/')
+            finder = described_class.new('/')
             finder.add_file('/abc/def')
 
             expect do
@@ -68,7 +68,7 @@ module Epuber
           end
 
           it "doesn't crash when searched path is empty (specified context path), only raises valid error" do
-            finder = Imaginary.new('/')
+            finder = described_class.new('/')
             finder.add_file('/abc/def')
 
             expect do

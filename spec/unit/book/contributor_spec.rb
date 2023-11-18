@@ -7,10 +7,10 @@ module Epuber
   class Book
     describe Contributor do
       before do
-        @contributor = Contributor.new('Jason Fried', 'FRIED, Jason', 'aut')
+        @contributor = described_class.new('Jason Fried', 'FRIED, Jason', 'aut')
       end
 
-      it 'should return same values' do
+      it 'returns same values' do
         expect(@contributor.pretty_name).to eq 'Jason Fried'
         expect(@contributor.file_as).to eq 'FRIED, Jason'
         expect(@contributor.role).to eq 'aut'
@@ -19,7 +19,7 @@ module Epuber
 
     describe NormalContributor do
       before do
-        @contributor = NormalContributor.new('Jason', 'Fried', 'aut')
+        @contributor = described_class.new('Jason', 'Fried', 'aut')
       end
 
       it 'formats file_as' do

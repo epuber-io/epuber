@@ -15,15 +15,15 @@ module Epuber
         include FakeFS::SpecHelpers
 
         it 'writes content into file' do
-          expect(File.exist?('b.txt')).to be_falsey
+          expect(File).not_to exist('b.txt')
 
-          file = GeneratedFile.new
+          file = described_class.new
           file.destination_path = 'b.txt'
           file.final_destination_path = '/b.txt'
           file.content = 'some content'
           file.process(nil)
 
-          expect(File.exist?('b.txt')).to be_truthy
+          expect(File).to exist('b.txt')
           expect(File.read('b.txt')).to eq 'some content'
         end
       end
