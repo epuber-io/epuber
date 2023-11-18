@@ -26,7 +26,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        gem update --system
+        gem update --system 3.2.3
         bundle config set --local with 'dev'
         bundle install
 
