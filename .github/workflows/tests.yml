@@ -20,13 +20,13 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
+        rubygems: 3.2.3
 
     - name: Install Calibre
       run: sudo -v && sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
 
     - name: Install dependencies
       run: |
-        gem update --system 3.2.3
         bundle config set --local with 'dev'
         bundle install
 
