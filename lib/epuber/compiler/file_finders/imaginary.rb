@@ -166,9 +166,9 @@ module Epuber
                  .gsub('(', '\(')
                  .gsub(')', '\)')
                  .gsub(/\{(.*?)\}/) do
-            "(#{Regexp.last_match[1].gsub(',', '|')})"
-          end
-            .gsub(/\A\./, '(?!\.).')
+                   "(#{Regexp.last_match[1].gsub(',', '|')})"
+                 end
+                 .gsub(/\A\./, '(?!\.).')
         end
       end
     end
