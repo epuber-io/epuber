@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.8.0 (2023-11-19)
+
+- fixed not failing build when running `build --check` or `build --release` and Epubcheck fails with errors #82
+- add Global ID feature (more in [docs](docs/usage.md#global-ids)) #57
+- add validation of `.bookspec` file in plugins #20
+
+
 ## v0.7.4
 
 - fixed using precompiled version of Bade and correct import and require paths
