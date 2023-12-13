@@ -57,6 +57,21 @@ module Epuber
         expect(contributor.file_as).to eq 'FRIED, Jason'
       end
 
+      it 'parse Contributor from Hash with symbols :file_as, :pretty_name and :role' do
+        hash = {
+          pretty_name: 'Jason Fried',
+          file_as: 'FRIED, Jason',
+          role: 'aut2',
+        }
+
+        contributor = Contributor.from_obj(hash)
+
+        expect(contributor).to be_a(Contributor)
+        expect(contributor.pretty_name).to eq 'Jason Fried'
+        expect(contributor.file_as).to eq 'FRIED, Jason'
+        expect(contributor.role).to eq 'aut2'
+      end
+
       it 'parse Contributor from Hash with symbols :first_name and :last_name' do
         hash = {
           first_name: 'Jason',
@@ -69,6 +84,48 @@ module Epuber
         expect(contributor.first_name).to eq 'Jason'
         expect(contributor.last_name).to eq 'Fried'
         expect(contributor.role).to eq 'aut'
+      end
+
+      it 'parse Contributor from Hash with symbols :first_name, :last_name and :role' do
+        hash = {
+          first_name: 'Jason',
+          last_name: 'Fried',
+          role: 'aut3',
+        }
+
+        contributor = Contributor.from_obj(hash)
+
+        expect(contributor).to be_a(NormalContributor)
+        expect(contributor.first_name).to eq 'Jason'
+        expect(contributor.last_name).to eq 'Fried'
+        expect(contributor.role).to eq 'aut3'
+      end
+
+      it 'parse Contributor from Hash with symbol :name' do
+        hash = {
+          name: 'Jason Fried',
+        }
+
+        contributor = Contributor.from_obj(hash, 'aut')
+
+        expect(contributor).to be_a(NormalContributor)
+        expect(contributor.first_name).to eq 'Jason'
+        expect(contributor.last_name).to eq 'Fried'
+        expect(contributor.role).to eq 'aut'
+      end
+
+      it 'parse Contributor from Hash with symbol :name and :role' do
+        hash = {
+          name: 'Jason Fried',
+          role: 'aut4',
+        }
+
+        contributor = Contributor.from_obj(hash)
+
+        expect(contributor).to be_a(NormalContributor)
+        expect(contributor.first_name).to eq 'Jason'
+        expect(contributor.last_name).to eq 'Fried'
+        expect(contributor.role).to eq 'aut4'
       end
 
       it 'parse Contributor from simple name in string' do

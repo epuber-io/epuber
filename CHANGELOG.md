@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Not released
+
+- add way to specify contributor's role by adding `:role` key in hash syntax (see [bookspec.md](docs/bookspec.md#role))
+- add some docs about bookspec (see [bookspec.md](docs/bookspec.md))
+
 ## v0.8.0 (2023-11-19)
 
 - fixed not failing build when running `build --check` or `build --release` and Epubcheck fails with errors #82

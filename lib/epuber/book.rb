@@ -160,7 +160,7 @@ module Epuber
               container: Array,
               required: true,
               singularize: true,
-              auto_convert: { [String, Hash] => ->(value) { Contributor.from_obj(value, 'aut') } }
+              auto_convert: { [String, Hash] => ->(value) { Contributor.from_obj(value) } }
 
 
     # @return [String] publisher name

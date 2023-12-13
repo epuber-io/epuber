@@ -36,17 +36,21 @@ module Epuber
       #
       # @return [Contributor]
       #
-      def self.from_obj(obj, role)
+      def self.from_obj(obj, role = 'aut')
         if obj.is_a?(String)
           components = obj.split(' ')
           if components.length >= 2
             NormalContributor.new(components.first(components.length - 1).join(' '), components.last, role)
+          else
+            Contributor.new(obj, obj, role)
           end
         elsif obj.is_a?(Hash)
           if obj.key?(:first_name)
-            NormalContributor.new(obj[:first_name], obj[:last_name], role)
+            NormalContributor.new(obj[:first_name], obj[:last_name], obj[:role] || role)
           elsif obj.key?(:file_as)
-            Contributor.new(obj[:pretty_name], obj[:file_as], role)
+            Contributor.new(obj[:pretty_name], obj[:file_as], obj[:role] || role)
+          elsif obj.key?(:name)
+            Contributor.from_obj(obj[:name], obj[:role] || role)
           end
         end
       end
