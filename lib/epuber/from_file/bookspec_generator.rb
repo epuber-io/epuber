@@ -17,36 +17,18 @@ module Epuber
       end
     end
 
-    # @param opf [Nokogiri::XML::Document]
-    #
-    # @return [Array<Nokogiri::XML::Document, Nokogiri::XML::Document>] nav, ncx
-    #
-    def self.find_nav_and_ncx(opf)
-      nav = opf.at_css('manifest item[properties="nav"]')
-
-      spine = opf.at_css('spine')
-      ncx_id = spine['toc']
-      ncx = opf.at_css(%(manifest item[id="#{ncx_id}"]))
-
-      [nav, ncx]
-    end
-
-    # @param opf [Nokogiri::XML::Document]
+    # @param opf [Epuber::OpfFile]
     # @param nav [Nokogiri::XML::Document, nil]
     # @param ncx [Nokogiri::XML::Document, nil]
     #
     def initialize(opf, nav: nil, ncx: nil)
       @opf = opf
-      @opf.remove_namespaces!
 
       @nav_xhtml = nav
       @nav_xhtml&.remove_namespaces!
       @ncx = ncx
       @ncx&.remove_namespaces!
       @nav = _parse_nav
-
-      @metadata = @opf.at_css('package metadata')
-      @manifest = @opf.at_css('package manifest')
     end
 
     # @return [String]
@@ -73,12 +55,12 @@ module Epuber
     # @return [void]
     #
     def generate_titles
-      titles = @metadata.css('title')
+      titles = @opf.metadata.css('title')
       titles.each do |title|
         is_main = titles.count == 1
 
         id = title['id']
-        is_main = find_refines(id, 'title-type') == 'main' if id && !is_main
+        is_main = @opf.find_refines(id, 'title-type') == 'main' if id && !is_main
 
         add_comment('alternate title found from original EPUB file (Epuber supports only one title)') unless is_main
         add_setting_property(:title, title.text.inspect, commented: !is_main)
@@ -88,7 +70,7 @@ module Epuber
     # @return [void]
     #
     def generate_authors
-      authors = @metadata.css('creator')
+      authors = @opf.metadata.css('creator')
       if authors.empty?
         add_setting_property(:author, nil)
       elsif authors.count == 1
@@ -105,8 +87,8 @@ module Epuber
       id = author_node['id']
 
       if id
-        role = find_refines(id, 'role')
-        file_as = find_refines(id, 'file-as')
+        role = @opf.find_refines(id, 'role')
+        file_as = @opf.find_refines(id, 'file-as')
       else
         role = author_node['role']
         file_as = author_node['file-as']
@@ -129,12 +111,12 @@ module Epuber
     # @return [void]
     #
     def generate_id
-      nodes = @metadata.css('identifier')
+      nodes = @opf.metadata.css('identifier')
 
       nodes.each do |id_node|
         value = id_node.text
 
-        is_main = @opf.at_css('package')['unique-identifier'] == id_node['id']
+        is_main = @opf.package['unique-identifier'] == id_node['id']
         is_isbn = value.start_with?('urn:isbn:')
         value = value.sub(/^urn:isbn:/, '').strip if is_isbn
         key = is_isbn ? :isbn : :identifier
@@ -151,48 +133,37 @@ module Epuber
     # @return [String]
     #
     def generate_language
-      language = @metadata.at_css('language')
+      language = @opf.metadata.at_css('language')
       add_setting_property(:language, language.text.strip.inspect) if language
     end
 
     # @return [String]
     #
     def generate_published
-      published = @metadata.at_css('date')
+      published = @opf.metadata.at_css('date')
       add_setting_property(:published, published.text.strip.inspect) if published
     end
 
     # @return [String]
     #
     def generate_publisher
-      publisher = @metadata.at_css('publisher')
+      publisher = @opf.metadata.at_css('publisher')
       add_setting_property(:publisher, publisher.text.strip.inspect) if publisher
     end
 
     # @return [String]
     #
     def generate_toc
-      spine = @opf.at_css('spine')
-      if spine.nil?
-        UI.warning('No spine found in OPF file, skipping generating of table of contents')
-        return
-      end
+      spine_items = @opf.spine_items.dup
+      idrefs = spine_items.map(&:idref)
 
-      spine_items = spine.children
-                         .select { |node| node.element? && node.name == 'itemref' }
-
-      idrefs = spine_items.map { |itemref| itemref['idref'] }
-
-      toc_id = spine['toc']
-      return unless toc_id
-
-      render_toc_item = lambda do |spine_item, toc_item|
+      render_toc_item = lambda do |manifest_item, toc_item|
         # ignore this item when it was already rendered
-        next if spine_item && !idrefs.include?(spine_item['id'])
+        next if manifest_item && !idrefs.include?(manifest_item['id'])
 
-        spine_item ||= manifest_file_by_href(toc_item.href)
+        manifest_item ||= @opf.manifest_file_by_href(toc_item.href)
 
-        href = toc_item&.href || spine_item['href']
+        href = toc_item&.href || manifest_item['href']
         toc_item ||= @nav&.find { |n| n.href == href }
 
         href_output = href.sub(/\.x?html$/, '').sub(/\.x?html#/, '#')
@@ -209,17 +180,15 @@ module Epuber
           add_code(%(toc.file #{attribs}))
         end
 
-        idrefs.delete(spine_item['id']) if spine_item
+        idrefs.delete(manifest_item['id']) if manifest_item
       end
 
       add_code('book.toc do |toc, target|', after: 'end') do
         spine_items.each do |itemref|
-          next unless itemref.element?
-
-          idref = itemref['idref']
+          idref = itemref.idref
           next unless idref
 
-          item = manifest_file_by_id(idref)
+          item = @opf.manifest_file_by_id(idref)
           render_toc_item.call(item, nil)
         end
       end
@@ -269,31 +238,6 @@ module Epuber
     def decrease_indent
       @indent -= 2
       @indent = 0 if @indent.negative?
-    end
-
-    def find_refines(id, property)
-      @opf.at_css(%(meta[refines="##{id}"][property="#{property}"]))&.text
-    end
-
-    # @param [String] id
-    #
-    # @return [Nokogiri::XML::Element]
-    #
-    def manifest_file_by_id(id)
-      node = @manifest.at_css(%(item[id="#{id}"]))
-      raise "Manifest item with id #{id.inspect} not found" unless node
-
-      node
-    end
-
-    def manifest_file_by_href(href)
-      # remove anchor
-      href = href.sub(/#.*$/, '')
-
-      node = @manifest.at_css(%(item[href="#{href}"]))
-      raise "Manifest item with href #{href.inspect} not found" unless node
-
-      node
     end
 
     # Compares two contributors by file_as, it will return true if file_as is same even when case is different

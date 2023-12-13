@@ -3,11 +3,14 @@
 require_relative '../../spec_helper'
 require_relative 'epub3_fixtures'
 
+require 'epuber/from_file/opf_file'
+require 'epuber/from_file/bookspec_generator'
+
 module Epuber
   describe BookspecGenerator do
     describe 'epub3' do
       it 'can generate book title' do
-        sut = described_class.new(Nokogiri::XML(EPUB3_OPF), nav: Nokogiri::XML(EPUB3_NAV))
+        sut = described_class.new(OpfFile.new(EPUB3_OPF), nav: Nokogiri::XML(EPUB3_NAV))
 
         res = sut.generate_bookspec
 
@@ -43,7 +46,7 @@ module Epuber
       end
 
       it 'can be parsed by Epuber::Book' do
-        sut = described_class.new(Nokogiri::XML(EPUB3_OPF), nav: Nokogiri::XML(EPUB3_NAV))
+        sut = described_class.new(OpfFile.new(EPUB3_OPF), nav: Nokogiri::XML(EPUB3_NAV))
 
         res = sut.generate_bookspec
 
