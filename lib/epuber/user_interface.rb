@@ -192,9 +192,9 @@ module Epuber
 
       comps = []
       comps << message.to_s
-      message_already_formatted = (
+      message_already_formatted =
         message.is_a?(Epuber::Compiler::Problem) || message.is_a?(Epuber::Checker::TextChecker::MatchProblem)
-      )
+
       if !location.nil? && !message_already_formatted
         path = location.path
 

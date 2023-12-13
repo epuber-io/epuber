@@ -65,7 +65,7 @@ module Epuber
       end
 
       def update_all_metadata
-        @all_files.each do |file_path, _|
+        @all_files.each_key do |file_path|
           update_metadata(file_path)
         end
       end
@@ -98,7 +98,7 @@ module Epuber
         to_remove = @all_files.keys - file_paths
         to_remove.each { |key| @all_files.delete(key) }
 
-        @all_files.each do |_, stat|
+        @all_files.each_value do |stat|
           _cleanup_stat_dependency_list(file_paths, stat)
         end
       end

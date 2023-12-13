@@ -104,3 +104,5 @@ And to specify role you have to use Hash syntax and use key `role` to set it, li
 ```rb
 book.author = { name: 'Roman Kříž', role: 'ill' }
 ```
+
+This was added in Epuber 0.9.
