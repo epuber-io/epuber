@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'mime-types', '~> 3.0'
   spec.add_runtime_dependency 'nokogiri', '~> 1.8', '>= 1.8.2'
   spec.add_runtime_dependency 'os', '~> 1.0'
+  spec.add_runtime_dependency 'uuidtools', '~> 2.1'
 
   spec.add_runtime_dependency 'sinatra', '>= 2.0', '< 4.0'
   spec.add_runtime_dependency 'sinatra-contrib', '>= 2.0', '< 4.0'

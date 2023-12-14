@@ -74,5 +74,15 @@ module Epuber
       expect(File).to exist('fonts/Georgia/Georgia-Regular.ttf')
       expect(File).to exist('fonts/OpenSans/OpenSans-Regular.ttf')
     end
+
+    it 'can deobfuscate files' do
+      epub_filepath = File.join(__dir__, '..', 'fixtures', 'wasteland-otf-obf.epub')
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
+
+      # following values were manually checked
+      expect(Digest::MD5.file('OldStandard-Bold.obf.otf')).to eq '9d814cc771da428de00f001351aa61e9'
+      expect(Digest::MD5.file('OldStandard-Italic.obf.otf')).to eq 'd9c5ff1299294ddd08ffe329c46dcd09'
+      expect(Digest::MD5.file('OldStandard-Regular.obf.otf')).to eq '74b70d8fb0dde57b8411d75f2e6eee21'
+    end
   end
 end

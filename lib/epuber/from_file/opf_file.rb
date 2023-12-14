@@ -157,6 +157,25 @@ module Epuber
       nil
     end
 
+    # Returns main unique identifier of this EPUB
+    #
+    # @return [String, nil]
+    #
+    def raw_unique_identifier
+      id = @package['unique-identifier']
+      return unless id
+
+      @metadata.at_css(%(identifier[id="#{id}"]))&.text
+    end
+
+    # Return all identifiers from EPUB metadata
+    #
+    # @return [Array<Nokogiri::XML::Node>]
+    #
+    def identifiers
+      @metadata.css('identifier')
+    end
+
     # Find meta refines in EPUB 3 metadata
     #
     # @param [String] id

@@ -4,6 +4,7 @@ require 'zip'
 
 require_relative 'opf_file'
 require_relative 'nav_file'
+require_relative 'encryption_handler'
 
 module Epuber
   class FromFileExecutor
@@ -80,6 +81,8 @@ module Epuber
     end
 
     def export_files
+      encryption_items = prepare_encryption_items
+
       @opf.manifest_items.each_value do |item|
         # ignore text files which are not in spine
         text_file_extensions = %w[.xhtml .html]
@@ -97,9 +100,37 @@ module Epuber
                             .join(item.href)
                             .to_s
 
+        encryption_item = encryption_items&.find { |e| e.file_path == full_path }
+
+        contents = @zip_file.read(full_path)
+        if encryption_item
+          contents = EncryptionHandler.decrypt_font_data(encryption_item.key, contents, encryption_item.algorithm)
+        end
+
         FileUtils.mkdir_p(File.dirname(item.href))
-        File.write(item.href, @zip_file.read(full_path))
+        File.write(item.href, contents)
       end
+    end
+
+    # @return [Array<EncryptionHandler::EncryptionItem>, nil]
+    #
+    def prepare_encryption_items
+      encryption_file_entry = @zip_file.find_entry('META-INF/encryption.xml')
+      return unless encryption_file_entry
+
+      idpf_key = EncryptionHandler.parse_idpf_key(@opf.raw_unique_identifier)
+      adobe_key = EncryptionHandler.find_and_parse_encryption_key(@opf.identifiers)
+
+      encryption_items = EncryptionHandler.parse_encryption_file(@zip_file.read(encryption_file_entry))
+      encryption_items.each do |i|
+        if i.algorithm == EncryptionHandler::IDPF_OBFUSCATION
+          i.key = idpf_key
+        elsif i.algorithm == EncryptionHandler::ADOBE_OBFUSCATION
+          i.key = adobe_key
+        end
+      end
+
+      encryption_items
     end
   end
 end
