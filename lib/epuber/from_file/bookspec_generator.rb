@@ -2,33 +2,12 @@
 
 module Epuber
   class BookspecGenerator
-    class NavItem
-      # @return [String]
-      attr_accessor :href
-      # @return [String]
-      attr_accessor :title
-      # @return [Array<NavItem>]
-      attr_accessor :children
-
-      def initialize(href, title)
-        @href = href
-        @title = title
-        @children = []
-      end
-    end
-
     # @param opf [Epuber::OpfFile]
-    # @param nav [Nokogiri::XML::Document, nil]
-    # @param ncx [Nokogiri::XML::Document, nil]
+    # @param nav [Epuber::NavFile, nil]
     #
-    def initialize(opf, nav: nil, ncx: nil)
+    def initialize(opf, nav)
       @opf = opf
-
-      @nav_xhtml = nav
-      @nav_xhtml&.remove_namespaces!
-      @ncx = ncx
-      @ncx&.remove_namespaces!
-      @nav = _parse_nav
+      @nav = nav
     end
 
     # @return [String]
@@ -157,14 +136,17 @@ module Epuber
       spine_items = @opf.spine_items.dup
       idrefs = spine_items.map(&:idref)
 
+      # @param [ManifestItem, nil] manifest_item
+      # @param [NavItem, nil] toc_item
+      #
       render_toc_item = lambda do |manifest_item, toc_item|
         # ignore this item when it was already rendered
-        next if manifest_item && !idrefs.include?(manifest_item['id'])
+        next if manifest_item && !idrefs.include?(manifest_item.id)
 
         manifest_item ||= @opf.manifest_file_by_href(toc_item.href)
 
-        href = toc_item&.href || manifest_item['href']
-        toc_item ||= @nav&.find { |n| n.href == href }
+        href = toc_item&.href || manifest_item.href
+        toc_item ||= @nav&.find_by_href(href)
 
         href_output = href.sub(/\.x?html$/, '').sub(/\.x?html#/, '#')
         attribs = [href_output.inspect, toc_item&.title&.inspect].compact.join(', ')
@@ -180,7 +162,7 @@ module Epuber
           add_code(%(toc.file #{attribs}))
         end
 
-        idrefs.delete(manifest_item['id']) if manifest_item
+        idrefs.delete(manifest_item.id) if manifest_item
       end
 
       add_code('book.toc do |toc, target|', after: 'end') do
@@ -249,58 +231,6 @@ module Epuber
     #
     def contributor_file_as_eq?(file_as_a, file_as_b)
       file_as_a == file_as_b || file_as_a.mb_chars.downcase == file_as_b.mb_chars.downcase
-    end
-
-    # @param [Nokogiri::XML::Element] li_node
-    #
-    # @return [NavItem]
-    #
-    def _parse_nav_xhtml_item(li_node)
-      href = li_node.at_css('a')['href']
-      title = li_node.at_css('a').text
-
-      item = NavItem.new(href, title)
-      item.children = li_node.css('ol > li').map { |p| _parse_nav_xhtml_item(p) }
-      item
-    end
-
-    # @return [Array<NavItem>]
-    #
-    def _parse_nav_xhtml
-      return nil if @nav_xhtml.nil?
-
-      @nav_xhtml.css('nav[type="toc"] > ol > li')
-                .map { |point| _parse_nav_xhtml_item(point) }
-    end
-
-    # @param [Nokogiri::XML::Element] point_node
-    #
-    # @return [NavItem]
-    #
-    def _parse_nav_ncx_item(point_node)
-      href = point_node.at_css('content')['src']
-      title = point_node.at_css('navLabel text')
-
-      item = NavItem.new(href, title)
-      item.children = point_node.css('> navPoint').map { |p| _parse_nav_ncx_item(p) }
-      item
-    end
-
-    # @return [Array<NavItem>]
-    #
-    def _parse_nav_ncx
-      @ncx.css('navMap > navPoint')
-          .map { |point| _parse_nav_ncx_item(point) }
-    end
-
-    # @return [Array<NavItem>]
-    #
-    def _parse_nav
-      if @nav_xhtml
-        _parse_nav_xhtml
-      elsif @ncx
-        _parse_nav_ncx(@ncx)
-      end
     end
   end
 end
