@@ -84,5 +84,20 @@ module Epuber
       expect(Digest::MD5.file('OldStandard-Italic.obf.otf')).to eq 'd9c5ff1299294ddd08ffe329c46dcd09'
       expect(Digest::MD5.file('OldStandard-Regular.obf.otf')).to eq '74b70d8fb0dde57b8411d75f2e6eee21'
     end
+
+    it 'will print some information to console' do
+      epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
+
+      message = <<~TEXT.rstrip.ansi.green
+        🎉 Project initialized.
+        Please review generated childrens-media-query.bookspec file and start using Epuber.
+
+        For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.
+      TEXT
+
+      expect do
+        Epuber::Command.run(%w[from-file] + [epub_filepath])
+      end.to output("#{message}\n").to_stdout
+    end
   end
 end

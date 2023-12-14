@@ -25,6 +25,13 @@ module Epuber
         File.write("#{basename}.bookspec", generate_bookspec)
 
         export_files
+
+        UI.puts <<~TEXT.rstrip.ansi.green
+          🎉 Project initialized.
+          Please review generated #{basename}.bookspec file and start using Epuber.
+
+          For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.
+        TEXT
       end
     end
 
