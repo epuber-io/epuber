@@ -51,6 +51,12 @@ EPUB2_OPF = <<~XML
       <itemref idref="page4" />
     </spine>
 
+    <guide>
+      <reference type="text" title="" href="childrens-book-page1.xhtml"/>
+      <reference type="cover" title="" href="childrens-book-page1.xhtml"/>
+      <reference type="copyright-page" title="" href="childrens-book-page2.xhtml"/>
+    </guide>
+
   </package>
 XML
 

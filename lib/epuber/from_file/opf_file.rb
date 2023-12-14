@@ -74,6 +74,34 @@ module Epuber
       end
     end
 
+    class GuideItem
+      # @return [String]
+      #
+      attr_accessor :type
+
+      # @return [String]
+      #
+      attr_accessor :href
+
+      def initialize(type, href)
+        @type = type
+        @href = href
+      end
+
+      # @param [Nokogiri::XML::Node] node
+      #
+      # @return [GuideItem]
+      #
+      def self.from_node(node)
+        new(node['type'], node['href'])
+      end
+    end
+
+    # reversed map of generator's map
+    LANDMARKS_MAP = Compiler::OPFGenerator::LANDMARKS_MAP.map { |k, v| [v, k] }
+                                                         .to_h
+                                                         .freeze
+
     # @return [Nokogiri::XML::Document]
     #
     attr_reader :document
@@ -89,6 +117,10 @@ module Epuber
     # @return [Array<SpineItem>]
     #
     attr_reader :spine_items
+
+    # @return [Array<GuideItem>]
+    #
+    attr_reader :guide_items
 
     # @param [String] document
     def initialize(xml)
@@ -106,6 +138,8 @@ module Epuber
                                  .to_h
       @spine_items = @document.css('package spine itemref')
                               .map { |node| SpineItem.from_node(node) }
+      @guide_items = @document.css('package guide reference')
+                              .map { |node| GuideItem.from_node(node) }
     end
 
     # Find nav file in EPUB (both EPUB 2 and EPUB 3). Returns array with nav and type of nav (:xhtml or :ncx).

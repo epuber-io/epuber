@@ -32,12 +32,12 @@ module Epuber
             book.cover_image = "childrens-book-flowers"
 
             book.toc do |toc, target|
-              toc.file "childrens-book-page1", "Page 1" do
+              toc.file "childrens-book-page1", "Page 1", :landmark_start_page, :landmark_cover do
                 toc.file "childrens-book-page1#page_1_1", "Page 1.1"
                 toc.file "childrens-book-page1#page_1_2", "Page 1.2"
                 toc.file "childrens-book-page1#page_1_3", "Page 1.3"
               end
-              toc.file "childrens-book-page2", "Page 2" do
+              toc.file "childrens-book-page2", "Page 2", :landmark_copyright do
                 toc.file "childrens-book-page2_sub1", "Page 2.1"
                 toc.file "childrens-book-page2_sub2", "Page 2.2"
                 toc.file "childrens-book-page2_sub3", "Page 2.3"
@@ -83,12 +83,12 @@ module Epuber
             book.cover_image = "childrens-book-flowers"
 
             book.toc do |toc, target|
-              toc.file "childrens-book-page1", "Page 1" do
+              toc.file "childrens-book-page1", "Page 1", :landmark_start_page, :landmark_cover do
                 toc.file "childrens-book-page1#page_1_1", "Page 1.1"
                 toc.file "childrens-book-page1#page_1_2", "Page 1.2"
                 toc.file "childrens-book-page1#page_1_3", "Page 1.3"
               end
-              toc.file "childrens-book-page2", "Page 2" do
+              toc.file "childrens-book-page2", "Page 2", :landmark_copyright do
                 toc.file "childrens-book-page2_sub1", "Page 2.1"
                 toc.file "childrens-book-page2_sub2", "Page 2.2"
                 toc.file "childrens-book-page2_sub3", "Page 2.3"

@@ -11,6 +11,7 @@ module Epuber
     end
 
     # @return [String]
+    #
     def generate_bookspec
       @indent = 0
       @bookspec = []
@@ -165,7 +166,8 @@ module Epuber
         toc_item ||= @nav&.find_by_href(href)
 
         href_output = href.sub(/\.x?html$/, '').sub(/\.x?html#/, '#')
-        attribs = [href_output.inspect, toc_item&.title&.inspect].compact.join(', ')
+        landmarks_for_this = landmark_for_href(href).map(&:inspect)
+        attribs = [href_output.inspect, toc_item&.title&.inspect, *landmarks_for_this].compact.join(', ')
         should_nest = toc_item && !toc_item.children.empty?
 
         if should_nest
@@ -257,6 +259,26 @@ module Epuber
     #
     def contributor_file_as_eq?(file_as_a, file_as_b)
       file_as_a == file_as_b || file_as_a.mb_chars.downcase == file_as_b.mb_chars.downcase
+    end
+
+    # @param [String] href
+    #
+    # @return [Array<Symbol>]
+    #
+    def landmark_for_href(href)
+      landmarks = @nav&.landmarks
+      landmark_map = NavFile::LANDMARKS_MAP unless landmarks.nil?
+
+      if landmarks.nil?
+        landmarks = @opf.guide_items
+        landmark_map = OpfFile::LANDMARKS_MAP
+      end
+
+      landmarks.select { |l| l.href == href }
+               .map(&:type)
+               .compact
+               .map { |t| landmark_map[t] }
+               .compact
     end
   end
 end

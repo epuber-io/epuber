@@ -61,7 +61,7 @@ module Epuber
 
           book.toc do |toc, target|
             toc.file "text/social_drm", "Social DRM"
-            toc.file "text/copyright"
+            toc.file "text/copyright", :landmark_copyright
           end
         end
       RUBY

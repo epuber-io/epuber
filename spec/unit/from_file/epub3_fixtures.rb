@@ -93,6 +93,22 @@ EPUB3_NAV = <<~XML
           <li><a href="childrens-book-page4.xhtml">Page 4</a></li>
         </ol>
       </nav>
+      <nav epub:type="landmarks">
+        <ol>
+          <li>
+            <a epub:type="bodymatter" href="childrens-book-page1.xhtml">Start Reading</a>
+          </li>
+          <li>
+            <a epub:type="ibooks:reader-start-page" href="childrens-book-page1.xhtml">Start Reading</a>
+          </li>
+          <li>
+            <a epub:type="cover" href="childrens-book-page1.xhtml">Cover page</a>
+          </li>
+          <li>
+            <a epub:type="copyright-page" href="childrens-book-page2.xhtml">Copyright page</a>
+          </li>
+        </ol>
+      </nav>
     </body>
   </html>
 XML

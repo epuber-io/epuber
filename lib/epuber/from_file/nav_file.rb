@@ -30,6 +30,39 @@ module Epuber
       end
     end
 
+    class LandmarkItem
+      # @return [String]
+      #
+      attr_accessor :href
+
+      # @return [String]
+      #
+      attr_accessor :type
+
+      # @param [String] href
+      # @param [String] type
+      #
+      def initialize(href, type)
+        @href = href
+        @type = type
+      end
+
+      # @param [Nokogiri::XML::Node] node
+      #
+      # @return [LandmarkItem]
+      #
+      def self.from_node(node)
+        new(node['href'], node['type'])
+      end
+    end
+
+    LANDMARKS_MAP = {
+      'cover' => :landmark_cover,
+      'bodymatter' => :landmark_start_page,
+      'copyright-page' => :landmark_copyright,
+      'toc' => :landmark_toc,
+    }.freeze
+
     MODE_NCX = :ncx
     MODE_XHTML = :xhtml
 
@@ -45,6 +78,10 @@ module Epuber
     #
     attr_reader :items
 
+    # @return [Array<LandmarkItem>, nil]
+    #
+    attr_reader :landmarks
+
     # @param [string] document
     # @param [:ncx, :xhtml] mode
     #
@@ -56,6 +93,8 @@ module Epuber
 
       @mode = mode
       @items = _parse
+
+      @landmarks = _parse_landmarks
     end
 
     # @param [String] href
@@ -104,6 +143,13 @@ module Epuber
         @document.css('navMap > navPoint')
                  .map { |point| _parse_nav_ncx_item(point) }
       end
+    end
+
+    def _parse_landmarks
+      return nil if @mode != MODE_XHTML
+
+      @document.css('nav[type="landmarks"] > ol > li > a')
+               .map { |node| LandmarkItem.from_node(node) }
     end
   end
 end
