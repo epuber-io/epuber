@@ -39,7 +39,7 @@ EPUB3_OPF = <<~XML
     <manifest>
       <item href="childrens-book-style.css" id="css1" media-type="text/css"/>
       <item href="small-screen.css" id="css2" media-type="text/css"/>
-      <item href="childrens-book-flowers.jpg" id="image1" media-type="image/jpeg"/>
+      <item href="childrens-book-flowers.jpg" id="image1" properties="cover-image" media-type="image/jpeg"/>
       <item href="childrens-book-swans.jpg" id="image2" media-type="image/jpeg"/>
       <item href="childrens-book-page1.xhtml" id="page1" media-type="application/xhtml+xml"/>
       <item href="childrens-book-page2.xhtml" id="page2" media-type="application/xhtml+xml"/>
@@ -65,7 +65,7 @@ EPUB3_OPF = <<~XML
   </package>
 XML
 
-EPUB3_NAV = <<~HTML
+EPUB3_NAV = <<~XML
   <?xml version="1.0"?>
   <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
     <head>
@@ -95,4 +95,4 @@ EPUB3_NAV = <<~HTML
       </nav>
     </body>
   </html>
-HTML
+XML

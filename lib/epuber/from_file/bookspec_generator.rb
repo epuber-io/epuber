@@ -24,6 +24,8 @@ module Epuber
         generate_published
         generate_publisher
         add_empty_line
+        generate_cover
+        add_empty_line
         generate_toc
       end
       add_empty_line
@@ -62,16 +64,16 @@ module Epuber
     # @return [String]
     #
     def format_author(author_node)
-      name = author_node.text
+      name = author_node.text.strip
       id = author_node['id']
 
       if id
         role = @opf.find_refines(id, 'role')
         file_as = @opf.find_refines(id, 'file-as')
-      else
-        role = author_node['role']
-        file_as = author_node['file-as']
       end
+
+      role ||= author_node['opf:role']
+      file_as ||= author_node['opf:file-as']
 
       role_is_default = role.nil? || role == 'aut'
       file_as_is_default = file_as.nil? || contributor_file_as_eq?(Book::Contributor.from_obj(name).file_as, file_as)
@@ -93,7 +95,7 @@ module Epuber
       nodes = @opf.metadata.css('identifier')
 
       nodes.each do |id_node|
-        value = id_node.text
+        value = id_node.text.strip
 
         is_main = @opf.package['unique-identifier'] == id_node['id']
         is_isbn = value.start_with?('urn:isbn:')
@@ -109,28 +111,42 @@ module Epuber
       end
     end
 
-    # @return [String]
+    # @return [void]
     #
     def generate_language
       language = @opf.metadata.at_css('language')
       add_setting_property(:language, language.text.strip.inspect) if language
     end
 
-    # @return [String]
+    # @return [void]
     #
     def generate_published
       published = @opf.metadata.at_css('date')
       add_setting_property(:published, published.text.strip.inspect) if published
     end
 
-    # @return [String]
+    # @return [void]
     #
     def generate_publisher
       publisher = @opf.metadata.at_css('publisher')
       add_setting_property(:publisher, publisher.text.strip.inspect) if publisher
     end
 
-    # @return [String]
+    # @return [void]
+    #
+    def generate_cover
+      cover_property = Compiler::OPFGenerator::PROPERTIES_MAP[:cover_image]
+
+      cover_id = @opf.manifest_items.find { |_, item| item.properties&.include?(cover_property) }&.last&.id
+      cover_id ||= @opf.metadata.at_css('meta[name="cover"]')&.[]('content')
+      cover = @opf.manifest_file_by_id(cover_id) if cover_id
+      return unless cover
+
+      href = cover.href.sub(/#{Regexp.escape(File.extname(cover.href))}$/, '')
+      add_setting_property(:cover_image, href.inspect)
+    end
+
+    # @return [void]
     #
     def generate_toc
       spine_items = @opf.spine_items.dup
@@ -178,6 +194,14 @@ module Epuber
 
     private
 
+    # Add code to final file. When block is given, it will be indented.
+    #
+    # @param [String] code  code to print into final file
+    # @param [Boolean] commented should be code commented?
+    # @param [String, nil] after code to print after this code
+    #
+    # @return [void]
+    #
     def add_code(code, commented: false, after: nil)
       indent_str = ' ' * @indent
       comment_prefix = commented ? '# ' : ''
@@ -210,6 +234,8 @@ module Epuber
     end
 
     def add_empty_line
+      return if @bookspec.last == ''
+
       @bookspec << ''
     end
 

@@ -15,7 +15,7 @@ module Epuber
       #
       attr_accessor :media_type
 
-      # @return [String]
+      # @return [String, nil]
       #
       attr_accessor :properties
 

@@ -53,6 +53,7 @@ module Epuber
 
       @document = Nokogiri::XML(document)
       @document.remove_namespaces!
+
       @mode = mode
       @items = _parse
     end
@@ -72,8 +73,8 @@ module Epuber
     # @return [NavItem]
     #
     def _parse_nav_xhtml_item(li_node)
-      href = li_node.at_css('a')['href']
-      title = li_node.at_css('a').text
+      href = li_node.at_css('a')['href'].strip
+      title = li_node.at_css('a').text.strip
 
       item = NavItem.new(href, title)
       item.children = li_node.css('ol > li').map { |p| _parse_nav_xhtml_item(p) }
@@ -85,8 +86,8 @@ module Epuber
     # @return [NavItem]
     #
     def _parse_nav_ncx_item(point_node)
-      href = point_node.at_css('content')['src']
-      title = point_node.at_css('navLabel text').text
+      href = point_node.at_css('content')['src'].strip
+      title = point_node.at_css('navLabel text').text.strip
 
       item = NavItem.new(href, title)
       item.children = point_node.css('> navPoint').map { |p| _parse_nav_ncx_item(p) }
