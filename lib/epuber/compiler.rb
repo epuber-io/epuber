@@ -88,6 +88,11 @@ module Epuber
 
         process_all_target_files
         generate_other_files
+
+        compilation_context.perform_plugin_things(Transformer, :after_all_text_files) do |transformer|
+          transformer.call(@book, compilation_context)
+        end
+
         process_global_ids
 
         # build folder cleanup
