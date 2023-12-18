@@ -10,7 +10,7 @@ module Epuber
   class Version
     include Comparable
 
-    VERSION_RE ||= /\A[0-9]+(\.[0-9a-zA-Z]+)*\z/.freeze
+    VERSION_RE = /\A[0-9]+(\.[0-9a-zA-Z]+)*\z/.freeze
 
     # True if the +version+ string matches RubyGems' requirements.
     #
@@ -52,7 +52,7 @@ module Epuber
     def <=>(other)
       return unless other.is_a?(Version) || other.is_a?(String) || other.is_a?(Float) || other.is_a?(Integer)
 
-      other = other.is_a?(Version) ? other : Version.new(other)
+      other = Version.new(other) unless other.is_a?(Version)
 
       return 0 if @version == other.version
 
@@ -61,7 +61,7 @@ module Epuber
 
       lhsize = lhsegments.size
       rhsize = rhsegments.size
-      limit  = (lhsize > rhsize ? lhsize : rhsize) - 1
+      limit  = [lhsize, rhsize].max - 1
 
       i = 0
 

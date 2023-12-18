@@ -37,10 +37,10 @@ module Epuber
           file.process(nil)
 
           expect(File).to exist(img_dest)
-          expect(FileUtils.compare_file(img_source, img_dest)).to eq true
+          expect(FileUtils.compare_file(img_source, img_dest)).to be true
         end
 
-        it 'downscales the image when is too large', expensive: true do
+        it 'downscales the image when is too large', :expensive do
           source = File.join(spec_root, 'fixtures/6000x6000.png')
           dest = File.join(temp_dir, 'dest_image.png')
 

@@ -11,10 +11,10 @@ Gem::Specification.new do |spec|
   spec.homepage = Epuber::HOME_URL
   spec.license  = 'MIT'
   spec.required_ruby_version = '>= 2.5'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files         = Dir['bin/**/*'] + Dir['lib/**/*'] + %w[epuber.gemspec Gemfile LICENSE.txt README.md]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'activesupport', '>= 6.0', '< 8.0'
@@ -39,9 +39,4 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'bade', '~> 0.3', '>= 0.3.1'
   spec.add_runtime_dependency 'coffee-script', '~> 2.4'
   spec.add_runtime_dependency 'epuber-stylus', '~> 1.1', '>= 1.1.1'
-
-  spec.add_development_dependency 'fakefs', '>= 1.3', '< 3.0' # 2.0.0 is not compatible with Ruby 2.5
-  spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rspec', '~> 3.2'
-  spec.add_development_dependency 'rubocop', '~> 1.14'
 end

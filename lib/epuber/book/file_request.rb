@@ -45,7 +45,7 @@ module Epuber
       # @return [Numeric]
       #
       def hash
-        @source_pattern.hash ^ @group.hash ^ @only_one.hash
+        [@source_pattern, @group, @only_one].hash
       end
 
       # @param [String, self] other

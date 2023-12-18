@@ -45,15 +45,7 @@ module Epuber
                           end
                         end
 
-          if !precompiled.nil?
-            xhtml_content = UI.print_step_processing_time('rendering precompiled Bade') do
-              renderer = Bade::Renderer.from_precompiled(precompiled)
-                                       .with_locals(variables)
-              renderer.file_path = source_path
-
-              renderer.render(new_line: '', indent: '')
-            end
-          else
+          if precompiled.nil?
             if compilation_context.incremental_build?
               UI.print_processing_debug_info('Parsing new version of source file')
             end
@@ -69,6 +61,14 @@ module Epuber
 
               FileUtils.mkdir_p(File.dirname(precompiled_path))
               renderer.precompiled.write_yaml_to_file(precompiled_path)
+
+              renderer.render(new_line: '', indent: '')
+            end
+          else
+            xhtml_content = UI.print_step_processing_time('rendering precompiled Bade') do
+              renderer = Bade::Renderer.from_precompiled(precompiled)
+                                       .with_locals(variables)
+              renderer.file_path = source_path
 
               renderer.render(new_line: '', indent: '')
             end

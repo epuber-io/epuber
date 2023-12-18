@@ -37,8 +37,8 @@ module Epuber
         end
 
         it 'initial value is nil' do
-          expect(@example.optional_string).to be nil
-          expect(@example.optional_number).to be nil
+          expect(@example.optional_string).to be_nil
+          expect(@example.optional_number).to be_nil
         end
 
         it 'stores value' do

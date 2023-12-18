@@ -38,7 +38,7 @@ module Epuber
       #
       def self.from_obj(obj, role = 'aut')
         if obj.is_a?(String)
-          components = obj.split(' ')
+          components = obj.split
           if components.length >= 2
             NormalContributor.new(components.first(components.length - 1).join(' '), components.last, role)
           else

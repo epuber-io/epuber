@@ -87,9 +87,7 @@ module Epuber
         def self.write_to_file!(content, to_path)
           FileUtils.mkdir_p(File.dirname(to_path))
 
-          File.open(to_path, 'w') do |file_handle|
-            file_handle.write(content)
-          end
+          File.write(to_path, content)
         end
       end
     end
