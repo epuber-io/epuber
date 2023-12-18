@@ -8,7 +8,10 @@ module Epuber
 
     it 'can init project with file' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
-      Epuber::Command.run(%w[from-file] + [epub_filepath])
+
+      expect do
+        Epuber::Command.run(%w[from-file] + [epub_filepath])
+      end.to output(/.*/).to_stdout
 
       expect(File).to exist('childrens-media-query.bookspec')
       expect(File.read('childrens-media-query.bookspec')).to eq <<~RUBY
@@ -42,7 +45,10 @@ module Epuber
 
     it 'can init project with EPUB 2 file' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'testing_book1-copyright.epub')
-      Epuber::Command.run(%w[from-file] + [epub_filepath])
+
+      expect do
+        Epuber::Command.run(%w[from-file] + [epub_filepath])
+      end.to output(/.*/).to_stdout
 
       expect(File).to exist('testing_book1-copyright.bookspec')
       expect(File.read('testing_book1-copyright.bookspec')).to eq <<~RUBY
@@ -77,7 +83,10 @@ module Epuber
 
     it 'can deobfuscate files' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'wasteland-otf-obf.epub')
-      Epuber::Command.run(%w[from-file] + [epub_filepath])
+
+      expect do
+        Epuber::Command.run(%w[from-file] + [epub_filepath])
+      end.to output(/.*/).to_stdout
 
       # following values were manually checked
       expect(Digest::MD5.file('OldStandard-Bold.obf.otf')).to eq '9d814cc771da428de00f001351aa61e9'

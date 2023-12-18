@@ -34,7 +34,9 @@ module Epuber
           end
         RUBY
 
-        Epuber::Command.run(%w[build ibooks])
+        expect do
+          Epuber::Command.run(%w[build ibooks])
+        end.to output(/.*/).to_stdout
 
         expect(load_xhtml('.epuber/build/ibooks/OEBPS/text/file1.xhtml').at_css('body div').to_s).to eql <<~HTML.rstrip
           <div>

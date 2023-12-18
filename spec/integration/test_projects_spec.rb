@@ -11,8 +11,10 @@ describe 'Test project' do # rubocop:disable RSpec/DescribeClass
       # FileUtils.rmtree(Epuber::Config::WORKING_PATH)
       # FileUtils.remove(Dir.glob('*.epub'))
 
-      Epuber::Command.run(%w[build --check --write --verbose])
-      Epuber::Command.run(%w[build --release --verbose])
+      expect do
+        Epuber::Command.run(%w[build --check --write --verbose])
+        Epuber::Command.run(%w[build --release --verbose])
+      end.to output(/.*/).to_stdout_from_any_process
     end
   end
 end
