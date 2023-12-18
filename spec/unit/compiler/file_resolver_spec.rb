@@ -242,7 +242,7 @@ module Epuber
       describe '.file_class_for' do
         it 'selects correct file type from file extension' do
           expect(described_class.file_class_for('.styl')).to be FileTypes::StylusFile
-          expect(described_class.file_class_for('.css')).to be FileTypes::StaticFile
+          expect(described_class.file_class_for('.css')).to be FileTypes::CSSFile
 
           expect(described_class.file_class_for('.js')).to be FileTypes::StaticFile
           expect(described_class.file_class_for('.coffee')).to be FileTypes::CoffeeScriptFile

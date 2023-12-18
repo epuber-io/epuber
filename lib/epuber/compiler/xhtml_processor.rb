@@ -50,7 +50,8 @@ module Epuber
 
         parse_options = Nokogiri::XML::ParseOptions::DEFAULT_XML |
                         Nokogiri::XML::ParseOptions::NOERROR | # to silence any errors or warnings printing into console
-                        Nokogiri::XML::ParseOptions::NOWARNING
+                        Nokogiri::XML::ParseOptions::NOWARNING |
+                        Nokogiri::XML::ParseOptions::NOENT
 
         doc = Nokogiri::XML("#{before}<root>#{text}</root>", file_path, nil, parse_options)
         text_for_errors = before + text

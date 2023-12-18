@@ -5,7 +5,7 @@
 All paths to files are relative or absolute from project root. You don't have to specify file extensions, Epuber will
 resolve them during build.
 
-Epuber process only (X)HTML files, other files like JS and CSS are untouched.
+Epuber process only (X)HTML/Bade and CSS/Stylus files, other files like JavaScript files are untouched.
 
 Epuber support following situations:
 
@@ -39,6 +39,32 @@ Epuber support following situations:
 <a href="other_file#abc">link</a>
 ->
 <a href="other_file.xhtml#abc">link</a>
+```
+
+#### Images in CSS
+
+```css
+div {
+    background: url('image');
+}
+->
+div {
+    background: url('../images/image.png');
+}
+```
+
+#### Fonts in CSS
+
+```css
+@font-face {
+    font-family: 'MyFont';
+    src: url('my-font-regular');
+}
+->
+@font-face {
+    font-family: 'MyFont';
+    src: url('../fonts/my-font-regular.otf');
+}
 ```
 
 

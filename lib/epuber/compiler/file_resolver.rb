@@ -20,7 +20,7 @@ module Epuber
     require_relative 'file_types/container_xml_file'
     require_relative 'file_types/ibooks_display_options_file'
     require_relative 'file_types/coffee_script_file'
-
+    require_relative 'file_types/css_file'
 
     class FileResolver
       class ResolveError < StandardError; end
@@ -247,6 +247,7 @@ module Epuber
         def file_class_for(extname)
           mapping = {
             '.styl' => FileTypes::StylusFile,
+            '.css' => FileTypes::CSSFile,
 
             '.coffee' => FileTypes::CoffeeScriptFile,
 
