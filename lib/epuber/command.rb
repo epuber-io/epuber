@@ -16,6 +16,7 @@ module Epuber
     require_relative 'command/compile'
     require_relative 'command/init'
     require_relative 'command/server'
+    require_relative 'command/from_file'
 
     self.abstract_command = true
     self.command = 'epuber'
