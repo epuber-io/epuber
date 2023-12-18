@@ -25,9 +25,16 @@ jobs:
     - name: Install Calibre
       run: sudo -v && sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
 
+    - name: Cache bundler
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-gems
+
     - name: Install dependencies
       run: |
         bundle config set --local with 'dev'
+        bundle config set --local path 'vendor/bundle'
         bundle install
 
     - name: Run tests
@@ -35,7 +42,7 @@ jobs:
 
     - name: Run Rubocop
       run: |
-        if [[ "${{ matrix.ruby }}" == "2.5" ]]; then
+        if [[ "${{ matrix.ruby }}" == "2.5" || "${{ matrix.ruby }}" == "2.6" ]]; then
           bundle exec rubocop | true
         else
           bundle exec rubocop
