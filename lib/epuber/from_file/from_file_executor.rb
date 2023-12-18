@@ -8,6 +8,13 @@ require_relative 'encryption_handler'
 
 module Epuber
   class FromFileExecutor
+    MIMETYPE_PATH = 'mimetype'
+
+    ENCRYPTION_PATH = 'META-INF/encryption.xml'
+    CONTAINER_PATH = 'META-INF/container.xml'
+
+    # @param [String] filepath path to EPUB file
+    #
     def initialize(filepath)
       @filepath = filepath
     end
@@ -20,6 +27,10 @@ module Epuber
 
         @opf_path = content_opf_path
         @opf = OpfFile.new(zip_file.read(@opf_path))
+
+        if zip_file.find_entry(ENCRYPTION_PATH)
+          @encryption_handler = EncryptionHandler.new(zip_file.read(ENCRYPTION_PATH), @opf)
+        end
 
         basename = File.basename(@filepath, File.extname(@filepath))
         File.write("#{basename}.bookspec", generate_bookspec)
@@ -40,15 +51,15 @@ module Epuber
     # @return [void]
     #
     def validate_mimetype
-      entry = @zip_file.find_entry('mimetype')
-      UI.error! 'This is not valid EPUB file (mimetype file is missing)' if entry.nil?
+      entry = @zip_file.find_entry(MIMETYPE_PATH)
+      UI.error! "This is not valid EPUB file (#{MIMETYPE_PATH} file is missing)" if entry.nil?
 
-      mimetype = @zip_file.read('mimetype')
+      mimetype = @zip_file.read(entry)
 
       return if mimetype == 'application/epub+zip'
 
       UI.error! <<~MSG
-        This is not valid EPUB file (mimetype file does not contain required application/epub+zip, it is #{mimetype} instead)
+        This is not valid EPUB file (#{MIMETYPE_PATH} file does not contain required application/epub+zip, it is #{mimetype} instead)
       MSG
     end
 
@@ -56,15 +67,15 @@ module Epuber
     #
     # @return [String]
     def content_opf_path
-      entry = @zip_file.find_entry('META-INF/container.xml')
-      UI.error! 'This is not valid EPUB file (META-INF/container.xml file is missing)' if entry.nil?
+      entry = @zip_file.find_entry(CONTAINER_PATH)
+      UI.error! "This is not valid EPUB file (#{CONTAINER_PATH} file is missing)" if entry.nil?
 
       doc = Nokogiri::XML(@zip_file.read(entry))
       doc.remove_namespaces!
 
       rootfile = doc.at_xpath('//rootfile')
       if rootfile.nil?
-        UI.error! 'This is not valid EPUB file (META-INF/container.xml file does not contain any <rootfile> element)'
+        UI.error! "This is not valid EPUB file (#{CONTAINER_PATH} file does not contain any <rootfile> element)"
       end
 
       rootfile['full-path']
@@ -88,8 +99,6 @@ module Epuber
     end
 
     def export_files
-      encryption_items = prepare_encryption_items
-
       @opf.manifest_items.each_value do |item|
         # ignore text files which are not in spine
         text_file_extensions = %w[.xhtml .html]
@@ -107,37 +116,12 @@ module Epuber
                             .join(item.href)
                             .to_s
 
-        encryption_item = encryption_items&.find { |e| e.file_path == full_path }
-
         contents = @zip_file.read(full_path)
-        if encryption_item
-          contents = EncryptionHandler.decrypt_font_data(encryption_item.key, contents, encryption_item.algorithm)
-        end
+        contents = @encryption_handler&.process_file(full_path, contents)
 
         FileUtils.mkdir_p(File.dirname(item.href))
         File.write(item.href, contents)
       end
-    end
-
-    # @return [Array<EncryptionHandler::EncryptionItem>, nil]
-    #
-    def prepare_encryption_items
-      encryption_file_entry = @zip_file.find_entry('META-INF/encryption.xml')
-      return unless encryption_file_entry
-
-      idpf_key = EncryptionHandler.parse_idpf_key(@opf.raw_unique_identifier)
-      adobe_key = EncryptionHandler.find_and_parse_encryption_key(@opf.identifiers)
-
-      encryption_items = EncryptionHandler.parse_encryption_file(@zip_file.read(encryption_file_entry))
-      encryption_items.each do |i|
-        if i.algorithm == EncryptionHandler::IDPF_OBFUSCATION
-          i.key = idpf_key
-        elsif i.algorithm == EncryptionHandler::ADOBE_OBFUSCATION
-          i.key = adobe_key
-        end
-      end
-
-      encryption_items
     end
   end
 end

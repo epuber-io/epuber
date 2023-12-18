@@ -26,7 +26,7 @@ New command introduced in version 0.9.0.
 
 ## Server
 
-Command to create development server, starts to listening for changes in files and automatically rebuilds whole book and updates preview in web browser.
+Command to create development server which allows to quickly iterate over style and text changes in source code of the book. It will listen for changes in all source files of the book and rebuild whenever there is some change and update preview on web page.
 
 ```sh
 epuber server [TARGET]
@@ -56,3 +56,15 @@ You can use following flags to change output or behavior:
 - `--release` Create release version of the book, no caching, everything creates from scratch + performs epubcheck validation.
 - `--no-cache` Turns off incremental build, can resolve some bugs but build takes much longer.
 - `--verbose` Show more debugging information
+
+Example to build all targets as release build:
+
+```sh
+epuber build --release
+```
+
+To build only several targets (`apple`, `google` and `amazon`) and run validation:
+
+```sh
+epuber build apple google amazon --check
+```
