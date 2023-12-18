@@ -26,7 +26,7 @@ module Epuber
         ].concat(super)
       end
 
-      # @param argv [CLAide::ARGV]
+      # @param [CLAide::ARGV] argv
       #
       def initialize(argv)
         @targets_names = argv.arguments!

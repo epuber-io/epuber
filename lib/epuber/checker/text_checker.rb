@@ -10,9 +10,9 @@ module Epuber
   class Checker
     class TextChecker < Checker
       class MatchProblem < Compiler::Problem
-        # @param message [String]
-        # @param file_path [String]
-        # @param match [MatchData]
+        # @param [String] message
+        # @param [String] file_path
+        # @param [MatchData] match
         #
         def initialize(match, message, file_path)
           whole_text = match.pre_match + match.matched_string + match.post_match
@@ -36,8 +36,8 @@ module Epuber
 
 
 
-      # @param file_path [String]
-      # @param text [String]
+      # @param [String] file_path
+      # @param [String] text
       # @param [CompilationContext] compilation_context
       #
       # @return nil
@@ -52,7 +52,7 @@ module Epuber
         @file_path = nil
       end
 
-      # @param regexp [Regexp]
+      # @param [Regexp] regexp
       # @param [String] message  message to display, when the regexp found something
       #
       def should_not_contain(regexp, message)

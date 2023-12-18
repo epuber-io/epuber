@@ -4,7 +4,7 @@ require 'nokogiri'
 
 require_relative '../spec_helper'
 
-# @param xpath [String]
+# @param [String] xpath
 # @return [String]
 #
 def xpath_namespace_hack(xpath)
@@ -22,8 +22,8 @@ end
 
 $global_xpath = nil
 
-# @param doc [Nokogiri::XML::Document]
-# @param xpath [String]
+# @param [Nokogiri::XML::Document] doc
+# @param [String] xpath
 #
 def with_xpath(doc, xpath, &block)
   xpath = xpath_namespace_hack(xpath)

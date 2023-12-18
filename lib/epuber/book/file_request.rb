@@ -48,7 +48,7 @@ module Epuber
         @source_pattern.hash ^ @group.hash ^ @only_one.hash
       end
 
-      # @param other [String, self]
+      # @param [String, self] other
       #
       def ==(other)
         if other.is_a?(String)

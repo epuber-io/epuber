@@ -179,8 +179,8 @@ module Epuber
       self.class.build_path
     end
 
-    # @param level [Symbol]
-    # @param message [String]
+    # @param [Symbol] level
+    # @param [String] message
     #
     # @return nil
     #
@@ -208,7 +208,7 @@ module Epuber
 
     # @!group Helpers
 
-    # @param pattern [String]
+    # @param [String] pattern
     #
     # @return [String] path to file
     #
@@ -217,7 +217,7 @@ module Epuber
       finder.find_files(pattern).first
     end
 
-    # @param index [Fixnum]
+    # @param [Fixnum] index
     # @return [Epuber::Book::File, nil]
     #
     def spine_file_at(index)
@@ -257,8 +257,8 @@ module Epuber
       add_script_to_head(html_doc, source)
     end
 
-    # @param html_doc [Nokogiri::HTML::Document]
-    # @param script_text [String]
+    # @param [Nokogiri::HTML::Document] html_doc
+    # @param [String] script_text
     #
     def add_script_to_head(html_doc, script_text)
       script_node = html_doc.create_element('script', script_text, type: 'text/javascript')
@@ -272,7 +272,7 @@ module Epuber
       head.add_child(script_node)
     end
 
-    # @param html_doc [Nokogiri::HTML::Document]
+    # @param [Nokogiri::HTML::Document] html_doc
     #
     def add_auto_refresh_script(html_doc)
       add_file_to_head(:js, html_doc, 'auto_refresh/reloader.coffee')
@@ -282,7 +282,7 @@ module Epuber
       add_script_to_head(html_doc, 'var auto_refresh = new AutoRefresh(window, console);')
     end
 
-    # @param html_doc [Nokogiri::HTML::Document]
+    # @param [Nokogiri::HTML::Document] html_doc
     #
     def add_keyboard_control_script(html_doc, previous_path, next_path)
       add_script_file_to_head(html_doc, 'keyboard_control.coffee',
@@ -290,7 +290,7 @@ module Epuber
                               '$next_path' => next_path)
     end
 
-    # @param html_doc [Nokogiri::HTML::Document]
+    # @param [Nokogiri::HTML::Document] html_doc
     #
     def add_file_to_head(type, html_doc, file_path)
       head = html_doc.at_css('head')
@@ -310,9 +310,9 @@ module Epuber
       head.add_child(node)
     end
 
-    # @param html_doc [Nokogiri::HTML::Document]
-    # @param key [String]
-    # @param value [String]
+    # @param [Nokogiri::HTML::Document] html_doc
+    # @param [String] key
+    # @param [String] value
     #
     def add_meta_to_head(name, content, html_doc, force: false)
       head = html_doc.at_css('head')
@@ -368,7 +368,7 @@ module Epuber
       @compilation_thread.join
     end
 
-    # @param message [String]
+    # @param [String] message
     #
     def self.send_to_clients(message)
       _log :info, "sending message to clients #{message.inspect}"
@@ -378,7 +378,7 @@ module Epuber
       end
     end
 
-    # @param type [Symbol]
+    # @param [Symbol] type
     def self.notify_clients(type, data = nil)
       _log :info, "Notifying clients with type #{type.inspect}"
       raise "Not known type `#{type}`" unless %i[styles reload compile_start compile_end].include?(type)
@@ -401,9 +401,9 @@ module Epuber
       files_paths.select { |file| file_resolver.file_with_source_path(file) || book.file_path == file }
     end
 
-    # @param modified [Array<String>]
-    # @param added [Array<String>]
-    # @param removed [Array<String>]
+    # @param [Array<String>] modified
+    # @param [Array<String>] added
+    # @param [Array<String>] removed
     #
     def self.changes_detected(modified, added, removed)
       all_changed = (modified + added + removed).uniq.map(&:unicode_normalize)

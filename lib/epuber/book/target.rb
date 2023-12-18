@@ -215,8 +215,8 @@ module Epuber
                 inherited: false
 
 
-      # @param file_path [String | Epuber::Book::File]
-      # @param group [Symbol]
+      # @param [String | Epuber::Book::File] file_path
+      # @param [Symbol] group
       #
       # @return [Epuber::Book::File] created file
       #
@@ -238,7 +238,7 @@ module Epuber
         end
       end
 
-      # @param file_paths [Array<String>]
+      # @param [Array<String>] file_paths
       #
       # @return [void]
       #
@@ -249,8 +249,8 @@ module Epuber
         end
       end
 
-      # @param key [String]
-      # @param value [String]
+      # @param [String] key
+      # @param [String] value
       #
       # @return [void]
       #
@@ -262,7 +262,7 @@ module Epuber
         end
       end
 
-      # @param file_paths [Array<String>]
+      # @param [Array<String>] file_paths
       #
       # @return [void]
       #
@@ -278,7 +278,7 @@ module Epuber
       # Add default styles to default target, default styles will be automatically added to xhtml document
       #
       # Only difference with #add_default_style is it adds multiple files with one pattern
-      # @param file_paths [Array<String>]
+      # @param [Array<String>] file_paths
       #
       # @return [void]
       #
@@ -291,7 +291,7 @@ module Epuber
         end
       end
 
-      # @param file_paths [Array<String>]
+      # @param [Array<String>] file_paths
       #
       # @return [void]
       #
@@ -307,7 +307,7 @@ module Epuber
       # Add default scripts to target, default scripts will be automatically added to xhtml document
       #
       # Only difference with #add_default_script is it adds multiple files with one pattern
-      # @param file_paths [Array<String>]
+      # @param [Array<String>] file_paths
       #
       # @return [void]
       #
@@ -330,7 +330,7 @@ module Epuber
         yield(@root_toc, self) if block_given?
       end
 
-      # @param path [String] use some file/module/package
+      # @param [String] path use some file/module/package
       #
       # @return [nil]
       #

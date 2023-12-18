@@ -14,7 +14,7 @@ module Epuber
         CLAide::Argument.new('PROJECT_NAME', false, true),
       ]
 
-      # @param argv [CLAide::ARGV]
+      # @param [CLAide::ARGV] argv
       #
       def initialize(argv)
         @book_name = argv.arguments!.first
@@ -57,7 +57,7 @@ module Epuber
 
       # Creates <book-id>.bookspec file from template
       #
-      # @param book_id [String]
+      # @param [String] book_id
       #
       # @return [void]
       #
@@ -71,7 +71,7 @@ module Epuber
 
       # Creates <book-id>.sublime-project
       #
-      # @param book_id [String]
+      # @param [String] book_id
       #
       # @return [void]
       #
@@ -115,8 +115,8 @@ module Epuber
         STYLUS
       end
 
-      # @param string [String] text to file
-      # @param file_path [String] path to file
+      # @param [String] string text to file
+      # @param [String] file_path path to file
       #
       # @return [void]
       #
@@ -125,8 +125,8 @@ module Epuber
         UI.puts "   #{'create'.ansi.green}  #{file_path}"
       end
 
-      # @param string [String] text to file
-      # @param file_path [String] path to file
+      # @param [String] string text to file
+      # @param [String] file_path path to file
       #
       # @return [void]
       #
@@ -158,7 +158,7 @@ module Epuber
         UI.puts "   #{'create'.ansi.green}  #{dir_path}/"
       end
 
-      # @param text [String]
+      # @param [String] text
       #
       # @return [String] returned text without new line
       #

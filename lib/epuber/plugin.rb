@@ -66,7 +66,7 @@ module Epuber
     #
     attr_reader :files
 
-    # @param path [String]
+    # @param [String] path
     #
     def initialize(path)
       @path = path

@@ -16,7 +16,7 @@ module Epuber
     #
     attr_accessor :locals
 
-    # @param source [String]
+    # @param [String] source
     #
     # @return [self]
     #
@@ -27,7 +27,7 @@ module Epuber
       inst
     end
 
-    # @param file [String, File]
+    # @param [String, File] file
     #
     # @return [self]
     #
@@ -46,7 +46,7 @@ module Epuber
     # DSL methods
 
 
-    # @param locals [Hash]
+    # @param [Hash] locals
     #
     # @return [self]
     #

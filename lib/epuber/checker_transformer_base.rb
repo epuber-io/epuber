@@ -55,7 +55,7 @@ module Epuber
       {}
     end
 
-    # @param type [Symbol]
+    # @param [Symbol] type
     #
     # @return [Class]
     #

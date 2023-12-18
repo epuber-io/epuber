@@ -58,7 +58,7 @@ module Epuber
 
       # Creates new instance by parsing ruby code from file
       #
-      # @param file_path [String]
+      # @param [String] file_path
       #
       # @return [Self]
       #
@@ -68,7 +68,7 @@ module Epuber
 
       # Creates new instance by parsing ruby code from string
       #
-      # @param string [String]
+      # @param [String] string
       #
       # @return [Self]
       #

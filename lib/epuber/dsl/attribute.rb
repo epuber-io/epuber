@@ -17,7 +17,7 @@ module Epuber
 
       # Returns a new attribute initialized with the given options.
       #
-      # @param name [Symbol]
+      # @param [Symbol] name
       #
       # @see #name
       #

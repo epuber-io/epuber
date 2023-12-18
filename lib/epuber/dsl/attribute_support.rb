@@ -9,8 +9,8 @@ module Epuber
       #     attribute :name
       #     attribute :title, required: true, inherited: true
       #
-      # @param name [Symbol] attribute name
-      # @param options [Hash]
+      # @param [Symbol] name attribute name
+      # @param [Hash] options
       #
       # @see Attribute
       #
@@ -44,8 +44,8 @@ module Epuber
         end
       end
 
-      # @param name [Symbol]
-      # @param attr [Epuber::DSL::Attribute]
+      # @param [Symbol] name
+      # @param [Epuber::DSL::Attribute] attr
       #
       # @return nil
       #

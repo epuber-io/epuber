@@ -14,7 +14,7 @@ module Epuber
       @project_path ||= Dir.pwd.unicode_normalize
     end
 
-    # @param of_file [String] absolute path to file
+    # @param [String] of_file absolute path to file
     #
     # @return [String] relative path to file from root of project
     #
@@ -84,7 +84,7 @@ module Epuber
       bookspec_lockfile.write_to_file
     end
 
-    # @param target [Epuber::Book::Target]
+    # @param [Epuber::Book::Target] target
     #
     # @return [String]
     #
@@ -92,7 +92,7 @@ module Epuber
       File.join(working_path, 'build', target.name.to_s)
     end
 
-    # @param target [Epuber::Book::Target]
+    # @param [Epuber::Book::Target] target
     #
     # @return [String]
     #

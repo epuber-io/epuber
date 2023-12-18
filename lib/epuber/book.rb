@@ -294,7 +294,7 @@ module Epuber
 
     # Finds target with name or nil when not found
     #
-    # @param target_name [Symbol, String, Epuber::Book::Target]
+    # @param [Symbol, String, Epuber::Book::Target] target_name
     #
     # @return [Epuber::Book::Target, nil]
     #

@@ -2,8 +2,8 @@
 
 module Epuber
   class BookspecGenerator
-    # @param opf [Epuber::OpfFile]
-    # @param nav [Epuber::NavFile, nil]
+    # @param [Epuber::OpfFile] opf
+    # @param [Epuber::NavFile, nil] nav
     #
     def initialize(opf, nav)
       @opf = opf

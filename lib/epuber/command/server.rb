@@ -17,7 +17,7 @@ module Epuber
         ].concat(super)
       end
 
-      # @param args [CLAide::ARGV]
+      # @param [CLAide::ARGV] args
       #
       def initialize(args)
         super

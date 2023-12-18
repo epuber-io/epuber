@@ -111,7 +111,7 @@ module Epuber
         end
       end
 
-      # @param toc_items [Array<Epuber::Book::TocItem>]
+      # @param [Array<Epuber::Book::TocItem>] toc_items
       #
       def visit_toc_items(toc_items)
         iterate_lambda = lambda do
@@ -133,7 +133,7 @@ module Epuber
         toc_items.any? { |a| a.title || contains_item_with_title(a.sub_items) }
       end
 
-      # @param toc_item [Epuber::Book::TocItem]
+      # @param [Epuber::Book::TocItem] toc_item
       #
       def visit_toc_item(toc_item)
         result_file_path = pretty_path_for_toc_item(toc_item)
@@ -165,7 +165,7 @@ module Epuber
 
       # --------------- landmarks -----------------------------
 
-      # @param toc_items [Array<Epuber::Book::TocItem>]
+      # @param [Array<Epuber::Book::TocItem>] toc_items
       #
       def landmarks_visit_toc_items(toc_items)
         toc_items.each do |child_item|
@@ -173,7 +173,7 @@ module Epuber
         end
       end
 
-      # @param toc_item [Epuber::Book::TocItem]
+      # @param [Epuber::Book::TocItem] toc_item
       #
       def landmarks_visit_toc_item(toc_item)
         landmarks = toc_item.landmarks

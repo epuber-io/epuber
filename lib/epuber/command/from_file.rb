@@ -11,7 +11,7 @@ module Epuber
         CLAide::Argument.new('EPUB_FILE', true),
       ]
 
-      # @param argv [CLAide::ARGV]
+      # @param [CLAide::ARGV] argv
       #
       def initialize(argv)
         @filepath = argv.arguments!.first

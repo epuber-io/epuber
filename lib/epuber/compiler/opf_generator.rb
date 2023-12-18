@@ -217,7 +217,7 @@ module Epuber
         end
       end
 
-      # @param toc_items [Array<Epuber::Book::TocItem>]
+      # @param [Array<Epuber::Book::TocItem>] toc_items
       #
       # @return nil
       #
@@ -227,7 +227,7 @@ module Epuber
         end
       end
 
-      # @param toc_item [Epuber::Book::TocItem]
+      # @param [Epuber::Book::TocItem] toc_item
       #
       # @return nil
       #
@@ -251,7 +251,7 @@ module Epuber
 
       # Creates id from file path
       #
-      # @param path [String]
+      # @param [String] path
       #
       # @return [String]
       #
@@ -263,7 +263,7 @@ module Epuber
 
       # Creates proper mime-type for file
       #
-      # @param file [Epuber::Compiler::FileTypes::AbstractFile | String]
+      # @param [Epuber::Compiler::FileTypes::AbstractFile | String] file
       #
       # @return [String]
       #

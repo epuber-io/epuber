@@ -279,7 +279,7 @@ module Epuber
 
       private
 
-      # @param file [Epuber::Compiler::AbstractFile]
+      # @param [Epuber::Compiler::AbstractFile] file
       #
       # @return [nil]
       #

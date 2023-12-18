@@ -46,7 +46,7 @@ module Epuber
       end
     end
 
-    # @param zip_file [Zip::File]
+    # @param [Zip::File] zip_file
     #
     # @return [void]
     #
@@ -63,7 +63,7 @@ module Epuber
       MSG
     end
 
-    # @param zip_file [Zip::File]
+    # @param [Zip::File] zip_file
     #
     # @return [String]
     def content_opf_path
@@ -81,8 +81,8 @@ module Epuber
       rootfile['full-path']
     end
 
-    # @param opf [Nokogiri::XML::Document]
-    # @param zip_file [Zip::File]
+    # @param [Nokogiri::XML::Document] opf
+    # @param [Zip::File] zip_file
     #
     # @return [String]
     def generate_bookspec

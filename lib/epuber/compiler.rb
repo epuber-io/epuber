@@ -39,8 +39,8 @@ module Epuber
     #
     attr_reader :compilation_context
 
-    # @param book [Epuber::Book::Book]
-    # @param target [Epuber::Book::Target]
+    # @param [Epuber::Book::Book] book
+    # @param [Epuber::Book::Target] target
     #
     def initialize(book, target)
       @book = book
@@ -50,7 +50,7 @@ module Epuber
 
     # Compile target to build folder
     #
-    # @param build_folder [String] path to folder, where will be stored all compiled files
+    # @param [String] build_folder path to folder, where will be stored all compiled files
     # @param [Bool] check should run non-release checkers
     # @param [Bool] write should perform transformations of source files and write them back
     # @param [Bool] release this is release build
@@ -109,7 +109,7 @@ module Epuber
 
     # Archives current target files to epub
     #
-    # @param path [String] path to created archive
+    # @param [String] path path to created archive
     #
     # @return [String] path
     #
@@ -285,7 +285,7 @@ module Epuber
       UI.processing_files_done
     end
 
-    # @param toc_item [Epuber::Book::TocItem]
+    # @param [Epuber::Book::TocItem] toc_item
     #
     def parse_toc_item(toc_item)
       unless toc_item.file_request.nil?
@@ -310,7 +310,7 @@ module Epuber
 
     # Validates duplicity of global ids in all files + returns map of global ids to files
     #
-    # @param xhtml_files [Array<FileTypes::XHTMLFile>]
+    # @param [Array<FileTypes::XHTMLFile>] xhtml_files
     # @return [Hash<String, FileTypes::XHTMLFile>]
     #
     def validate_global_ids(xhtml_files)
@@ -333,7 +333,7 @@ module Epuber
       map
     end
 
-    # @param cmd [String]
+    # @param [String] cmd
     #
     # @return [void]
     #
