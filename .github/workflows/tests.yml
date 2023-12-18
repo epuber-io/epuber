@@ -22,8 +22,18 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         rubygems: 3.2.3
 
+    - name: Cache Calibre
+      uses: actions/cache@v3
+      with:
+        path: /tmp/calibre-installer-cache
+        key: ${{ matrix.os }}-calibre
+
     - name: Install Calibre
-      run: sudo -v && sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
+      run: |
+        sudo -vx
+        sudo apt-get update
+        sudo apt-get install -y libegl1 libopengl0
+        wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
 
     - name: Cache bundler
       uses: actions/cache@v3
