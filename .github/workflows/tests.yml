@@ -26,10 +26,10 @@ jobs:
       run: sudo -v && sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
 
     - name: Cache bundler
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor
-        key: ${{ runner.os }}-gems
+        key: ${{ matrix.os }}-gems-${{ matrix.ruby }}
 
     - name: Install dependencies
       run: |
