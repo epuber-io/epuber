@@ -38,5 +38,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'bade', '~> 0.3', '>= 0.3.1'
   spec.add_runtime_dependency 'coffee-script', '~> 2.4'
+  spec.add_runtime_dependency 'css_parser', '>= 0.8', '< 2.0'
   spec.add_runtime_dependency 'epuber-stylus', '~> 1.1', '>= 1.1.1'
 end

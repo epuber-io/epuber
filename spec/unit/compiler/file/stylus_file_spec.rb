@@ -46,13 +46,13 @@ module Epuber
 
 
         describe 'Real' do
-          FileUtils.mkdir_p('/tmp/epuber_stylus_tests')
+          include_context 'with temp dir'
 
           let(:ctx) do
             book = Book.new
 
             ctx = CompilationContext.new(book, book.default_target)
-            ctx.file_resolver = FileResolver.new('/tmp/epuber_stylus_tests', '/tmp/epuber_stylus_tests/.build')
+            ctx.file_resolver = FileResolver.new(temp_dir, File.join(temp_dir, '.build'))
 
             ctx
           end
@@ -70,10 +70,10 @@ module Epuber
 
             STYLUS
 
-            File.write('/tmp/epuber_stylus_tests/some_file.styl', source)
+            File.write(File.join(temp_dir, 'some_file.styl'), source)
 
-            file = described_class.new('/tmp/epuber_stylus_tests/some_file.styl')
-            file.destination_path = '/tmp/epuber_stylus_tests/some_file.css'
+            file = described_class.new(File.join(temp_dir, 'some_file.styl'))
+            file.destination_path = File.join(temp_dir, 'some_file.css')
             file.compilation_context = ctx
             resolve_file_paths(file)
 
@@ -89,6 +89,36 @@ module Epuber
             CSS
 
             expect(File.read(file.final_destination_path)).to eq expected
+          end
+
+          it 'modifies linked files using url()' do
+            source = <<~STYLUS
+              div
+                background: url(image.png);
+              div
+                background: url("image");
+            STYLUS
+
+            FileUtils.mkdir_p(File.join(temp_dir, 'styles'))
+            File.write(File.join(temp_dir, 'styles/some_file.styl'), source)
+            FileUtils.mkdir_p(File.join(temp_dir, 'images'))
+            FileUtils.touch(File.join(temp_dir, 'images/image.png'))
+
+            file = described_class.new('styles/some_file.styl')
+            file.destination_path = 'styles/some_file_res.css'
+            file.compilation_context = ctx
+            resolve_file_paths(file)
+
+            file.process(ctx)
+
+            expect(File.read(File.join(temp_dir, 'styles/some_file_res.css'))).to eq <<~CSS
+              div {
+                background: url("../images/image.png");
+              }
+              div {
+                background: url("../images/image.png");
+              }
+            CSS
           end
         end
       end

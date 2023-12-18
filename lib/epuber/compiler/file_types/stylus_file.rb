@@ -5,9 +5,9 @@ require 'epuber-stylus'
 module Epuber
   class Compiler
     module FileTypes
-      require_relative 'source_file'
+      require_relative 'css_file'
 
-      class StylusFile < SourceFile
+      class StylusFile < CSSFile
         # @param [Compiler::CompilationContext] compilation_context
         #
         def process(compilation_context)
@@ -19,7 +19,8 @@ module Epuber
           Stylus.define('__book_title', compilation_context.book.title)
           Stylus.define('__const', compilation_context.target.constants)
 
-          write_compiled(Stylus.compile(File.new(abs_source_path)))
+          css = Stylus.compile(File.new(abs_source_path))
+          write_compiled(process_css(css, compilation_context))
 
           update_metadata!
         end
