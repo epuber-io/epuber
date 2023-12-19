@@ -112,3 +112,39 @@ EPUB3_NAV = <<~XML
     </body>
   </html>
 XML
+
+EPUB3_ANCHORES_NAV = <<~XML
+  <?xml version="1.0"?>
+  <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+    <head>
+      <title>Abroad</title>
+    </head>
+    <body>
+      <nav id="toc" epub:type="toc">
+        <h1>Table of Contents</h1>
+        <ol>
+          <li><a href="childrens-book-page1.xhtml#s_123">Page 1</a></li>
+          <li><a href="childrens-book-page2.xhtml#s_345">Page 2</a></li>
+          <li><a href="childrens-book-page3.xhtml#s_678">Page 3</a></li>
+          <li><a href="childrens-book-page4.xhtml#s_901">Page 4</a></li>
+        </ol>
+      </nav>
+      <nav epub:type="landmarks">
+        <ol>
+          <li>
+            <a epub:type="bodymatter" href="childrens-book-page1.xhtml">Start Reading</a>
+          </li>
+          <li>
+            <a epub:type="ibooks:reader-start-page" href="childrens-book-page1.xhtml">Start Reading</a>
+          </li>
+          <li>
+            <a epub:type="cover" href="childrens-book-page1.xhtml">Cover page</a>
+          </li>
+          <li>
+            <a epub:type="copyright-page" href="childrens-book-page2.xhtml">Copyright page</a>
+          </li>
+        </ol>
+      </nav>
+    </body>
+  </html>
+XML
