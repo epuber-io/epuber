@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## Not released
+## v0.9.0 (2023-12-19)
 
 - add way to specify contributor's role by adding `:role` key in hash syntax (see [bookspec.md](docs/bookspec.md#role))
 - add some docs about bookspec (see [bookspec.md](docs/bookspec.md))
 - add command `from-file` to create new Epuber project from existing EPUB file [#95](https://github.com/epuber-io/epuber/pull/95)
 - resolves linked files in CSS and Stylus files [#97](https://github.com/epuber-io/epuber/issues/97)
+
 
 ## v0.8.0 (2023-11-19)
 
