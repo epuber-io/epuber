@@ -26,6 +26,11 @@ module Epuber
         ].concat(super)
       end
 
+      # To resolve problem with `compile` treating as subcommand
+      def self.subcommands
+        []
+      end
+
       # @param [CLAide::ARGV] argv
       #
       def initialize(argv)

@@ -11,7 +11,7 @@ module Epuber
     class Init < Command
       self.summary = 'Initialize current folder to use it as Epuber project'
       self.arguments = [
-        CLAide::Argument.new('PROJECT_NAME', false, true),
+        CLAide::Argument.new('PROJECT_NAME', false),
       ]
 
       # @param [CLAide::ARGV] argv
@@ -23,6 +23,8 @@ module Epuber
       end
 
       def validate!
+        super
+
         help! 'You must specify identifier-like name of the book as first argument' if @book_name.nil?
 
         existing = Dir.glob('*.bookspec')
