@@ -194,7 +194,7 @@ module Epuber
             end.flatten
 
             paths.select do |file_path|
-              valid_extensions.include?(::File.extname(file_path))
+              valid_extensions.include?(::File.extname(file_path).downcase)
             end
           end
         end

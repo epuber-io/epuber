@@ -35,6 +35,11 @@ module Epuber
                 font-family: 'MyFont';
                 src: url("font-italic.ttf");
               }
+
+              @font-face {
+                font-family: 'MyFont';
+                src: url("../Fonts/font-bold.TTF");
+              }
             CSS
 
             FileUtils.mkdir_p('/abc')
@@ -42,6 +47,8 @@ module Epuber
             FileUtils.touch('/abc/image.png')
             FileUtils.touch('/abc/font.ttf')
             FileUtils.touch('/abc/font-italic.ttf')
+            FileUtils.mkdir_p('/Fonts')
+            FileUtils.touch('/Fonts/font-bold.TTF')
 
             file = described_class.new('/abc/some_file.css')
             file.destination_path = 'abc/some_file_res.css'
@@ -63,6 +70,11 @@ module Epuber
               @font-face {
                 font-family: 'MyFont';
                 src: url("font-italic.ttf");
+              }
+
+              @font-face {
+                font-family: 'MyFont';
+                src: url("../Fonts/font-bold.TTF");
               }
             CSS
 
