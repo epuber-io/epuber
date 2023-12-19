@@ -2,6 +2,7 @@
 
 require 'zip'
 
+require_relative 'bookspec_generator'
 require_relative 'opf_file'
 require_relative 'nav_file'
 require_relative 'encryption_handler'
@@ -20,23 +21,29 @@ module Epuber
     end
 
     def run
+      UI.puts "📖 Loading EPUB file #{@filepath}"
+
       Zip::File.open(@filepath) do |zip_file|
         @zip_file = zip_file
 
         validate_mimetype
 
         @opf_path = content_opf_path
+        UI.puts "  Parsing OPF file at #{@opf_path}"
         @opf = OpfFile.new(zip_file.read(@opf_path))
 
         if zip_file.find_entry(ENCRYPTION_PATH)
+          UI.puts '  Parsing encryption.xml file'
           @encryption_handler = EncryptionHandler.new(zip_file.read(ENCRYPTION_PATH), @opf)
         end
 
+        UI.puts '  Generating bookspec file'
         basename = File.basename(@filepath, File.extname(@filepath))
         File.write("#{basename}.bookspec", generate_bookspec)
 
         export_files
 
+        UI.puts '' # empty line
         UI.puts <<~TEXT.rstrip.ansi.green
           🎉 Project initialized.
           Please review generated #{basename}.bookspec file and start using Epuber.
@@ -105,19 +112,25 @@ module Epuber
         extension = File.extname(item.href).downcase
         if text_file_extensions.include?(extension) &&
            @opf.spine_items.none? { |spine_item| spine_item.idref == item.id }
+          UI.puts "  Skipping #{item.href} (not in spine)"
           next
         end
 
         # ignore ncx file
-        next if item.media_type == 'application/x-dtbncx+xml'
+        if item.media_type == 'application/x-dtbncx+xml'
+          UI.puts "  Skipping #{item.href} (ncx file)"
+          next
+        end
 
         full_path = Pathname.new(@opf_path)
                             .dirname
                             .join(item.href)
                             .to_s
 
+        UI.puts "  Exporting #{item.href} (from #{full_path})"
+
         contents = @zip_file.read(full_path)
-        contents = @encryption_handler&.process_file(full_path, contents)
+        contents = @encryption_handler.process_file(full_path, contents) if @encryption_handler
 
         FileUtils.mkdir_p(File.dirname(item.href))
         File.write(item.href, contents)

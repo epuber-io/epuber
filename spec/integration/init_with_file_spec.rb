@@ -35,6 +35,7 @@ module Epuber
 
       # rest of files
       expect(File).to exist('childrens-book-flowers.jpg')
+      expect(File.size('childrens-book-flowers.jpg')).to eq 17_094
       expect(File).to exist('childrens-book-page.xhtml')
       expect(File).to exist('childrens-book-style.css')
       expect(File).to exist('childrens-book-swans.jpg')
@@ -97,11 +98,30 @@ module Epuber
     it 'will print some information to console' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
 
-      message = <<~TEXT.rstrip.ansi.green
+      progress = <<~TEXT.rstrip
+        📖 Loading EPUB file #{__dir__}/../fixtures/childrens-media-query.epub
+          Parsing OPF file at EPUB/content.opf
+          Generating bookspec file
+          Exporting childrens-book-style.css (from EPUB/childrens-book-style.css)
+          Exporting small-screen.css (from EPUB/small-screen.css)
+          Exporting childrens-book-flowers.jpg (from EPUB/childrens-book-flowers.jpg)
+          Exporting childrens-book-swans.jpg (from EPUB/childrens-book-swans.jpg)
+          Exporting childrens-book-page.xhtml (from EPUB/childrens-book-page.xhtml)
+          Skipping toc.ncx (ncx file)
+          Skipping toc.xhtml (not in spine)
+      TEXT
+
+      final = <<~TEXT.rstrip.ansi.green
         🎉 Project initialized.
         Please review generated childrens-media-query.bookspec file and start using Epuber.
 
         For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.
+      TEXT
+
+      message = <<~TEXT.rstrip
+        #{progress}
+
+        #{final}
       TEXT
 
       expect do
