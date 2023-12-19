@@ -40,8 +40,6 @@ module Epuber
         # @return [String]
         #
         def process_css(content, compilation_context)
-          file_resolver = compilation_context.file_resolver
-
           parser = UI.print_step_processing_time('css parsing') do
             parser = CssParser::Parser.new
             parser.load_string!(content)
@@ -69,27 +67,10 @@ module Epuber
                 next if path.start_with?('data:') || path.start_with?('http://') || path.start_with?('https://')
 
                 resource_group = DECLARATION_TO_FILE_GROUP_MAP[property]
-                dirname = File.dirname(destination_path)
-
-                begin
-                  new_path = file_resolver.dest_finder.find_file(path, groups: resource_group, context_path: dirname)
-                rescue FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
-                  new_path = XHTMLProcessor.resolved_link_to_file(path,
-                                                                  resource_group,
-                                                                  dirname,
-                                                                  file_resolver.source_finder).to_s
-                  pkg_abs_path = File.expand_path(new_path, dirname).unicode_normalize
-                  pkg_new_path = Pathname.new(pkg_abs_path)
-                                         .relative_path_from(Pathname.new(file_resolver.source_path))
-                                         .to_s
-
-                  file_class = FileResolver.file_class_for(File.extname(new_path))
-                  file = file_class.new(pkg_new_path)
-                  file.path_type = :manifest
-                  file_resolver.add_file(file)
-                end
-
-                new_url = FileResolver.renamed_file_with_path(new_path)
+                new_url = SourceFile.resolve_relative_file(destination_path,
+                                                           path,
+                                                           compilation_context.file_resolver,
+                                                           group: resource_group)
                 content = content.gsub(value, "url(#{quote}#{new_url}#{quote})")
               end
             end

@@ -112,6 +112,37 @@ module Epuber
             MSG
           end
         end
+
+        def self.resolve_relative_file(destination_path, pattern, file_resolver, group: nil)
+          dirname = File.dirname(destination_path)
+
+          begin
+            new_path = file_resolver.dest_finder.find_file(pattern, groups: group, context_path: dirname)
+          rescue FileFinders::FileNotFoundError, FileFinders::MultipleFilesFoundError
+            begin
+              new_path = XHTMLProcessor.resolved_link_to_file(pattern,
+                                                              group,
+                                                              dirname,
+                                                              file_resolver.source_finder).to_s
+            rescue XHTMLProcessor::UnparseableLinkError,
+                   FileFinders::FileNotFoundError,
+                   FileFinders::MultipleFilesFoundError => e
+              UI.warning(e.to_s, location: img)
+            end
+          end
+
+          pkg_abs_path = File.expand_path(new_path, dirname).unicode_normalize
+          pkg_new_path = Pathname.new(pkg_abs_path)
+                                 .relative_path_from(Pathname.new(file_resolver.source_path))
+                                 .to_s
+
+          file_class = FileResolver.file_class_for(File.extname(new_path))
+          file = file_class.new(pkg_new_path)
+          file.path_type = :manifest
+          file_resolver.add_file(file)
+
+          FileResolver.renamed_file_with_path(new_path)
+        end
       end
     end
   end

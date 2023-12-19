@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.9.1 (2023-12-19)
+
+- fixed adding to final EPUB files that were found in cache but were deleted afterwards
+
+
 ## v0.9.0 (2023-12-19)
 
 - add way to specify contributor's role by adding `:role` key in hash syntax (see [bookspec.md](docs/bookspec.md#role))
