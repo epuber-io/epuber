@@ -1,7 +1,56 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Epuber
   class BookspecGenerator
+    class TocItem
+      # @return [String]
+      #
+      attr_accessor :href
+
+      # @return [String, nil]
+      #
+      attr_accessor :title
+
+      # @return [Array<TocItem>]
+      #
+      attr_accessor :children
+
+      # @return [Array<Symbol>]
+      #
+      attr_accessor :landmarks
+
+      def initialize(href, title = nil, landmarks = [], children = [])
+        @href = href
+        @title = title
+        @landmarks = landmarks
+        @children = children
+      end
+
+      def attribs
+        [href.inspect, title&.inspect, *landmarks.map(&:inspect)].compact.join(', ')
+      end
+
+      def ==(other)
+        other.is_a?(TocItem) &&
+          href == other.href &&
+          title == other.title &&
+          landmarks == other.landmarks &&
+          children == other.children
+      end
+
+      def to_s(level = 0)
+        indent = ' ' * level
+        children_str = children.map { |c| c.to_s(level + 2) }.join("\n")
+        %(#{indent}#{href.inspect} #{title.inspect} #{landmarks.inspect}\n#{children_str})
+      end
+
+      def inspect
+        %(#<#{self.class.name} #{self}>)
+      end
+    end
+
     # @param [Epuber::OpfFile] opf
     # @param [Epuber::NavFile, nil] nav
     #
@@ -150,46 +199,23 @@ module Epuber
     # @return [void]
     #
     def generate_toc
-      spine_items = @opf.spine_items.dup
-      idrefs = spine_items.map(&:idref)
+      items = calculate_toc_items
 
-      # @param [ManifestItem, nil] manifest_item
-      # @param [NavItem, nil] toc_item
-      #
-      render_toc_item = lambda do |manifest_item, toc_item|
-        # ignore this item when it was already rendered
-        next if manifest_item && !idrefs.include?(manifest_item.id)
-
-        manifest_item ||= @opf.manifest_file_by_href(toc_item.href)
-
-        href = toc_item&.href || manifest_item.href
-        toc_item ||= @nav&.find_by_href(href)
-
-        href_output = href.sub(/\.x?html$/, '').sub(/\.x?html#/, '#')
-        landmarks_for_this = landmark_for_href(href).map(&:inspect)
-        attribs = [href_output.inspect, toc_item&.title&.inspect, *landmarks_for_this].compact.join(', ')
-        should_nest = toc_item && !toc_item.children.empty?
-
-        if should_nest
-          add_code(%(toc.file #{attribs} do), after: 'end') do
-            toc_item.children.each do |child|
-              render_toc_item.call(nil, child)
+      render_toc_item = lambda do |item|
+        if item.children.empty?
+          add_code(%(toc.file #{item.attribs}))
+        else
+          add_code(%(toc.file #{item.attribs} do), after: 'end') do
+            item.children.each do |child|
+              render_toc_item.call(child)
             end
           end
-        else
-          add_code(%(toc.file #{attribs}))
         end
-
-        idrefs.delete(manifest_item.id) if manifest_item
       end
 
       add_code('book.toc do |toc, target|', after: 'end') do
-        spine_items.each do |itemref|
-          idref = itemref.idref
-          next unless idref
-
-          item = @opf.manifest_file_by_id(idref)
-          render_toc_item.call(item, nil)
+        items.each do |toc_item|
+          render_toc_item.call(toc_item)
         end
       end
     end
@@ -274,11 +300,72 @@ module Epuber
         landmark_map = OpfFile::LANDMARKS_MAP
       end
 
-      landmarks.select { |l| l.href == href }
-               .map(&:type)
-               .compact
-               .map { |t| landmark_map[t] }
-               .compact
+      found = landmarks.select { |l| l.href == href }
+                       .map(&:type)
+                       .compact
+                       .map { |t| landmark_map[t] }
+                       .compact
+
+      return found unless found.empty?
+
+      # try to find by href without fragment
+      if href.include?('#')
+        href = href.split('#').first
+        return landmark_for_href(href)
+      end
+
+      []
+    end
+
+    # @return [Array<Epuber::BookspecGenerator::TocItem>]
+    #
+    def calculate_toc_items
+      spine_items = @opf.spine_items
+      idrefs = spine_items.map(&:idref)
+      landmarks = Set.new
+
+      # @param [ManifestItem, nil] manifest_item
+      # @param [NavItem, nil] toc_item
+      #
+      # @return [Array<Epuber::BookspecGenerator::TocItem>]
+      #
+      render_toc_item = lambda do |manifest_item, toc_item|
+        # ignore this item when it was already rendered
+        next nil if manifest_item && !idrefs.include?(manifest_item.id)
+
+        manifest_item ||= @opf.manifest_file_by_href(toc_item.href)
+
+        href = toc_item&.href || manifest_item.href
+        toc_item ||= @nav&.find_by_href(href) || @nav&.find_by_href(href, ignore_fragment: true)
+        href = toc_item&.href || manifest_item.href
+
+        href_output = href.sub(/\.x?html$/, '')
+                          .sub(/\.x?html#/, '#')
+
+        landmarks_for_this = landmark_for_href(href)
+        unless landmarks_for_this.empty?
+          diff = Set.new(landmarks_for_this) - landmarks
+          landmarks += diff
+
+          landmarks_for_this = diff.to_a
+        end
+
+        item = TocItem.new(href_output, toc_item&.title, landmarks_for_this)
+        item.children = toc_item&.children&.map do |child|
+          render_toc_item.call(nil, child)
+        end || []
+
+        idrefs.delete(manifest_item.id) if manifest_item
+
+        item
+      end
+
+      spine_items.map do |itemref|
+        idref = itemref.idref
+        next unless idref
+
+        render_toc_item.call(@opf.manifest_file_by_id(idref), nil)
+      end.compact
     end
   end
 end

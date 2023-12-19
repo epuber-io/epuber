@@ -19,14 +19,21 @@ module Epuber
         @children = []
       end
 
-      # @param [String] href
+      # @param [String] other_href
+      # @param [Boolean] ignore_fragment
       #
       # @return [NavItem, nil]
       #
-      def find_by_href(href)
-        return self if @href == href
+      def find_by_href(other_href, ignore_fragment: false)
+        if ignore_fragment
+          other_href = other_href.split('#').first
+          self_href = @href.split('#').first
+          return self if self_href == other_href
+        elsif @href == other_href
+          return self
+        end
 
-        @children.find { |item| item.find_by_href(href) }
+        @children.find { |item| item.find_by_href(other_href) }
       end
     end
 
@@ -98,11 +105,12 @@ module Epuber
     end
 
     # @param [String] href
+    # @param [Boolean] ignore_fragment
     #
     # @return [NavItem, nil]
     #
-    def find_by_href(href)
-      @items.find { |item| item.find_by_href(href) }
+    def find_by_href(href, ignore_fragment: false)
+      @items.find { |item| item.find_by_href(href, ignore_fragment: ignore_fragment) }
     end
 
     private
