@@ -65,6 +65,14 @@ module Epuber
                                                        Config.instance.pretty_path_from_project(file_path))
         end
       end
+
+      def error(message, location: nil)
+        super(message, location: location || Config.instance.pretty_path_from_project(file_path))
+      end
+
+      def warning(message, location: nil)
+        super(message, location: location || Config.instance.pretty_path_from_project(file_path))
+      end
     end
   end
 end
