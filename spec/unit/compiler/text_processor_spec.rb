@@ -447,14 +447,14 @@ module Epuber
           end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
         end
 
-        it "will not print warning when the attribute is #" do
+        it 'does not print warning when the attribute is #' do
           FileUtils.touch('root.xhtml')
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href="#">text</a>', 'root.xhtml')
 
           expect do
             XHTMLProcessor.resolve_links(doc, 'root.xhtml', finder)
-          end.to_not output.to_stdout
+          end.not_to output.to_stdout
 
           expect(doc.root.to_xml).to eq '<a href="#">text</a>'
         end
