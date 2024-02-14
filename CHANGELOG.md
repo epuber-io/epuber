@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.9.2 (2024-02-14)
+
+- fixed warning about not founding file when using `<a href="#">` link in (x)html file
+
+
 ## v0.9.1 (2023-12-19)
 
 - fixed adding to final EPUB files that were found in cache but were deleted afterwards
