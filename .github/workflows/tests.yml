@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: '16'
 
@@ -23,7 +23,7 @@ jobs:
         rubygems: 3.2.3
 
     - name: Cache Calibre
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: /tmp/calibre-installer-cache
         key: ${{ matrix.os }}-calibre
@@ -36,7 +36,7 @@ jobs:
         wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin version=6.26.0
 
     - name: Cache bundler
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ matrix.os }}-gems-${{ matrix.ruby }}
