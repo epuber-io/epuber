@@ -453,7 +453,7 @@ module Epuber
           doc = described_class.xml_document_from_string('<a href="#">text</a>', 'root.xhtml')
 
           expect do
-            XHTMLProcessor.resolve_links(doc, 'root.xhtml', finder)
+            described_class.resolve_links(doc, 'root.xhtml', finder)
           end.not_to output.to_stdout
 
           expect(doc.root.to_xml).to eq '<a href="#">text</a>'
