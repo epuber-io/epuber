@@ -189,7 +189,7 @@ module Epuber
           expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def', 'qwe'
         end
 
-        it 'will not add duplicated items' do
+        it 'does not add duplicated items' do
           doc = described_class.xml_document_from_string('')
           described_class.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
 
@@ -201,7 +201,7 @@ module Epuber
           expect(doc.css('link[rel="stylesheet"]').map { |node| node['href'] }).to contain_exactly 'abc', 'def'
         end
 
-        it 'will not add style that is already there' do
+        it 'does not add style that is already there' do
           input_str = '<html>
               <head>
                 <link rel="stylesheet" type="text/css" href="qwe" />
@@ -249,7 +249,7 @@ module Epuber
           expect(doc.css('script').map { |node| node['src'] }).to contain_exactly 'abc', 'def', 'qwe'
         end
 
-        it 'will not add duplicated items' do
+        it 'does not add duplicated items' do
           doc = described_class.xml_document_from_string('')
           described_class.add_missing_root_elements(doc, 'Baf', Epuber::Version.new(3.0))
 
@@ -390,7 +390,7 @@ module Epuber
           end.to raise_error FileFinders::FileNotFoundError
         end
 
-        it 'will not raise for valid path' do
+        it 'does not raise for valid path' do
           FileUtils.mkdir_p('image')
           FileUtils.touch('image/stan_mindsetbw.png')
 

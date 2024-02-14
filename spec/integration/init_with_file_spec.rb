@@ -95,7 +95,7 @@ module Epuber
       expect(Digest::MD5.file('OldStandard-Regular.obf.otf')).to eq '74b70d8fb0dde57b8411d75f2e6eee21'
     end
 
-    it 'will print some information to console' do
+    it 'prints some information to console' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
 
       progress = <<~TEXT.rstrip

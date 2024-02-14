@@ -97,7 +97,7 @@ module Epuber
           @ctx.release_build = true
           file.compilation_context = @ctx
 
-          expected_output1 = [ # rubocop:disable Style/StringConcatenation
+          expected_output1 = [
             <<~TEXT.rstrip.ansi.yellow,
               some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body
                 </body>
@@ -110,7 +110,7 @@ module Epuber
             TEXT
           ].join("\n")
 
-          expected_output2 = [ # rubocop:disable Style/StringConcatenation
+          expected_output2 = [
             expected_output1,
             <<~TEXT.rstrip.ansi.yellow,
               some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1
