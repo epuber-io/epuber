@@ -218,6 +218,8 @@ module Epuber
           end
         end
 
+        return uri if path == '#'
+
         # skip uri with scheme (links to web pages)
         return uri unless uri.scheme.nil?
 
