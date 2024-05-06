@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.9.3 (2024-05-06)
+
+- fixed crash when resolving files in CSS or Bade and the target file was not found
+
+
 ## v0.9.2 (2024-02-14)
 
 - fixed warning about not founding file when using `<a href="#">` link in (x)html file
