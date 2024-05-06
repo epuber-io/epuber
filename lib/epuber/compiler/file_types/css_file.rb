@@ -49,8 +49,10 @@ module Epuber
           # resolve links to files, add other linked resources and compute correct path
           UI.print_step_processing_time('resolving url()') do
             parser.each_rule_set do |rule_set, _media_types|
+              # @type [CssParser::RuleSet::Declarations]
               declarations = rule_set.instance_eval { @declarations }
               declarations.each do |property, decl_value|
+                # @type [String]
                 value = decl_value.to_s
                 next unless value =~ URL_REGEXP
 
@@ -70,8 +72,12 @@ module Epuber
                 new_url = SourceFile.resolve_relative_file(destination_path,
                                                            path,
                                                            compilation_context.file_resolver,
-                                                           group: resource_group)
-                content = content.gsub(value, "url(#{quote}#{new_url}#{quote})")
+                                                           group: resource_group,
+                                                           location: self)
+
+                if new_url
+                  content = content.gsub(value, "url(#{quote}#{new_url}#{quote})")
+                end
               end
             end
           end

@@ -113,7 +113,7 @@ module Epuber
           end
         end
 
-        def self.resolve_relative_file(destination_path, pattern, file_resolver, group: nil)
+        def self.resolve_relative_file(destination_path, pattern, file_resolver, group: nil, location: nil)
           dirname = File.dirname(destination_path)
 
           begin
@@ -127,7 +127,8 @@ module Epuber
             rescue XHTMLProcessor::UnparseableLinkError,
                    FileFinders::FileNotFoundError,
                    FileFinders::MultipleFilesFoundError => e
-              UI.warning(e.to_s, location: img)
+              UI.warning(e.to_s, location: location)
+              return nil
             end
           end
 

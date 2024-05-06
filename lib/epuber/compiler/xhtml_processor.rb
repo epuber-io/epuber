@@ -351,7 +351,8 @@ module Epuber
           new_path = Compiler::FileTypes::SourceFile.resolve_relative_file(file_path,
                                                                            path,
                                                                            file_resolver,
-                                                                           group: resource_group)
+                                                                           group: resource_group,
+                                                                           location: img)
           img[attribute_name] = new_path if new_path
         end
       end
