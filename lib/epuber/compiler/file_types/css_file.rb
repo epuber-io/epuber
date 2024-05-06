@@ -75,9 +75,7 @@ module Epuber
                                                            group: resource_group,
                                                            location: self)
 
-                if new_url
-                  content = content.gsub(value, "url(#{quote}#{new_url}#{quote})")
-                end
+                content = content.gsub(value, "url(#{quote}#{new_url}#{quote})") if new_url
               end
             end
           end
