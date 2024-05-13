@@ -36,19 +36,19 @@ module Epuber
       attr_reader :destination_path
 
 
-      # @return [Array<FileTypes::Abstract>] all files that will be in spine
+      # @return [Array<Epuber::Compiler::FileTypes::AbstractFile>] all files that will be in spine
       #
       attr_reader :spine_files
 
-      # @return [Array<FileTypes::Abstract>] all files that has to be in manifest file (OPF)
+      # @return [Array<Epuber::Compiler::FileTypes::AbstractFile>] all files that has to be in manifest file (OPF)
       #
       attr_reader :manifest_files
 
-      # @return [Array<FileTypes::Abstract>] all files that will be copied to EPUB package
+      # @return [Array<Epuber::Compiler::FileTypes::AbstractFile>] all files that will be copied to EPUB package
       #
       attr_reader :package_files
 
-      # @return [Array<FileTypes::Abstract>] totally all files
+      # @return [Array<Epuber::Compiler::FileTypes::AbstractFile>] totally all files
       #
       attr_reader :files
 

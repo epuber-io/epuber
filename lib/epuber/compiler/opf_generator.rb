@@ -126,7 +126,10 @@ module Epuber
           cover_image = @target.cover_image
           unless cover_image.nil?
             cover_image_result = @file_resolver.file_from_request(cover_image)
-            @xml.meta(name: 'cover', content: create_id_from_path(pretty_path(cover_image_result)))
+            if cover_image_result
+              @xml.meta(name: 'cover',
+                        content: create_id_from_path(pretty_path(cover_image_result)))
+            end
           end
 
           if epub_version >= 3
@@ -164,8 +167,11 @@ module Epuber
 
             properties = file.properties
             if properties.length.positive? && @target.epub_version >= 3
-              pretty_properties = properties.to_a.map { |property| PROPERTIES_MAP[property] }.join(' ')
-              attrs['properties'] = pretty_properties
+              formatted = properties.to_a
+                                    .map { |prop| PROPERTIES_MAP[prop] }
+                                    .compact
+                                    .join(' ')
+              attrs['properties'] = formatted unless formatted.empty?
             end
 
             @xml.item(attrs)

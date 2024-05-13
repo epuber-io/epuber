@@ -36,6 +36,12 @@ module Epuber
           # do nothing
         end
 
+        # @return [Set<Symbol>] list of properties
+        #
+        def properties
+          file_request&.properties || super
+        end
+
         # Source file does not change from last build
         # @warning Using only this method can cause not updating files that are different for targets
         #

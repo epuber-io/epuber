@@ -5,6 +5,8 @@ require_relative '../../spec_helper'
 
 module Epuber
   describe Compiler::OPFGenerator do
+    include FakeFS::SpecHelpers
+
     before do
       book = Book.new
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
@@ -31,11 +33,16 @@ module Epuber
         b.version      = 1.0
         b.is_ibooks    = true
         b.custom_fonts = true
-        ### b.cover_image = 'cover.jpg'
+        b.cover_image = 'cover.jpg'
       end
+
+      FileUtils.mkdir_p('/source')
+      FileUtils.touch('/source/cover.jpg')
 
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
+      ctx.file_resolver.add_file_from_request(book.cover_image)
+
       @sut = described_class.new(ctx)
 
       opf_xml = @sut.generate_opf
@@ -56,11 +63,11 @@ module Epuber
         expect(metadata).to have_xpath("/meta[@property='ibooks:version']", '1.0')
         expect(metadata).to have_xpath("/meta[@property='ibooks:specified-fonts']", 'true')
 
-        ### expect(metadata).to have_xpath("/meta[@property='cover']", 'cover.jpg')
+        expect(metadata).to have_xpath("/meta[@name='cover']/@content", 'cover.jpg')
       end
 
-      with_xpath(opf_xml, '/package/manifest') do |_manifest|
-        ### expect(manifest).to have_xpath("/item[@properties='cover-image']")
+      with_xpath(opf_xml, '/package/manifest') do |manifest|
+        expect(manifest).to have_xpath("/item[@properties='cover-image']/@id", 'cover.jpg')
       end
     end
 
@@ -75,16 +82,18 @@ module Epuber
         b.is_ibooks    = true
         b.custom_fonts = true
         b.epub_version = 2.0
-        ### b.cover_image = 'cover.jpg'
+        b.cover_image = 'cover.jpg'
       end
 
-
+      FileUtils.mkdir_p('/source')
+      FileUtils.touch('/source/cover.jpg')
 
       ncx_file = Compiler::FileTypes::GeneratedFile.new
       ncx_file.destination_path = 'nav.ncx'
       ncx_file.path_type = :manifest
       resolver = Compiler::FileResolver.new('/source', '/dest')
       resolver.add_file(ncx_file)
+      resolver.add_file_from_request(book.cover_image)
 
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = resolver
