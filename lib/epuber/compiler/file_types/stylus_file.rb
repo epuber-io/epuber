@@ -12,7 +12,7 @@ module Epuber
         #
         def process(compilation_context)
           if destination_file_up_to_date?
-            # HACK for now, we need to process the file again, because we need to find linked files
+            # HACK: for now, we need to process the file again, because we need to find linked files
             process_css(File.read(final_destination_path), compilation_context)
             return
           end
