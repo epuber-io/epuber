@@ -27,9 +27,12 @@ module Epuber
         # @param [Compiler::CompilationContext] compilation_context
         #
         def process(compilation_context)
-          return if destination_file_up_to_date?
-
-          write_processed(process_css(File.read(abs_source_path), compilation_context))
+          if destination_file_up_to_date?
+            # HACK for now, we need to process the file again, because we need to find linked files
+            process_css(File.read(final_destination_path), compilation_context)
+          else
+            write_processed(process_css(File.read(abs_source_path), compilation_context))
+          end
         end
 
         # Processes CSS file, resolves all linked files and adds them to file resolver
