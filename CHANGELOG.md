@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.9.4 (2024-05-13)
+
+- fixed missing `properties="cover-image"` in EPUB v3 #96
+- fixed missing font files when doing incremental builds or running server
+
+
 ## v0.9.3 (2024-05-06)
 
 - fixed crash when resolving files in CSS or Bade and the target file was not found
