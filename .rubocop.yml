@@ -55,10 +55,13 @@ Metrics/PerceivedComplexity:
   Enabled: false
 
 
+Lint/UnusedMethodArgument:
+  Exclude:
+    - spec/**/*_spec.rb
 
 Naming/VariableNumber:
   Exclude:
-    - spec/unit/book/toc_item_spec.rb
+    - spec/**/*_spec.rb
 
 
 # At the moment not ready to be used

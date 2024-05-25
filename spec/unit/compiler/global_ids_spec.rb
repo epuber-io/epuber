@@ -34,10 +34,10 @@ module Epuber
           end
         RUBY
 
-        expect do
-          Epuber::Command.run(%w[build ibooks])
-        end.to output(/.*/).to_stdout
+        # Act
+        Epuber::Command.run(%w[build ibooks])
 
+        # Assert
         expect(load_xhtml('.epuber/build/ibooks/OEBPS/text/file1.xhtml').at_css('body div').to_s).to eql <<~HTML.rstrip
           <div>
             <p><a href="file2.xhtml#some_id">abc</a></p>
@@ -79,9 +79,13 @@ module Epuber
           end
         RUBY
 
-        expect do
-          Epuber::Command.run(%w[build ibooks])
-        end.to output(%r{Can't find global id 'some_id' from link in file text/file1.xhtml}).to_stdout
+        # Act
+        Epuber::Command.run(%w[build ibooks])
+
+        # Assert
+        message = UI.logger.messages.last
+        expect(message.level).to eq :error
+        expect(message.message).to eq("Can't find global id 'some_id' from link in file text/file1.xhtml")
       end
     end
   end

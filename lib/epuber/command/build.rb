@@ -40,7 +40,7 @@ module Epuber
         @release_version = argv.flag?('release', false)
         @use_cache = argv.flag?('cache', true)
 
-        self.debug_steps_times = argv.flag?('debug-steps-times', false)
+        UI.logger.debug_steps_times = argv.flag?('debug-steps-times', false)
 
         super(argv)
       end
@@ -56,7 +56,7 @@ module Epuber
       def run
         super
 
-        UI.puts "building book `#{Config.instance.pretty_path_from_project(book.file_path)}`"
+        UI.info "building book `#{Config.instance.pretty_path_from_project(book.file_path)}`"
 
         if @release_version
           # Remove all previous versions of compiled files
@@ -77,9 +77,7 @@ module Epuber
             FileUtils.remove_file(archive_name) if ::File.exist?(archive_name)
 
             archive_path = compiler.archive(archive_name)
-
-            Epubcheck.check(archive_path)
-
+            run_epubcheck(archive_path, build_path)
             convert_epub_to_mobi(archive_path, "#{::File.basename(archive_path, '.epub')}.mobi") if target.create_mobi
 
             Epuber::Config.instance.release_build = false
@@ -94,11 +92,14 @@ module Epuber
                                          use_cache: @use_cache)
             archive_path = compiler.archive(configuration_suffix: 'debug')
 
-            Epubcheck.check(archive_path) if @should_check
+            run_epubcheck(archive_path, build_path) if @should_check
 
             convert_epub_to_mobi(archive_path, "#{::File.basename(archive_path, '.epub')}.mobi") if target.create_mobi
           end
         end
+
+        # Exit with error if there are any errors
+        exit(1) if (@release_version || @should_check) && Epuber::UI.logger.error?
 
         write_lockfile
       end
@@ -129,6 +130,34 @@ module Epuber
         return unless ::File.directory?(path)
 
         path
+      end
+
+      def run_epubcheck(archive_path, build_dir)
+        UI.info("Running Epubcheck for #{archive_path}")
+
+        problems = Epubcheck.check(archive_path)
+        problems.each do |problem|
+          relative_path = problem.location.path.sub("#{archive_path}/", '')
+          file_path = ::File.join(build_dir, relative_path)
+
+          nice_path = Config.instance.pretty_path_from_project(file_path)
+          content = ::File.read(file_path)
+
+          log_level = case problem.level
+                      when :fatal, :error then :error
+                      when :warning then :warning
+                      else :info
+                      end
+          message = "#{problem.level}: #{problem.message}"
+
+          p = Compiler::Problem.new(problem.level, message, content, line: problem.location.lineno,
+                                                                     column: problem.location.column,
+                                                                     length: 1,
+                                                                     file_path: nice_path)
+          UI.send(log_level, p)
+        end
+
+        UI.error('Epubcheck found some errors in epub file.') if problems.any?(&:error?)
       end
 
       def find_calibre_app

@@ -115,6 +115,31 @@ module Epuber
               }
             CSS
           end
+
+          it 'reports error when linked file is not found' do
+            source = <<~CSS
+              div {
+                background: url(image.png);
+              }
+            CSS
+
+            FileUtils.mkdir_p('/abc/styles')
+            File.write('/abc/styles/some_file.css', source)
+
+            file = described_class.new('/abc/styles/some_file.css')
+            file.destination_path = 'abc/styles/some_file_res.css'
+            ctx.release_build = true
+            file.compilation_context = ctx
+            resolve_file_paths(file)
+
+            # Act
+            file.process(ctx)
+
+            # Assert
+            expect(UI.logger.formatted_messages).to eq <<~LOG.rstrip
+              Not found file matching pattern `image.png` from context path abc/styles.
+            LOG
+          end
         end
       end
     end

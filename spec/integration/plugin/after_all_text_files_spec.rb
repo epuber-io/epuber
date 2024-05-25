@@ -12,7 +12,7 @@ module Epuber
             not_existing_file = transformer.find_file('texta')
 
             file = transformer.find_file('text')
-            content = transformer.read_destination_file('text.xhtml')
+            content = transformer.read_destination_file('text', groups: :text)
             content = content.gsub('Hello', 'Goodbye')
             transformer.write_destination_file(file, content)
           end
@@ -35,10 +35,10 @@ module Epuber
           end
         RUBY
 
-        expect do
-          Epuber::Command.run(%w[build])
-        end.to output(/.*/).to_stdout
+        # Act
+        Epuber::Command.run(%w[build])
 
+        # Assert
         expect(File.read('.epuber/build/OEBPS/text.xhtml')).to include(<<~HTML)
           <p>Goodbye world</p>
         HTML

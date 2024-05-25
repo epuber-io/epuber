@@ -9,10 +9,10 @@ module Epuber
     it 'can init project with file' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
 
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output(/.*/).to_stdout
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
+      # Assert
       expect(File).to exist('childrens-media-query.bookspec')
       expect(File.read('childrens-media-query.bookspec')).to eq <<~RUBY
         Epuber::Book.new do |book|
@@ -47,10 +47,10 @@ module Epuber
     it 'can init project with EPUB 2 file' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'testing_book1-copyright.epub')
 
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output(/.*/).to_stdout
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
+      # Assert
       expect(File).to exist('testing_book1-copyright.bookspec')
       expect(File.read('testing_book1-copyright.bookspec')).to eq <<~RUBY
         Epuber::Book.new do |book|
@@ -85,10 +85,10 @@ module Epuber
     it 'can deobfuscate files' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'wasteland-otf-obf.epub')
 
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output(/.*/).to_stdout
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
+      # Assert
       # following values were manually checked
       expect(Digest::MD5.file('OldStandard-Bold.obf.otf')).to eq '9d814cc771da428de00f001351aa61e9'
       expect(Digest::MD5.file('OldStandard-Italic.obf.otf')).to eq 'd9c5ff1299294ddd08ffe329c46dcd09'
@@ -98,7 +98,7 @@ module Epuber
     it 'prints some information to console' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
 
-      progress = <<~TEXT.rstrip
+      message = <<~TEXT.rstrip
         📖 Loading EPUB file #{__dir__}/../fixtures/childrens-media-query.epub
           Parsing OPF file at EPUB/content.opf
           Generating bookspec file
@@ -109,24 +109,18 @@ module Epuber
           Exporting childrens-book-page.xhtml (from EPUB/childrens-book-page.xhtml)
           Skipping toc.ncx (ncx file)
           Skipping toc.xhtml (not in spine)
-      TEXT
 
-      final = <<~TEXT.rstrip.ansi.green
-        🎉 Project initialized.
+        <green:start>🎉 Project initialized.
         Please review generated childrens-media-query.bookspec file and start using Epuber.
 
-        For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.
+        For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.<color-end>
       TEXT
 
-      message = <<~TEXT.rstrip
-        #{progress}
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath] + ['--ansi'])
 
-        #{final}
-      TEXT
-
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output("#{message}\n").to_stdout
+      # Assert
+      expect(UI.logger.formatted_messages).to eq message
     end
   end
 end

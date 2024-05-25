@@ -142,18 +142,14 @@ module Epuber
           end
 
           # perform transformations
-          UI.print_step_processing_time('performing final transformations') do
-            compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
-              xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
-            end
+          compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
+            xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
           end
 
           # perform custom validation
           if compilation_context.should_check
-            UI.print_step_processing_time('performing final validations') do
-              compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
-                checker.call(final_destination_path, xhtml_string, compilation_context)
-              end
+            compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
+              checker.call(final_destination_path, xhtml_string, compilation_context)
             end
           end
 
@@ -175,7 +171,7 @@ module Epuber
         # @param [Compiler::CompilationContext] compilation_context
         # @param [Hash<String, XHTMLFile>] global_ids
         #
-        def process_global_ids(compilation_context, global_ids)
+        def process_global_ids(_compilation_context, global_ids)
           return if self.global_ids.empty? && global_links.empty?
 
           xhtml_doc = XHTMLProcessor.xml_document_from_string(File.read(final_destination_path), final_destination_path)
@@ -196,12 +192,8 @@ module Epuber
               node['href'] = "#{rel_path}##{href}"
             else
               message = "Can't find global id '#{href}' from link in file #{source_path}"
-              location = UserInterface::Location.new(path: final_destination_path, lineno: node.line)
-              if compilation_context.release_build?
-                UI.error!(message, location: location)
-              else
-                UI.warning(message, location: location)
-              end
+              location = Epuber::Location.new(path: final_destination_path, lineno: node.line)
+              UI.error(message, location: location)
             end
           end
 

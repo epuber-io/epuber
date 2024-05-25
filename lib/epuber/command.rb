@@ -25,31 +25,22 @@ module Epuber
     self.plugin_prefixes = plugin_prefixes + %w[epuber]
 
     def self.run(argv = [])
-      UI.current_command = self
       super
-      UI.current_command = nil
     rescue Interrupt
       UI.error('[!] Cancelled')
     rescue StandardError => e
       UI.error!(e)
-
-      UI.current_command = nil
     end
 
-    def validate!
+    def initialize(argv)
       super
-      UI.current_command = self
+
+      UI.logger.verbose = verbose?
     end
 
-    def run
-      UI.current_command = self
-    end
-
-    attr_reader :debug_steps_times
+    def run; end
 
     protected
-
-    attr_writer :debug_steps_times
 
     # @return [Epuber::Book::Book]
     #
@@ -63,12 +54,15 @@ module Epuber
     #
     def verify_one_bookspec_exists!
       project_path = Config.instance.project_path
-      if project_path.nil?
+      bookspec_files = Config.find_bookspec_files(project_path)
+
+      if bookspec_files.empty?
         raise PlainInformative, "No `.bookspec' found in the project directory (or in any parent folders)."
       end
 
-      bookspec_files = Config.find_bookspec_files(project_path)
-      raise PlainInformative, "Multiple `.bookspec' found in current directory" if bookspec_files.count > 1
+      if bookspec_files.count > 1
+        raise PlainInformative, "Multiple `.bookspec' found in directory (directory: #{project_path})"
+      end
     end
 
     def write_lockfile

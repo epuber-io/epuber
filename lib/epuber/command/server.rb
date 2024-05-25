@@ -51,7 +51,7 @@ module Epuber
               if @open_web_browser
                 system "open #{uri}"
               else
-                UI.puts 'Web browser can be automatically opened by adding --open flag, see --help'
+                UI.info 'Web browser can be automatically opened by adding --open flag, see --help'
               end
             end
           end

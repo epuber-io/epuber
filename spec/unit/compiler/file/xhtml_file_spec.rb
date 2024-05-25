@@ -21,20 +21,22 @@ module Epuber
         end
 
         it 'handles ugly file with all xml bullshit lines' do
-          source = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-  <head>
-    <title/>
-    <meta charset="utf-8"/>
-  </head>
-  <body id="Nastaveni-mysli_001-az-304-1">
-    <div class="_idGenObjectStyleOverride-1">
-      <p>Some bullshit content</p>
-    </div>
-  </body>
-</html>
-'
+          source = <<~XML
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+              <head>
+                <title/>
+                <meta charset="utf-8"/>
+              </head>
+              <body id="Nastaveni-mysli_001-az-304-1">
+                <div class="_idGenObjectStyleOverride-1">
+                  <p>Some bullshit content</p>
+                </div>
+              </body>
+            </html>
+          XML
+
           File.write('some_file.xhtml', source)
 
           file = described_class.new('some_file.xhtml')
@@ -69,14 +71,15 @@ module Epuber
           file.destination_path = 'some_file_dest.xhtml'
           resolve_file_paths(file)
 
-          expected_message = <<~TEXT.rstrip
-            XML header must be at the beginning of document
-              (in file some_file.xhtml line 1)
-          TEXT
+          # Act
+          file.process(@ctx)
 
-          expect do
-            file.process(@ctx)
-          end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
+          # Assert
+          message = UI.logger.messages.last
+          expect(message.level).to eq :warning
+          expect(message.message).to eq 'XML header must be at the beginning of document'
+          expect(message.location.path).to eq 'some_file.xhtml'
+          expect(message.location.lineno).to eq 1
 
           expect(File.read('some_file_dest.xhtml')).to eq source.lstrip
         end
@@ -97,32 +100,27 @@ module Epuber
           @ctx.release_build = true
           file.compilation_context = @ctx
 
-          expected_output1 = [
-            <<~TEXT.rstrip.ansi.yellow,
-              some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body
-                </body>
-                       ^
-            TEXT
-            <<~TEXT.rstrip.ansi.yellow,
-              some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root
-                </body>
-                       ^
-            TEXT
-          ].join("\n")
+          expected_output1 = <<~TEXT.rstrip
+            some_file.xhtml:3 column: 8 --- 3:8: FATAL: Opening and ending tag mismatch: p line 2 and body
+              </body>
+                     ^
+            some_file.xhtml:4 column: 8 --- 4:8: FATAL: Opening and ending tag mismatch: body line 1 and root
+              </body>
+                     ^
+          TEXT
 
-          expected_output2 = [
-            expected_output1,
-            <<~TEXT.rstrip.ansi.yellow,
-              some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1
-                </body>
-            TEXT
-          ].join("\n")
+          expected_output2 = <<~TEXT.rstrip
+            #{expected_output1}
+            some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1
+              </body>
+                     ^
+          TEXT
 
-          expected_output = /(#{Regexp.escape(expected_output1)}|#{Regexp.escape(expected_output2)})/
+          # Act
+          file.process(@ctx)
 
-          expect do
-            file.process(@ctx)
-          end.to output(expected_output).to_stdout
+          # Assert
+          expect(UI.logger.formatted_messages).to match(expected_output1).or match(expected_output2)
         end
 
         it 'handles space in link' do

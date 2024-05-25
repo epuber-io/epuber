@@ -25,7 +25,7 @@ module Epuber
 
         if /\A[\n\r ]+(<\?xml)/ =~ text
           UI.warning('XML header must be at the beginning of document',
-                     location: UI::Location.new(path: file_path, lineno: 1))
+                     location: Epuber::Location.new(path: file_path, lineno: 1))
 
           text = text.lstrip
         end

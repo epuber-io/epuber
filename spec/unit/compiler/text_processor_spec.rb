@@ -437,14 +437,15 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href=""/>', 'root.txt')
 
-          expected_message = <<~MSG.rstrip
-            Not found file matching pattern `` from context path root.txt.
-              (in file root.txt line 1)
-          MSG
+          # Act
+          described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
 
-          expect do
-            described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
+          # Assert
+          message = UI.logger.messages.last
+          expect(message.level).to eq :warning
+          expect(message.message).to eq 'Not found file matching pattern `` from context path root.txt.'
+          expect(message.location.path).to eq 'root.txt'
+          expect(message.location.lineno).to eq 1
         end
 
         it 'does not print warning when the attribute is #' do
@@ -452,10 +453,11 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href="#">text</a>', 'root.xhtml')
 
-          expect do
-            described_class.resolve_links(doc, 'root.xhtml', finder)
-          end.not_to output.to_stdout
+          # Act
+          described_class.resolve_links(doc, 'root.xhtml', finder)
 
+          # Assert
+          expect(UI.logger.messages).to be_empty
           expect(doc.root.to_xml).to eq '<a href="#">text</a>'
         end
 
@@ -465,14 +467,15 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href="blabla"/>', 'root.txt')
 
-          expected_message = <<~MSG.rstrip
-            Not found file matching pattern `blabla` from context path root.txt.
-              (in file root.txt line 1)
-          MSG
+          # Act
+          described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
 
-          expect do
-            described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          end.to output(/#{Regexp.escape(expected_message)}/).to_stdout
+          # Assert
+          message = UI.logger.messages.last
+          expect(message.level).to eq :warning
+          expect(message.message).to eq 'Not found file matching pattern `blabla` from context path root.txt.'
+          expect(message.location.path).to eq 'root.txt'
+          expect(message.location.lineno).to eq 1
         end
 
         it 'silently skips tags without specified attributes' do
@@ -480,9 +483,11 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a/>')
 
-          expect do
-            described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          end.not_to output.to_stdout
+          # Act
+          described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
+
+          # Assert
+          expect(UI.logger.messages).to be_empty
         end
       end
 

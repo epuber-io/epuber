@@ -26,7 +26,9 @@ module Epuber
         expect do
           Epuber::Command.run(%w[build --release])
         end.to raise_error(SystemExit)
-          .and output(/ISBN is invalid/).to_stdout
+
+        # Assert
+        expect(UI.logger.formatted_messages).to include('ISBN is invalid')
       end
     end
   end

@@ -52,7 +52,7 @@ module Epuber
       private
 
       def print_good_bye(book_id)
-        UI.puts <<~TEXT.ansi.green
+        UI.info <<~TEXT.ansi.green
           Project initialized, please review #{book_id}.bookspec file, remove comments and fill some attributes like book title.
         TEXT
       end
@@ -124,7 +124,7 @@ module Epuber
       #
       def write(file_path, string)
         File.write(file_path, string)
-        UI.puts "   #{'create'.ansi.green}  #{file_path}"
+        UI.info "   #{'create'.ansi.green}  #{file_path}"
       end
 
       # @param [String] string text to file
@@ -148,7 +148,7 @@ module Epuber
         existing_content << "\n"
 
         File.write(file_path, existing_content)
-        UI.puts "   #{'update'.ansi.green}  #{file_path}"
+        UI.info "   #{'update'.ansi.green}  #{file_path}"
       end
 
       # @param [String] dir_path path to dir
@@ -157,7 +157,7 @@ module Epuber
       #
       def create_folder(dir_path)
         FileUtils.mkdir_p(dir_path)
-        UI.puts "   #{'create'.ansi.green}  #{dir_path}/"
+        UI.info "   #{'create'.ansi.green}  #{dir_path}/"
       end
 
       # @param [String] text
@@ -169,7 +169,7 @@ module Epuber
         result = $stdin.gets.chomp
 
         while result.empty?
-          UI.puts 'Value cannot be empty, please fill it!'.ansi.red
+          UI.info 'Value cannot be empty, please fill it!'.ansi.red
           print text
           result = $stdin.gets.chomp
         end
