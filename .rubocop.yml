@@ -286,6 +286,9 @@ Style/SwapValues: # new in 1.1
   Enabled: true
 Style/YAMLFileRead: # new in 1.53
   Enabled: true
+Style/SymbolProc:
+  Exclude:
+    - spec/**/*_spec.rb
 Capybara/ClickLinkOrButtonStyle: # new in 2.19
   Enabled: true
 Capybara/MatchStyle: # new in 2.17
