@@ -66,6 +66,10 @@ Naming/VariableNumber:
 Style/Documentation:
   Enabled: false
 
+# Disable guard clause (I want to use it only when it make sense)
+Style/GuardClause:
+  Enabled: false
+
 # Having these make it easier to *not* forget to add one when adding a new
 # value and you can simply copy the previous line.
 Style/TrailingCommaInArguments:

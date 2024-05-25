@@ -8,10 +8,13 @@ module Epuber
   class Config
     WORKING_PATH = '.epuber'
 
-    # @return [String]
+    # @return [String] path to project directory (where .bookspec file is located or current directory if not found)
     #
     def project_path
-      @project_path ||= Dir.pwd.unicode_normalize
+      @project_path ||= begin
+        path = self.class.find_project_dir(Dir.pwd) || Dir.pwd
+        path.unicode_normalize
+      end
     end
 
     # @param [String] of_file absolute path to file
@@ -19,7 +22,9 @@ module Epuber
     # @return [String] relative path to file from root of project
     #
     def pretty_path_from_project(of_file)
-      Pathname.new(of_file.unicode_normalize).relative_path_from(Pathname.new(project_path)).to_s
+      Pathname.new(of_file.unicode_normalize)
+              .relative_path_from(Pathname.new(project_path))
+              .to_s
     end
 
     # @return [String]
@@ -31,23 +36,13 @@ module Epuber
     # @return [String]
     #
     def bookspec_path
-      @bookspec_path ||= find_all_bookspecs.first
+      @bookspec_path ||= self.class.find_bookspec_files(project_path).first
     end
 
     # @return [String]
     #
     def bookspec_lockfile_path
       "#{bookspec_path}.lock"
-    end
-
-    # @return [Array<String>]
-    #
-    def find_all_bookspecs
-      Dir.chdir(project_path) do
-        Dir.glob('*.bookspec').map do |path|
-          File.expand_path(path)
-        end
-      end
     end
 
     # @return [Epuber::Book]
@@ -181,6 +176,32 @@ module Epuber
         book.freeze if frozen
 
         book
+      end
+
+      # Find all bookspec files in given directory
+      #
+      # @param [String] dir
+      #
+      def find_bookspec_files(dir)
+        Dir.chdir(dir) do
+          Dir.glob('*.bookspec').map do |path|
+            File.expand_path(path)
+          end
+        end
+      end
+
+      # Find project directory by searching for .bookspec files in current and parent directories
+      #
+      # @param [String] dir
+      # @return [String, nil]
+      #
+      def find_project_dir(dir)
+        return dir if find_bookspec_files(dir).any?
+
+        parent = File.dirname(dir)
+        return nil if parent == dir
+
+        find_project_dir(parent)
       end
     end
 
