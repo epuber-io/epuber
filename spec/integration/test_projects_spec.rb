@@ -17,4 +17,16 @@ describe 'Test project' do # rubocop:disable RSpec/DescribeClass
       end.to output(/.*/).to_stdout_from_any_process
     end
   end
+
+  it 'can build project from text subfolder', :expensive do
+    FileUtils.remove(Dir.glob('test_project/*.epub'))
+
+    Dir.chdir('test_project/text') do
+      expect do
+        Epuber::Command.run(%w[build ibooks])
+      end.to output(/.*/).to_stdout_from_any_process
+    end
+
+    expect(File).to exist('test_project/prace_na_dalku5-ibooks-debug.epub')
+  end
 end

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Epuber
   class Compiler
     class CompilationContext
@@ -37,8 +36,8 @@ module Epuber
             file_resolver.add_file(file)
           end
           plugin
-        rescue LoadError
-          UI.error "Can't find plugin at path #{path}"
+        rescue LoadError => e
+          UI.error "Can't find plugin at path #{path}, #{e}"
         end.compact
       end
 

@@ -106,6 +106,22 @@ module Epuber
       @current_file = nil
     end
 
+    # Debug message, prints message only when verbose output is enabled
+    #
+    # @param [String] message
+    #
+    def self.debug(message)
+      return unless current_command&.verbose?
+
+      _clear_processing_line_for_new_output do
+        $stdout.puts(message)
+      end
+    end
+
+    # Prints message
+    #
+    # @param [String] message
+    #
     def self.puts(message)
       _clear_processing_line_for_new_output do
         $stdout.puts(message)

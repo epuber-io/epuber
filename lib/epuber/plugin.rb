@@ -12,7 +12,7 @@ module Epuber
       #
       attr_reader :instances
 
-      # @param [String] file_path path to plugin file
+      # @param [String] relative_path path to plugin file (relative to project root)
       #
       def initialize(file_path)
         super(file_path)

@@ -6,7 +6,7 @@ module Epuber
       require_relative 'abstract_file'
 
       class SourceFile < AbstractFile
-        # @return [String] relative source path
+        # @return [String] relative source path (from project root)
         #
         attr_reader :source_path
 

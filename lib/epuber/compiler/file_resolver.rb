@@ -27,7 +27,7 @@ module Epuber
 
       PATH_TYPES = [:spine, :manifest, :package, nil].freeze
 
-      # @return [String] path where should look for source files
+      # @return [String] path where should look for source files (relative to project root)
       #
       attr_reader :source_path
 
