@@ -198,7 +198,7 @@ module Epuber
       # @param [Symbol | Array<Symbol>] groups  groups of the searching file, could be for example :image when searching
       #                                         for file from tag <img>
       # @param [String] file_path  path to file from which is searching for other file
-      # @param [Epuber::Compiler::FileFinder] file_finder  finder for searching for files
+      # @param [Epuber::Compiler::FileFinders::Abstract] file_finder  finder for searching for files
       #
       # @raise UnparseableLinkError, FileFinder::FileNotFoundError, FileFinder::MultipleFilesFoundError
       #

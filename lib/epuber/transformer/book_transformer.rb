@@ -30,21 +30,26 @@ module Epuber
       #
       # @param [String] pattern
       # @param [String] context_path path to directory that is used as context for finding
+      # @param [Array<Symbol>, Symbol] groups
       # @param [Thread::Backtrace::Location] location
       #
       # @return [Epuber::Compiler::FileTypes::AbstractFile, nil]
       #
-      def find_file(pattern, context_path: nil, location: caller_locations.first)
+      def find_file(pattern, context_path: nil, groups: nil, location: caller_locations.first)
         return pattern if pattern.is_a?(Compiler::FileTypes::AbstractFile)
 
         UI.error!("Pattern for finding file can't be nil", location: location) if pattern.nil?
 
         begin
-          path = @compilation_context.file_resolver.source_finder.find_file(pattern, context_path: context_path)
+          path = @compilation_context.file_resolver.source_finder.find_file(pattern, context_path: context_path,
+                                                                                     groups: groups)
+          path = File.join(context_path, path) if context_path
           @compilation_context.file_resolver.file_with_source_path(path)
         rescue Compiler::FileFinders::FileNotFoundError
           begin
-            path = @compilation_context.file_resolver.dest_finder.find_file(pattern, context_path: context_path)
+            path = @compilation_context.file_resolver.dest_finder.find_file(pattern, context_path: context_path,
+                                                                                     groups: groups)
+            path = File.join(context_path, path) if context_path
             @compilation_context.file_resolver.file_with_destination_path(path)
           rescue Compiler::FileFinders::FileNotFoundError
             nil
@@ -56,14 +61,16 @@ module Epuber
       #
       # @param [String] pattern
       # @param [String] context_path path to directory that is used as context for finding
+      # @param [Array<Symbol>, Symbol] groups
       # @param [Thread::Backtrace::Location] location
       #
       # @return [Array<Epuber::Compiler::FileTypes::AbstractFile>]
       #
-      def find_destination_files(pattern, context_path: nil, location: caller_locations.first)
+      def find_destination_files(pattern, context_path: nil, groups: nil, location: caller_locations.first)
         UI.error!("Pattern for finding file can't be nil", location: location) if pattern.nil?
 
-        paths = @compilation_context.file_resolver.dest_finder.find_files(pattern, context_path: context_path)
+        paths = @compilation_context.file_resolver.dest_finder.find_files(pattern, context_path: context_path,
+                                                                                   groups: groups)
         paths.map { |path| @compilation_context.file_resolver.file_with_destination_path(path) }
       end
 
@@ -71,12 +78,13 @@ module Epuber
       #
       # @param [String] pattern
       # @param [String] context_path path to directory that is used as context for finding
+      # @param [Array<Symbol>, Symbol] groups
       # @param [Thread::Backtrace::Location] location
       #
       # @return [Epuber::Compiler::FileTypes::AbstractFile]
       #
-      def get_file(pattern, context_path: nil, location: caller_locations.first)
-        file = find_file(pattern, context_path: context_path, location: location)
+      def get_file(pattern, context_path: nil, groups: nil, location: caller_locations.first)
+        file = find_file(pattern, context_path: context_path, groups: groups, location: location)
         unless file
           UI.error!("File with pattern #{pattern} not found (context path: #{context_path || 'nil'})",
                     location: location)
@@ -89,12 +97,13 @@ module Epuber
       #
       # @param [String] pattern
       # @param [String] context_path path to directory that is used as context for finding
+      # @param [Array<Symbol>, Symbol] groups
       # @param [Thread::Backtrace::Location] location
       #
       # @return [String]
       #
-      def read_destination_file(pattern, context_path: nil, location: caller_locations.first)
-        file = get_file(pattern, context_path: context_path, location: location)
+      def read_destination_file(pattern, context_path: nil, groups: nil, location: caller_locations.first)
+        file = get_file(pattern, context_path: context_path, groups: groups, location: location)
         File.read(file.final_destination_path)
       end
 
@@ -103,12 +112,13 @@ module Epuber
       # @param [String] pattern
       # @param [String] content
       # @param [String] context_path path to directory that is used as context for finding
+      # @param [Array<Symbol>, Symbol] groups
       # @param [Thread::Backtrace::Location] location
       #
       # @return [void]
       #
-      def write_destination_file(pattern, content, context_path: nil, location: caller_locations.first)
-        file = get_file(pattern, context_path: context_path, location: location)
+      def write_destination_file(pattern, content, context_path: nil, groups: nil, location: caller_locations.first)
+        file = get_file(pattern, context_path: context_path, groups: groups, location: location)
         Compiler::FileTypes::AbstractFile.write_to_file(content, file.final_destination_path)
       end
     end
