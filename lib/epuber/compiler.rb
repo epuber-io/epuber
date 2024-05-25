@@ -71,7 +71,7 @@ module Epuber
 
         FileUtils.mkdir_p(build_folder)
 
-        UI.puts "  #{<<~MSG}"
+        UI.info "  #{<<~MSG}"
           building target #{@target.name.inspect} (build dir: #{Config.instance.pretty_path_from_project(build_folder)})
         MSG
 
@@ -131,7 +131,7 @@ module Epuber
             old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
             diff = old_paths - new_paths
             diff.each do |file_to_remove|
-              UI.puts "DEBUG: removing file from result EPUB: #{file_to_remove}" if compilation_context.verbose?
+              UI.info "DEBUG: removing file from result EPUB: #{file_to_remove}" if compilation_context.verbose?
               zip_file.remove(file_to_remove)
             end
           end
@@ -174,7 +174,7 @@ module Epuber
            .select { |d| File.directory?(d) }
            .select { |d| (Dir.entries(d) - %w[. ..]).empty? }
            .each do |d|
-             UI.puts "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
+             UI.info "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
              Dir.rmdir(d)
            end
       end
@@ -188,7 +188,7 @@ module Epuber
       end
       unnecessary_paths.each do |path|
         if compilation_context.verbose?
-          UI.puts "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
+          UI.info "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
         end
 
         File.delete(path)
@@ -283,11 +283,11 @@ module Epuber
     #
     def process_all_target_files
       @file_resolver.manifest_files.each_with_index do |file, idx|
-        UI.print_processing_file(file, idx, @file_resolver.manifest_files.count)
+        UI.start_processing_file(file, idx, @file_resolver.manifest_files.count)
         process_file(file)
       end
 
-      UI.processing_files_done
+      UI.end_processing
     end
 
     # @param [Epuber::Book::TocItem] toc_item

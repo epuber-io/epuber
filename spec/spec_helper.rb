@@ -9,6 +9,7 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'epuber'
 
 require_relative 'matchers/xml'
+require_relative 'spec_utils/test_logger'
 
 Epuber::Config.test = true
 
@@ -33,6 +34,12 @@ RSpec.configure do |c|
   c.before do
     Epuber::Config.clear_instance!
     Epuber::Config.instance
+
+    # always enable ANSI colors
+    CLAide::ANSI.disabled = false
+    Epuber::UI.instance_exec do
+      @logger = TestLogger.new
+    end
   end
 
   c.after do

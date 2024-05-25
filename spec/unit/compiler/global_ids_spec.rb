@@ -79,9 +79,13 @@ module Epuber
           end
         RUBY
 
-        expect do
-          Epuber::Command.run(%w[build ibooks])
-        end.to output(%r{Can't find global id 'some_id' from link in file text/file1.xhtml}).to_stdout
+        # Act
+        Epuber::Command.run(%w[build ibooks])
+
+        # Assert
+        message = UI.logger.messages.last
+        expect(message.level).to eq :warning
+        expect(message.message).to eq("Can't find global id 'some_id' from link in file text/file1.xhtml")
       end
     end
   end

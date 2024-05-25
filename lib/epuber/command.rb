@@ -25,25 +25,14 @@ module Epuber
     self.plugin_prefixes = plugin_prefixes + %w[epuber]
 
     def self.run(argv = [])
-      UI.current_command = self
       super
-      UI.current_command = nil
     rescue Interrupt
       UI.error('[!] Cancelled')
     rescue StandardError => e
       UI.error!(e)
-
-      UI.current_command = nil
     end
 
-    def validate!
-      super
-      UI.current_command = self
-    end
-
-    def run
-      UI.current_command = self
-    end
+    def run; end
 
     attr_reader :debug_steps_times
 

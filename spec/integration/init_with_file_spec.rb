@@ -98,7 +98,7 @@ module Epuber
     it 'prints some information to console' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
 
-      progress = <<~TEXT.rstrip
+      message = <<~TEXT.rstrip
         📖 Loading EPUB file #{__dir__}/../fixtures/childrens-media-query.epub
           Parsing OPF file at EPUB/content.opf
           Generating bookspec file
@@ -109,24 +109,18 @@ module Epuber
           Exporting childrens-book-page.xhtml (from EPUB/childrens-book-page.xhtml)
           Skipping toc.ncx (ncx file)
           Skipping toc.xhtml (not in spine)
-      TEXT
 
-      final = <<~TEXT.rstrip.ansi.green
-        🎉 Project initialized.
+        <green:start>🎉 Project initialized.
         Please review generated childrens-media-query.bookspec file and start using Epuber.
 
-        For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.
+        For more information about Epuber, please visit https://github.com/epuber-io/epuber/tree/master/docs.<color-end>
       TEXT
 
-      message = <<~TEXT.rstrip
-        #{progress}
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
-        #{final}
-      TEXT
-
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output("#{message}\n").to_stdout
+      # Assert
+      expect(UI.logger.formatted_messages).to eq message
     end
   end
 end

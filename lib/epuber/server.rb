@@ -116,7 +116,7 @@ module Epuber
 
       super() do |server|
         $stderr = old_stderr
-        UI.puts "Started development server on #{server.host}:#{server.port}"
+        UI.info "Started development server on #{server.host}:#{server.port}"
 
         host = if server.host == '0.0.0.0'
                  'localhost'
@@ -187,13 +187,13 @@ module Epuber
     def self._log(level, message)
       case level
       when :ui
-        UI.puts message
+        UI.info message
       when :info
-        UI.puts "INFO: #{message}" if verbose
+        UI.info "INFO: #{message}" if verbose
       when :get
-        UI.puts " GET: #{message}" if verbose
+        UI.info " GET: #{message}" if verbose
       when :ws
-        UI.puts "  WS: #{message}" if verbose
+        UI.info "  WS: #{message}" if verbose
       else
         raise "Unknown log level #{level}"
       end

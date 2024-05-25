@@ -196,7 +196,7 @@ module Epuber
               node['href'] = "#{rel_path}##{href}"
             else
               message = "Can't find global id '#{href}' from link in file #{source_path}"
-              location = UserInterface::Location.new(path: final_destination_path, lineno: node.line)
+              location = Epuber::Location.new(path: final_destination_path, lineno: node.line)
               if compilation_context.release_build?
                 UI.error!(message, location: location)
               else

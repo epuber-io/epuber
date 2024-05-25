@@ -56,7 +56,7 @@ module Epuber
       def run
         super
 
-        UI.puts "building book `#{Config.instance.pretty_path_from_project(book.file_path)}`"
+        UI.info "building book `#{Config.instance.pretty_path_from_project(book.file_path)}`"
 
         if @release_version
           # Remove all previous versions of compiled files

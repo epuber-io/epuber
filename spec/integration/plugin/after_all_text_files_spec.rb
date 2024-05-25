@@ -12,7 +12,7 @@ module Epuber
             not_existing_file = transformer.find_file('texta')
 
             file = transformer.find_file('text')
-            content = transformer.read_destination_file('text.xhtml')
+            content = transformer.read_destination_file('text', groups: :text)
             content = content.gsub('Hello', 'Goodbye')
             transformer.write_destination_file(file, content)
           end

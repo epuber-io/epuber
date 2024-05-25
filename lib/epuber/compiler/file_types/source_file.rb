@@ -133,7 +133,12 @@ module Epuber
             rescue XHTMLProcessor::UnparseableLinkError,
                    FileFinders::FileNotFoundError,
                    FileFinders::MultipleFilesFoundError => e
-              UI.warning(e.to_s, location: location)
+              if Config.instance.release_build
+                UI.error!(e.to_s, location: location)
+              else
+                UI.error(e.to_s, location: location)
+              end
+
               return nil
             end
           end
