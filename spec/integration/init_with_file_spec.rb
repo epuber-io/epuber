@@ -9,10 +9,10 @@ module Epuber
     it 'can init project with file' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
 
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output(/.*/).to_stdout
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
+      # Assert
       expect(File).to exist('childrens-media-query.bookspec')
       expect(File.read('childrens-media-query.bookspec')).to eq <<~RUBY
         Epuber::Book.new do |book|
@@ -47,10 +47,10 @@ module Epuber
     it 'can init project with EPUB 2 file' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'testing_book1-copyright.epub')
 
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output(/.*/).to_stdout
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
+      # Assert
       expect(File).to exist('testing_book1-copyright.bookspec')
       expect(File.read('testing_book1-copyright.bookspec')).to eq <<~RUBY
         Epuber::Book.new do |book|
@@ -85,10 +85,10 @@ module Epuber
     it 'can deobfuscate files' do
       epub_filepath = File.join(__dir__, '..', 'fixtures', 'wasteland-otf-obf.epub')
 
-      expect do
-        Epuber::Command.run(%w[from-file] + [epub_filepath])
-      end.to output(/.*/).to_stdout
+      # Act
+      Epuber::Command.run(%w[from-file] + [epub_filepath])
 
+      # Assert
       # following values were manually checked
       expect(Digest::MD5.file('OldStandard-Bold.obf.otf')).to eq '9d814cc771da428de00f001351aa61e9'
       expect(Digest::MD5.file('OldStandard-Italic.obf.otf')).to eq 'd9c5ff1299294ddd08ffe329c46dcd09'
@@ -117,7 +117,7 @@ module Epuber
       TEXT
 
       # Act
-      Epuber::Command.run(%w[from-file] + [epub_filepath])
+      Epuber::Command.run(%w[from-file] + [epub_filepath] + ['--ansi'])
 
       # Assert
       expect(UI.logger.formatted_messages).to eq message

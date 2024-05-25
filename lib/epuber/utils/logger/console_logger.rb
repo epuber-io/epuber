@@ -6,19 +6,25 @@ module Epuber
   module Logger
     class ConsoleLogger < AbstractLogger
       def _log(level, message, location: nil, backtrace: nil, sticky: false)
-        prev_line = _remove_sticky_message if sticky
+        prev_line = _remove_sticky_message
 
+        # save sticky message
         @sticky_message = message if sticky
 
-        formatted_message = _format_message(level, message, location: location)
+        formatted_message = _format_message(level, message, location: location, backtrace: backtrace)
+
+        # print the message
         if sticky
           $stdout.print(formatted_message)
         else
           $stdout.puts(formatted_message)
-        end
 
-        # reprint sticky message
-        $stdout.print(prev_line) if prev_line && !sticky
+          # reprint previous sticky message when this message is not sticky
+          if prev_line
+            @sticky_message = prev_line
+            $stdout.print(prev_line)
+          end
+        end
       end
 
       private
@@ -44,7 +50,7 @@ module Epuber
       #
       # @return [String] formatted message
       #
-      def _format_message(level, message, location: nil)
+      def _format_message(level, message, location: nil, backtrace: nil)
         location = _location_from_obj(location)
 
         comps = []
@@ -54,10 +60,11 @@ module Epuber
 
         should_add_location = if message_already_formatted || location.nil?
                                 false
-                              elsif level == :error || level == :warning
-                                true
+                              else
+                                %i[error warning].include?(level)
                               end
 
+        # add location
         if should_add_location
           path = location.path
 
@@ -73,26 +80,28 @@ module Epuber
           comps << "#{line_parts.join(' ')})"
         end
 
+        # add backtrace
+        comps += _format_backtrace(backtrace, location: location) if backtrace && @verbose && level == :error
+
         comps.join("\n").ansi.send(_color_from_level(level))
-      end
-
-      def _clear_processing_line_for_new_output
-        last_line = _remove_sticky_message
-
-        yield
-
-        @sticky_message = last_line
-        $stdout.print(last_line)
       end
 
       # @param [Array<Thread::Backtrace::Location>] locations locations of the error (only for verbose output)
       # @param [Thread::Backtrace::Location] location location of the error
       #
-      # @return [String] formatted message
+      # @return [Array<String>] formatted message
       #
       def _format_backtrace(locations, location: nil)
         index = locations.index(location) || 0
-        locations[index, locations.size].map(&:to_s)
+
+        formatted = []
+        formatted << '' # empty line
+        formatted << 'Full backtrace:'
+        formatted += locations[index, locations.size].map do |loc|
+          "  #{loc}"
+        end
+
+        formatted
       end
 
       # @return [String, nil] last line

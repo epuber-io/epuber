@@ -35,10 +35,10 @@ module Epuber
           end
         RUBY
 
-        expect do
-          Epuber::Command.run(%w[build])
-        end.to output(/.*/).to_stdout
+        # Act
+        Epuber::Command.run(%w[build])
 
+        # Assert
         expect(File.read('.epuber/build/OEBPS/text.xhtml')).to include(<<~HTML)
           <p>Goodbye world</p>
         HTML

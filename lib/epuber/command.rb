@@ -32,13 +32,15 @@ module Epuber
       UI.error!(e)
     end
 
+    def initialize(argv)
+      super
+
+      UI.logger.verbose = verbose?
+    end
+
     def run; end
 
-    attr_reader :debug_steps_times
-
     protected
-
-    attr_writer :debug_steps_times
 
     # @return [Epuber::Book::Book]
     #
@@ -52,12 +54,15 @@ module Epuber
     #
     def verify_one_bookspec_exists!
       project_path = Config.instance.project_path
-      if project_path.nil?
+      bookspec_files = Config.find_bookspec_files(project_path)
+
+      if bookspec_files.empty?
         raise PlainInformative, "No `.bookspec' found in the project directory (or in any parent folders)."
       end
 
-      bookspec_files = Config.find_bookspec_files(project_path)
-      raise PlainInformative, "Multiple `.bookspec' found in current directory" if bookspec_files.count > 1
+      if bookspec_files.count > 1
+        raise PlainInformative, "Multiple `.bookspec' found in directory (directory: #{project_path})"
+      end
     end
 
     def write_lockfile

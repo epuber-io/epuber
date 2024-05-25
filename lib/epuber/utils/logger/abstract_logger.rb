@@ -10,6 +10,14 @@ module Epuber
         debug
       ].freeze
 
+      # @return [Boolean]
+      #
+      attr_accessor :verbose
+
+      # @return [Boolean]
+      #
+      attr_accessor :debug_steps_times
+
       # @param [Hash] opts
       # @option opts [Boolean] :verbose (false)
       # @option opts [Boolean] :debug_steps_times (false)
@@ -20,6 +28,7 @@ module Epuber
 
         @current_file = nil
         @sticky_message = nil
+        @error_was_logged = false
       end
 
       # Report error message
@@ -28,9 +37,9 @@ module Epuber
       # @param [Thread::Backtrace::Location, Epuber::Location, Nokogiri::XML::Node, nil] location
       # @param [Boolean] stick if true, the error message will be sticked to the previous one
       #
-      def error!(message, location: caller_locations.first)
-        _common_log(:error, message, location: location)
-        raise Epuber::PlainInformative, message
+      def error!(message, location: nil, backtrace: caller_locations)
+        _common_log(:error, message, location: location, backtrace: backtrace)
+        exit(1)
       end
 
       # Report error message
@@ -39,8 +48,8 @@ module Epuber
       # @param [Thread::Backtrace::Location, Epuber::Location, Nokogiri::XML::Node, nil] location
       # @param [Boolean] stick if true, the error message will be sticked to the previous one
       #
-      def error(message, sticky: false, location: caller_locations.first)
-        _common_log(:error, message, sticky: sticky, location: location)
+      def error(message, sticky: false, location: nil, backtrace: caller_locations)
+        _common_log(:error, message, sticky: sticky, location: location, backtrace: backtrace)
       end
 
       # Report warning message
@@ -48,8 +57,8 @@ module Epuber
       # @param [String, #to_s] message
       # @param [Thread::Backtrace::Location, Epuber::Location, Nokogiri::XML::Node, nil] location
       #
-      def warning(message, sticky: false, location: caller_locations.first)
-        _common_log(:warning, message, sticky: sticky, location: location)
+      def warning(message, sticky: false, location: nil, backtrace: caller_locations)
+        _common_log(:warning, message, sticky: sticky, location: location, backtrace: backtrace)
       end
 
       # Report info message
@@ -57,8 +66,8 @@ module Epuber
       # @param [String, #to_s] message
       # @param [Thread::Backtrace::Location, Epuber::Location, Nokogiri::XML::Node, nil] location
       #
-      def info(message, sticky: false, location: caller_locations.first)
-        _common_log(:info, message, sticky: sticky, location: location)
+      def info(message, sticky: false, location: nil, backtrace: caller_locations)
+        _common_log(:info, message, sticky: sticky, location: location, backtrace: backtrace)
       end
 
       # Report debug message
@@ -66,8 +75,10 @@ module Epuber
       # @param [String, #to_s] message
       # @param [Thread::Backtrace::Location, Epuber::Location, Nokogiri::XML::Node, nil] location
       #
-      def debug(message, sticky: false, location: caller_locations.first)
-        _common_log(:debug, message, sticky: sticky, location: location)
+      def debug(message, sticky: false, location: nil, backtrace: caller_locations)
+        return unless @verbose
+
+        _common_log(:debug, message, sticky: sticky, location: location, backtrace: backtrace)
       end
 
       # @param [Epuber::Compiler::FileTypes::AbstractFile] file
@@ -120,9 +131,16 @@ module Epuber
                     "▸ #{@current_file.source_path}: #{info_text}"
                   end
 
-        $stdout.puts(_format_message(:debug, message))
+        _log(:debug, message)
 
         returned_value
+      end
+
+      # Return true if there was any error logged
+      #
+      # @return [Boolean]
+      def error?
+        @error_was_logged
       end
 
       protected
@@ -133,7 +151,7 @@ module Epuber
       # @param [String] message
       # @param [Epuber::Location, nil] location
       # @param [Array<Thread::Backtrace::Location>, nil] backtrace
-      # @param [Boolean] remove_last if true, the last line should be removed
+      # @param [Boolean] sticky if true, the message will be sticky (will be always as the last message)
       #
       def _log(level, message, location: nil, backtrace: nil, remove_last: false) # rubocop:disable Lint/UnusedMethodArgument
         raise 'Not implemented, this is abstract class'
@@ -153,15 +171,20 @@ module Epuber
       # @param message [String]
       # @param location [Thread::Backtrace::Location, Epuber::Location, Nokogiri::XML::Node,
       #                  Epuber::Compiler::FileTypes::AbstractFile, nil]
-      # @param sticky [Symbol, nil] if true, the message will be sticky (will be always as the last message)
+      # @param sticky [Boolean] if true, the message will be sticky (will be always as the last message)
       #
-      def _common_log(level, message, location: nil, sticky: false)
+      def _common_log(level, message, sticky: false, location: nil, backtrace: nil)
         raise ArgumentError, "Unknown log level #{level}" unless LEVELS.include?(level)
+
+        @error_was_logged = true if level == :error
 
         location = _location_from_obj(location)
 
         if @verbose && level == :error
-          backtrace = location.try(:backtrace_locations) || message.try(:backtrace_locations) || caller_locations
+          backtrace = location.try(:backtrace_locations) ||
+                      message.try(:backtrace_locations) ||
+                      backtrace ||
+                      caller_locations
         end
 
         _log(level, message, location: location, backtrace: backtrace, sticky: sticky)

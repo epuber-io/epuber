@@ -21,20 +21,22 @@ module Epuber
         end
 
         it 'handles ugly file with all xml bullshit lines' do
-          source = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
-  <head>
-    <title/>
-    <meta charset="utf-8"/>
-  </head>
-  <body id="Nastaveni-mysli_001-az-304-1">
-    <div class="_idGenObjectStyleOverride-1">
-      <p>Some bullshit content</p>
-    </div>
-  </body>
-</html>
-'
+          source = <<~XML
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+              <head>
+                <title/>
+                <meta charset="utf-8"/>
+              </head>
+              <body id="Nastaveni-mysli_001-az-304-1">
+                <div class="_idGenObjectStyleOverride-1">
+                  <p>Some bullshit content</p>
+                </div>
+              </body>
+            </html>
+          XML
+
           File.write('some_file.xhtml', source)
 
           file = described_class.new('some_file.xhtml')
@@ -107,10 +109,11 @@ module Epuber
                      ^
           TEXT
 
-          expected_output2 = <<~TEXT
+          expected_output2 = <<~TEXT.rstrip
             #{expected_output1}
-              some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1
-                </body>
+            some_file.xhtml:4 column: 8 --- 4:8: FATAL: Premature end of data in tag root line 1
+              </body>
+                     ^
           TEXT
 
           # Act

@@ -453,10 +453,11 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a href="#">text</a>', 'root.xhtml')
 
-          expect do
-            described_class.resolve_links(doc, 'root.xhtml', finder)
-          end.not_to output.to_stdout
+          # Act
+          described_class.resolve_links(doc, 'root.xhtml', finder)
 
+          # Assert
+          expect(UI.logger.messages).to be_empty
           expect(doc.root.to_xml).to eq '<a href="#">text</a>'
         end
 
@@ -482,9 +483,11 @@ module Epuber
           finder = FileFinders::Normal.new('/')
           doc = described_class.xml_document_from_string('<a/>')
 
-          expect do
-            described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
-          end.not_to output.to_stdout
+          # Act
+          described_class.resolve_links_for(doc, 'a', 'href', nil, 'root.txt', finder)
+
+          # Assert
+          expect(UI.logger.messages).to be_empty
         end
       end
 

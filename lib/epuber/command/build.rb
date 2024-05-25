@@ -40,7 +40,7 @@ module Epuber
         @release_version = argv.flag?('release', false)
         @use_cache = argv.flag?('cache', true)
 
-        self.debug_steps_times = argv.flag?('debug-steps-times', false)
+        UI.logger.debug_steps_times = argv.flag?('debug-steps-times', false)
 
         super(argv)
       end
@@ -84,6 +84,8 @@ module Epuber
 
             Epuber::Config.instance.release_build = false
           end
+
+          Epuber::UI.error!('Errors occurred during building the book.') if Epuber::UI.logger.error?
 
           # Build all targets to always clean directory
         else

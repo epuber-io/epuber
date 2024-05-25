@@ -19,10 +19,10 @@ module Epuber
         argv = CLAide::ARGV.new(['book_name'])
         init = described_class.new(argv)
 
-        expect do
-          init.run
-        end.to output(/.*/).to_stdout
+        # Act
+        init.run
 
+        # Assert
         expect(Dir.entries('.')).to contain_exactly '.', '..',
                                                     '.gitignore',
                                                     'book_name.bookspec',
@@ -48,10 +48,11 @@ module Epuber
 
         argv = CLAide::ARGV.new(['book_name'])
         init = described_class.new(argv)
-        expect do
-          init.run
-        end.to output(/.*/).to_stdout
 
+        # Act
+        init.run
+
+        # Assert
         expected = <<~NEW
           .DS_Store
           Bla
