@@ -43,6 +43,7 @@ module Epuber
 
       # @param [Class] klass class of thing you want to perform (Checker or Transformer)
       # @param [Symbol] source_type source type of that thing (Checker or Transformer)
+      # @param [String] processing_time_step_name name of step for processing time
       #
       # @yield
       # @yieldparam [Epuber::CheckerTransformerBase] instance of checker or transformer
@@ -57,7 +58,11 @@ module Epuber
             next if instance.source_type != source_type
             next if instance.options.include?(:run_only_before_release) && !release_build
 
-            yield instance
+            location = instance.block.source_location.map(&:to_s).join(':')
+            message = "performing #{source_type.inspect} from plugin #{location}"
+            UI.print_step_processing_time(message) do
+              yield instance
+            end
           end
         end
       end

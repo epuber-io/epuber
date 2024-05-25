@@ -89,6 +89,7 @@ module Epuber
         process_all_target_files
         generate_other_files
 
+        # run :after_all_text_files transformers
         compilation_context.perform_plugin_things(Transformer, :after_all_text_files) do |transformer|
           transformer.call(@book, compilation_context)
         end
@@ -131,7 +132,7 @@ module Epuber
             old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
             diff = old_paths - new_paths
             diff.each do |file_to_remove|
-              UI.info "DEBUG: removing file from result EPUB: #{file_to_remove}" if compilation_context.verbose?
+              UI.debug "removing file from result EPUB: #{file_to_remove}"
               zip_file.remove(file_to_remove)
             end
           end
@@ -174,7 +175,7 @@ module Epuber
            .select { |d| File.directory?(d) }
            .select { |d| (Dir.entries(d) - %w[. ..]).empty? }
            .each do |d|
-             UI.info "DEBUG: removing empty folder `#{d}`" if compilation_context.verbose?
+             UI.debug "removing empty folder `#{d}`"
              Dir.rmdir(d)
            end
       end
@@ -188,7 +189,7 @@ module Epuber
       end
       unnecessary_paths.each do |path|
         if compilation_context.verbose?
-          UI.info "DEBUG: removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
+          UI.debug "removing unnecessary file: `#{Config.instance.pretty_path_from_project(path)}`"
         end
 
         File.delete(path)
@@ -305,11 +306,13 @@ module Epuber
     end
 
     def process_global_ids
-      xhtml_files = @file_resolver.files.select { |file| file.is_a?(FileTypes::XHTMLFile) }
-      global_ids = validate_global_ids(xhtml_files)
+      UI.print_step_processing_time('Processing global ids') do
+        xhtml_files = @file_resolver.files.select { |file| file.is_a?(FileTypes::XHTMLFile) }
+        global_ids = validate_global_ids(xhtml_files)
 
-      xhtml_files.each do |file|
-        file.process_global_ids(compilation_context, global_ids)
+        xhtml_files.each do |file|
+          file.process_global_ids(compilation_context, global_ids)
+        end
       end
     end
 

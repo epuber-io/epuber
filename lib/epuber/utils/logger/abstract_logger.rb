@@ -115,8 +115,6 @@ module Epuber
       def print_step_processing_time(step_name, time = nil)
         return yield unless @debug_steps_times
 
-        _remove_sticky_message
-
         if block_given?
           start = Time.now
           returned_value = yield
@@ -124,7 +122,7 @@ module Epuber
           time = Time.now - start
         end
 
-        info_text = "Step #{step_name} took #{time * 1000} ms"
+        info_text = "Step #{step_name} took #{(time * 1000).round(2)} ms"
         message = if @current_file.nil?
                     "▸ #{info_text}"
                   else

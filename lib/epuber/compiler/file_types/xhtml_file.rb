@@ -142,18 +142,14 @@ module Epuber
           end
 
           # perform transformations
-          UI.print_step_processing_time('performing final transformations') do
-            compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
-              xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
-            end
+          compilation_context.perform_plugin_things(Transformer, :result_text_xhtml_string) do |transformer|
+            xhtml_string = transformer.call(final_destination_path, xhtml_string, compilation_context)
           end
 
           # perform custom validation
           if compilation_context.should_check
-            UI.print_step_processing_time('performing final validations') do
-              compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
-                checker.call(final_destination_path, xhtml_string, compilation_context)
-              end
+            compilation_context.perform_plugin_things(Checker, :result_text_xhtml_string) do |checker|
+              checker.call(final_destination_path, xhtml_string, compilation_context)
             end
           end
 
