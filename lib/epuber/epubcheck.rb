@@ -1,9 +1,21 @@
 # frozen_string_literal: true
 
 require 'open3'
+require 'json'
+
+require_relative 'utils/location'
 
 module Epuber
   class Epubcheck
+    Report = Struct.new(:problems, keyword_init: true) do
+      # !attribute [r] problems
+      #   @return [Array<Problem>] problems found by epubcheck
+
+      def error?
+        problems.any?(&:error?)
+      end
+    end
+
     Problem = Struct.new(:level, :code, :location, :message, keyword_init: true) do
       # !attribute [r] level
       #   @return [Symbol] level of the problem (:fatal, :error, :warning, :info, :usage, :suppressed)
@@ -12,7 +24,7 @@ module Epuber
       #   @return [String] code of the problem (for example: RSC-005)
 
       # !attribute [r] location
-      #   @return [Epuber::Location] location of the problem
+      #   @return [Epuber::Location, nil] location of the problem
 
       # !attribute [r] message
       #   @return [String] message of the problem
@@ -24,60 +36,59 @@ module Epuber
       def error?
         level == :error || level == :fatal
       end
+
+      def self.from_json(json)
+        json_location = json['locations'].first
+
+        location = if json_location
+                     Epuber::Location.new(
+                       path: json_location['path'],
+                       lineno: json_location['line'],
+                       column: json_location['column'],
+                     )
+                   end
+
+        new(
+          level: json['severity'].downcase.to_sym,
+          code: json['ID'],
+          message: json['message'],
+          location: location,
+        )
+      end
     end
 
     class << self
-      LINE_REGEXP = /(?<level>[A-Z]+)\((?<code>[A-Z\-0-9]+)\):\s*(?<path>.+?)\((?<lineno>[0-9]+),(?<column>[0-9]+)\):\s*(?<message>[^\n]+)/.freeze # rubocop:disable Layout/LineLength
-
       # @param [String] path path to file
       #
-      # @return [Array<Problem>] list of problems
+      # @return [Report] report of the epubcheck
       #
       def check(path)
-        problems = []
-        Open3.popen3('epubcheck', path) do |_stdin, stdout, stderr, _wait_thr|
-          problems += _process_output(stdout)
-          problems += _process_output(stderr)
-        end
+        report = nil
 
-        problems
-      end
+        Dir.mktmpdir('epubcheck-') do |tmpdir|
+          json_path = File.join(tmpdir, 'epubcheck.json')
+          Open3.popen3('epubcheck', path, '--json', json_path) do |_stdin, _stdout, stderr, wait_thr|
+            exit_status = wait_thr.value
 
-      # @param [StringIO] output
-      #
-      # @return [Array<Problem, String>]
-      #
-      def _process_output(output)
-        problems = []
-        output.each_line do |line|
-          line = _parse_line(line.chomp)
-          if line.is_a?(Problem)
-            UI.debug(line.to_s)
-            problems << line
-          else
-            UI.debug(line)
+            if exit_status.success?
+              report = _parse_json(File.read(json_path))
+            else
+              UI.error(stderr.gets.chomp)
+            end
           end
         end
 
-        problems
+        report
       end
 
-      # @param [String] line
+      # @param [String] string json string
+      # @return [Report]
       #
-      # @return [Problem, String]
-      #
-      def _parse_line(line)
-        match = LINE_REGEXP.match(line)
-        return line unless match
+      def _parse_json(string)
+        json = JSON.parse(string)
+        messages = json['messages']
 
-        location = Epuber::Location.new(path: match[:path], lineno: match[:lineno].to_i, column: match[:column].to_i)
-
-        Problem.new(
-          level: match[:level].downcase.to_sym,
-          code: match[:code],
-          location: location,
-          message: match[:message],
-        )
+        Report.new(problems: messages.map { |msg| Problem.from_json(msg) })
       end
     end
   end

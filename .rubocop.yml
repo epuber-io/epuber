@@ -18,6 +18,8 @@ Layout/EmptyLines:
 # We all have wide screen monitors, so why only 80?
 Layout/LineLength:
   Max: 120
+  Exclude:
+    - spec/**/*_spec.rb
 
 # We adopted raise instead of fail.
 Style/SignalException:

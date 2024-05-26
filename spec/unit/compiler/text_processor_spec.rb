@@ -102,7 +102,7 @@ module Epuber
         end
 
         it 'can parse copyright from 4 hour working week book' do
-          file_path = File.join(spec_root, 'fixtures/4HPT_copyright.xhtml')
+          file_path = fixture_path('4HPT_copyright.xhtml')
           FakeFS::FileSystem.clone(file_path)
           input = File.read(file_path)
 

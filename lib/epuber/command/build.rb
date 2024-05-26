@@ -138,8 +138,8 @@ module Epuber
       def run_epubcheck(archive_path, build_dir)
         UI.info("Running Epubcheck for #{archive_path}")
 
-        problems = Epubcheck.check(archive_path)
-        problems.each do |problem|
+        report = Epubcheck.check(archive_path)
+        report.problems.each do |problem|
           relative_path = problem.location.path.sub("#{archive_path}/", '')
           file_path = ::File.join(build_dir, relative_path)
 
@@ -151,7 +151,7 @@ module Epuber
                       when :warning then :warning
                       else :info
                       end
-          message = "#{problem.level}: #{problem.message}"
+          message = "#{problem.level}(#{problem.code}): #{problem.message}"
 
           p = Compiler::Problem.new(problem.level, message, content, line: problem.location.lineno,
                                                                      column: problem.location.column,
@@ -160,7 +160,7 @@ module Epuber
           UI.send(log_level, p, backtrace: nil)
         end
 
-        if problems.any?(&:error?)
+        if report.error?
           UI.error('Epubcheck found some errors in epub file.')
         else
           UI.info('Epubcheck finished successfully.')

@@ -7,7 +7,7 @@ module Epuber
     include_context 'with temp dir'
 
     it 'can init project with file' do
-      epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
+      epub_filepath = fixture_path('childrens-media-query.epub')
 
       # Act
       Epuber::Command.run(%w[from-file] + [epub_filepath])
@@ -45,7 +45,7 @@ module Epuber
     end
 
     it 'can init project with EPUB 2 file' do
-      epub_filepath = File.join(__dir__, '..', 'fixtures', 'testing_book1-copyright.epub')
+      epub_filepath = fixture_path('testing_book1-copyright.epub')
 
       # Act
       Epuber::Command.run(%w[from-file] + [epub_filepath])
@@ -83,7 +83,7 @@ module Epuber
     end
 
     it 'can deobfuscate files' do
-      epub_filepath = File.join(__dir__, '..', 'fixtures', 'wasteland-otf-obf.epub')
+      epub_filepath = fixture_path('wasteland-otf-obf.epub')
 
       # Act
       Epuber::Command.run(%w[from-file] + [epub_filepath])
@@ -96,10 +96,10 @@ module Epuber
     end
 
     it 'prints some information to console' do
-      epub_filepath = File.join(__dir__, '..', 'fixtures', 'childrens-media-query.epub')
+      epub_filepath = fixture_path('childrens-media-query.epub')
 
       message = <<~TEXT.rstrip
-        📖 Loading EPUB file #{__dir__}/../fixtures/childrens-media-query.epub
+        📖 Loading EPUB file #{spec_root}/fixtures/childrens-media-query.epub
           Parsing OPF file at EPUB/content.opf
           Generating bookspec file
           Exporting childrens-book-style.css (from EPUB/childrens-book-style.css)
