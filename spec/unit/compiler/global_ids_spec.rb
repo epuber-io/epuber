@@ -83,7 +83,10 @@ module Epuber
         Epuber::Command.run(%w[build ibooks])
 
         # Assert
-        message = UI.logger.messages.last
+        error_messages = UI.logger.messages.select { |m| m.level == :error }
+        expect(error_messages.size).to eq(1)
+
+        message = error_messages.first
         expect(message.level).to eq :error
         expect(message.message).to eq("Can't find global id 'some_id' from link in file text/file1.xhtml")
       end
