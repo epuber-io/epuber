@@ -1,8 +1,16 @@
 # CHANGELOG
 
+## v0.10.0 (2024-05-26)
+
+- redo logging messages, error and progress [#85](https://github.com/epuber-io/epuber/issues/85)
+- format Epubcheck validation issues with line preview (shows location to build folder, actual error message) [#111](https://github.com/epuber-io/epuber/issues/111)
+- allow to run from any nested folder [#79](https://github.com/epuber-io/epuber/issues/79)
+- enhance BookTransformer to include more options how to find files (`:context_path` + `:groups`)
+
+
 ## v0.9.4 (2024-05-13)
 
-- fixed missing `properties="cover-image"` in EPUB v3 #96
+- fixed missing `properties="cover-image"` in EPUB v3 [#96](https://github.com/epuber-io/epuber/issues/96)
 - fixed missing font files when doing incremental builds or running server
 
 

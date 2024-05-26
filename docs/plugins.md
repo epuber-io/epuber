@@ -282,3 +282,8 @@ Pattern are like everywhere else, it can be relative (from bookspec in this case
 - `get_file(path | pattern)` - find file, return instance or throw exception
 - `read_destination_file(path | pattern | instance)` - read file from destination folder and returns it as string
 - `write_destination_file(path | pattern | instance, content)` - write file to destination folder
+
+All methods have key arguments:
+- `context_path: nil` - context path to start searching desired file from
+- `groups: nil` - filter files by types (e.g. :text, :image, :font, :style and/or :script), specify one or more groups, single `:text` or multiple: `[:text, :image]`, see [`Epuber::Compiler::FileFinders::GROUP_EXTENSIONS`](https://github.com/epuber-io/epuber/blob/ff30cdc5aa1d53914dc3a0e91ede5ad615d89e12/lib/epuber/compiler/file_finders/abstract.rb#L71)
+- `location: nil` - source of searching, e.g. XMLNode, file, [`Epuber::Location`](https://github.com/epuber-io/epuber/blob/master/lib/epuber/utils/location.rb) (used when logging error or warning)
