@@ -99,9 +99,12 @@ module Epuber
         end
 
         # Exit with error if there are any errors
-        exit(1) if (@release_version || @should_check) && Epuber::UI.logger.error?
-
-        write_lockfile
+        if (@release_version || @should_check) && Epuber::UI.logger.error?
+          exit(1)
+        else
+          UI.info('🎉 Build finished successfully.'.ansi.green)
+          write_lockfile
+        end
       end
 
       private
@@ -154,10 +157,14 @@ module Epuber
                                                                      column: problem.location.column,
                                                                      length: 1,
                                                                      file_path: nice_path)
-          UI.send(log_level, p)
+          UI.send(log_level, p, backtrace: nil)
         end
 
-        UI.error('Epubcheck found some errors in epub file.') if problems.any?(&:error?)
+        if problems.any?(&:error?)
+          UI.error('Epubcheck found some errors in epub file.')
+        else
+          UI.info('Epubcheck finished successfully.')
+        end
       end
 
       def find_calibre_app
