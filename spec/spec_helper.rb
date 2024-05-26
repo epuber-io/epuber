@@ -2,6 +2,7 @@
 
 require 'pp' # rubocop:disable Lint/RedundantRequireStatement
 require 'rspec'
+require 'claide'
 require 'fakefs/spec_helpers'
 
 
@@ -83,4 +84,12 @@ end
 
 def load_xhtml(path)
   Epuber::Compiler::XHTMLProcessor.xml_document_from_string(File.read(path), path)
+end
+
+def fixture_path(name)
+  File.join(spec_root, 'fixtures', name)
+end
+
+def load_fixture(name)
+  File.read(fixture_path(name))
 end

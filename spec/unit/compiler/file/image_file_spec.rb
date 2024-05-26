@@ -41,7 +41,7 @@ module Epuber
         end
 
         it 'downscales the image when is too large', :expensive do
-          source = File.join(spec_root, 'fixtures/6000x6000.png')
+          source = fixture_path('6000x6000.png')
           dest = File.join(temp_dir, 'dest_image.png')
 
           source_magick_file = Magick::Image.read(source).first
