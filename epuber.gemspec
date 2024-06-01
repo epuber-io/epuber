@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'sinatra-websocket', '~> 0.3'
   spec.add_runtime_dependency 'thin', '~> 1.6'
 
-  spec.add_runtime_dependency 'rmagick', '>= 4.2', '< 6.0'
+  spec.add_runtime_dependency 'rmagick', '>= 4.2', '< 7.0'
   spec.add_runtime_dependency 'rubyzip', '~> 2.3'
 
   spec.add_runtime_dependency 'epubcheck-ruby', '>= 4.0', '< 6.0'
