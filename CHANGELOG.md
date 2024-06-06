@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.10.1 (2024-06-06)
+
+- fixed parsing result from Epubcheck when there was some error
+
+
 ## v0.10.0 (2024-05-26)
 
 - redo logging messages, error and progress [#85](https://github.com/epuber-io/epuber/issues/85)

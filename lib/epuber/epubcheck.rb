@@ -67,14 +67,9 @@ module Epuber
 
         Dir.mktmpdir('epubcheck-') do |tmpdir|
           json_path = File.join(tmpdir, 'epubcheck.json')
-          Open3.popen3('epubcheck', path, '--json', json_path) do |_stdin, _stdout, stderr, wait_thr|
-            exit_status = wait_thr.value
-
-            if exit_status.success?
-              report = _parse_json(File.read(json_path))
-            else
-              UI.error(stderr.gets.chomp)
-            end
+          Open3.popen2('epubcheck', path, '--json', json_path) do |_stdin, _stdout, wait_thr|
+            wait_thr.value # wait for the process to finish
+            report = _parse_json(File.read(json_path))
           end
         end
 
