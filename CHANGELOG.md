@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.10.2 (2024-06-13)
+
+- fixed parsing multiple problems from Epubcheck with same ID [#115](https://github.com/epuber-io/epuber/issues/115)
+- fixed crash when running server
+
+
 ## v0.10.1 (2024-06-06)
 
 - fixed parsing result from Epubcheck when there was some error
