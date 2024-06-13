@@ -36,25 +36,6 @@ module Epuber
       def error?
         level == :error || level == :fatal
       end
-
-      def self.from_json(json)
-        json_location = json['locations'].first
-
-        location = if json_location
-                     Epuber::Location.new(
-                       path: json_location['path'],
-                       lineno: json_location['line'],
-                       column: json_location['column'],
-                     )
-                   end
-
-        new(
-          level: json['severity'].downcase.to_sym,
-          code: json['ID'],
-          message: json['message'],
-          location: location,
-        )
-      end
     end
 
     class << self
@@ -76,14 +57,41 @@ module Epuber
         report
       end
 
+      # Parse json from epubcheck
+      #
       # @param [String] string json string
       # @return [Report]
       #
       def _parse_json(string)
         json = JSON.parse(string)
         messages = json['messages']
+        problems = messages
+                   .map { |msg| _parse_locations(msg) }
+                   .flatten
 
-        Report.new(problems: messages.map { |msg| Problem.from_json(msg) })
+        Report.new(problems: problems)
+      end
+
+      # Parse all problems from single message
+      #
+      # @param [Hash] json
+      # @return [Array<Problem>]
+      #
+      def _parse_locations(json)
+        json['locations'].map do |json_location|
+          location = Epuber::Location.new(
+            path: json_location['path'],
+            lineno: json_location['line'],
+            column: json_location['column'],
+          )
+
+          Problem.new(
+            level: json['severity'].downcase.to_sym,
+            code: json['ID'],
+            message: json['message'],
+            location: location,
+          )
+        end
       end
     end
   end
