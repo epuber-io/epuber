@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.10.3 (2024-09-03)
+
+- fixed resolving urls in CSS when there are multiple `url()` functions in one declaration
+
+
 ## v0.10.2 (2024-06-13)
 
 - fixed parsing multiple problems from Epubcheck with same ID [#115](https://github.com/epuber-io/epuber/issues/115)
