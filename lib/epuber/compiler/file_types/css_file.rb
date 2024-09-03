@@ -71,10 +71,10 @@ module Epuber
 
                   resource_group = DECLARATION_TO_FILE_GROUP_MAP[property]
                   new_url = SourceFile.resolve_relative_file(destination_path,
-                                                            path,
-                                                            compilation_context.file_resolver,
-                                                            group: resource_group,
-                                                            location: self)
+                                                             path,
+                                                             compilation_context.file_resolver,
+                                                             group: resource_group,
+                                                             location: self)
 
                   content = content.gsub(url_function, "url(#{quote}#{new_url}#{quote})") if new_url
                 end
