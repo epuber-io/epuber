@@ -22,7 +22,7 @@ module Epuber
           'src' => :font,
         }.freeze
 
-        URL_REGEXP = /url\((.+)\)/.freeze
+        URL_REGEXP = /url\((.+?)\)/.freeze
 
         # @param [Compiler::CompilationContext] compilation_context
         #
@@ -55,30 +55,29 @@ module Epuber
               # @type [CssParser::RuleSet::Declarations]
               declarations = rule_set.instance_eval { @declarations }
               declarations.each do |property, decl_value|
-                # @type [String]
-                value = decl_value.to_s
-                next unless value =~ URL_REGEXP
+                decl_value.to_s.scan(URL_REGEXP) do
+                  url_function = Regexp.last_match(0)
+                  path = Regexp.last_match(1)
+                  if path.start_with?('"') && path.end_with?('"')
+                    path = path[1..-2]
+                    quote = '"'
+                  end
+                  if path.start_with?("'") && path.end_with?("'")
+                    path = path[1..-2]
+                    quote = "'"
+                  end
 
-                path = Regexp.last_match(1)
-                if path.start_with?('"') && path.end_with?('"')
-                  path = path[1..-2]
-                  quote = '"'
+                  next if path.start_with?('data:') || path.start_with?('http://') || path.start_with?('https://')
+
+                  resource_group = DECLARATION_TO_FILE_GROUP_MAP[property]
+                  new_url = SourceFile.resolve_relative_file(destination_path,
+                                                            path,
+                                                            compilation_context.file_resolver,
+                                                            group: resource_group,
+                                                            location: self)
+
+                  content = content.gsub(url_function, "url(#{quote}#{new_url}#{quote})") if new_url
                 end
-                if path.start_with?("'") && path.end_with?("'")
-                  path = path[1..-2]
-                  quote = "'"
-                end
-
-                next if path.start_with?('data:') || path.start_with?('http://') || path.start_with?('https://')
-
-                resource_group = DECLARATION_TO_FILE_GROUP_MAP[property]
-                new_url = SourceFile.resolve_relative_file(destination_path,
-                                                           path,
-                                                           compilation_context.file_resolver,
-                                                           group: resource_group,
-                                                           location: self)
-
-                content = content.gsub(value, "url(#{quote}#{new_url}#{quote})") if new_url
               end
             end
           end

@@ -87,7 +87,7 @@ module Epuber
           it 'modifies linked files using url()' do
             source = <<~CSS
               div {
-                background: url(image.png);
+                background: url(image.png), url(image2.png);
               }
               div {
                 background: url("image");
@@ -98,6 +98,7 @@ module Epuber
             File.write('/abc/styles/some_file.css', source)
             FileUtils.mkdir_p('/abc/images')
             FileUtils.touch('/abc/images/image.png')
+            FileUtils.touch('/abc/images/image2.png')
 
             file = described_class.new('/abc/styles/some_file.css')
             file.destination_path = 'abc/styles/some_file_res.css'
@@ -108,7 +109,7 @@ module Epuber
 
             expect(File.read('/abc/styles/some_file_res.css')).to eq <<~CSS
               div {
-                background: url(../images/image.png);
+                background: url(../images/image.png), url(../images/image2.png);
               }
               div {
                 background: url("../images/image.png");
