@@ -58,3 +58,11 @@ jobs:
         else
           bundle exec rubocop
         fi
+
+    - name: Print debug log when failure
+      if: failure()
+      run: |
+        for log in $(find vendor/bundle -type f -name "*.log"); do
+          echo "Log file: $log"
+          cat $log
+        done
