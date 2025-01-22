@@ -43,6 +43,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        apt-get update && apt-get install -y imagemagick
         bundle config set --local with 'dev'
         bundle config set --local path 'vendor/bundle'
         bundle install
