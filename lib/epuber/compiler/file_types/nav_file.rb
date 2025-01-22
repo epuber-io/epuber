@@ -5,34 +5,44 @@ module Epuber
     module FileTypes
       require_relative 'generated_file'
 
-      class NavFile < GeneratedFile
-        # @return [Epuber::Version]
+      class NavAbstractFile < GeneratedFile
+        # @return [Class]
         #
-        attr_reader :epub_version
+        attr_reader :generator_type
 
-        # @param [Epuber::Version] epub_version
+        # @param [String] filename
+        # @param [Class] generator Class of generator (subclass of Epuber::Compiler::Generator)
         #
-        def initialize(epub_version)
+        def initialize(filename, generator_type, properties = [])
           super()
 
-          @epub_version = epub_version
+          @generator_type = generator_type
 
-          properties << :navigation
-
-          self.destination_path = if epub_version >= 3
-                                    'nav.xhtml'
-                                  else
-                                    'nav.ncx'
-                                  end
-
+          self.properties = properties
+          self.destination_path = filename
           self.path_type = :manifest
         end
 
         # @param [Compiler::CompilationContext] compilation_context
         #
         def process(compilation_context)
-          gen = NavGenerator.new(compilation_context)
-          write_generate(gen.generate_nav.to_s)
+          result = generator_type.new(compilation_context)
+                                 .generate
+                                 .to_s
+
+          write_generate(result)
+        end
+      end
+
+      class NavFile < NavAbstractFile
+        def initialize
+          super('nav.xhtml', NavGenerator, [:navigation])
+        end
+      end
+
+      class NcxFile < NavAbstractFile
+        def initialize
+          super('toc.ncx', NcxGenerator, [])
         end
       end
     end

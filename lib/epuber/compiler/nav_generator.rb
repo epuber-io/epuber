@@ -2,17 +2,12 @@
 
 require_relative '../book/toc_item'
 
-
 module Epuber
   class Compiler
     require_relative 'file_resolver'
     require_relative 'generator'
 
     class NavGenerator < Generator
-      NCX_NAMESPACES = {
-        'xmlns' => 'http://www.daisy.org/z3986/2005/ncx/',
-      }.freeze
-
       XHTML_NAMESPACES = {
         'xmlns' => 'http://www.w3.org/1999/xhtml',
         'xmlns:epub' => 'http://www.idpf.org/2007/ops',
@@ -37,13 +32,9 @@ module Epuber
       #
       # @return [Nokogiri::XML::Document]
       #
-      def generate_nav
+      def generate
         generate_xml do
-          if @target.epub_version >= 3
-            generate_xhtml_content
-          else
-            generate_ncx_content
-          end
+          generate_xhtml_content
         end
       end
 
@@ -53,13 +44,9 @@ module Epuber
       # @return [Hash<String, String>]
       #
       def nav_namespaces
-        if @target.epub_version >= 3
-          dict = XHTML_NAMESPACES
-          dict = dict.merge(XHTML_IBOOKS_NAMESPACES) if @target.ibooks?
-          dict
-        else
-          NCX_NAMESPACES
-        end
+        dict = XHTML_NAMESPACES
+        dict = dict.merge(XHTML_IBOOKS_NAMESPACES) if @target.ibooks?
+        dict
       end
 
       # @return nil
@@ -86,46 +73,15 @@ module Epuber
         end
       end
 
-      def generate_ncx_content
-        @xml.doc.create_internal_subset('ncx',
-                                        '-//NISO//DTD ncx 2005-1//EN',
-                                        'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd')
-
-        @xml.ncx(nav_namespaces, version: '2005-1') do
-          # head
-          @xml.head do
-            @xml.meta(name: 'dtb:uid', content: @target.identifier || "urn:isbn:#{@target.isbn}")
-          end
-
-          # title
-          @xml.docTitle do
-            @xml.text_(@book.title)
-          end
-
-          @nav_nav_point_id = 1
-
-          # nav map
-          @xml.navMap do
-            visit_toc_items(@target.root_toc.sub_items)
-          end
-        end
-      end
-
       # @param [Array<Epuber::Book::TocItem>] toc_items
       #
       def visit_toc_items(toc_items)
-        iterate_lambda = lambda do
-          toc_items.each do |child_item|
-            visit_toc_item(child_item)
-          end
-        end
-
-        if @target.epub_version >= 3 && toc_items.length.positive? && contains_item_with_title(toc_items)
+        if toc_items.length.positive? && contains_item_with_title(toc_items)
           @xml.ol do
-            iterate_lambda.call
+            toc_items.each do |child_item|
+              visit_toc_item(child_item)
+            end
           end
-        else
-          iterate_lambda.call
         end
       end
 
@@ -140,22 +96,10 @@ module Epuber
 
         if toc_item.title.nil?
           visit_toc_items(toc_item.sub_items)
-        elsif @target.epub_version >= 3
+        else
           @xml.li do
             node_builder = @xml.a(href: result_file_path)
             node_builder.node.inner_html = toc_item.title
-
-            visit_toc_items(toc_item.sub_items)
-          end
-        else
-          @xml.navPoint(id: "navPoint_#{@nav_nav_point_id}") do
-            @xml.navLabel do
-              node_builder = @xml.text_
-              node_builder.node.inner_html = toc_item.title
-            end
-            @xml.content(src: result_file_path)
-
-            @nav_nav_point_id += 1
 
             visit_toc_items(toc_item.sub_items)
           end

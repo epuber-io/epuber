@@ -184,14 +184,12 @@ module Epuber
       # @return nil
       #
       def generate_spine
-        args = if @target.epub_version >= 3
-                 {}
-               else
-                 nav_file = @file_resolver.manifest_files.find { |file| file.destination_path.end_with?('.ncx') }
-                 raise 'not found nav file' if nav_file.nil?
+        ncx_file = @file_resolver.manifest_files.find { |file| file.is_a?(FileTypes::NcxFile) }
+        raise 'not found NCX file' if ncx_file.nil?
 
-                 { toc: create_id_from_path(pretty_path(nav_file)) }
-               end
+        args = {
+          toc: create_id_from_path(pretty_path(ncx_file)),
+        }
 
         all_items = @target.root_toc.flat_sub_items.map do |toc_item|
           result_file = @file_resolver.file_from_request(toc_item.file_request)

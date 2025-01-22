@@ -11,6 +11,7 @@ module Epuber
       book = Book.new
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
+      ctx.file_resolver.add_file(Compiler::FileTypes::NcxFile.new)
       @sut = described_class.new(ctx)
     end
 
@@ -42,6 +43,8 @@ module Epuber
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
       ctx.file_resolver = Compiler::FileResolver.new('/source', '/dest')
       ctx.file_resolver.add_file_from_request(book.cover_image)
+      ctx.file_resolver.add_file(Compiler::FileTypes::NcxFile.new)
+      ctx.file_resolver.add_file(Compiler::FileTypes::NavFile.new)
 
       @sut = described_class.new(ctx)
 
@@ -88,11 +91,9 @@ module Epuber
       FileUtils.mkdir_p('/source')
       FileUtils.touch('/source/cover.jpg')
 
-      ncx_file = Compiler::FileTypes::GeneratedFile.new
-      ncx_file.destination_path = 'nav.ncx'
-      ncx_file.path_type = :manifest
       resolver = Compiler::FileResolver.new('/source', '/dest')
-      resolver.add_file(ncx_file)
+
+      resolver.add_file(Compiler::FileTypes::NcxFile.new)
       resolver.add_file_from_request(book.cover_image)
 
       ctx = Compiler::CompilationContext.new(book, book.all_targets.first)
