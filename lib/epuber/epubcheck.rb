@@ -34,7 +34,7 @@ module Epuber
       end
 
       def error?
-        level == :error || level == :fatal
+        %i[error fatal].include?(level)
       end
     end
 

@@ -6,21 +6,19 @@ require 'rspec'
 require 'fileutils'
 
 describe 'Test project' do # rubocop:disable RSpec/DescribeClass
-  xit 'do something', :expensive do
+  it 'do something', :expensive do
     Dir.chdir('test_project') do
       # FileUtils.rmtree(Epuber::Config::WORKING_PATH)
       # FileUtils.remove(Dir.glob('*.epub'))
 
-      # expect do
-        # expect do
-          Epuber::Command.run(%w[build --check --write --verbose])
-          Epuber::Command.run(%w[build --release --verbose])
-        # end.to output(/.*/).to_stdout_from_any_process
-      # end.to_not raise_error
+      expect do
+        Epuber::Command.run(%w[build --check --write --verbose])
+        Epuber::Command.run(%w[build --release --verbose])
+      end.to output(/.*/).to_stdout
     end
   end
 
-  xit 'can build project from text subfolder', :expensive do
+  it 'can build project from text subfolder', :expensive do
     FileUtils.remove(Dir.glob('test_project/*.epub'))
 
     current_dir = Dir.pwd
@@ -29,7 +27,7 @@ describe 'Test project' do # rubocop:disable RSpec/DescribeClass
     try do
       expect do
         Epuber::Command.run(%w[build ibooks])
-      end.to output(/.*/).to_stdout_from_any_process
+      end.to output(/.*/).to_stdout
     ensure
       Dir.chdir(current_dir)
     end
