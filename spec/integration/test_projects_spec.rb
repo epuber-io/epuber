@@ -14,7 +14,7 @@ describe 'Test project' do # rubocop:disable RSpec/DescribeClass
       expect do
         Epuber::Command.run(%w[build --check --write --verbose])
         Epuber::Command.run(%w[build --release --verbose])
-      end.to output(/.*/).to_stdout
+      end.to output(/.*/).to_stdout_from_any_process
     end
   end
 
@@ -27,7 +27,7 @@ describe 'Test project' do # rubocop:disable RSpec/DescribeClass
     try do
       expect do
         Epuber::Command.run(%w[build ibooks])
-      end.to output(/.*/).to_stdout
+      end.to output(/.*/).to_stdout_from_any_process
     ensure
       Dir.chdir(current_dir)
     end
