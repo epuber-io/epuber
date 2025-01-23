@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu]
-        ruby: [3.4, 3.3, 3.2, 3.1, 3.0, 2.7, 2.6, 2.5]
+        ruby: ['3.4', '3.3', '3.2', '3.1', '3.0', '2.7', '2.6', '2.5']
 
     steps:
     - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y imagemagick
+        sudo apt-get update && sudo apt-get install -y imagemagick libmagickwand-dev
         bundle config set --local with 'dev'
         bundle config set --local path 'vendor/bundle'
         bundle install
@@ -58,3 +58,11 @@ jobs:
         else
           bundle exec rubocop
         fi
+
+    - name: Print debug log when failure
+      if: failure()
+      run: |
+        for log in $(find vendor/bundle -type f -name "*.log"); do
+          echo "Log file: $log"
+          cat $log
+        done

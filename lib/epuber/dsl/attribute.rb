@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'date'
-
 require 'active_support/core_ext/string/inflections'
 
 module Epuber
@@ -33,7 +32,6 @@ module Epuber
                      default_value: nil,
                      auto_convert: {},
                      types: nil)
-
         @name = name
 
         @inherited     = inherited

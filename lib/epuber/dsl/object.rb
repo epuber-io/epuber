@@ -3,6 +3,7 @@
 require_relative 'attribute'
 require_relative 'attribute_support'
 
+require 'logger' # for active_support to work in version 6.1.7.10
 require 'active_support'
 require 'active_support/core_ext/string/inflections'
 

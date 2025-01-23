@@ -74,7 +74,7 @@ module Epuber
 
             archive_name = compiler.epub_name
 
-            FileUtils.remove_file(archive_name) if ::File.exist?(archive_name)
+            FileUtils.rm_f(archive_name)
 
             archive_path = compiler.archive(archive_name)
             run_epubcheck(archive_path, build_path)

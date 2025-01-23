@@ -34,7 +34,7 @@ module Epuber
       end
 
       def error?
-        level == :error || level == :fatal
+        %i[error fatal].include?(level)
       end
     end
 
@@ -48,7 +48,7 @@ module Epuber
 
         Dir.mktmpdir('epubcheck-') do |tmpdir|
           json_path = File.join(tmpdir, 'epubcheck.json')
-          Open3.popen2('epubcheck', path, '--json', json_path) do |_stdin, _stdout, wait_thr|
+          Open3.popen3('epubcheck', path, '--json', json_path) do |_in, _out, _err, wait_thr|
             wait_thr.value # wait for the process to finish
             report = _parse_json(File.read(json_path))
           end
