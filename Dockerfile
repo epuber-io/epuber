@@ -1,5 +1,7 @@
-FROM ruby:3.0-alpine
-LABEL maintainer="roman@kriz.io"
+FROM ruby:3.1-alpine
+LABEL org.opencontainers.image.source="https://github.com/epuber-io/epuber"
+LABEL org.opencontainers.image.authors="Roman Kříž <roman@kriz.io>"
+
 
 # Set Epuber version
 ARG EPUBER_VERSION
