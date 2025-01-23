@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.11.0 (2025-01-23)
+
+- NCX file is now generated always (even for EPUB 3)
+- add missing playOrder attribute in generated NCX file (which is required)
+
+
 ## v0.10.3 (2024-09-03)
 
 - fixed resolving urls in CSS when there are multiple `url()` functions in one declaration
