@@ -14,6 +14,7 @@ module Epuber
 
     require_relative 'compiler/opf_generator'
     require_relative 'compiler/nav_generator'
+    require_relative 'compiler/ncx_generator'
     require_relative 'compiler/meta_inf_generator'
 
     require_relative 'compiler/file_resolver'
@@ -199,10 +200,17 @@ module Epuber
     # @return nil
     #
     def generate_other_files
-      # generate nav file (nav.xhtml or nav.ncx)
-      nav_file = FileTypes::NavFile.new(@target.epub_version)
-      @file_resolver.add_file(nav_file)
-      process_file(nav_file)
+      # generate ncx file (nav.ncx)
+      ncx_file = FileTypes::NcxFile.new
+      @file_resolver.add_file(ncx_file)
+      process_file(ncx_file)
+
+      if @target.epub_version >= 3.0
+        # generate nav file (nav.xhtml)
+        nav_file = FileTypes::NavFile.new
+        @file_resolver.add_file(nav_file)
+        process_file(nav_file)
+      end
 
       # generate .opf file
       opf_file = FileTypes::OPFFile.new

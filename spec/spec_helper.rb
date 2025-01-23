@@ -46,6 +46,12 @@ RSpec.configure do |c|
   c.after do
     Epuber::Config.clear_instance!
   end
+
+  c.around do |ex|
+    ex.run
+  rescue SystemExit => e
+    raise "SystemExit with status #{e.status} was raised."
+  end
 end
 
 RSpec.shared_context 'with temp dir' do
