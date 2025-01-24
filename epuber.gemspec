@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rmagick', '>= 4.2', '< 7.0'
   spec.add_runtime_dependency 'rubyzip', '~> 2.3'
 
-  spec.add_runtime_dependency 'epubcheck-ruby', '>= 4.0', '< 6.0'
+  spec.add_runtime_dependency 'epubcheck-ruby', '>= 4.0', '< 6.0', '!= 5.2.0.0'
 
   spec.add_runtime_dependency 'bade', '~> 0.3', '>= 0.3.1'
   spec.add_runtime_dependency 'coffee-script', '~> 2.4'

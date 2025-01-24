@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.11.1 (2025-01-24)
+
+- do not use epubcheck v5.2.0 (bacause of issue [w3c/epubcheck #1595](https://github.com/w3c/epubcheck/issues/1595))
+
+
 ## v0.11.0 (2025-01-23)
 
 - NCX file is now generated always (even for EPUB 3)
