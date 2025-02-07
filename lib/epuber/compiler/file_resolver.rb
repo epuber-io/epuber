@@ -258,6 +258,7 @@ module Epuber
             '.jpg' => FileTypes::ImageFile,
             '.jpeg' => FileTypes::ImageFile,
             '.png' => FileTypes::ImageFile,
+            '.svg' => FileTypes::StaticFile,
           }
 
           mapping[extname] || FileTypes::StaticFile

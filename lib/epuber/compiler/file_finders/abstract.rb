@@ -66,11 +66,11 @@ module Epuber
       end
 
       BINARY_EXTENSIONS = %w[.png .jpeg .jpg .otf .ttf].freeze
-      STATIC_EXTENSIONS = BINARY_EXTENSIONS + %w[.css .js]
+      STATIC_EXTENSIONS = BINARY_EXTENSIONS + %w[.css .js .svg]
 
       GROUP_EXTENSIONS = {
         text: %w[.xhtml .html .bade],
-        image: %w[.png .jpg .jpeg],
+        image: %w[.png .jpg .jpeg .svg],
         font: %w[.otf .ttf],
         style: %w[.css .styl],
         script: %w[.js .coffee],
