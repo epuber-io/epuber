@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.12.0 (2025-02-07)
+
+- Add basic support for SVG files (Epuber will correctly find them even when extension is missing) [#66](https://github.com/epuber-io/epuber/issues/66)
+
+
 ## v0.11.1 (2025-01-24)
 
 - do not use epubcheck v5.2.0 (bacause of issue [w3c/epubcheck #1595](https://github.com/w3c/epubcheck/issues/1595))
