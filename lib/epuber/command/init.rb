@@ -19,7 +19,7 @@ module Epuber
       def initialize(argv)
         @book_name = argv.arguments!.first
 
-        super(argv)
+        super
       end
 
       def validate!

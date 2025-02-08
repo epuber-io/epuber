@@ -15,7 +15,7 @@ module Epuber
       # @param [String] relative_path path to plugin file (relative to project root)
       #
       def initialize(file_path)
-        super(file_path)
+        super
         @instances = []
 
         eval(::File.read(file_path), binding, file_path) # rubocop:disable Security/Eval

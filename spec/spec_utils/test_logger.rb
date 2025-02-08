@@ -20,7 +20,7 @@ class TestLogger < Epuber::Logger::AbstractLogger
   attr_reader :messages
 
   def initialize(opts = {})
-    super(opts)
+    super
 
     @messages = []
   end

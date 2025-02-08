@@ -42,7 +42,7 @@ module Epuber
 
         UI.logger.debug_steps_times = argv.flag?('debug-steps-times', false)
 
-        super(argv)
+        super
       end
 
       def validate!

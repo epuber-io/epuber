@@ -16,7 +16,7 @@ module Epuber
       def initialize(argv)
         @filepath = argv.arguments!.first
 
-        super(argv)
+        super
       end
 
       def validate!
