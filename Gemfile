@@ -6,14 +6,13 @@ source 'https://rubygems.org'
 gemspec
 
 # dev
-gem 'fakefs', '>= 1.3', '< 3.0' # 2.0.0 is not compatible with Ruby 2.5
+gem 'fakefs', '>= 1.3', '< 4.0'
 gem 'rake', '~> 13.0'
 gem 'rspec', '~> 3.2'
 gem 'rubocop', '~> 1.14'
-
-# VSCode plugins
-gem 'ruby-lsp', require: false
+gem 'rubocop-rspec', '~> 3.0', require: false
 
 group :dev, optional: true do
-  gem 'rubocop-rspec', '~> 3.0', require: false
+  # VSCode plugins
+  gem 'ruby-lsp', require: false
 end
