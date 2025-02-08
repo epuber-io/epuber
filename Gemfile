@@ -15,5 +15,5 @@ gem 'rubocop', '~> 1.14'
 gem 'ruby-lsp', require: false
 
 group :dev, optional: true do
-  gem 'rubocop-rspec', '~> 2.0', require: false
+  gem 'rubocop-rspec', '~> 3.0', require: false
 end

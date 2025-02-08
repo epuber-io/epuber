@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Epuber
-  describe Compiler do # rubocop:disable RSpec/FilePath
+  describe Compiler do
     describe 'global ids' do
       include_context 'with temp dir'
 

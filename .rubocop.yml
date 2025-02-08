@@ -298,36 +298,10 @@ Style/YAMLFileRead: # new in 1.53
 Style/SymbolProc:
   Exclude:
     - spec/**/*_spec.rb
-Capybara/ClickLinkOrButtonStyle: # new in 2.19
-  Enabled: true
-Capybara/MatchStyle: # new in 2.17
-  Enabled: true
-Capybara/NegationMatcher: # new in 2.14
-  Enabled: true
-Capybara/SpecificActions: # new in 2.14
-  Enabled: true
-Capybara/SpecificFinders: # new in 2.13
-  Enabled: true
-Capybara/SpecificMatcher: # new in 2.12
-  Enabled: true
-Capybara/RSpec/HaveSelector: # new in 2.19
-  Enabled: true
+
 Capybara/RSpec/PredicateMatcher: # new in 2.19
   Enabled: true
-FactoryBot/AssociationStyle: # new in 2.23
-  Enabled: true
-FactoryBot/ConsistentParenthesesStyle: # new in 2.14
-  Enabled: true
-FactoryBot/FactoryAssociationWithStrategy: # new in 2.23
-  Enabled: true
-FactoryBot/FactoryNameStyle: # new in 2.16
-  Enabled: true
-FactoryBot/IdSequence: # new in <<next>>
-  Enabled: true
-FactoryBot/RedundantFactoryOption: # new in 2.23
-  Enabled: true
-FactoryBot/SyntaxMethods: # new in 2.7
-  Enabled: true
+
 RSpec/BeEmpty: # new in 2.20
   Enabled: true
 RSpec/BeEq: # new in 2.9.0
@@ -373,16 +347,4 @@ RSpec/SpecFilePathSuffix: # new in 2.24
 RSpec/SubjectDeclaration: # new in 2.5
   Enabled: true
 RSpec/VerifiedDoubleReference: # new in 2.10.0
-  Enabled: true
-RSpecRails/AvoidSetupHook: # new in 2.4
-  Enabled: true
-RSpecRails/HaveHttpStatus: # new in 2.12
-  Enabled: true
-RSpecRails/InferredSpecType: # new in 2.14
-  Enabled: true
-RSpecRails/MinitestAssertions: # new in 2.17
-  Enabled: true
-RSpecRails/NegationBeValid: # new in 2.23
-  Enabled: true
-RSpecRails/TravelAround: # new in 2.19
   Enabled: true

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Epuber
-  describe Version do # rubocop:disable RSpec/FilePath
+  describe Version do
     describe 'direct comparison' do
       it 'compares equal values' do
         one = described_class.new('1.0.0')

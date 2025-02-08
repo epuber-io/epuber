@@ -105,7 +105,7 @@ module Epuber
 
           it 'converse regexp into string' do
             @sut.multi = /^some text$/
-            expect(@sut.multi).to be_kind_of String
+            expect(@sut.multi).to be_a String
             expect(@sut.multi).to include 'some text'
           end
         end
