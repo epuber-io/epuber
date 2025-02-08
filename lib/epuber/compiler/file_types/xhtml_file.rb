@@ -178,11 +178,11 @@ module Epuber
 
           XHTMLProcessor.find_global_ids_nodes(xhtml_doc).each do |node|
             id = node['id']
-            node['id'] = id[1..-1]
+            node['id'] = id[1..]
           end
 
           XHTMLProcessor.find_global_links_nodes(xhtml_doc).each do |node|
-            href = node['href'][1..-1]
+            href = node['href'][1..]
 
             dest_file = global_ids[href]
             if dest_file

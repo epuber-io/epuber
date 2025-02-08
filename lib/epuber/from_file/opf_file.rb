@@ -98,8 +98,7 @@ module Epuber
     end
 
     # reversed map of generator's map
-    LANDMARKS_MAP = Compiler::OPFGenerator::LANDMARKS_MAP.map { |k, v| [v, k] }
-                                                         .to_h
+    LANDMARKS_MAP = Compiler::OPFGenerator::LANDMARKS_MAP.to_h { |k, v| [v, k] }
                                                          .freeze
 
     # @return [Nokogiri::XML::Document]
@@ -133,9 +132,8 @@ module Epuber
       @spine = @document.at_css('package spine')
 
       @manifest_items = @document.css('package manifest item')
-                                 .map { |node| ManifestItem.from_node(node) }
-                                 .map { |item| [item.id, item] }
-                                 .to_h
+                                 .map { |node| ManifestItem.from_node(node) } # rubocop:disable Style/MapToHash
+                                 .to_h { |item| [item.id, item] }
       @spine_items = @document.css('package spine itemref')
                               .map { |node| SpineItem.from_node(node) }
       @guide_items = @document.css('package guide reference')

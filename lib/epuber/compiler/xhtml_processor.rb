@@ -370,7 +370,7 @@ module Epuber
       #
       def self.find_global_ids(xhtml_doc)
         find_global_ids_nodes(xhtml_doc)
-          .map { |node| node['id'][1..-1] }
+          .map { |node| node['id'][1..] }
       end
 
       # @param [Nokogiri::XML::Document] xhtml_doc  input XML document to work with
@@ -386,7 +386,7 @@ module Epuber
       #
       def self.find_global_links(xhtml_doc)
         find_global_links_nodes(xhtml_doc)
-          .map { |node| node['href'][1..-1] }
+          .map { |node| node['href'][1..] }
       end
     end
   end

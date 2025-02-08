@@ -69,7 +69,7 @@ module Epuber
           path = location.path
 
           # calculate relative path when path is absolute and in project
-          path = path[Config.instance.project_path.size + 1..-1] if path.start_with?(Config.instance.project_path)
+          path = path[Config.instance.project_path.size + 1..] if path.start_with?(Config.instance.project_path)
 
           line_parts = [
             "  (in file #{path}",

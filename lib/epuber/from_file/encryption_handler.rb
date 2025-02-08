@@ -140,7 +140,7 @@ module Epuber
           i.key = adobe_key
         end
       end
-      items.map { |i| [i.file_path, i] }.to_h
+      items.to_h { |i| [i.file_path, i] }
     end
   end
 end
