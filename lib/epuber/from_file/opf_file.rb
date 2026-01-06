@@ -132,7 +132,7 @@ module Epuber
       @spine = @document.at_css('package spine')
 
       @manifest_items = @document.css('package manifest item')
-                                 .map { |node| ManifestItem.from_node(node) } # rubocop:disable Style/MapToHash
+                                 .map { |node| ManifestItem.from_node(node) }
                                  .to_h { |item| [item.id, item] }
       @spine_items = @document.css('package spine itemref')
                               .map { |node| SpineItem.from_node(node) }

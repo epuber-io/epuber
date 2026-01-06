@@ -44,11 +44,7 @@ module Epuber
           item.is_a?(Hash) && (item.include?(:linear) || item.include?('linear'))
         end.first
 
-        if first.nil?
-          true
-        else
-          first.values.first
-        end
+        first.nil? || first.values.first
       end
 
       # @return [String]

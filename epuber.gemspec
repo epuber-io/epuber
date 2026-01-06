@@ -26,10 +26,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'os', '~> 1.0'
   spec.add_dependency 'uuidtools', '~> 2.1'
 
-  spec.add_dependency 'sinatra', '>= 2.0', '< 4.0'
-  spec.add_dependency 'sinatra-contrib', '>= 2.0', '< 4.0'
+  spec.add_dependency 'sinatra', '>= 2.0', '< 5.0'
+  spec.add_dependency 'sinatra-contrib', '>= 2.0', '< 5.0'
   spec.add_dependency 'sinatra-websocket', '~> 0.3'
-  spec.add_dependency 'thin', '~> 1.6'
+  spec.add_dependency 'thin', '>= 1.6', '< 3.0'
 
   spec.add_dependency 'rmagick', '>= 4.2', '< 7.0'
   spec.add_dependency 'rubyzip', '~> 2.3'

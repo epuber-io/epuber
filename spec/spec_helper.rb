@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pp' # rubocop:disable Lint/RedundantRequireStatement
+require 'pp'
 require 'rspec'
 require 'claide'
 require 'fakefs/spec_helpers'
