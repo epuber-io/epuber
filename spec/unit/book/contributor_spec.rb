@@ -6,40 +6,35 @@ require_relative '../../spec_helper'
 module Epuber
   class Book
     describe Contributor do
-      before do
-        @contributor = described_class.new('Jason Fried', 'FRIED, Jason', 'aut')
-      end
-
       it 'returns same values' do
-        expect(@contributor.pretty_name).to eq 'Jason Fried'
-        expect(@contributor.file_as).to eq 'FRIED, Jason'
-        expect(@contributor.role).to eq 'aut'
+        contributor = described_class.new('Jason Fried', 'FRIED, Jason', 'aut')
+
+        expect(contributor.pretty_name).to eq 'Jason Fried'
+        expect(contributor.file_as).to eq 'FRIED, Jason'
+        expect(contributor.role).to eq 'aut'
       end
     end
 
     describe NormalContributor do
-      before do
-        @contributor = described_class.new('Jason', 'Fried', 'aut')
-      end
+      it 'automatically formats file_as and pretty_name' do
+        contributor = described_class.new('Jason', 'Fried', 'aut')
 
-      it 'formats file_as' do
-        expect(@contributor.file_as).to eq 'FRIED, Jason'
-      end
-
-      it 'formats pretty_name' do
-        expect(@contributor.pretty_name).to eq 'Jason Fried'
-      end
-
-      it 'pretty_name is readonly' do
+        expect(contributor.file_as).to eq 'FRIED, Jason'
+        expect(contributor.pretty_name).to eq 'Jason Fried'
         expect do
-          @contributor.pretty_name = ''
+          contributor.pretty_name = ''
+        end.to raise_error NameError
+
+        expect do
+          contributor.file_as = ''
         end.to raise_error NameError
       end
 
-      it 'file_as is readonly' do
-        expect do
-          @contributor.file_as = ''
-        end.to raise_error NameError
+      it 'automatically formats file_as and pretty_name with unicode characters' do
+        contributor = described_class.new('Ěščřžýáíé', 'Úůňó', 'aut')
+
+        expect(contributor.file_as).to eq 'ÚŮŇÓ, Ěščřžýáíé'
+        expect(contributor.pretty_name).to eq 'Ěščřžýáíé Úůňó'
       end
     end
 
