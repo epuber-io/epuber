@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.12.2 (2026-02-07)
+
+- Drop usage of `String#mb_chars` because of deprecation on ActiveSupport side
+
+## v0.12.1 (2026-01-06)
+
+- Allow to use Sinatra v4, Thin v2 and ActiveSupport v8
+
 ## v0.12.0 (2025-02-07)
 
 - Add basic support for SVG files (Epuber will correctly find them even when extension is missing) [#66](https://github.com/epuber-io/epuber/issues/66)

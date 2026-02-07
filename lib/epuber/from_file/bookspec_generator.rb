@@ -284,7 +284,7 @@ module Epuber
     # @return [Boolean]
     #
     def contributor_file_as_eq?(file_as_a, file_as_b)
-      file_as_a == file_as_b || file_as_a.mb_chars.downcase == file_as_b.mb_chars.downcase
+      file_as_a == file_as_b || file_as_a.downcase == file_as_b.downcase
     end
 
     # @param [String] href
