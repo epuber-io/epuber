@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.12.3 (2026-08-07)
+
+- Allow to use css_parser v2 and v3 (v3 fixes [CVE-2026-53727](https://github.com/premailer/css_parser/security/advisories/GHSA-9pmc-p236-855h), it is used on Ruby 3.3+)
+- Allow to use RMagick v7 (it is used on Ruby 3.2+)
+- Allow to use Rubyzip v3 (it is used on Ruby 3.0+)
+- Allow to use UUIDTools v3
+
 ## v0.12.2 (2026-02-07)
 
 - Drop usage of `String#mb_chars` because of deprecation on ActiveSupport side

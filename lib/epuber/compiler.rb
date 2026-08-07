@@ -129,8 +129,8 @@ module Epuber
         new_paths = @file_resolver.package_files.map(&:pkg_destination_path)
 
         if ::File.exist?(epub_path)
-          Zip::File.open(epub_path, true) do |zip_file|
-            old_paths = zip_file.instance_eval { @entry_set.entries.map(&:name) }
+          Zip::File.open(epub_path) do |zip_file|
+            old_paths = zip_file.entries.map(&:name)
             diff = old_paths - new_paths
             diff.each do |file_to_remove|
               UI.debug "removing file from result EPUB: #{file_to_remove}"
