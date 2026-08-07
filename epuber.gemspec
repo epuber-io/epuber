@@ -24,15 +24,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mime-types', '~> 3.0'
   spec.add_dependency 'nokogiri', '~> 1.8', '>= 1.8.2'
   spec.add_dependency 'os', '~> 1.0'
-  spec.add_dependency 'uuidtools', '~> 2.1'
+  spec.add_dependency 'uuidtools', '>= 2.1', '< 4.0'
 
   spec.add_dependency 'sinatra', '>= 2.0', '< 5.0'
   spec.add_dependency 'sinatra-contrib', '>= 2.0', '< 5.0'
   spec.add_dependency 'sinatra-websocket', '~> 0.3'
   spec.add_dependency 'thin', '>= 1.6', '< 3.0'
 
-  spec.add_dependency 'rmagick', '>= 4.2', '< 7.0'
-  spec.add_dependency 'rubyzip', '~> 2.3'
+  spec.add_dependency 'rmagick', '>= 4.2', '< 8.0'
+  spec.add_dependency 'rubyzip', '>= 2.3', '< 4.0'
 
   spec.add_dependency 'epubcheck-ruby', '>= 4.0', '< 6.0', '!= 5.2.0.0'
 
